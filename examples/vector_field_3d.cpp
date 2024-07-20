@@ -29,7 +29,8 @@
   @endparblock
  @filedetails   
 
-  This example illustrates 
+  This example illustrates how to uniformly sample a vector field.  Just for fun we have also produced a solution to the Lorenz system, and directly
+  stored it with a MR_cell_cplx.
 */
 /*******************************************************************************************************************************************************.H.E.**/
 
