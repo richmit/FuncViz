@@ -2,7 +2,7 @@
 # ######################################################################################################################################################.H.S.##
 # FILE:        readme.org
 #+TITLE:       Rectilinear Trees
-#+SUBTITLE:    Generalizing quadtrees & octtrees
+#+SUBTITLE:    Generalizing quadtrees & octrees
 #+AUTHOR:      Mitch Richling
 #+EMAIL:       http://www.mitchr.me/
 #+DATE:        2024-06-07
@@ -24,26 +24,39 @@
 #+HTML_HEAD: <style>.org-src-container>pre:before { display: block; position: absolute; background-color: #b3b3b3; top: 0; right: 0; padding: 0 0.2em 0 0.4em; border-bottom-left-radius: 8px; border: 0; color: white; font-size: 100%; font-family: Helvetica, sans-serif;}</style>
 #+HTML_HEAD: <style>pre.example { white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -o-pre-wrap; font-family: Lucida Console, monospace; font-size: 80%; background: #404040; color: white; display: block; padding: 0em; border: 2px solid black; }</style>
 #+HTML_HEAD: <style>blockquote { margin-bottom: 0.5em; padding: 0.5em; background-color: #FFF8DC; border-left: 2px solid #A5573E; border-left-color: rgb(255, 228, 102); display: block; margin-block-start: 1em; margin-block-end: 1em; margin-inline-start: 5em; margin-inline-end: 5em; } </style>
-# #+HTML_LINK_HOME: https://www.mitchr.me/
-# #+HTML_LINK_UP: https://www.mitchr.me/FIXME
+#+HTML_LINK_HOME: https://www.mitchr.me/
+#+HTML_LINK_UP: https://github.com/richmit/MRPTree/
 # ######################################################################################################################################################.H.E.##
 
+#+ATTR_HTML: :border 2 solid #ccc :frame hsides :align center
+|          <r> | <l>                                          |
+|    *Author:* | /{{{author}}}/                               |
+|   *Updated:* | /{{{modification-time(%Y-%m-%d %H:%M:%S)}}}/ |
+| *Generated:* | /{{{time(%Y-%m-%d %H:%M:%S)}}}/              |
+#+ATTR_HTML: :align center
+Copyright \copy {{{time(%Y)}}} Mitch Richling. All rights reserved.
+
+#+TOC: headlines 5
+
 * Introduction
+:PROPERTIES:
+:CUSTOM_ID: intro
+:END:
 
 A quadtree is a nested 2D multi-resolution rectangular mesh.  We start with a rectangular region of $\mathbb{R}^2$ and split it up into sub-rectangles.  We
 then continue the process with each of these new rectangles.  An octtree is the obvious generalization of the quadtree to 3D -- start with a cube, and
 recursively break it up into sub-cubes.  The recursive structure of these structures makes them a a natural fit with tree data structures.
 
-It's a simple exercise to mathematically generalize quadtrees and octtrees to $2^n\mathrm{-trees}$; however, generalizing computer codes to impliment these
-generalizations is no trivial task.  Most usefull operations on $2^n\mathrm{-trees}$ are inherently driven by the geometry of the mesh.  This introduces
-difficult algorithmic problems because of the diffucltiy of translateing these geometric problems into tree manipulation.  In this library we overcome these
-difficluties by dispensing with the tree data structure entirely.
+It's a simple exercise to mathematically generalize quadtrees and octrees to $2^n\mathrm{-trees}$; however, generalizing computer codes to implement these
+generalizations is no trivial task.  Most useful operations on $2^n\mathrm{-trees}$ are inherently driven by the geometry of the mesh.  This introduces
+difficult algorithmic problems because of the difficulty of translating these geometric problems into tree manipulation.  In this library we overcome these
+difficulties by dispensing with the tree data structure entirely.
 
-The key innovation at the heart of this new data structure is an enumeration scheme uniquely identifing both mesh cells and vertex points via an integer
+The key innovation at the heart of this new data structure is an enumeration scheme uniquely identifying both mesh cells and vertex points via an integer
 intimately related to the geometric structure of the grid. The close relationship between these integers and the grid geometry dramatically simplifies
-generalizeing the quadtree concept to arbitrary dimensions.  In order to define this enummeration we must make two simplifying assumptions about our trees:
+generalizing the quadtree concept to arbitrary dimensions.  In order to define this enumeration we must make two simplifying assumptions about our trees:
 
-  * Our trees require a strictly regular refinement stratigy.  i.e. We always refine a cell of a $2^n\mathrm{-tree}$ into $n$ parts.  
+  * Our trees require a strictly regular refinement strategy.  i.e. We always refine a cell of a $2^n\mathrm{-tree}$ into $n$ parts.  
 
   * We must choose a maximum refinement depth (we call this the tree's MESH-POWER and denote it by $P$).
 
@@ -56,11 +69,11 @@ points with integers like this:
 
 [[file:fig-1Dfam-01.pdf][file:fig-1Dfam-01.png]]
 
-We start a tree with one quad (a line sgement in this case) over the entire domain.
+We start a tree with one quad (a line segment in this case) over the entire domain.
 
 [[file:fig-1Dfam-02.pdf][file:fig-1Dfam-02.png]]
 
-Now we refine the right inteveral:
+Now we refine the right interval:
 
 [[file:fig-1Dfam-03.pdf][file:fig-1Dfam-04.png]]
 
@@ -72,7 +85,7 @@ Finally we refine the right side of the interval we just refined:
 
 [[file:fig-1Dfam-06.pdf][file:fig-1Dfam-06.png]]
 
-For refrence, this set of nested intervals might be stored in a tree data structure liek so:
+For reference, this set of nested intervals might be stored in a tree data structure like so:
 
 [[file:fig-1Dfam-07.pdf][file:fig-1Dfam-07.png]]
 
@@ -101,9 +114,10 @@ data structure choice is hashable in our language of choice.
 [[file:fig-2Dfam.pdf][file:fig-2Dfam.png]]
 
 
-** The Details
-
-*** Notation
+* Integer Coordinates: Notation & Basic Observations
+:PROPERTIES:
+:CUSTOM_ID: int_coords
+:END:
 
  * $P$ -- The mesh power of the rectilinear tree
 
@@ -112,15 +126,15 @@ data structure choice is hashable in our language of choice.
  * $\mathbb{Z}_{k}$ -- Non-negative (unsigned) integers less than $k$.
    $$\mathbb{Z}_{k} = \left\{ i\in\mathbb{Z} \,\vert\, 0\le i\lt k \right\}$$ 
 
- * $\mathcal{L}=\mathbb{Z}_{2^P+1}^D$ -- The $D$ dimensional integer latice where integer coordinates are defined. \\
+ * $\mathcal{L}=\mathbb{Z}_{2^P+1}^D$ -- The $D$ dimensional integer lattice where integer coordinates are defined. \\
    As usual, the power set of $\mathcal{L}$ is written $2^\mathcal{L}$. \\
    We use $\vec{\mathbf{n}}=[n_1, ..., n_D]\in\mathcal{L}$ for general elements of $\mathcal{L}$. When $D=1$, we use $n$ instead of $\vec{\mathbf{n}}$.
 
- * $\mathcal{C}\subset\mathcal{L}$ -- The subset $\mathcal{L}$ coorispnoding to coordinates that can be used as a cell center. \\
+ * $\mathcal{C}\subset\mathcal{L}$ -- The subset $\mathcal{L}$ corresponding to coordinates that can be used as a cell center. \\
    As usual, the power set of $\mathcal{C}$ is written $2^\mathcal{C}$. \\
    We use $\vec{\mathbf{c}}=[c_1, ..., c_D]\in\mathcal{C}$ -- for general elements of $\mathcal{C}$.  When $D=1$, we use $c$. \\
-   The set of cells and cell centers are in 1-1 coorispondance, and thus we use the cell centers to identify cells.  \\
-   As such, when we speak of a "set of cells", we are actually refering to a set of "cell centers" (integer coordinate tuples).
+   The set of cells and cell centers are in 1-1 correspondence, and thus we use the cell centers to identify cells.  \\
+   As such, when we speak of a "set of cells", we are actually referring to a set of "cell centers" (integer coordinate tuples).
 
  * $L(\vec{\mathbf{c}}) : \mathcal{C} \rightarrow \mathbb{Z}_P$ -- Level of cell $\vec{\mathbf{c}}$
    $$L(\vec{\mathbf{c}}) = (P-1)-\mathrm{ctz}(c_1)$$
@@ -168,7 +182,7 @@ data structure choice is hashable in our language of choice.
  * $\hat{R}(K) : 2^\mathcal{L} \rightarrow \mathcal{L}$ & $\check{R}(K) : 2^\mathcal{L} \rightarrow \mathcal{L}$ -- Upper, and lower, bounding rectangle coordinates for a set of coordinates $K$ \\
    $$\hat{R}(K)   = [\max_{n\in K}(n_1), \max_{n\in K}(n_2), ..., \max_{n\in K}(n_D)] $$
    $$\check{R}(K) = [\min_{n\in K}(n_1), \min_{n\in K}(n_2), ..., \min_{n\in K}(n_D)] $$
-   Both $\hat{R}(K)$ & $\check{R}(K)$ are vectors, and subscripts refere to compoents. Ex: $\hat{R}_i(K)$
+   Both $\hat{R}(K)$ & $\check{R}(K)$ are vectors, and subscripts refer to components. Ex: $\hat{R}_i(K)$
 
  * $B(\vec{\mathbf{c}}, d) : \mathcal{C}\times\mathbb{Z}_P \rightarrow 2^\mathcal{L}$ -- Boundary Vertexes of $V(\vec{\mathbf{c}})$.
    $$B(\vec{\mathbf{c}}, d) = \{ \vec{\mathbf{c}'}\in V(\vec{\mathbf{c}}, d)\,\,\vert\,\,\exists i\in\mathbb{Z}_{P+1} \mathrm{with}\, \vec{\mathbf{c}'}_i=\hat{R}_i(K)\, \mathrm{or}\, \vec{\mathbf{c}'}_i=\check{R}_i(K) \}  $$
@@ -188,7 +202,10 @@ data structure choice is hashable in our language of choice.
 
    [[file:fig-cell-coords.pdf][file:fig-cell-coords.png]]
 
-*** Set enumeration
+* Enumerating Integer Coordinate Sets
+:PROPERTIES:
+:CUSTOM_ID: enum_int_coords
+:END:
 
 Here we use the word /enumeration/ from the field of computer science where it refers to the ability to traverse a data structure in a specific order.  Many
 of the functions defined in the previous sections have a range of $2^\mathcal{L}$ or $2^\mathcal{C}$, and as a practical matter it is advantageous to place an
@@ -197,26 +214,51 @@ unambiguous order on these sets.
 When enumerating these sets we use the lexicographic ordering, and we use subscripts to denote the elements.  For example:
 $$E(\vec{\mathbf{c}})= \{ E_0(\vec{\mathbf{c}}), E_1(\vec{\mathbf{c}}), , ..., E_{2D}(\vec{\mathbf{c}}) \} $$
 
-*** Integer coordinates and real coordinates
+* Real Coordinates
+:PROPERTIES:
+:CUSTOM_ID: det_real_coord
+:END:
 
- * $\hat{X}$ & $\check{X}$ -- Upper, and lower, bounding rectangle /points/ in $\mathbb{R}^D$
+ * $\mathcal{F}=\mathbb{R}^D$ -- The real domain vector space within which cells are defined
 
- * $X(\vec{\mathbf{n}})$ -- The $\vec{\mathbf{x}}$ value associated to the index in the domain space of the function
+ * $\hat{X}$ & $\check{X} \in \mathcal{F}$ -- Upper, and lower, /points/ defining the rectangle within which our cells are defined
 
-#+begin_src text
-MORE TO COME.  MORE TO COME.  MORE TO COME.  MORE TO COME.  MORE TO COME.  MORE TO COME.  MORE TO COME.  
-#+end_src
+ * $\mathcal{D}=\{x\in\mathcal{F}|\check{X}_i\le x_i\le\hat{X}_i\}$ -- The real domain rectangle within which cells are defined
 
-** Triangulating Quads
+ * $\Delta_D = \hat{X}-\check{X} \in\mathbb{R}^D$ -- The overall width of the domain in each dimension.
 
-Quads are triangulated such that:
+ * $\Delta_X = \frac{\Delta_D}{2^P} \in\mathbb{R}^D$ -- The distance between closest grid points
+
+ * $X(\vec{\mathbf{n}}) : \mathcal{L} \rightarrow \mathcal{D} \subset \mathcal{F}$ -- The $\vec{\mathbf{x}}$ value associated to the index in the domain space of the function
+
+   $$X(\vec{\mathbf{n}}) = \check{X} + \Delta_X * \vec{\mathbf{n}} $$
+   Where $*$ is vector pairwise multiplication: if $c=a*b$, then $c_i=a_i\cdot b_i$.
+
+* Cell Tessellation
+:PROPERTIES:
+:CUSTOM_ID: tessellation
+:END:
+
+By tessellation we mean partitioning of both the domain and range spaces for the tree into useful parts.  
+
+Of course the leaf cells themselves form a tessellation of the domain space, and this tessellation imposes a tessellation upon the range space.  If the cells
+of the imposed tessellation are rectilinear, then using the cells directly is frequently the best approach.  In some applications the cells in the range space
+are not truly "rectangular".  For example, if we map 2D square cells of the domain into "quads" in the range via a parametric function, then the cells in the
+range space are frequently not even quadrilaterals.  In such cases using the cells directly may lead to unsatisfactory results unless the tree is perfectly
+balanced.  In this case we may archive better results by tessellation into triangle'ish parts.
+
+What follows is a description of how to deal with 2D domains; however, the generalization to other dimensions is trivial.  For example, with a three
+dimensional domain we simply have pyramids extending from the center point to the sides instead of triangles.  For a 1D domain, we have line segments
+extending from the cell centers.
+
+We triangulate 2D cells such that:
 
   * Every triangle has precisely one vertex at the center of the quad
   * Every triangle has precisely two vertices in the boundary of the quad
   * Every quad boundary point is a vertex of two triangles
   * Triangles only overlap on edges and vertices
   * A triangle vertex is a vertex of every triangle containing it
-  * No triangles are degenerate (area zero or three collinear vertexes)
+  * No triangles are degenerate (area zero or three co-linear vertexes)
 
 If all quads are the same size, we say the tree is balanced level 0 (i.e. the depth of all neighboring quads are equal).  This situation is illustrated below:
 
@@ -232,8 +274,3 @@ are frequently called "fans" in this case.  Here is a level 3 example:
 
 [[file:fig-2Dtri3.pdf][file:fig-2Dtri3.png]]
 
-* Software interface
-
-#+begin_src text
-MORE TO COME.  MORE TO COME.  MORE TO COME.  MORE TO COME.  MORE TO COME.  MORE TO COME.  MORE TO COME.  
-#+end_src
