@@ -531,7 +531,7 @@ namespace mjr {
       bool geomr_seg_tri_intersection(pnt_t tp1, pnt_t tp2, pnt_t tp3, pnt_t sp1, pnt_t sp2) const {
         //  MJR TODO NOTE <2024-07-11T16:08:16-0500> geomr_seg_tri_intersection: implement
         //  MJR TODO NOTE <2024-07-11T16:08:27-0500> geomr_seg_tri_intersection: Should this be a bool or an enum?
-        return false;
+        return (tp1[0]+tp2[0]+tp3[0]+sp1[0]+sp2[0]>1.0);
       }
       //@}
 

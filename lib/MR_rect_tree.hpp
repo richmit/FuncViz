@@ -1091,7 +1091,7 @@ namespace mjr {
           @param level_delta The Level.
           @param func        Function to sample */
       int refine_leaves_once_if_unbalanced(int level_delta, std::function<rrpt_t(drpt_t)> func) {
-        return refine_leaves_once_if_cell_pred(ccc_get_top_cell(), -1, func, std::bind_front(cell_is_unbalanced, this, level_delta));
+        return refine_leaves_once_if_cell_pred(ccc_get_top_cell(), -1, func, std::bind_front(&cell_is_unbalanced, this, level_delta));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Balance the cell to the given level.
@@ -1101,7 +1101,7 @@ namespace mjr {
           @param level_delta  The Level.
           @param func         Function to sample */
       void balance_tree(int level_delta, std::function<rrpt_t(drpt_t)> func) {
-        refine_leaves_atomically_if_cell_pred(ccc_get_top_cell(), -1, func, std::bind_front(cell_is_unbalanced, this, level_delta));
+        refine_leaves_atomically_if_cell_pred(ccc_get_top_cell(), -1, func, std::bind_front(&cell_is_unbalanced, this, level_delta));
       }
       //@}
 
