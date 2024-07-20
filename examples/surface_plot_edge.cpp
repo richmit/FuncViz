@@ -1,0 +1,107 @@
+// -*- Mode:C++; Coding:us-ascii-unix; fill-column:158 -*-
+/*******************************************************************************************************************************************************.H.S.**/
+/**
+ @file      surface_plot_edge.cpp
+ @author    Mitch Richling http://www.mitchr.me/
+ @date      2024-07-16
+ @std       C++23
+ @copyright 
+  @parblock
+  Copyright (c) 2024, Mitchell Jay Richling <http://www.mitchr.me/> All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+  1. Redistributions of source code must retain the above copyright notice, this list of conditions, and the following disclaimer.
+
+  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions, and the following disclaimer in the documentation
+     and/or other materials provided with the distribution.
+
+  3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software
+     without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+  OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+  DAMAGE.
+  @endparblock
+ @filedetails   
+
+  Surface plots are frequently complicated by regions upon which the function singular -- or not real.  These functions often behave quite poorly on the
+  boundaries of such regions.  In the case of the humble half, unit sphere we have a function not defined outside the unit circle who's derivative approaches
+  infinity near the unit circle.  
+
+  Right now this example illustrates two things:
+    - How to drive up the sample rate near NaNs.
+    - How to add a strip to the edge of the NaN region to "seal up" triangles.
+  In the future, after I implement the NaN edge solver in MR_rt_to_cc, I'll add:
+    - How repair triangles containing NaNs.
+*/
+/*******************************************************************************************************************************************************.H.E.**/
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include "MR_rect_tree.hpp"
+#include "MR_cell_cplx.hpp"
+#include "MR_rt_to_cc.hpp"
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+double halfSphere2(std::array<double, 2> xvec) {
+  double m = xvec[0] * xvec[0] + xvec[1] * xvec[1];
+  if (m > 1) {
+    if (m < 1.02) // This small strip provides a landing for very small triangles that cross over the NaN region boundary.
+      return 0;
+    else
+      return std::numeric_limits<double>::quiet_NaN();
+  } else {
+    return std::sqrt(1-m);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+typedef mjr::tree15b2d1rT            tt_t;
+typedef mjr::MRccT5                  cc_t;
+typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int main() {
+  tt_t tree({-1.2, -1.2}, 
+            { 1.2,  1.2});
+  cc_t ccplx;
+  tc_t treeConverter;
+
+  // Sample a uniform grid across teh domain
+  tree.refine_grid(4, halfSphere2);
+
+  /* halfSphere2 produces NaNs outside the unit circle.  
+     We can refine cells that cross the unit circle using refine_recursive_if_cell_vertex_is_nan */
+  tree.refine_recursive_if_cell_vertex_is_nan(8, halfSphere2);
+
+  /* halfSphere2 produces NaNs outside the unit circle.  
+     We can refine cells that cross the unit circle using refine_leaves_recursive_cell_pred & cell_vertex_is_nan.
+     The result is the same as the call to refine_recursive_if_cell_vertex_is_nan above. */
+  // tree.refine_leaves_recursive_cell_pred(6, halfSphere2, [&tree](int i) { return (tree.cell_vertex_is_nan(i)); });
+
+  /* Note: Instead of looking for NaNs, we could have used a SDF to simply tell the tree to sample anything that crosses
+     the unit circle.  This is the technique used in MR_rect_tree_test_surf_corner.cpp. */
+
+  // Balance the three to the traditional level of 1 (no cell borders a cell more than half it's size)
+  tree.balance_tree(1, halfSphere2);
+
+  tree.dump_tree(20);
+
+  treeConverter.construct_geometry(ccplx,
+                                   tree,
+                                   tc_t::cell_structure_t::FANS, 
+                                   2,
+                                   { "points", 
+                                     tc_t::tree_val_src_t::DOMAIN, 0, 
+                                     tc_t::tree_val_src_t::DOMAIN, 1,
+                                     tc_t::tree_val_src_t::RANGE,  0},
+                                   {{ "x",      tc_t::tree_val_src_t::DOMAIN, 0},
+                                    { "y",      tc_t::tree_val_src_t::DOMAIN, 1},
+                                    { "f(x,y)", tc_t::tree_val_src_t::RANGE,  0}},
+                                   {});
+
+  ccplx.write_xml_vtk("surface_plot_edge.vtu", "surface_plot_edge");
+}
