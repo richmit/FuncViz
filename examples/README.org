@@ -1,0 +1,55 @@
+
+This directory contains various examples.
+
+* Step 1: Setup Build Tree
+
+From the root of the =git= repository, create a =build= directory and change into it.
+
+#+begin_src sh
+     mkdir build
+     cd build
+#+end_src
+
+* Step 2: Create Build Files
+
+** For Windows MSYS2 Using CLANG:
+   
+#+begin_src sh
+     cmake -G "MSYS Makefiles" -DCMAKE_CXX_COMPILER=clang++ ..
+#+end_src
+   
+** For Windows MSYS2 Using GCC:
+   
+#+begin_src sh
+     cmake -G "MSYS Makefiles" -DCMAKE_CXX_COMPILER=g++.exe ..
+#+end_src
+
+** For Windows Using Microsoft Visual C++:
+
+#+begin_src sh
+     cmake -G "Visual Studio 17 2022" ..
+#+end_src
+
+** For Linux/UNIX Using GCC:
+
+#+begin_src sh
+     cmake -G "MSYS Makefiles" -DCMAKE_CXX_COMPILER='g++' ..
+#+end_src
+
+** For Linux/UNIX Using CLANG:
+
+#+begin_src sh
+     cmake -G "MSYS Makefiles" -DCMAKE_CXX_COMPILER='clang++' ..
+#+end_src
+
+* Step 3: Build
+
+   Now start up your IDE or run your build tool.  For MSYS2 &
+   Linux/UNIX that will be =make=.  For =MSVC= that would be Visual
+   Studio.
+
+* EOF
+
+Have fun!!
+
+-mitch

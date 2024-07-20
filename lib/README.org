@@ -1,0 +1,10 @@
+
+This directory contains the libraries:
+
+ - The =MRPTree= library: =lib/MR_cell_cplx.hpp=
+ - An unstructured cell-complex library: =lib/MR_cell_cplx.hpp=)
+ - Tree tessellation library: =lib/MR_rt_to_cc.hpp=)
+
+Have fun!!
+
+-mitch
