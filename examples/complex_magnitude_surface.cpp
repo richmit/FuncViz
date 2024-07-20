@@ -36,9 +36,11 @@
    - Sample near level curves
    - Sample based on a data value -- not part of the geometry
    - Sample near domain axis
-   - Directly attach colors to geometric points (TBD)
+   - Directly attach colors to geometric points
    - Do rough clipping with high sampling and cell filtering
 
+  References:
+    Richardson (1991); Visualizing quantum scattering on the CM-2 supercomputer; Computer Physics Communications 63; pp 84-94"
 */
 /*******************************************************************************************************************************************************.H.E.**/
 
@@ -48,27 +50,34 @@
 #include "MR_rt_to_cc.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-std::array<double, 6> cpf(std::array<double, 2> xvec) {
-  //  MJR TODO NOTE cpf: Add coloring data to this function, and out the color data.
+std::array<double, 9> cpf(std::array<double, 2> xvec) {
   std::complex<double> z(xvec[0], xvec[1]);
-  double z_abs, z_arg, f_re, f_im, f_abs, f_arg;
+  double z_abs, z_arg, f_re, f_im, f_abs, f_arg, red, green, blue;
+
+  z_abs = std::abs(z);
+  z_arg = std::arg(z);
+
   if ( (std::abs(z-1.0) > 1.0e-5) && (std::abs(z+1.0) > 1.0e-5) ) {
-    std::complex<double> f = 1.0/(z+1.0) + 1.0/(z-1.0);
-    z_abs = std::abs(z);
-    z_arg = std::arg(z);
-    f_re  = std::real(f);
-    f_im  = std::imag(f);
-    f_abs = std::abs(f);
-    f_arg = std::arg(f);
+    std::complex<double> f;
+    double f_abs2, f_re_scl, f_im_scl, f_abs2p1, ofs;
+    f        = 1.0/(z+1.0) + 1.0/(z-1.0);
+    f_re     = std::real(f);
+    f_im     = std::imag(f);
+    f_abs    = std::abs(f);
+    f_arg    = std::arg(f);
+    f_abs2   = f_abs * f_abs;
+    f_re_scl = f_re / std::sqrt(30.0/5.0);
+    f_im_scl = f_im / std::sqrt(2.0);
+    f_abs2p1 = 1 + f_abs2;
+    ofs      = (f_abs<1 ? -1.0 : 1.0) * (0.5 - f_abs/f_abs2p1);
+    red      = ofs + (0.5 + (std::sqrt(2.0/3.0) * f_re) / f_abs2p1);
+    green    = ofs + (0.5 - (f_re_scl - f_im_scl)       / f_abs2p1);
+    blue     = ofs + (0.5 - (f_re_scl + f_im_scl)       / f_abs2p1);
   } else {
-    z_abs = std::numeric_limits<double>::quiet_NaN();
-    z_arg = std::numeric_limits<double>::quiet_NaN();
-    f_re  = std::numeric_limits<double>::quiet_NaN();
-    f_im  = std::numeric_limits<double>::quiet_NaN();
-    f_abs = std::numeric_limits<double>::quiet_NaN();
-    f_arg = std::numeric_limits<double>::quiet_NaN();
+    f_re = f_im = f_abs = f_arg = red = green = blue = std::numeric_limits<double>::quiet_NaN();
   }
-  return {z_abs, z_arg, f_re, f_im, f_abs, f_arg};
+
+  return {z_abs, z_arg, f_re, f_im, f_abs, f_arg, red, green, blue};
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,8 +94,8 @@ double cpfd(std::array<double, 2> xvec) {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef mjr::tree15b2d6rT          tt_t;
-typedef mjr::MRccT5                cc_t;
+typedef mjr::tree15b2d9rT            tt_t;
+typedef mjr::MRccT5                  cc_t;
 typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,12 +188,19 @@ int main() {
                                                  { "Im(f(z))",  tc_t::tree_val_src_t::RANGE,  3},
                                                  { "abs(f(z))", tc_t::tree_val_src_t::RANGE,  4},
                                                  { "arg(f(z))", tc_t::tree_val_src_t::RANGE,  5}},
-                                                {});
+                                                {{"COLORS",
+                                                  tc_t::tree_val_src_t::RANGE, 6,
+                                                  tc_t::tree_val_src_t::RANGE, 7,
+                                                  tc_t::tree_val_src_t::RANGE, 8}});
   std::cout << "TC Return: " << tcret << std::endl;
 
   ccplx.dump_cplx(5);
 
-  ccplx.write_legacy_vtk("MR_rect_tree_test_cplx.vtk", "MR_rect_tree_test_cplx");
-  ccplx.write_xml_vtk(   "MR_rect_tree_test_cplx.vtu", "MR_rect_tree_test_cplx");
-  ccplx.write_ply(       "MR_rect_tree_test_cplx.ply", "MR_rect_tree_test_cplx");
+  ccplx.write_legacy_vtk("complex_magnitude_surface.vtk", "complex_magnitude_surface");
+  ccplx.write_xml_vtk(   "complex_magnitude_surface.vtu", "complex_magnitude_surface");
+  ccplx.write_ply(       "complex_magnitude_surface.ply", "complex_magnitude_surface");
 }
+
+
+
+
