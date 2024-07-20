@@ -44,7 +44,7 @@ set(TARGETS_EXAMPLE "MR_cell_cplx_test_mpl" "MR_cell_cplx_test_wedge"
                     "MR_rect_tree_test_surf_edge" 
                     "MR_rect_tree_test_surf_corner"
                     "MR_rect_tree_test_flat1"
-                    "MR_rect_tree_test_cplx"
+                    "complex_magnitude_surface"
                   )
 set(TARGETS_TEST "check_cell_hexahedron" "check_cell_pyramid" "check_cell_quad" "check_cell_triangle" "check_cell_segment"
                  "geomi_seg_isect_type" 
