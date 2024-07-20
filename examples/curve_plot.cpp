@@ -28,8 +28,9 @@
   @endparblock
  @filedetails   
 
-  Univariate function plots are bread-and-butter of the plotting world.  Normally a simple, uniformly spaced, sequence is enough to get the job done.
-  Still, a few things can come up:
+  Univariate function plots are the bread-and-butter of the plotting world.  Normally a simple, uniformly spaced, sequence is enough to get the job 
+  done quite nicely.  Still, a few things can come up:
+
    - Jump discontinuities & Vertical asymptotes: Resolved with higher sampling near the discontinuities and a cutting edge (TBD)
    - Isolated, non-differentiable points:  Resolved with higher sampling near the points and a folding edge (TBD)
    - Undefined intervals:  Resolved with higher sampling near the edges and NaN edge repair (TBD)
@@ -39,6 +40,7 @@
   Note that most of the items above are listed TBD.  A few features need to be added to MR_rt_to_cc. ;)  Note the TODO comments in the body of main().
 */
 /*******************************************************************************************************************************************************.H.E.**/
+/** @cond exj */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "MR_rect_tree.hpp"
@@ -114,3 +116,4 @@ int main() {
 
   ccplx.write_xml_vtk("curve_plot.vtu", "curve_plot");
 }
+/** @endcond */

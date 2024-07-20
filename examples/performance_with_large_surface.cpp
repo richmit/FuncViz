@@ -33,6 +33,7 @@
   render stripes on the surface.
 */
 /*******************************************************************************************************************************************************.H.E.**/
+/** @cond exj */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "MR_rect_tree.hpp"
@@ -99,4 +100,4 @@ int main() {
   std::cout << "write_vtk time ....... " << static_cast<std::chrono::duration<double>>(vtkWriteTime-vtkFanTime)     << " sec" << std::endl;
   std::cout << "Total Run Time ....... " << static_cast<std::chrono::duration<double>>(vtkWriteTime-startTime)      << " sec" << std::endl;
 }
-
+/** @endcond */

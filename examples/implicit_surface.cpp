@@ -30,9 +30,13 @@
  @filedetails   
 
   This example is very similar to implicit_curve_2d.cpp; however, instead of extracting a curve from a triangulation of a surface, this time we extract a
-  surface from a quad tessellation of a hexahedron.
+  surface from a quad tessellation of a hexahedron.  In addition to what we demonstrate with implicit_curve_2d.cpp, this example also demonstrates:
+
+   - How to use an SDF to identify cells that contain the level set
+   - How to export only a subset of cells 
 */
 /*******************************************************************************************************************************************************.H.E.**/
+/** @cond exj */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "MR_rect_tree.hpp"
@@ -67,12 +71,10 @@ int main() {
 
   tree.dump_tree(5);
 
-  /* Convert our tree to a cell complex.  Note that we could just export the cells from the tree that contain a bit of our surface by using the version of
-     construct_geometry that takes a cell list.  That third argument would look something like this:
-         tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, isf)); }) 
-  */
+  /* Convert our tree to a cell complex.  Note that we use an SDF to export only cells that contain our surface */
   treeConverter.construct_geometry(ccplx,
                                    tree,
+                                   tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, isf)); }),
                                    tc_t::cell_structure_t::RECTANGLES, 
                                    3,
                                    { "points", 
@@ -91,3 +93,4 @@ int main() {
   /* Write out our cell complex */
   ccplx.write_xml_vtk("implicit_surface.vtu", "implicit_surface");
 }
+/** @endcond */

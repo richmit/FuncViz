@@ -29,12 +29,27 @@
   @endparblock
  @filedetails   
 
-  Many visualization tools can extract a "level set" from a triangulation.  In this example we extract a curve from a function of two variables -- usually
-  called an "implicit curve".  The trick to obtaining high quality results is to make sure the triangulation has a high enough resolution.  The naive way, and
-  the way it's normally done, is to simply sample uniformly across a grid the curve is expected to be inside.  A better way is to detect where the curve is,
-  and to sample at higher resolution near the curve.
+  For many of us our first exposure to an implicit curve was the unit circle in high school algebra, @f$x^2+y^2=1@f$, where we were ask to graph @f$y@f$ with
+  respect to @f$x@f$ only to discover that @f$y@f$ didn't appear to be a function of @f$x@f$ because @f$y@f$ had TWO values for some values of @f$x@f$!  But
+  we soon discovered that a great many interesting curves could be defined this way, and that we could represent them all by thinking of the equations as a
+  functions of two variables and the curves as sets of zeros.  That is to say, we can always write an implicit equation in two variables in the form
+  @f$F(x,y)=0@f$, and think of the implicit curve as the set of roots, or zeros, of the function @f$F@f$.  We can then generalize this
+  idea to "level sets" as solutions to @f$F(x,y)=L@f$ -- i.e. the set of points where the function is equal to some "level" @f$L@f$.
+
+  Many visualization tools can extract a "level set" from a mesh.  For 2D meshes (surfaces), the level sets are frequently 1D sets (curves). The trick to
+  obtaining high quality results is to make sure the triangulation has a high enough resolution.  Of course we could simply sample the 2D grid uniformly
+  with a very fine mesh.  A better way is to detect where the curve is, and to sample at higher resolution near the curve.
+
+  Currently we demonstrate a couple ways to refine the mesh near the curve:
+   - Using cell_cross_range_level() to find cells that cross a particular level (zero in this case)
+   - Using cell_cross_sdf() instead -- which generally works just like cell_cross_range_level() with a level of zero.
+
+  Today we extract the curve with Paraview, but I hope to extend MR_rt_to_cc to extract level sets in the future:
+   - Extract "standard" midpoint level sets (TBD)
+   - Solve for accurate edge/function level intersections, and construct high quality level sets. (TBD)
 */
 /*******************************************************************************************************************************************************.H.E.**/
+/** @cond exj */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "MR_rect_tree.hpp"
@@ -93,4 +108,4 @@ int main() {
 
   ccplx.write_xml_vtk("implicit_curve_2d.vtu", "implicit_curve_2d");
 }
-
+/** @endcond */

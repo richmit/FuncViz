@@ -29,21 +29,19 @@
   @endparblock
  @filedetails   
 
-  This example demonstrates several things
-   - Surface normals
-     - How to compute a surface gradient for a function plot
-     - How to unitize the gradient into a surface normal
-     - How to add the normal to the sample data stored by a MRPTree
-   - Signed Distance Functions
-     - How to create a simple SDF function
-     - How to use an SDF to increase sampling on the SDF boundary
+  Surface normals may be used by many visualization tools to render smoother results.  In this example we demonstrate:
+
+   - How to compute a surface gradient for a function plot
+   - How to unitize the gradient into a surface normal
+   - How to add the normal to the sample data stored by a MRPTree
+   - How to include normals in the cell complex
+   - How to increase sampling with a SDF function
+   - How to increase sampling near humps by testing derivatives
    - How to balance a tree
-   - Tree conversion into geometry
-     - How to convert a tree of sample data into a cell complex
-     - How to check the result of treeConverter
    - How to dump a cell complex into various file types
 */
 /*******************************************************************************************************************************************************.H.E.**/
+/** @cond exj */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "MR_rect_tree.hpp"
@@ -94,14 +92,18 @@ int main() {
   // Make a few samples on a uniform grid
   tree.refine_grid(2, dampCosWave2);
 
-  // Sample more on the humps (we could have done this with a derivative test, but this is a good example of how to use an SDF)
-  for(double i: {0, 1, 2, 3}) {
-    double r = i*std::numbers::pi/4;
-    tree.refine_leaves_recursive_cell_pred(7, dampCosWave2, [&tree, r](int i) { return (tree.cell_cross_sdf(i, std::bind_front(circleSDF2, r))); });
-  }
+  // The humps need extra samples.  We know where they are, and we could sample on them with an SDF like this:
+  // for(double i: {0, 1, 2, 3}) {
+  //   double r = i*std::numbers::pi/4;
+  //   tree.refine_leaves_recursive_cell_pred(7, dampCosWave2, [&tree, r](int i) { return (tree.cell_cross_sdf(i, std::bind_front(circleSDF2, r))); });
+  // }
+
+  // Alternately, we can test the derivative values to identify the humps
+  tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 1, 0.0); });
+  tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 2, 0.0); });
 
   // Balance the three to the traditional level of 1 (no  cell borders a cell more than half it's size)
-  // tree.balance_tree(1, dampCosWave2);
+  tree.balance_tree(1, dampCosWave2);
 
   tree.dump_tree(5);
 
@@ -128,3 +130,4 @@ int main() {
   ccplx.write_xml_vtk(   "surface_with_normals.vtu", "surface_with_normals");
   ccplx.write_ply(       "surface_with_normals.ply", "surface_with_normals");
 }
+/** @endcond */

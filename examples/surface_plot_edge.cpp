@@ -28,17 +28,21 @@
   @endparblock
  @filedetails   
 
-  Surface plots are frequently complicated by regions upon which the function singular -- or not real.  These functions often behave quite poorly on the
-  boundaries of such regions.  In the case of the humble half, unit sphere we have a function not defined outside the unit circle who's derivative approaches
-  infinity near the unit circle.  
+  Surface plots are frequently complicated by regions upon which the function singular or undefined.  These functions often behave quite poorly on the
+  boundaries of such regions.  For this example we consider @f$f(x, y)=\sqrt{1-x^2-y^2}@f$ -- the upper half of the unit sphere.  Outside the unit circle this
+  function is complex.  As we approach the unit circle from the center, the derivative approaches infinity.
 
   Right now this example illustrates two things:
+
     - How to drive up the sample rate near NaNs.
     - How to add a strip to the edge of the NaN region to "seal up" triangles.
+
   In the future, after I implement the NaN edge solver in MR_rt_to_cc, I'll add:
-    - How repair triangles containing NaNs.
+
+    - How to repair triangles containing NaNs.
 */
 /*******************************************************************************************************************************************************.H.E.**/
+/** @cond exj */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "MR_rect_tree.hpp"
@@ -105,3 +109,4 @@ int main() {
 
   ccplx.write_xml_vtk("surface_plot_edge.vtu", "surface_plot_edge");
 }
+/** @endcond */

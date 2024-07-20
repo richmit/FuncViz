@@ -29,20 +29,29 @@
   @endparblock
  @filedetails   
 
-  This example demonstrates several things
-   - Alternate ways to do an initial sample
-   - Sample near a point
+  One popular way to plot complex functions is to use a surface plot of @f$\vert f(z)\vert@f$ and color the surface with @f$\arg(f(z))@f$.  This way we can
+  simultaneously represent the magnitude and phase over the complex plain.  There are several ways to color the plots, and we will be following the method
+  described by Richardson in 1991.  In this example, we demonstrates several techniques:
+
+   - Alternate ways to do an initial sample (grid vs recursive)
+   - Sample near a point in the domain
    - Sample below a level in the range
    - Sample near level curves
-   - Sample based on a data value -- not part of the geometry
+   - Sample based on a data value that is *not* part of the geometry
    - Sample near domain axis
    - Directly attach colors to geometric points
-   - Do rough clipping with high sampling and cell filtering
+   - Do rough clipping with high sampling and cell filtering.  
+
+  Eventually we will also demonstrate:
+
+   - Clip with a clipping plain (TBD) -- requires new functionality in MR_rt_to_cc.
+   - Extract level curves (TBD) -- requires new functionality in MR_rt_to_cc.
 
   References:
     Richardson (1991); Visualizing quantum scattering on the CM-2 supercomputer; Computer Physics Communications 63; pp 84-94"
 */
 /*******************************************************************************************************************************************************.H.E.**/
+/** @cond exj */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "MR_rect_tree.hpp"
@@ -200,7 +209,4 @@ int main() {
   ccplx.write_xml_vtk(   "complex_magnitude_surface.vtu", "complex_magnitude_surface");
   ccplx.write_ply(       "complex_magnitude_surface.ply", "complex_magnitude_surface");
 }
-
-
-
-
+/** @endcond */
