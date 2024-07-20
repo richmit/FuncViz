@@ -266,7 +266,24 @@ namespace mjr {
             }
           }
         } else if (cell_structure == cell_structure_t::FANS) {
-          if (rtree.domain_dimension == 2) {
+          if (rtree.domain_dimension == 1) {
+
+
+std::cout << "HI HO" << std::endl;
+
+            for(auto& cell: cells) {
+              typename cc_t::pnt_idx_t ctr_pnti = add_point_and_data_from_tree(rtree, ccplx, cell, point_src, scalar_data_src_lst, vector_data_src_lst);
+              typename rt_t::diti_list_t corners = rtree.ccc_get_corners(cell);
+              typename cc_t::pnt_idx_t cn0_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[0], point_src, scalar_data_src_lst, vector_data_src_lst);
+              typename cc_t::pnt_idx_t cn1_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[1], point_src, scalar_data_src_lst, vector_data_src_lst);
+              ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {cn0_pnti, ctr_pnti}, output_dimension);
+              ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {ctr_pnti, cn1_pnti}, output_dimension);
+            }
+
+
+
+            
+          } else if (rtree.domain_dimension == 2) {
             for(auto& cell: cells) {
               typename cc_t::pnt_idx_t ctr_pnti = add_point_and_data_from_tree(rtree, ccplx, cell, point_src, scalar_data_src_lst, vector_data_src_lst);
               for(int i=0; i<2; i++) {

@@ -802,7 +802,7 @@ namespace mjr {
           @param diti Input integer tuple
           @return domain space value. */
       inline drta_t diti_to_drta(diti_t diti) const {
-        drpt_t rv;
+        drta_t rv;
         rv.fill(static_cast<src_t>(0.0));
         if constexpr (dom_dim == 1) {
           rv[0] = (bbox_min + bbox_delta * diti);
