@@ -60,8 +60,7 @@ namespace mjr {
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Geometric Structure */
-      enum class cell_structure_t { POINTS,       //!< Just points
-                                    RECTANGLES,   //!< hyper-rectangles made up of a cell's corners.
+      enum class cell_structure_t { RECTANGLES,   //!< hyper-rectangles made up of a cell's corners.
                                     FANS,         //!< hyper-triangles containing the center point and shared corner points of neighboring cells
                                   };
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -257,39 +256,47 @@ namespace mjr {
           return 1;
         }
         ccplx.clear();
-        if (cell_structure == cell_structure_t::POINTS) {
+        if (output_dimension == 0) {
           for(auto& cell: cells) {
-            typename rt_t::diti_list_t verts = rtree.ccc_get_vertexes(cell);
+            typename rt_t::diti_list_t verts = (cell_structure == cell_structure_t::FANS ? rtree.ccc_get_vertexes(cell) : rtree.ccc_get_corners(cell));
             for(auto& vert: verts) {
               typename cc_t::pnt_idx_t pnti = add_point_and_data_from_tree(rtree, ccplx, vert, point_src, scalar_data_src_lst, vector_data_src_lst);
               ccplx.add_cell(cc_t::cell_type_t::POINT, {pnti});
             }
           }
-        } else if (cell_structure == cell_structure_t::FANS) {
-          if (rtree.domain_dimension == 1) {
-
-
-            for(auto& cell: cells) {
-              typename cc_t::pnt_idx_t ctr_pnti = add_point_and_data_from_tree(rtree, ccplx, cell, point_src, scalar_data_src_lst, vector_data_src_lst);
-              typename rt_t::diti_list_t corners = rtree.ccc_get_corners(cell);
-              typename cc_t::pnt_idx_t cn0_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[0], point_src, scalar_data_src_lst, vector_data_src_lst);
-              typename cc_t::pnt_idx_t cn1_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[1], point_src, scalar_data_src_lst, vector_data_src_lst);
-              ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {cn0_pnti, ctr_pnti}, output_dimension);
-              ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {ctr_pnti, cn1_pnti}, output_dimension);
-            }
-
-
-
-            
-          } else if (rtree.domain_dimension == 2) {
-            for(auto& cell: cells) {
-              typename cc_t::pnt_idx_t ctr_pnti = add_point_and_data_from_tree(rtree, ccplx, cell, point_src, scalar_data_src_lst, vector_data_src_lst);
-              for(int i=0; i<2; i++) {
-                for(int j=-1; j<2; j+=2) {
-                  typename rt_t::diti_list_t nbrs = rtree.get_existing_neighbor(cell, i, j);
-                  if (nbrs.size() > 1) {
-                    for(auto n: nbrs) {
-                      typename rt_t::diti_list_t corners = rtree.ccc_get_corners(n, i, -j);
+        } else { // if(output_dimension > 0) {
+          if (rtree.domain_dimension == 3) {
+            std::cout << "ERROR: construct_geometry: output_dimension >3 not supported for output_dimension>0!" << std::endl;
+            return 1;
+          }
+          if (cell_structure == cell_structure_t::FANS) {
+            if (rtree.domain_dimension == 1) {
+              for(auto& cell: cells) {
+                typename cc_t::pnt_idx_t ctr_pnti = add_point_and_data_from_tree(rtree, ccplx, cell, point_src, scalar_data_src_lst, vector_data_src_lst);
+                typename rt_t::diti_list_t corners = rtree.ccc_get_corners(cell);
+                typename cc_t::pnt_idx_t cn0_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[0], point_src, scalar_data_src_lst, vector_data_src_lst);
+                typename cc_t::pnt_idx_t cn1_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[1], point_src, scalar_data_src_lst, vector_data_src_lst);
+                ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {cn0_pnti, ctr_pnti}, output_dimension);
+                ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {ctr_pnti, cn1_pnti}, output_dimension);
+              }
+            } else if (rtree.domain_dimension == 2) {
+              for(auto& cell: cells) {
+                typename cc_t::pnt_idx_t ctr_pnti = add_point_and_data_from_tree(rtree, ccplx, cell, point_src, scalar_data_src_lst, vector_data_src_lst);
+                for(int i=0; i<2; i++) {
+                  for(int j=-1; j<2; j+=2) {
+                    typename rt_t::diti_list_t nbrs = rtree.get_existing_neighbor(cell, i, j);
+                    if (nbrs.size() > 1) {
+                      for(auto n: nbrs) {
+                        typename rt_t::diti_list_t corners = rtree.ccc_get_corners(n, i, -j);
+                        typename cc_t::pnt_idx_t cn0_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[0], point_src, scalar_data_src_lst, vector_data_src_lst);
+                        typename cc_t::pnt_idx_t cn1_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[1], point_src, scalar_data_src_lst, vector_data_src_lst);
+                        if( ((i == 0) && (j == -1)) || ((i == 1) && (j == 1)) )
+                          ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cn1_pnti, cn0_pnti, ctr_pnti}, output_dimension);
+                        else
+                          ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cn0_pnti, cn1_pnti, ctr_pnti}, output_dimension);
+                      }
+                    } else {
+                      typename rt_t::diti_list_t corners = rtree.ccc_get_corners(cell, i, j);
                       typename cc_t::pnt_idx_t cn0_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[0], point_src, scalar_data_src_lst, vector_data_src_lst);
                       typename cc_t::pnt_idx_t cn1_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[1], point_src, scalar_data_src_lst, vector_data_src_lst);
                       if( ((i == 0) && (j == -1)) || ((i == 1) && (j == 1)) )
@@ -297,50 +304,39 @@ namespace mjr {
                       else
                         ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cn0_pnti, cn1_pnti, ctr_pnti}, output_dimension);
                     }
-                  } else {
-                    typename rt_t::diti_list_t corners = rtree.ccc_get_corners(cell, i, j);
-                    typename cc_t::pnt_idx_t cn0_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[0], point_src, scalar_data_src_lst, vector_data_src_lst);
-                    typename cc_t::pnt_idx_t cn1_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[1], point_src, scalar_data_src_lst, vector_data_src_lst);
-                    if( ((i == 0) && (j == -1)) || ((i == 1) && (j == 1)) )
-                      ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cn1_pnti, cn0_pnti, ctr_pnti}, output_dimension);
-                    else
-                      ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cn0_pnti, cn1_pnti, ctr_pnti}, output_dimension);
                   }
                 }
               }
-            }
-          } else { // (rtree.domain_dimension == 3) 
-            if (output_dimension == 3) {
-              //  MJR TODO NOTE construct_geometry: ADD CODE
-            } else if (output_dimension == 2) {
-              //  MJR TODO NOTE construct_geometry: ADD CODE
-            } else { // (output_dimension == 1)
-              //  MJR TODO NOTE construct_geometry: ADD CODE
-            }
-          }          
-        } else if (cell_structure == cell_structure_t::RECTANGLES) {
-          for(auto& cell: cells) {
-            std::vector<typename cc_t::pnt_idx_t> cnr_pti;
-            typename rt_t::diti_list_t corners = rtree.ccc_get_corners(cell);
-            for(auto& corner: corners) {
-              typename cc_t::pnt_idx_t pnti = add_point_and_data_from_tree(rtree, ccplx, corner, point_src, scalar_data_src_lst, vector_data_src_lst);
-              cnr_pti.push_back(pnti);
-            }
-            if (output_dimension == 0) {
-              for (auto p: cnr_pti) 
-                ccplx.add_cell(cc_t::cell_type_t::POINT, {p});
-            } else {
-              if (rtree.domain_dimension == 2) {
+            } else { // if (rtree.domain_dimension == 3) {
+              if (output_dimension == 3) {
+                //  MJR TODO NOTE construct_geometry: ADD CODE
+              } else if (output_dimension == 2) {
+                //  MJR TODO NOTE construct_geometry: ADD CODE
+              } else { // (output_dimension == 1)
+                //  MJR TODO NOTE construct_geometry: ADD CODE
+              }
+            }          
+          } else { // if (cell_structure == cell_structure_t::RECTANGLES) {
+            for(auto& cell: cells) {
+              std::vector<typename cc_t::pnt_idx_t> cnr_pti;
+              typename rt_t::diti_list_t corners = rtree.ccc_get_corners(cell);
+              for(auto& corner: corners) {
+                typename cc_t::pnt_idx_t pnti = add_point_and_data_from_tree(rtree, ccplx, corner, point_src, scalar_data_src_lst, vector_data_src_lst);
+                cnr_pti.push_back(pnti);
+              }
+              if (rtree.domain_dimension == 1) {
+                ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {cnr_pti[0], cnr_pti[1]}, output_dimension);
+              } else if (rtree.domain_dimension == 2) {
                 ccplx.add_cell(cc_t::cell_type_t::QUAD, {cnr_pti[0], cnr_pti[1], cnr_pti[3], cnr_pti[2]}, output_dimension);
-              } else { // (rtree.domain_dimension == 3) 
+              } else { // if(rtree.domain_dimension == 3) {
                 ccplx.add_cell(cc_t::cell_type_t::HEXAHEDRON, 
                                {cnr_pti[0], cnr_pti[1], cnr_pti[3], cnr_pti[2],
                                 cnr_pti[4], cnr_pti[5], cnr_pti[7], cnr_pti[6]},
                                output_dimension);
-              }
+              } 
             }
           }
-        } 
+        }
         return 0;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
