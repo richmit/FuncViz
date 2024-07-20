@@ -269,8 +269,6 @@ namespace mjr {
           if (rtree.domain_dimension == 1) {
 
 
-std::cout << "HI HO" << std::endl;
-
             for(auto& cell: cells) {
               typename cc_t::pnt_idx_t ctr_pnti = add_point_and_data_from_tree(rtree, ccplx, cell, point_src, scalar_data_src_lst, vector_data_src_lst);
               typename rt_t::diti_list_t corners = rtree.ccc_get_corners(cell);

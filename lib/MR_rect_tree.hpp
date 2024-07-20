@@ -1141,21 +1141,21 @@ namespace mjr {
           @param cell Input cell*/
       inline bool cell_good_samples(diti_t cell) const {
         diti_list_t verts = ccc_get_vertexes(cell);
-        return (std::all_of(verts.cbegin(), verts.cend(), [this](int i) { return (vertex_exists(i)); }));
+        return (std::all_of(verts.cbegin(), verts.cend(), [this](diti_t i) { return (vertex_exists(i)); }));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Test if a cell has a vertex with a NaN value for a sample 
           @param cell Input cell */
       inline bool cell_vertex_is_nan(diti_t cell) {
         diti_list_t verts = ccc_get_vertexes(cell);
-        return (std::any_of(verts.cbegin(), verts.cend(), [this](int i) { return (vertex_is_nan(i)); }));
+        return (std::any_of(verts.cbegin(), verts.cend(), [this](diti_t i) { return (vertex_is_nan(i)); }));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Test if a cell has an corner with a NaN value for a sample 
           @param cell Input cell */
       inline bool cell_corner_is_nan(diti_t cell) {
         diti_list_t corners = ccc_get_corners(cell);
-        return (std::any_of(corners.cbegin(), corners.cend(), [this](int i) { return (vertex_is_nan(i)); }));
+        return (std::any_of(corners.cbegin(), corners.cend(), [this](diti_t i) { return (vertex_is_nan(i)); }));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Test if a cell has children
