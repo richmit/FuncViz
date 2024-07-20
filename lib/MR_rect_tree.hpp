@@ -1249,7 +1249,8 @@ namespace mjr {
           @return true if the cell above the domain level. */
       inline bool cell_above_domain_level(diti_t cell, int domain_index, src_t domain_level, src_t epsilon) {
         return ((dom_at(diti_to_drpt(ccc_cell_get_corner_min(cell)), domain_index) > domain_level-epsilon));
-      }      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Test if a cell crosses the given range component value
           @warning Incorrect result if ALL vertexes of the cell equal the level.
           @param cell Input Cell
