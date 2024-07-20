@@ -1,7 +1,7 @@
 # -*- Mode:Org; Coding:utf-8; fill-column:158 -*-
 # ######################################################################################################################################################.H.S.##
 # FILE:        readme.org
-#+TITLE:       RPTree
+#+TITLE:       Rectilinear Trees
 #+SUBTITLE:    Generalizing quadtrees & octtrees
 #+AUTHOR:      Mitch Richling
 #+EMAIL:       http://www.mitchr.me/
@@ -105,9 +105,9 @@ data structure choice is hashable in our language of choice.
 
 *** Notation
 
- * $P$ -- The mesh power of the RPTree
+ * $P$ -- The mesh power of the rectilinear tree
 
- * $D$ -- The dimension of the RPTree
+ * $D$ -- The dimension of the rectilinear tree
 
  * $\mathbb{Z}_{k}$ -- Non-negative (unsigned) integers less than $k$.
    $$\mathbb{Z}_{k} = \left\{ i\in\mathbb{Z} \,\vert\, 0\le i\lt k \right\}$$ 

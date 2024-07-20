@@ -1,9 +1,72 @@
-* MRPTree
 
-MRPTree is C++ library implementing a generalization of the quadtree/octtree concept to any dimension.
-This generalization is faster and easier to use than traditional tree based data structures.
+#+BEGIN_CENTER
+                *WARNING WARNING WARNING WARNING* \\
+        *WARNING WARNING WARNING WARNING WARNING WARNING* \\
+*WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING*
 
-When I get some time I start publishing some code; however, right now
-this repo only contains some [[https://richmit.github.io/MRPTree/tree_theory/trees.html][documentation]].
+This software is pre-alpha!
+
+About half of planned functionality is implemented. Unit test coverage is less than 5%.
+
+*The exposed API is in flux.*
+
+Items below for which I have not yet started working are marked (*TBD*).  
+
+The source code files document numerous TODO items.
+
+*WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING* \\
+        *WARNING WARNING WARNING WARNING WARNING WARNING* \\
+                *WARNING WARNING WARNING WARNING* 
+#+END_CENTER
+
+* =MRPTree= (MR $2^P$ Tree)
+
+=MRPTree= is C++ library implementing a data structure that is a generalization of the
+[[https://en.wikipedia.org/wiki/Quadtree][quadtree]]/[[https://en.wikipedia.org/wiki/Octree][octree]]
+concept to any dimension.  
+  - This single data structure is capable of representing quadtree-like structures in any dimension -- with no code modifications.
+  - The resulting code is both less complex and easier to use than traditional tree based data structures.
+  - Many tree operations are transformed into simple integer manipulation, and thus are much faster than tree operations.
+
+You can read more about the way the data structure works here: [[https://richmit.github.io/MRPTree/tree_theory/trees.html][$2^P$ Tree Theory]]
+
+* Repository Contents (Current & Planned)
+
+ - Documentation about how data structure works: [[https://richmit.github.io/MRPTree/tree_theory/trees.html][$2^P$ Tree Theory]]
+ - Some notes about mathematical function visualization                                                        (*TBD*)
+ - The =MRPTree= itself (See the single header file: =lib/MR_cell_cplx.hpp=)
+ - Several examples of mathematical function visualization illustrating MRPTree in 1, 2, & 3 dimensions:
+     - [[https://en.wikipedia.org/wiki/Graph_of_a_function][Function Graphs]]:
+       - Functions $f:\mathbf{R}^1\rightarrow\mathbf{R}^1$ as a *curve*                                        (*TBD*)
+       - Functions $f:\mathbf{R}^2\rightarrow\mathbf{R}^1$ as a *surface*
+         - How to create clean edges on domain boundaries (like the edge of a circle)                          (*TBD*)
+         - How to increase sample rate near near a NaN                                                         (*TBD*)
+         - How to create sharp corners on non-differentiable edges                                             (*TBD*)
+         - How to increase sample rate near an arbitrary curve in the domain                                   (*TBD*)
+     - [[https://en.wikipedia.org/wiki/Parametric_equation][Parametric Equations]]:
+       - Functions $f:\mathbf{R}^1\rightarrow\mathbf{R}^2$ as a *curve* in the plane                           (*TBD*)
+       - Functions $f:\mathbf{R}^1\rightarrow\mathbf{R}^3$ as a *curve* in space                               (*TBD*)
+       - Functions $f:\mathbf{R}^2\rightarrow\mathbf{R}^3$ as a *surface* in space
+         - How to deal with singular points and degenerate geometries                                          (*TBD*)
+         - How to measure library components runtime for large meshes                                          (*TBD*)
+     - [[https://en.wikipedia.org/wiki/Scalar_field][Scalar Fields]] & [[https://en.wikipedia.org/wiki/Vector_field][Vector Fields]]:
+       - Functions $f:\mathbf{R}^2\rightarrow\mathbf{R}^1$ as a *scalar field* in the plane -- i.e. an "image" (*TBD*)
+       - Functions $f:\mathbf{R}^2\rightarrow\mathbf{R}^3$ as a *vector field* in the plane                    (*TBD*)
+       - Functions $f:\mathbf{R}^3\rightarrow\mathbf{R}^3$ as a *vector field* in the space                    (*TBD*)
+         - How to interactively solve a a differential equation on an empirical vector field with Paraview     (*TBD*)
+     - [[https://en.wikipedia.org/wiki/Level_set][Level Sets]] ([[https://en.wikipedia.org/wiki/Implicit_curve][implicit curves]] & [[https://en.wikipedia.org/wiki/Implicit_surface][surfaces]])
+       - Functions $f:\mathbf{R}^2\rightarrow\mathbf{R}^1$ level sets as a *curve* in the plane or in space
+       - Functions $f:\mathbf{R}^3\rightarrow\mathbf{R}^1$ level sets as a *surface* in space
+         - How to adaptively sample near the surface                                                           (*TBD*)
+     - Complex function magnitude plots with [[https://en.wikipedia.org/wiki/Domain_coloring][domain coloring]]
+       - Functions $f:\mathbf{C}^1\rightarrow\mathbf{C}^1$ as magnitude surfaces with domain coloring
+         - How to increase sample rate where the function's phase angle jumps                                  (*TBD*)
+         - How to increase sample rate near a zero                                                             (*TBD*)
+         - How to increase sample rate near a cropping plane                                                   (*TBD*)
+ - An unstructured cell-complex (similar to a [[https://en.wikipedia.org/wiki/Simplicial_complex][simplicial complex]]) library (See the single header file: =lib/MR_cell_cplx.hpp=)
+ - A library to tessellate an =MR_rect_tree= object into an =MR_cell_cplx= object (See the single header file: =lib/MR_rt_to_cc.hpp=)
+
+
+Have fun!!
 
 -mitch
