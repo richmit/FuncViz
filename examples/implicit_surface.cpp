@@ -65,7 +65,12 @@ int main() {
   /* Refine near surface */
   tree.refine_leaves_recursive_cell_pred(6, isf, [&tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, isf)); });
 
-  /* Convert our tree to a cell complex */
+  tree.dump_tree(5);
+
+  /* Convert our tree to a cell complex.  Note that we could just export the cells from the tree that contain a bit of our surface by using the version of
+     construct_geometry that takes a cell list.  That third argument would look something like this:
+         tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, isf)); }) 
+  */
   treeConverter.construct_geometry(ccplx,
                                    tree,
                                    tc_t::cell_structure_t::RECTANGLES, 
