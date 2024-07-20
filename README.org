@@ -16,7 +16,7 @@ The source code files document numerous TODO items.
 *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING*
 
 
-* =MRPTree= (MR $2^P$ Tree)
+* =MRPTree= (MR 2^P Tree)
 
 =MRPTree= is C++ library implementing a data structure that is a generalization of the
 [[https://en.wikipedia.org/wiki/Quadtree][quadtree]]/[[https://en.wikipedia.org/wiki/Octree][octree]]
@@ -25,11 +25,11 @@ concept to any dimension.
   - The resulting code is both less complex and easier to use than traditional tree based data structures.
   - Many tree operations are transformed into simple integer manipulation, and thus are much faster than tree operations.
 
-You can read more about the way the data structure works here: [[https://richmit.github.io/MRPTree/tree_theory/trees.html][$2^P$ Tree Theory]]
+You can read more about the way the data structure works here: [[https://richmit.github.io/MRPTree/tree_theory/trees.html][2^P Tree Theory]]
 
 * Repository Contents (Current & Planned)
 
- - Documentation about how data structure works: [[https://richmit.github.io/MRPTree/tree_theory/trees.html][$2^P$ Tree Theory]]
+ - Documentation about how data structure works: [[https://richmit.github.io/MRPTree/tree_theory/trees.html][2^P Tree Theory]]
  - Some notes about mathematical function visualization                                                        (*TBD*)
  - The =MRPTree= itself (See the single header file: =lib/MR_cell_cplx.hpp=)
  - Several examples of mathematical function visualization illustrating MRPTree in 1, 2, & 3 dimensions:
