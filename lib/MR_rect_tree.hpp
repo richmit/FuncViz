@@ -125,14 +125,18 @@ namespace mjr {
      - Adaptive function sample (cell angle, cell aspect ratio, & cell width)
        - bitree
        - quadtree
-     - Cell edge solver for cell cutting & folding points
-       - Solve for plane (orthogonal to an axis) intersection
-       - Solve for SDF boundary intersection
-       - Solve for NaN/non-NaN boundary
+     - Cell segment solver
+       - Takes two points in the TREE, and isolates a point on the segment between them
+       - Stuff we can isolate
+         - SDF zero
+         - Boolean function transition (ex: NaN/non-NaN boundry)
+         - Level transition in range
+         - Level transition in domain
+       - Stuff we can do with an isolated point
+         - Cut around it (for example to make sure a cell won't cross a discontinuity)
+         - Fold on it (to make sharp corners at nondifferentiable points)
+         - Healing broken cells
      - Examples:
-       - implicit surface
-         - step-wise improvement via refine_leaves_once_if_cell_pred
-         - Demonstrate how to limit output to cells covering surface with cell filtering
        - Demonstrate cell healing & edge solver with half sphere example
        - Demonstrate edge solver & cell folding with SDF for surface with a corner
        - Demonstrate "cropping" z-axis plot range with crop plane & edge solver
