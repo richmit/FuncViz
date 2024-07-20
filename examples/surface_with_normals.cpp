@@ -49,7 +49,12 @@
 #include "MR_rt_to_cc.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-std::array<double, 4> dampCosWave2(std::array<double, 2> xvec) {
+typedef mjr::tree15b2d5rT            tt_t;
+typedef mjr::MRccT5                  cc_t;
+typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+tt_t::rrpt_t dampCosWave2(tt_t::drpt_t xvec) {
   double x = xvec[0];
   double y = xvec[1];
   double d = x*x+y*y;
@@ -58,29 +63,27 @@ std::array<double, 4> dampCosWave2(std::array<double, 2> xvec) {
   double z = m*cos(4*s);
   double dx = -(cos((4 * s)) * s + 4 * sin( (4 * s))) * x * exp(-x * x / 2 - y * y / 2);
   double dy = -(cos((4 * s)) * s + 4 * sin( (4 * s))) * y * exp(-x * x / 2 - y * y / 2);
+  double dd =   -m*(cos(4*s)*s+8*sin(4*s));
   if (s>1.0e-5) {
     dx = dx / s;
     dy = dy / s;
+    dd = dd / (4 * s);
   } else {
-    dx = 0;
-    dy = 0;
+    dx = 1;
+    dy = 1;
+    dd = 1;
   }
   double nm = std::sqrt(1+dx*dx+dy*dy);
-  return {z, -dx/nm, -dy/nm, 1/nm};
+  return {z, -dx/nm, -dy/nm, 1/nm, dd};
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-double circleSDF2(double r, std::array<double, 2> xvec) {
+double circleSDF2(double r, tt_t::drpt_t xvec) {
   double x = xvec[0];
   double y = xvec[1];
   double m = x*x+y*y;
   return (r*r-m);
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef mjr::tree15b2d4rT            tt_t;
-typedef mjr::MRccT5                  cc_t;
-typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int main() {
@@ -93,14 +96,17 @@ int main() {
   tree.refine_grid(2, dampCosWave2);
 
   // The humps need extra samples.  We know where they are, and we could sample on them with an SDF like this:
-  // for(double i: {0, 1, 2, 3}) {
-  //   double r = i*std::numbers::pi/4;
-  //   tree.refine_leaves_recursive_cell_pred(7, dampCosWave2, [&tree, r](int i) { return (tree.cell_cross_sdf(i, std::bind_front(circleSDF2, r))); });
-  // }
+  for(double i: {0, 1, 2, 3}) {
+    double r = i*std::numbers::pi/4;
+    tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&tree, r](int i) { return (tree.cell_cross_sdf(i, std::bind_front(circleSDF2, r))); });
+  }
 
   // Alternately, we can test the derivative values to identify the humps
-  tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 1, 0.0); });
-  tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 2, 0.0); });
+  // tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 1, 0.0); });
+  // tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 2, 0.0); });
+
+  // Lastly we can use the directional derivative radiating from the origin
+  // tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 4, 0.0); });
 
   // Balance the three to the traditional level of 1 (no  cell borders a cell more than half it's size)
   tree.balance_tree(1, dampCosWave2);
