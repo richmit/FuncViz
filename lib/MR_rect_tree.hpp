@@ -449,17 +449,17 @@ namespace mjr {
           @return The level of the given cell. */
       inline dic_t ccc_cell_level(diti_t cell) const     { return static_cast<dic_t>(max_level-static_cast<diti_t>(1)-std::countr_zero(cell)); } 
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Compute cell half width
-          @warning No error checking -- cell must be a valid center coordinate. See: cell_good_cords()
-          @param cell Input cell
-          @return Half width of the given cell. */
-       inline dic_t ccc_cell_half_width(diti_t cell) const { return static_cast<dic_t>(cell & (~cell+static_cast<diti_t>(1))); }         
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute cell quarter width
           @warning No error checking -- cell must be a valid center coordinate. See: cell_good_cords()
           @param cell Input cell
           @return Quarter width of the given cell. */
       inline dic_t ccc_cell_quarter_width(diti_t cell) const { return static_cast<dic_t>(ccc_cell_half_width(cell) >> static_cast<dic_t>(1)); } 
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Compute cell half width
+          @warning No error checking -- cell must be a valid center coordinate. See: cell_good_cords()
+          @param cell Input cell
+          @return Half width of the given cell. */
+       inline dic_t ccc_cell_half_width(diti_t cell) const { return static_cast<dic_t>(cell & (~cell+static_cast<diti_t>(1))); }         
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute cell full width
           @warning No error checking -- cell must be a valid center coordinate. See: cell_good_cords()
@@ -564,21 +564,21 @@ namespace mjr {
           @param diti The input tuple
           @param index Which component to extract
           @return The component at index position */
-      inline dic_t  cuc_get_crd(diti_t diti, int index) const { return (diti_msk0 & (diti >> (dic_bits * index))); }
+      inline dic_t  cuc_get_crd(diti_t diti, int index) const { return static_cast<dic_t>(diti_msk0 & static_cast<diti_t>(diti >> (dic_bits * index))); }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Incriment a component in a a tuple
           @param diti The input tuple
           @param index Which component to incriment
           @param value Amout by which to increment the component
           @return New tuple with the specified component incrimented */
-      inline diti_t cuc_inc_crd(diti_t diti, int index, dic_t value) const { return (diti + (static_cast<diti_t>(value) << (dic_bits*index))); }
+      inline diti_t cuc_inc_crd(diti_t diti, int index, dic_t value) const { return (diti + (static_cast<diti_t>(static_cast<diti_t>(value) << (dic_bits*index)))); }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Decriment a component in a a tuple
           @param diti The input tuple
           @param index Which component to incriment
           @param value Amout by which to decrement the component
           @return New tuple with the specified component decrimented */
-      inline diti_t cuc_dec_crd(diti_t diti, int index, dic_t value) const { return (diti - (static_cast<diti_t>(value) << (dic_bits*index))); }
+      inline diti_t cuc_dec_crd(diti_t diti, int index, dic_t value) const { return (diti - (static_cast<diti_t>(static_cast<diti_t>(value) << (dic_bits*index)))); }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Decriment all components in a a tuple
           @param diti The input tuple
@@ -1522,6 +1522,7 @@ namespace mjr {
     typedef mjr::MR_rect_tree<7, double, 2, 1> tree7b2d1rT;
     typedef mjr::MR_rect_tree<7, double, 3, 1> tree7b3d1rT;
     typedef mjr::MR_rect_tree<7, double, 4, 1> tree7b4d1rT;
+    typedef mjr::MR_rect_tree<7, double, 5, 1> tree7b5d1rT; // For testing
 
     typedef mjr::MR_rect_tree<7, double, 1, 2> tree7b1d2rT;
     typedef mjr::MR_rect_tree<7, double, 2, 2> tree7b2d2rT;
@@ -1537,6 +1538,7 @@ namespace mjr {
     typedef mjr::MR_rect_tree<7, double, 2, 4> tree7b2d4rT;
     typedef mjr::MR_rect_tree<7, double, 3, 4> tree7b3d4rT;
     typedef mjr::MR_rect_tree<7, double, 4, 4> tree7b4d4rT;
+
 
     //--------------------------------------------------------------------------------------------------------------------------------------------------------
     /* 15-bit per coordinate */

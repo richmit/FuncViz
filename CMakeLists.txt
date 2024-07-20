@@ -48,6 +48,8 @@ set(TARGETS_EXAMPLE "MR_cell_cplx_test_mpl" "MR_cell_cplx_test_wedge"
                   )
 set(TARGETS_TEST "check_cell_hexahedron" "check_cell_pyramid" "check_cell_quad" "check_cell_triangle" "check_cell_segment"
                  "geomi_seg_isect_type" 
+                 "tree_basics_7b1" "tree_basics_7b2" "tree_basics_7b3" "tree_basics_7b4" "tree_basics_7b5"
+                 "tree_basics_15b1" "tree_basics_15b3"
                  "zzz_tbd_MRPTree"
                )
 
