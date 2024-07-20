@@ -36,7 +36,7 @@ endif()
 set(TARGETS_EXAMPLE "MR_cell_cplx_test_mpl" "MR_cell_cplx_test_wedge" 
                     "MR_cell_cplx_test_surf_wave_hole" 
                     "hello_world" 
-                    "MR_rect_tree_test_surf_wave" 
+                    "surface_with_normals" 
                     "MR_rect_tree_test_surf_param" 
                     "MR_rect_tree_test_surf_param_deg"
                     "MR_rect_tree_test_surf_impl" 
@@ -48,6 +48,7 @@ set(TARGETS_EXAMPLE "MR_cell_cplx_test_mpl" "MR_cell_cplx_test_wedge"
                   )
 set(TARGETS_TEST "check_cell_hexahedron" "check_cell_pyramid" "check_cell_quad" "check_cell_triangle" "check_cell_segment"
                  "geomi_seg_isect_type" 
+                 "zzz_tbd_MRPTree"
                )
 
 # Construct list of targets we can build
