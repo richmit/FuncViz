@@ -179,9 +179,8 @@ int main() {
 
   auto tcret = treeConverter.construct_geometry(ccplx,
                                                 tree,
-
-                                                tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&tree](tt_t::diti_t i) { return !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
-
+                                                tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), 
+                                                                         [&tree](tt_t::diti_t i) { return !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
                                                 tc_t::cell_structure_t::FANS, 
                                                 2,
                                                 { "points", 

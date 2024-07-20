@@ -1,0 +1,1288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-07-20 Sat 13:14 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=1024, initial-scale=1" />
+<title>Function Visualization</title>
+<meta name="author" content="Mitch Richling" />
+<meta name="description" content="DESCRIPTION FIXME" />
+<meta name="keywords" content="KEYWORDS FIXME" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<style>body { width: 95%; margin: 2% auto; font-size: 18px; line-height: 1.4em; font-family: Georgia, serif; color: black; background-color: white; }</style>
+<style>body { min-width: 500px; max-width: 1024px; }</style>
+<style>h1,h2,h3,h4,h5,h6 { color: #A5573E; line-height: 1em; font-family: Helvetica, sans-serif; }</style>
+<style>h1,h2,h3 { line-height: 1.4em; }</style>
+<style>h1.title { font-size: 3em; }</style>
+<style>.subtitle { font-size: 0.6em; }</style>
+<style>h4,h5,h6 { font-size: 1em; }</style>
+<style>.org-src-container { border: 1px solid #ccc; box-shadow: 3px 3px 3px #eee; font-family: Lucida Console, monospace; font-size: 62%; margin: 0px; padding: 0px 0px; position: relative; }</style>
+<style>.org-src-container>pre { line-height: 1.2em; padding-top: 1.5em; margin: 0.5em; background-color: #404040; color: white; overflow: auto; }</style>
+<style>.org-src-container>pre:before { display: block; position: absolute; background-color: #b3b3b3; top: 0; right: 0; padding: 0 0.2em 0 0.4em; border-bottom-left-radius: 8px; border: 0; color: white; font-size: 100%; font-family: Helvetica, sans-serif;}</style>
+<style>pre.example { white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -o-pre-wrap; font-family: Lucida Console, monospace; font-size: 80%; background: #404040; color: white; display: block; padding: 0em; border: 2px solid black; }</style>
+<style>blockquote { margin-bottom: 0.5em; padding: 0.5em; background-color: #FFF8DC; border-left: 2px solid #A5573E; border-left-color: rgb(255, 228, 102); display: block; margin-block-start: 1em; margin-block-end: 1em; margin-inline-start: 5em; margin-inline-end: 5em; } </style>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="org-div-home-and-up">
+ <a accesskey="h" href="https://github.com/richmit/MRPTree/"> UP </a>
+ |
+ <a accesskey="H" href="https://www.mitchr.me/"> HOME </a>
+</div><div id="content" class="content">
+<h1 class="title">Function Visualization</h1>
+<div class="org-center">
+<p>
+<a href="media/complex_magnitude_surface_rot_50.gif"><img src="media/sq_complex_magnitude_surface_rot_10.gif" alt="sq_complex_magnitude_surface_rot_10.gif" /></a>
+<a href="media/implicit_surface_rt_rot_50.gif"><img src="media/sq_implicit_surface_rt_rot_10.gif" alt="sq_implicit_surface_rt_rot_10.gif" /></a>
+<a href="media/implicit_surface_make_50.gif"><img src="media/implicit_surface_make_10.gif" alt="implicit_surface_make_10.gif" /></a>
+<a href="media/lorenz_rot_rot_50.gif"><img src="media/sq_lorenz_rot_rot_10.gif" alt="sq_lorenz_rot_rot_10.gif" /></a>
+</p>
+</div>
+
+<table border="2 solid #ccc" cellspacing="0" cellpadding="6" rules="groups" frame="hsides" align="center">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-right"><b>Author:</b></td>
+<td class="org-left"><i>Mitch Richling</i></td>
+</tr>
+
+<tr>
+<td class="org-right"><b>Updated:</b></td>
+<td class="org-left"><i>2024-07-20 13:14:27</i></td>
+</tr>
+
+<tr>
+<td class="org-right"><b>Generated:</b></td>
+<td class="org-left"><i>2024-07-20 13:14:28</i></td>
+</tr>
+</tbody>
+</table>
+<p align="center">
+Copyright &copy; 2024 Mitch Richling. All rights reserved.
+</p>
+
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#intro">1. Introduction</a></li>
+<li><a href="#complex_magnitude_surface">2. Complex Magnitude Surface Plot</a></li>
+<li><a href="#implicit_curve_2d">3. Implicit Curve</a></li>
+<li><a href="#implicit_surface">4. Implicit Surface</a></li>
+<li><a href="#vector_field_3d">5. 3D Vector Field</a></li>
+<li><a href="#surface_with_normals">6. Surface Plot With Normals</a></li>
+<li><a href="#surface_plot_edge">7. Surface Plot With An Edge</a></li>
+<li><a href="#curve_plot">8. Curve Plot</a></li>
+<li><a href="#parametric_surface_with_defects">9. Parametric Surface With Defects</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-intro" class="outline-2">
+<h2 id="intro"><span class="section-number-2">1.</span> Introduction</h2>
+<div class="outline-text-2" id="text-intro">
+<p>
+Quadtree-like data structures are widely applied today: image processing, spatial indexing, collision detection, terrain modeling, sparse matrix computation,
+computational field dynamics, mesh generation, and many more.  Being a mathematician, my primary interest in these kinds of structures is
+visualization of mathematical objects &#x2013; i.e. mesh generation with a few extras.  As luck would have it, I think function visualization is a great way to
+demonstrate how to use this library because everything is self contained and easy to understand.
+</p>
+
+<p>
+The goal of this document is to gather together in one place information &amp; results for the example programs distributed with MRPTree.  As such, much of this
+page is auto-generated from the examples themselves &#x2013; the intro for each example section is pulled directly from the source code's top comment, and the code
+listing are pulled right out of the repository.
+</p>
+
+<p>
+In this document we break the process of mathematical function visualization into three steps:
+</p>
+
+<dl class="org-dl">
+<dt>Sample     </dt><dd>The goal is to evaluate the function at various sample points so that we can faithfully approximate the geometric structure we are interested in visualizing.
+In the examples here, this step is almost entirely accomplished via the <code>MR_rect_tree</code> class.  When possible we use more samples where the
+function behaviour is complex and fewer elseware.</dd>
+<dt>Approximate</dt><dd>In this step we transform our sample data into a finite collection of geometric primitives (a "mesh" or a "cell complex") that may be visualized.
+In the examples here, this step is accomplished by the <code>MR_cell_cplx</code> and <code>MR_rt_to_cc</code> classes.</dd>
+<dt>Explore    </dt><dd>Finally we use Paraview to display &amp; explore the data.</dd>
+</dl>
+
+<p>
+In some cases we preform post processing or use other tools: VisIT, meshlab, POV-Ray, Blender, ffmpeg, ImageMagick, etc&#x2026;
+</p>
+</div>
+</div>
+
+<div id="outline-container-complex_magnitude_surface" class="outline-2">
+<h2 id="complex_magnitude_surface"><span class="section-number-2">2.</span> Complex Magnitude Surface Plot</h2>
+<div class="outline-text-2" id="text-complex_magnitude_surface">
+<p>
+One popular way to plot complex functions is to use a surface plot of \(\vert f(z)\vert\) and color the surface with \(\arg(f(z))\).  This way we can
+simultaneously represent the magnitude and phase over the complex plain.  There are several ways to color the plots, and we will be following the method
+described by Richardson in 1991.  In this example, we demonstrates several techniques:
+</p>
+
+<ul class="org-ul">
+<li>Alternate ways to do an initial sample (grid vs recursive)</li>
+<li>Sample near a point in the domain</li>
+<li>Sample below a level in the range</li>
+<li>Sample near level curves</li>
+<li>Sample based on a data value that is <b>not</b> part of the geometry</li>
+<li>Sample near domain axis</li>
+<li>Directly attach colors to geometric points</li>
+<li>Do rough clipping with high sampling and cell filtering.</li>
+</ul>
+
+<p>
+Eventually we will also demonstrate:
+</p>
+
+<ul class="org-ul">
+<li>Clip with a clipping plain (TBD) &#x2013; requires new functionality in MR_rt_to_cc.</li>
+<li>Extract level curves (TBD) &#x2013; requires new functionality in MR_rt_to_cc.</li>
+</ul>
+
+<p>
+References:
+  Richardson (1991); Visualizing quantum scattering on the CM-2 supercomputer; Computer Physics Communications 63; pp 84-94"
+</p>
+
+<div class="org-center">
+<p>
+<a href="media/complex_magnitude_surface-2D_100.png"><img src="media/complex_magnitude_surface-2D_10.png" alt="complex_magnitude_surface-2D_10.png" /></a>
+<a href="media/complex_magnitude_surface_rot_50.gif"><img src="media/complex_magnitude_surface_rot_10.gif" alt="complex_magnitude_surface_rot_10.gif" /></a>
+</p>
+</div>
+
+<p>
+Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/complex_magnitude_surface.cpp">https://github.com/richmit/MRPTree/blob/main/examples/complex_magnitude_surface.cpp</a>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c++">
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
+
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b2d9rT</span>            <span style="color: #63b8ff;">tt_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
+
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">cpf</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #63b8ff;">complex</span>&lt;<span style="color: #63b8ff;">double</span>&gt; <span style="color: #7fffd4;">z</span>(xvec[0], xvec[1]);
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z_abs</span>, <span style="color: #7fffd4;">z_arg</span>, <span style="color: #7fffd4;">f_re</span>, <span style="color: #7fffd4;">f_im</span>, <span style="color: #7fffd4;">f_abs</span>, <span style="color: #7fffd4;">f_arg</span>, <span style="color: #7fffd4;">red</span>, <span style="color: #7fffd4;">green</span>, <span style="color: #7fffd4;">blue</span>;
+
+  z_abs = <span style="color: #8470ff; font-weight: bold;">std</span>::abs(z);
+  z_arg = <span style="color: #8470ff; font-weight: bold;">std</span>::arg(z);
+
+  <span style="color: #00ffff;">if</span> ( (<span style="color: #8470ff; font-weight: bold;">std</span>::abs(z-1.0) &gt; 1.0e-5) &amp;&amp; (<span style="color: #8470ff; font-weight: bold;">std</span>::abs(z+1.0) &gt; 1.0e-5) ) {
+    <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #63b8ff;">complex</span>&lt;<span style="color: #63b8ff;">double</span>&gt; <span style="color: #7fffd4;">f</span>;
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">f_abs2</span>, <span style="color: #7fffd4;">f_re_scl</span>, <span style="color: #7fffd4;">f_im_scl</span>, <span style="color: #7fffd4;">f_abs2p1</span>, <span style="color: #7fffd4;">ofs</span>;
+    f        = 1.0/(z+1.0) + 1.0/(z-1.0);
+    f_re     = <span style="color: #8470ff; font-weight: bold;">std</span>::real(f);
+    f_im     = <span style="color: #8470ff; font-weight: bold;">std</span>::imag(f);
+    f_abs    = <span style="color: #8470ff; font-weight: bold;">std</span>::abs(f);
+    f_arg    = <span style="color: #8470ff; font-weight: bold;">std</span>::arg(f);
+    f_abs2   = f_abs * f_abs;
+    f_re_scl = f_re / <span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(30.0/5.0);
+    f_im_scl = f_im / <span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(2.0);
+    f_abs2p1 = 1 + f_abs2;
+    ofs      = (f_abs&lt;1 ? -1.0 : 1.0) * (0.5 - f_abs/f_abs2p1);
+    red      = ofs + (0.5 + (<span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(2.0/3.0) * f_re) / f_abs2p1);
+    green    = ofs + (0.5 - (f_re_scl - f_im_scl)       / f_abs2p1);
+    blue     = ofs + (0.5 - (f_re_scl + f_im_scl)       / f_abs2p1);
+  } <span style="color: #00ffff;">else</span> {
+    f_re = f_im = f_abs = f_arg = red = green = blue = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numeric_limits</span>&lt;<span style="color: #63b8ff;">double</span>&gt;::quiet_NaN();
+  }
+
+  <span style="color: #00ffff;">return</span> {z_abs, z_arg, f_re, f_im, f_abs, f_arg, red, green, blue};
+}
+
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">src_t</span>  <span style="color: #00fa9a; font-weight: bold;">cpfd</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+  <span style="color: #63b8ff;">int</span>    <span style="color: #7fffd4;">idx_for_z</span> = 4;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">cut_for_z</span> = 3.5;
+  <span style="color: #00ffff;">auto</span>   <span style="color: #7fffd4;">fv</span>        = cpf(xvec);
+
+  <span style="color: #00ffff;">if</span>(<span style="color: #8470ff; font-weight: bold;">std</span>::isnan(fv[idx_for_z]))
+    <span style="color: #00ffff;">return</span> 100000.0;
+  <span style="color: #00ffff;">else</span>
+    <span style="color: #00ffff;">return</span> fv[idx_for_z]-cut_for_z;
+}
+
+<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
+  <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">tree</span>({-2.2, -1.2}, 
+            { 2.2,  1.2});
+  <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">ccplx</span>;
+  <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">treeConverter</span>;
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Initial sample</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">On a uniform grid</span>
+  tree.refine_grid(3, cpf);
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Alternately we can use refine_recursive() instead (refine_grid() is faster)</span>
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">tree.refine_recursive(4, cpf);</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Sample near 0+0i because we have a minimum at that piont</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">The most direct method </span>
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">tree.refine_leaves_recursive_cell_pred(6, cpf, [&amp;tree](tt_t::diti_t i) { return (tree.cell_close_to_domain_point({0, 0}, 1.0e-2, i)); });</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">This function is positive with a universal minimum at 0+0i, so we could just sample where  |f| is below 1/4</span>
+  tree.refine_leaves_recursive_cell_pred(6, cpf, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> !(tree.cell_above_range_level(i, 4, 0.25, 1.0e-5)); });
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Sample around the poles where we will clip the graph</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">With nice ranges the singularities will be precicely located on cell vertexes.  So we can just refine NaNs.</span>
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">tree.refine_recursive_if_cell_vertex_is_nan(6, cpf);</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Or we can directly sample on the clip level at |f|=3.5.  </span>
+  tree.refine_leaves_recursive_cell_pred(7, cpf, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_cross_range_level(i, 4, 3.5)); });
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">We can do the above with a constructed SDF instead.</span>
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">tree.refine_leaves_recursive_cell_pred(6, cpf, [&amp;tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, cpfd)); });</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Just like the previous, but with atomic refinement.</span>
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">tree.refine_leaves_atomically_if_cell_pred(6, cpf, [&amp;tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, cpfd)); });</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Refine where we plan to draw level curves</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">The easiest thing is to use cell_cross_range_level() for this.</span>
+  <span style="color: #00ffff;">for</span>(<span style="color: #00ffff;">auto</span> <span style="color: #7fffd4;">lev</span>: {0.4, 0.7, 1.1, 1.4, 1.8, 2.6, 3.5}) 
+    tree.refine_leaves_recursive_cell_pred(7, cpf, [&amp;<span style="color: #7fffd4;">tree</span>, <span style="color: #8470ff; font-weight: bold;">lev</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_cross_range_level(i, 4, lev)); });
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">We will be coloring based on arg(f), and so want to sample near the abrubpt change near arg(f)=0.</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">We can do this just like the level curves with |f|, but use arg(f) instead -- i.e. index 5 instead of 4.</span>
+  tree.refine_leaves_recursive_cell_pred(7, cpf, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_cross_range_level(i, 5, 0.0)); });
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">We can sample near the real &amp; imagaxes axes.</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Sample near the real axis</span>
+  tree.refine_leaves_recursive_cell_pred(5, cpf, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_cross_domain_level(i, 0, 0.0, 1.0e-6)); });
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Sample near the imaginary axis</span>
+  tree.refine_leaves_recursive_cell_pred(5, cpf, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_cross_domain_level(i, 1, 0.0, 1.0e-6)); });
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">We don't need to balance the three, but it makes things look nice.</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Balance the three to the traditional level of 1 (no  cell borders a cell more than half it's size)</span>
+  tree.balance_tree(1, cpf);
+
+  tree.dump_tree(5);
+
+  <span style="color: #00ffff;">auto</span> <span style="color: #7fffd4;">tcret</span> = treeConverter.construct_geometry(ccplx,
+                                                tree,
+                                                tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), 
+                                                                         [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
+                                                <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::FANS, 
+                                                2,
+                                                { <span style="color: #fa8072;">"points"</span>, 
+                                                  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0, 
+                                                  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1,
+                                                  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  4},
+                                                {{ <span style="color: #fa8072;">"Re(z)"</span>,     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
+                                                 { <span style="color: #fa8072;">"Im(z)"</span>,     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
+                                                 { <span style="color: #fa8072;">"abs(z)"</span>,    <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
+                                                 { <span style="color: #fa8072;">"arg(z)"</span>,    <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1},
+                                                 { <span style="color: #fa8072;">"Re(f(z))"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2},
+                                                 { <span style="color: #fa8072;">"Im(f(z))"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  3},
+                                                 { <span style="color: #fa8072;">"abs(f(z))"</span>, <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  4},
+                                                 { <span style="color: #fa8072;">"arg(f(z))"</span>, <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  5}},
+                                                {{<span style="color: #fa8072;">"COLORS"</span>,
+                                                  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 6,
+                                                  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 7,
+                                                  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 8}});
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"TC Return: "</span> &lt;&lt; tcret &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+
+  ccplx.dump_cplx(5);
+
+  ccplx.write_legacy_vtk(<span style="color: #fa8072;">"complex_magnitude_surface.vtk"</span>, <span style="color: #fa8072;">"complex_magnitude_surface"</span>);
+  ccplx.write_xml_vtk(   <span style="color: #fa8072;">"complex_magnitude_surface.vtu"</span>, <span style="color: #fa8072;">"complex_magnitude_surface"</span>);
+  ccplx.write_ply(       <span style="color: #fa8072;">"complex_magnitude_surface.ply"</span>, <span style="color: #fa8072;">"complex_magnitude_surface"</span>);
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-implicit_curve_2d" class="outline-2">
+<h2 id="implicit_curve_2d"><span class="section-number-2">3.</span> Implicit Curve</h2>
+<div class="outline-text-2" id="text-implicit_curve_2d">
+<p>
+For many of us our first exposure to an implicit curve was the unit circle in high school algebra, \(x^2+y^2=1\), where we were ask to graph \(y\) with
+respect to \(x\) only to discover that \(y\) didn't appear to be a function of \(x\) because \(y\) had TWO values for some values of \(x\)!  But
+we soon discovered that a great many interesting curves could be defined this way, and that we could represent them all by thinking of the equations as a
+functions of two variables and the curves as sets of zeros.  That is to say, we can always write an implicit equation in two variables in the form
+\(F(x,y)=0\), and think of the implicit curve as the set of roots, or zeros, of the function \(F\).  We can then generalize this
+idea to "level sets" as solutions to \(F(x,y)=L\) &#x2013; i.e. the set of points where the function is equal to some "level" \(L\).
+</p>
+
+<p>
+Many visualization tools can extract a "level set" from a mesh.  For 2D meshes (surfaces), the level sets are frequently 1D sets (curves). The trick to
+obtaining high quality results is to make sure the triangulation has a high enough resolution.  Of course we could simply sample the 2D grid uniformly
+with a very fine mesh.  A better way is to detect where the curve is, and to sample at higher resolution near the curve.
+</p>
+
+<p>
+Currently we demonstrate a couple ways to refine the mesh near the curve:
+</p>
+<ul class="org-ul">
+<li>Using cell_cross_range_level() to find cells that cross a particular level (zero in this case)</li>
+<li>Using cell_cross_sdf() instead &#x2013; which generally works just like cell_cross_range_level() with a level of zero.</li>
+</ul>
+
+<p>
+Today we extract the curve with Paraview, but I hope to extend MR_rt_to_cc to extract level sets in the future:
+</p>
+<ul class="org-ul">
+<li>Extract "standard" midpoint level sets (TBD)</li>
+<li>Solve for accurate edge/function level intersections, and construct high quality level sets. (TBD)</li>
+</ul>
+
+
+<div class="org-center">
+<p>
+<a href="media/implicit_curve_2d-2D_100.png"><img src="media/implicit_curve_2d-2D_10.png" alt="implicit_curve_2d-2D_10.png" /></a>
+<a href="media/implicit_curve_2d-3D_100.png"><img src="media/implicit_curve_2d-3D_10.png" alt="implicit_curve_2d-3D_10.png" /></a>
+</p>
+</div>
+
+<p>
+Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/implicit_curve_2d.cpp">https://github.com/richmit/MRPTree/blob/main/examples/implicit_curve_2d.cpp</a>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c++">
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
+
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b2d1rT</span>            <span style="color: #63b8ff;">tt_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
+
+<span style="color: #ffa500;">// </span><span style="color: #ff7f24;">This function is a classic "difficult case" for implicit curve algorithms.</span>
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">f</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x</span> = xvec[0];
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y</span> = xvec[1];
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z</span> = ((2*x*x*y - 2*x*x - 3*x + y*y*y - 33*y + 32) * ((x-2)*(x-2) + y*y + 3))/3000;
+  <span style="color: #00ffff;">if</span> (z&gt;1.0)
+    z=1.0;
+  <span style="color: #00ffff;">if</span> (z&lt;-1.0)
+    z=-1.0;
+  <span style="color: #00ffff;">return</span> z;
+}
+
+<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
+  <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">tree</span>({-10.0, -6.5},
+            { 10.0,  6.5});
+  <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">ccplx</span>;
+  <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">treeConverter</span>;
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">First we sample the top cell.  Just one cell!</span>
+  tree.sample_cell(f);
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Now we recursively refine cells that seem to cross over the curve</span>
+  tree.refine_leaves_recursive_cell_pred(7, f, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_cross_range_level(i, 0, 0.0)); });
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">We could have used the function f as an SDF, and achieved the same result with the following:</span>
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">tree.refine_leaves_recursive_cell_pred(7, f, [&amp;tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, f)); });</span>
+
+  tree.dump_tree(20);
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Convert the geometry into a 3D dataset so we can see the contour on the surface</span>
+  treeConverter.construct_geometry(ccplx,
+                                   tree,
+                                   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::FANS, 
+                                   2,
+                                   { <span style="color: #fa8072;">"points"</span>, 
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0,
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1,
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
+                                   {{<span style="color: #fa8072;">"x"</span>,       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
+                                    {<span style="color: #fa8072;">"y"</span>,       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
+                                    {<span style="color: #fa8072;">"f(x,y)"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0}},
+                                   {});
+
+  ccplx.write_xml_vtk(<span style="color: #fa8072;">"implicit_curve_2d.vtu"</span>, <span style="color: #fa8072;">"implicit_curve_2d"</span>);
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-implicit_surface" class="outline-2">
+<h2 id="implicit_surface"><span class="section-number-2">4.</span> Implicit Surface</h2>
+<div class="outline-text-2" id="text-implicit_surface">
+<p>
+This example is very similar to implicit_curve_2d.cpp; however, instead of extracting a curve from a triangulation of a surface, this time we extract a
+surface from a quad tessellation of a hexahedron.  In addition to what we demonstrate with implicit_curve_2d.cpp, this example also demonstrates:
+</p>
+
+<ul class="org-ul">
+<li>How to use an SDF to identify cells that contain the level set</li>
+<li>How to export only a subset of cells</li>
+</ul>
+
+
+<div class="org-center">
+<p>
+<a href="media/implicit_surface_rt_rot_50.gif"><img src="media/implicit_surface_rt_rot_10.gif" alt="implicit_surface_rt_rot_10.gif" /></a>
+<a href="media/implicit_surface_make_50.gif"><img src="media/implicit_surface_make_10.gif" alt="implicit_surface_make_10.gif" /></a>
+</p>
+</div>
+
+<p>
+Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/implicit_surface.cpp">https://github.com/richmit/MRPTree/blob/main/examples/implicit_surface.cpp</a>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c++">
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
+
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b3d1rT</span>            <span style="color: #63b8ff;">tt_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
+
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">isf</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x</span> = xvec[0];
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y</span> = xvec[1];
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z</span> = xvec[2];
+  <span style="color: #00ffff;">return</span> x*x*y+y*y*x-z*z*z-1;
+}
+
+<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
+  <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">tree</span>({-2.3, -2.3, -2.3}, 
+            { 2.3,  2.3,  2.3});
+  <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">ccplx</span>;
+  <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">treeConverter</span>;
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Initial uniform sample</span><span style="color: #ffa500;"> */</span>
+  tree.refine_grid(4, isf);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Refine near surface</span><span style="color: #ffa500;"> */</span>
+  tree.refine_leaves_recursive_cell_pred(6, isf, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_cross_sdf(i, isf)); });
+
+  tree.dump_tree(5);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Convert our tree to a cell complex.  Note that we use an SDF to export only cells that contain our surface</span><span style="color: #ffa500;"> */</span>
+  treeConverter.construct_geometry(ccplx,
+                                   tree,
+                                   tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_cross_sdf(i, isf)); }),
+                                   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::RECTANGLES, 
+                                   3,
+                                   { <span style="color: #fa8072;">"points"</span>, 
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0, 
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1,
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 2},
+                                   {{ <span style="color: #fa8072;">"x"</span>,        <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
+                                    { <span style="color: #fa8072;">"y"</span>,        <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
+                                    { <span style="color: #fa8072;">"z"</span>,        <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 2},
+                                    { <span style="color: #fa8072;">"f(x,y,z)"</span>, <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0}},
+                                   {});
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Display some data about the cell complex</span><span style="color: #ffa500;"> */</span>
+  ccplx.dump_cplx(5);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Write out our cell complex</span><span style="color: #ffa500;"> */</span>
+  ccplx.write_xml_vtk(<span style="color: #fa8072;">"implicit_surface.vtu"</span>, <span style="color: #fa8072;">"implicit_surface"</span>);
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-vector_field_3d" class="outline-2">
+<h2 id="vector_field_3d"><span class="section-number-2">5.</span> 3D Vector Field</h2>
+<div class="outline-text-2" id="text-vector_field_3d">
+<p>
+This example illustrates how to uniformly sample a vector field.  Just for fun we have also produced a solution to the Lorenz system, and directly
+stored it with a MR_cell_cplx.
+</p>
+
+<div class="org-center">
+<p>
+<a href="media/lorenz_100.png"><img src="media/lorenz_10.png" alt="lorenz_10.png" /></a>
+<a href="media/lorenz_rot_rot_50.gif"><img src="media/lorenz_rot_rot_10.gif" alt="lorenz_rot_rot_10.gif" /></a>
+</p>
+</div>
+
+<p>
+Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/vector_field_3d.cpp">https://github.com/richmit/MRPTree/blob/main/examples/vector_field_3d.cpp</a>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c++">
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
+
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b3d3rT</span>            <span style="color: #63b8ff;">tt_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
+
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">vf</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x</span> = xvec[0];
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y</span> = xvec[1];
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z</span> = xvec[2];
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">a</span> = 10.0;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">b</span> = 28.0;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">c</span> = 8.0/3.0;
+  <span style="color: #00ffff;">return</span> { a*y-a*z,
+           x*b-x*z,
+           x*y-c*z
+         };
+}                          
+
+<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
+  <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">vftree</span>({-30.0, -30.0,  -0.0},
+              { 30.0,  30.0,  60.0});
+  <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">vfccplx</span>;
+  <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">vftreeConverter</span>;
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Uniform sampling</span><span style="color: #ffa500;"> */</span>
+  vftree.refine_grid(5, vf);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Dump the vector field</span><span style="color: #ffa500;"> */</span>
+  vftreeConverter.construct_geometry(vfccplx,
+                                     vftree,
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::RECTANGLES, 
+                                     0,
+                                     { <span style="color: #fa8072;">"points"</span>, 
+                                       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN,  0,
+                                       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN,  1,
+                                       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN,  2},
+                                     {{<span style="color: #fa8072;">"x"</span>,   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
+                                      {<span style="color: #fa8072;">"y"</span>,   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
+                                      {<span style="color: #fa8072;">"z"</span>,   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 2}},
+                                     {{<span style="color: #fa8072;">"d"</span>,
+                                       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0,
+                                       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1,
+                                       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2}});
+  vfccplx.dump_cplx(5);
+  vfccplx.write_xml_vtk(<span style="color: #fa8072;">"vector_field_3d-f.vtu"</span>, <span style="color: #fa8072;">"vector_field_3d-f"</span>);
+
+
+  <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">cvccplx</span>;
+
+  <span style="color: #63b8ff;">int</span> <span style="color: #7fffd4;">max_steps</span> = 100000;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">delta</span>  = 0.001;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">t</span>      = 0;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x_old</span>  = 0.1;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y_old</span>  = 0.0;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z_old</span>  = 0.0;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">a</span>      = 10.0;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">b</span>      = 28.0;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">c</span>      = 8.0 / 3.0;
+
+  <span style="color: #00ffff;">auto</span> <span style="color: #7fffd4;">p_old</span> = cvccplx.add_point({x_old, y_old, z_old});
+  cvccplx.add_data_if_new(<span style="color: #fa8072;">"t"</span>, t);
+  <span style="color: #00ffff;">for</span>(<span style="color: #63b8ff;">int</span> <span style="color: #7fffd4;">num_steps</span>=0;num_steps&lt;max_steps;num_steps++) {    
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x_new</span> = x_old + a*(y_old-x_old)*delta;
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y_new</span> = y_old + (x_old*(b-z_old)-y_old)*delta;
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z_new</span> = z_old + (x_old*y_old-c*z_old)*delta;
+    t += delta;
+    <span style="color: #00ffff;">auto</span> <span style="color: #7fffd4;">p_new</span> = cvccplx.add_point({x_new, y_new, z_new});
+    cvccplx.add_data_if_new(<span style="color: #fa8072;">"t"</span>, t);
+    cvccplx.add_cell(<span style="color: #8470ff; font-weight: bold;">cc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_type_t</span>::SEGMENT, {p_old, p_new});
+    x_old=x_new;
+    y_old=y_new;
+    z_old=z_new;
+    p_old=p_new;
+
+  }
+
+  cvccplx.dump_cplx(5);
+  cvccplx.write_xml_vtk(<span style="color: #fa8072;">"vector_field_3d-c.vtu"</span>, <span style="color: #fa8072;">"vector_field_3d-c"</span>);
+
+
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-surface_with_normals" class="outline-2">
+<h2 id="surface_with_normals"><span class="section-number-2">6.</span> Surface Plot With Normals</h2>
+<div class="outline-text-2" id="text-surface_with_normals">
+<p>
+Surface normals may be used by many visualization tools to render smoother results.  In this example we demonstrate:
+</p>
+
+<ul class="org-ul">
+<li>How to compute a surface gradient for a function plot</li>
+<li>How to unitize the gradient into a surface normal</li>
+<li>How to add the normal to the sample data stored by a MRPTree</li>
+<li>How to include normals in the cell complex</li>
+<li>How to increase sampling with a SDF function</li>
+<li>How to increase sampling near humps by testing derivatives</li>
+<li>How to balance a tree</li>
+<li>How to dump a cell complex into various file types</li>
+</ul>
+
+<div class="org-center">
+<p>
+Surfaces with and without normals <br />
+<a href="media/surface_with_normals-withoutN_100.png"><img src="media/surface_with_normals-withoutN_10.png" alt="surface_with_normals-withoutN_10.png" /></a>
+<a href="media/surface_with_normals-withN_100.png"><img src="media/surface_with_normals-withN_10.png" alt="surface_with_normals-withN_10.png" /></a> <br />
+The mesh without any refinement <br />
+<a href="media/sq_surface_with_normals_grid_noref_100.png"><img src="media/sq_surface_with_normals_grid_noref_10.png" alt="sq_surface_with_normals_grid_noref_10.png" /></a> <br />
+The mesh with any refinement (sdf, partial derivative, directional derivative) <br />
+<a href="media/sq_surface_with_normals_grid_sdf_100.png"><img src="media/sq_surface_with_normals_grid_sdf_10.png" alt="sq_surface_with_normals_grid_sdf_10.png" /></a> 
+<a href="media/sq_surface_with_normals_grid_pd_100.png"><img src="media/sq_surface_with_normals_grid_pd_10.png" alt="sq_surface_with_normals_grid_pd_10.png" /></a> 
+<a href="media/sq_surface_with_normals_grid_dd_100.png"><img src="media/sq_surface_with_normals_grid_dd_10.png" alt="sq_surface_with_normals_grid_dd_10.png" /></a> <br />
+Mesh with directional directional refinement but unbalanced) <br />
+<a href="media/sq_surface_with_normals_grid_ddu_100.png"><img src="media/sq_surface_with_normals_grid_ddu_10.png" alt="sq_surface_with_normals_grid_ddu_10.png" /></a> 
+</p>
+</div>
+
+<p>
+Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surface_with_normals.cpp">https://github.com/richmit/MRPTree/blob/main/examples/surface_with_normals.cpp</a>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c++">
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
+
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b2d5rT</span>            <span style="color: #63b8ff;">tt_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
+
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">dampCosWave2</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x</span> = xvec[0];
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y</span> = xvec[1];
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">d</span> = x*x+y*y;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">m</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::exp(-d/4);
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">s</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(d);
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z</span> = m*cos(4*s);
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">dx</span> = -(cos((4 * s)) * s + 4 * sin( (4 * s))) * x * exp(-x * x / 2 - y * y / 2);
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">dy</span> = -(cos((4 * s)) * s + 4 * sin( (4 * s))) * y * exp(-x * x / 2 - y * y / 2);
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">dd</span> =   -m*(cos(4*s)*s+8*sin(4*s));
+  <span style="color: #00ffff;">if</span> (s&gt;1.0e-5) {
+    dx = dx / s;
+    dy = dy / s;
+    dd = dd / (4 * s);
+  } <span style="color: #00ffff;">else</span> {
+    dx = 1;
+    dy = 1;
+    dd = 1;
+  }
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">nm</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(1+dx*dx+dy*dy);
+  <span style="color: #00ffff;">return</span> {z, -dx/nm, -dy/nm, 1/nm, dd};
+}
+
+<span style="color: #63b8ff;">double</span> <span style="color: #00fa9a; font-weight: bold;">circleSDF2</span>(<span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">r</span>, <span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x</span> = xvec[0];
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y</span> = xvec[1];
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">m</span> = x*x+y*y;
+  <span style="color: #00ffff;">return</span> (r*r-m);
+}
+
+<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
+  <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">tree</span>({-2.1, -2.1}, 
+            { 2.1,  2.1});
+  <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">ccplx</span>;
+  <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">treeConverter</span>;
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Make a few samples on a uniform grid</span>
+  tree.refine_grid(2, dampCosWave2);
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">The humps need extra samples.  We know where they are, and we could sample on them with an SDF like this:</span>
+  <span style="color: #00ffff;">for</span>(<span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">i</span>: {0, 1, 2, 3}) {
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">r</span> = i*<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi/4;
+    tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&amp;<span style="color: #7fffd4;">tree</span>, <span style="color: #8470ff; font-weight: bold;">r</span>](<span style="color: #63b8ff;">int</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_cross_sdf(i, <span style="color: #8470ff; font-weight: bold;">std</span>::bind_front(circleSDF2, r))); });
+  }
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Alternately, we can test the derivative values to identify the humps</span>
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&amp;tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 1, 0.0); });</span>
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&amp;tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 2, 0.0); });</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Lastly we can use the directional derivative radiating from the origin</span>
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&amp;tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 4, 0.0); });</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Balance the three to the traditional level of 1 (no  cell borders a cell more than half it's size)</span>
+  tree.balance_tree(1, dampCosWave2);
+
+  tree.dump_tree(5);
+
+  treeConverter.construct_geometry(ccplx,
+                                   tree,
+                                   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::FANS, 
+                                   2,
+                                   { <span style="color: #fa8072;">"points"</span>, 
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0, 
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1,
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
+                                   {{ <span style="color: #fa8072;">"x"</span>,      <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
+                                    { <span style="color: #fa8072;">"y"</span>,      <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
+                                    { <span style="color: #fa8072;">"f(x,y)"</span>, <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
+                                    { <span style="color: #fa8072;">"-df/dx"</span>, <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1},
+                                    { <span style="color: #fa8072;">"-df/dy"</span>, <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2}},
+                                   {{<span style="color: #fa8072;">"NORMALS"</span>,
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 1,
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 2,
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 3}});
+
+  ccplx.dump_cplx(5);
+  ccplx.write_legacy_vtk(<span style="color: #fa8072;">"surface_with_normals.vtk"</span>, <span style="color: #fa8072;">"surface_with_normals"</span>);
+  ccplx.write_xml_vtk(   <span style="color: #fa8072;">"surface_with_normals.vtu"</span>, <span style="color: #fa8072;">"surface_with_normals"</span>);
+  ccplx.write_ply(       <span style="color: #fa8072;">"surface_with_normals.ply"</span>, <span style="color: #fa8072;">"surface_with_normals"</span>);
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-surface_plot_edge" class="outline-2">
+<h2 id="surface_plot_edge"><span class="section-number-2">7.</span> Surface Plot With An Edge</h2>
+<div class="outline-text-2" id="text-surface_plot_edge">
+<p>
+Surface plots are frequently complicated by regions upon which the function singular or undefined.  These functions often behave quite poorly on the
+boundaries of such regions.  For this example we consider \(f(x, y)=\sqrt{1-x^2-y^2}\) &#x2013; the upper half of the unit sphere.  Outside the unit circle this
+function is complex.  As we approach the unit circle from the center, the derivative approaches infinity.
+</p>
+
+<p>
+Right now this example illustrates two things:
+</p>
+
+<ul class="org-ul">
+<li>How to drive up the sample rate near NaNs.</li>
+<li>How to add a strip to the edge of the NaN region to "seal up" triangles.</li>
+</ul>
+
+<p>
+In the future, after I implement the NaN edge solver in MR_rt_to_cc, I'll add:
+</p>
+
+<ul class="org-ul">
+<li>How to repair triangles containing NaNs.</li>
+</ul>
+
+
+<div class="org-center">
+<p>
+<a href="media/surface_plot_edge_foot_100.png"><img src="media/surface_plot_edge_foot_10.png" alt="surface_plot_edge_foot_10.png" /></a>
+<a href="media/surface_plot_edge_jag_100.png"><img src="media/surface_plot_edge_jag_10.png" alt="surface_plot_edge_jag_10.png" /></a>
+</p>
+</div>
+
+<p>
+Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surface_plot_edge.cpp">https://github.com/richmit/MRPTree/blob/main/examples/surface_plot_edge.cpp</a>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c++">
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
+
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b2d1rT</span>            <span style="color: #63b8ff;">tt_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
+
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">halfSphere2</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">m</span> = xvec[0] * xvec[0] + xvec[1] * xvec[1];
+  <span style="color: #00ffff;">if</span> (m &gt; 1) {
+    <span style="color: #00ffff;">if</span> (m &lt; 1.02) <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">This small strip provides a landing for very small triangles that cross over the NaN region boundary.</span>
+      <span style="color: #00ffff;">return</span> 0;
+    <span style="color: #00ffff;">else</span>
+      <span style="color: #00ffff;">return</span> <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numeric_limits</span>&lt;<span style="color: #63b8ff;">double</span>&gt;::quiet_NaN();
+  } <span style="color: #00ffff;">else</span> {
+    <span style="color: #00ffff;">return</span> <span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(1-m);
+  }
+}
+
+<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
+  <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">tree</span>({-1.2, -1.2}, 
+            { 1.2,  1.2});
+  <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">ccplx</span>;
+  <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">treeConverter</span>;
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Sample a uniform grid across teh domain</span>
+  tree.refine_grid(4, halfSphere2);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">halfSphere2 produces NaNs outside the unit circle.  </span>
+<span style="color: #ff7f24;">     We can refine cells that cross the unit circle using refine_recursive_if_cell_vertex_is_nan</span><span style="color: #ffa500;"> */</span>
+  tree.refine_recursive_if_cell_vertex_is_nan(8, halfSphere2);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">halfSphere2 produces NaNs outside the unit circle.  </span>
+<span style="color: #ff7f24;">     We can refine cells that cross the unit circle using refine_leaves_recursive_cell_pred &amp; cell_vertex_is_nan.</span>
+<span style="color: #ff7f24;">     The result is the same as the call to refine_recursive_if_cell_vertex_is_nan above.</span><span style="color: #ffa500;"> */</span>
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">tree.refine_leaves_recursive_cell_pred(6, halfSphere2, [&amp;tree](int i) { return (tree.cell_vertex_is_nan(i)); });</span>
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Note: Instead of looking for NaNs, we could have used a SDF to simply tell the tree to sample anything that crosses</span>
+<span style="color: #ff7f24;">     the unit circle.  This is the technique used in MR_rect_tree_test_surf_corner.cpp.</span><span style="color: #ffa500;"> */</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Balance the three to the traditional level of 1 (no cell borders a cell more than half it's size)</span>
+  tree.balance_tree(1, halfSphere2);
+
+  tree.dump_tree(20);
+
+  treeConverter.construct_geometry(ccplx,
+                                   tree,
+                                   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::FANS, 
+                                   2,
+                                   { <span style="color: #fa8072;">"points"</span>, 
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0, 
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1,
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
+                                   {{ <span style="color: #fa8072;">"x"</span>,      <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
+                                    { <span style="color: #fa8072;">"y"</span>,      <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
+                                    { <span style="color: #fa8072;">"f(x,y)"</span>, <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0}},
+                                   {});
+
+  ccplx.write_xml_vtk(<span style="color: #fa8072;">"surface_plot_edge.vtu"</span>, <span style="color: #fa8072;">"surface_plot_edge"</span>);
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-curve_plot" class="outline-2">
+<h2 id="curve_plot"><span class="section-number-2">8.</span> Curve Plot</h2>
+<div class="outline-text-2" id="text-curve_plot">
+<p>
+Univariate function plots are the bread-and-butter of the plotting world.  Normally a simple, uniformly spaced, sequence is enough to get the job 
+done quite nicely.  Still, a few things can come up:
+</p>
+
+<ul class="org-ul">
+<li>Jump discontinuities &amp; Vertical asymptotes: Resolved with higher sampling near the discontinuities and a cutting edge (TBD)</li>
+<li>Isolated, non-differentiable points:  Resolved with higher sampling near the points and a folding edge (TBD)</li>
+<li>Undefined intervals:  Resolved with higher sampling near the edges and NaN edge repair (TBD)</li>
+<li>Regions of high oscillation: Resolved with higher sampling on the regions</li>
+<li>Extrema: Resolved with higher sampling near the extrema</li>
+</ul>
+
+<p>
+Note that most of the items above are listed TBD.  A few features need to be added to MR_rt_to_cc. ;)  Note the TODO comments in the body of main().
+</p>
+
+
+<div class="org-center">
+
+<div id="org2b1d1e5" class="figure">
+<p><a href="media/curve_plot_100.png"><img src="media/curve_plot_10.png" alt="curve_plot_10.png" /></a>
+</p>
+</div>
+</div>
+
+<p>
+Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/curve_plot.cpp">https://github.com/richmit/MRPTree/blob/main/examples/curve_plot.cpp</a>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c++">
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
+
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b1d1rT</span>            <span style="color: #63b8ff;">tt_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
+
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">f</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">x</span>) { 
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">ret</span> = (x&lt;0?-1:1)*<span style="color: #8470ff; font-weight: bold;">std</span>::pow(<span style="color: #8470ff; font-weight: bold;">std</span>::abs(x), 1/3.0) * <span style="color: #8470ff; font-weight: bold;">std</span>::sqrt((x+1.5)*(x+1.5)-1) * (x-2);
+  <span style="color: #00ffff;">if</span> (x&gt;2)
+    ret = 2+<span style="color: #8470ff; font-weight: bold;">std</span>::sin(20*x);
+  <span style="color: #00ffff;">if</span> (ret &lt; -3)
+    ret = -3;
+  <span style="color: #00ffff;">if</span> (ret &gt; 3.2)
+    ret = 3.2;
+  <span style="color: #00ffff;">return</span> ret;
+}
+
+<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
+  <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">tree</span>(-3, 3);
+  <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">ccplx</span>;
+  <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">treeConverter</span>;
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Sample a uniform grid across the domain</span>
+  tree.refine_grid(5, f);
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Refine near NaN</span>
+  tree.refine_recursive_if_cell_vertex_is_nan(10, f);
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">TODO: Add NaN edge repair when implemented in MR_rt_to_cc</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Refine near vertical tangent line</span>
+  tree.refine_leaves_recursive_cell_pred(10, f, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_close_to_domain_point(0.0, 1.0e-2, i)); });
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">TODO: Use derivative test for this</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Step discontinuities at 2.</span>
+  tree.refine_leaves_recursive_cell_pred(10, f, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_close_to_domain_point(2.0, 1.0e-2, i)); });
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">TODO: Add cell cut when implemented in MR_rt_to_cc</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Non differentiable point near x=-2.619185320</span>
+  tree.refine_leaves_recursive_cell_pred(11, f, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_close_to_domain_point(-2.619185320, 1.0e-2, i)); });
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">TODO: Add folding edge when implemented in MR_rt_to_cc</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">High oscillation from [2,3]</span>
+  tree.refine_leaves_recursive_cell_pred(10, f, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.diti_to_drpt(i) &gt;= 2.0); });
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Extrema near -0.2171001290</span>
+  tree.refine_leaves_recursive_cell_pred(10, f, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_close_to_domain_point(-0.2171001290, 1.0e-2, i)); });
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">TODO: Use derivative test for this</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Extrema near 0.8775087009</span>
+  tree.refine_leaves_recursive_cell_pred(8, f, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_close_to_domain_point(0.8775087009, 1.0e-2, i)); });
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">TODO: Use derivative test for this</span>
+
+  tree.dump_tree(20);
+
+  treeConverter.construct_geometry(ccplx,
+                                   tree,
+                                   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::FANS, 
+                                   1,
+                                   { <span style="color: #fa8072;">"points"</span>, 
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0, 
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0,
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::ZERO,   0},
+                                   {{ <span style="color: #fa8072;">"x"</span>,    <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
+                                    { <span style="color: #fa8072;">"f(x)"</span>, <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0}},
+                                   {});
+
+  ccplx.write_xml_vtk(<span style="color: #fa8072;">"curve_plot.vtu"</span>, <span style="color: #fa8072;">"curve_plot"</span>);
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-parametric_surface_with_defects" class="outline-2">
+<h2 id="parametric_surface_with_defects"><span class="section-number-2">9.</span> Parametric Surface With Defects</h2>
+<div class="outline-text-2" id="text-parametric_surface_with_defects">
+<p>
+This example illustrates some of the things that can go wrong when generating parametric surfaces.  We dump two version of the tessellation &#x2013; one with
+quads and one with triangles.  This allows us to better illustrate how some defects show up.
+</p>
+<ul class="org-ul">
+<li>Quads that are not plainer.
+Look closely at the rectangular tessellation, and note the "rectangles" appear to be broken in across the diagonal &#x2013; at least that's how they appear in
+most tools including Paraview &amp; meshlab.</li>
+<li>At the poles, the rectangular cells of the tree map to three distinct points instead of four.
+This means for the rectangular tessellation, the rectangles at the poles are degenerate!  Then converting from tree to cell complex, these quads are
+removed because they are degenerate. This is not an issue for the triangular tessellation (FANS).</li>
+<li>The v=0 edge meets up with the v=1 edge.  
+Because we have uniq_points set to true for the cell complex object, the duplicate points are "welded" together when the points are added.  This results
+in a seamless edge.</li>
+</ul>
+
+<div class="org-center">
+<p>
+<a href="media/parametric_surface_with_defects-rect_100.png"><img src="media/parametric_surface_with_defects-rect_10.png" alt="parametric_surface_with_defects-rect_10.png" /></a>
+<a href="media/parametric_surface_with_defects-tri_100.png"><img src="media/parametric_surface_with_defects-tri_10.png" alt="parametric_surface_with_defects-tri_10.png" /></a>
+</p>
+</div>
+
+<p>
+Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/parametric_surface_with_defects.cpp">https://github.com/richmit/MRPTree/blob/main/examples/parametric_surface_with_defects.cpp</a>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c++">
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
+
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b2d3rT</span>            <span style="color: #63b8ff;">tt_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
+
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">parSphere2</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">u</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi/4 * xvec[0] + <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi/4;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">v</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi   * xvec[1] + <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi;
+  <span style="color: #00ffff;">return</span> { <span style="color: #8470ff; font-weight: bold;">std</span>::sin(u)*<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v),
+           <span style="color: #8470ff; font-weight: bold;">std</span>::sin(u)*<span style="color: #8470ff; font-weight: bold;">std</span>::sin(v),
+           <span style="color: #8470ff; font-weight: bold;">std</span>::cos(u)
+         };
+}                          
+
+<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
+  <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">tree</span>;
+  <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">ccplx</span>;
+  <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">treeConverter</span>;
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Uniform sampling</span><span style="color: #ffa500;"> */</span>
+  tree.refine_grid(6, parSphere2);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">First we dump a tessellation made of triangles</span><span style="color: #ffa500;"> */</span>
+  treeConverter.construct_geometry(ccplx,
+                                   tree,
+                                   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::FANS, 
+                                   2,
+                                   { <span style="color: #fa8072;">"points"</span>, 
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0,
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1,
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2},
+                                   {{<span style="color: #fa8072;">"u"</span>,       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
+                                    {<span style="color: #fa8072;">"v"</span>,       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
+                                    {<span style="color: #fa8072;">"x(u,v)"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
+                                    {<span style="color: #fa8072;">"y(u,v)"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1},
+                                    {<span style="color: #fa8072;">"z(u,v)"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2}},
+                                   {});
+  ccplx.dump_cplx(5);
+  ccplx.write_xml_vtk(<span style="color: #fa8072;">"parametric_surface_with_defects-tri.vtu"</span>, <span style="color: #fa8072;">"parametric_surface_with_defects-tri"</span>);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Next we dump a tessellation made of rectangles</span><span style="color: #ffa500;"> */</span>
+  treeConverter.construct_geometry(ccplx,
+                                   tree,
+                                   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::RECTANGLES, 
+                                   2,
+                                   { <span style="color: #fa8072;">"points"</span>, 
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0,
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1,
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2},
+                                   {{<span style="color: #fa8072;">"u"</span>,       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
+                                    {<span style="color: #fa8072;">"v"</span>,       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
+                                    {<span style="color: #fa8072;">"x(u,v)"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
+                                    {<span style="color: #fa8072;">"y(u,v)"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1},
+                                    {<span style="color: #fa8072;">"z(u,v)"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2}},
+                                   {});
+  ccplx.dump_cplx(5);
+  ccplx.write_xml_vtk(<span style="color: #fa8072;">"parametric_surface_with_defects-rect.vtu"</span>, <span style="color: #fa8072;">"parametric_surface_with_defects-rect"</span>);
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br />
+<br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br />
+<br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br />
+<br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br />
+<br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br />
+</div>
+</body>
+</html>
