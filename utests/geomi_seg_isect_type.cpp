@@ -1,7 +1,7 @@
 // -*- Mode:C++; Coding:us-ascii-unix; fill-column:158 -*-
 /*******************************************************************************************************************************************************.H.S.**/
 /**
- @file      check_cell_triangle.cpp
+ @file      geomi_seg_isect_type.cpp
  @author    Mitch Richling http://www.mitchr.me/
  @date      2024-07-13
  @brief     Unit tests for MR_cell_cplx.@EOL
@@ -127,4 +127,3 @@ BOOST_AUTO_TEST_CASE(geomi_seg_isect_type) {
   BOOST_CHECK(aPoly.geomi_seg_isect_type(0, 2, 1, 3) == mjr::MRccT5::seg_isect_t::CI_VERTEX0);
 
 }
-

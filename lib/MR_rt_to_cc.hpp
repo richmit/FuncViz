@@ -96,7 +96,7 @@ namespace mjr {
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Convert a tree_val_src to a string */
-      static std::string tree_val_src_to_str(tree_val_src_t tree_val_src) { 
+      static std::string tree_val_src_to_string(tree_val_src_t tree_val_src) { 
         switch(tree_val_src) {
           case tree_val_src_t::DOMAIN: return("DOMAIN"); break;
           case tree_val_src_t::RANGE:  return("RANGE");  break;
@@ -106,8 +106,8 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Convert a tree_scl_val_desc_t to a string */
-      static std::string tree_scl_val_desc_to_str(tree_scl_val_desc_t scl_desc) { 
-        return (std::get<0>(scl_desc) + ":" + tree_val_src_to_str(get<1>(scl_desc)) + "/" + std::to_string(get<2>(scl_desc)));
+      static std::string tree_scl_val_desc_to_string(tree_scl_val_desc_t scl_desc) { 
+        return (std::get<0>(scl_desc) + ":" + tree_val_src_to_string(get<1>(scl_desc)) + "/" + std::to_string(get<2>(scl_desc)));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Validate a tree_scl_val_desc_t object
@@ -115,17 +115,17 @@ namespace mjr {
           @param scl_desc Object to valudate */
       static bool invalid_tree_scl_val_desc(const rt_t& rtree, tree_scl_val_desc_t scl_desc) { 
         if (std::get<2>(scl_desc) < 0) {
-          std::cout << "ERROR: Invalid val_desc: " << tree_scl_val_desc_to_str(scl_desc) << std::endl;
+          std::cout << "ERROR: Invalid val_desc: " << tree_scl_val_desc_to_string(scl_desc) << std::endl;
           return true;
         }
         if (std::get<1>(scl_desc) == tree_val_src_t::DOMAIN) {
           if (std::get<2>(scl_desc) >= rtree.domain_dimension) {
-            std::cout << "ERROR: Invalid val_desc: " << tree_scl_val_desc_to_str(scl_desc) << std::endl;
+            std::cout << "ERROR: Invalid val_desc: " << tree_scl_val_desc_to_string(scl_desc) << std::endl;
             return true;
           }
         } else {
           if (std::get<2>(scl_desc) >= rtree.range_dimension) {
-            std::cout << "ERROR: Invalid val_desc: " << tree_scl_val_desc_to_str(scl_desc) << std::endl;
+            std::cout << "ERROR: Invalid val_desc: " << tree_scl_val_desc_to_string(scl_desc) << std::endl;
             return true;
           }
         }

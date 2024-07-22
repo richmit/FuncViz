@@ -260,6 +260,54 @@ namespace mjr {
 
     public:
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /** @name 3D Vector Computations. */
+      //@{
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Compute the magnitude */
+      inline double vec3_two_norm(const pnt_t& pnt) const {
+        return std::sqrt(vec3_self_dot_product(pnt));
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Compute the self dot product -- i.e. magnitude squared */
+      inline double vec3_self_dot_product(const pnt_t& pnt) const {
+        double tmp = 0.0;
+        for(int i=0; i<3; ++i)
+          tmp += pnt[i]*pnt[i];
+        return tmp;
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Compute the cross prodcut */
+      inline double vec3_dot_product(const pnt_t& pnt1, const pnt_t& pnt2) const {
+        double tmp = 0.0;
+        for(int i=0; i<3; ++i)
+          tmp += pnt1[i]*pnt2[i];
+        return tmp;
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Compute the cross prodcut */
+      inline pnt_t vec3_cross_product(const pnt_t& pnt1, const pnt_t& pnt2) const {
+        pnt_t tmp;
+        tmp[0] = pnt1[1]*pnt2[2]-pnt1[2]*pnt2[1];
+        tmp[1] = pnt1[2]*pnt2[0]-pnt1[0]*pnt2[2];
+        tmp[2] = pnt1[0]*pnt2[1]-pnt1[1]*pnt2[0];
+        return tmp;
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Compute the vector diffrence */
+      inline pnt_t vec3_diff(const pnt_t& pnt1, const pnt_t& pnt2) const {
+        pnt_t tmp;
+        for(int i=0; i<3; ++i)
+          tmp[i] = pnt1[i] - pnt2[i];
+        return tmp;
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Compute the vector diffrence */
+      inline double vec3_scalar_triple_product(const pnt_t& pnt1, const pnt_t& pnt2, const pnt_t& pnt3) const {
+        return vec3_dot_product(pnt1, vec3_cross_product(pnt2, pnt3));
+      }
+      //@}
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /** @name 3D Geometry Computations. 
 
        Methods with geomi_ prefix take point index types while methods with a geomr_ prefix take double tuples.  */
@@ -442,7 +490,7 @@ namespace mjr {
         if (seg_distance) {
           double dp1 = geomr_pnt_pnt_distance(linpnt1, p);
           double dp2 = geomr_pnt_pnt_distance(linpnt2, p);
-          if (std::abs((dp1+dp2)-segd) > eps) 
+          if (std::abs((dp1+dp2)-segd) > eps) // MJR TODO NOTE: check logic -- dp1>segd || dp2>segd?
             return std::min(geomr_pnt_pnt_distance(linpnt1, pnt), geomr_pnt_pnt_distance(linpnt2, pnt));
         }
         return geomr_pnt_pnt_distance(p, pnt);
@@ -450,10 +498,33 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the euculedian (2 norm) distance between two points */
       double geomr_pnt_pnt_distance(const pnt_t& pnt1, const pnt_t& pnt2) const {
-        double d = 0;
-        for(int i=0; i<3; i++)
-          d += (pnt1[i]-pnt2[i])*(pnt1[i]-pnt2[i]);
-        return std::sqrt(d);          
+        return vec3_two_norm(vec3_diff(pnt1, pnt2));
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Compute the normal of a triangle (or a plane defined by 3 points) */
+      inline pnt_t geomr_tri_normal(const pnt_t& tripnt1, const pnt_t& tripnt2, const pnt_t& tripnt3, bool unit) const {
+        pnt_t basisv1 = vec3_diff(tripnt1, tripnt2);  // basis vectors for pln containing triagnel
+        pnt_t basisv2 = vec3_diff(tripnt3, tripnt2);  // basis vectors for pln containing triagnel
+        pnt_t normal = vec3_cross_product(basisv1, basisv2); // normal vector for tri. n=pld1xpld2
+        if (unit) {
+          double normal_length = vec3_two_norm(normal);
+          if (std::abs(normal_length) > eps)
+            for(int i=0; i<3; ++i) 
+              normal[i] = normal[i]/normal_length;
+        }
+        return normal;
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Compute the distance between a point and a plane */
+      double geomr_pnt_pln_distance(const pnt_t& plnpnt1, const pnt_t& plnpnt2, const pnt_t& plnpnt3, const pnt_t& pnt) const {
+        pnt_t n = geomr_tri_normal(plnpnt1, plnpnt2, plnpnt3, true);
+        return std::abs(vec3_dot_product(n, pnt) - vec3_dot_product(n, plnpnt2));
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Compute the distance between a point and a triangle */
+      double geomr_pnt_tri_distance(const pnt_t& tripnt1, const pnt_t& tripnt2, const pnt_t& tripnt3, const pnt_t& pnt) const {
+        //  MJR TODO NOTE geomr_pnt_tri_distance: Implement
+        return 1.0;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if points (just one point for this function) are zero.
@@ -477,17 +548,7 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if points are colinear */
       bool geomr_pts_colinear(pnt_t p1, pnt_t p2, pnt_t p3) const {
-        // p2=p2-p1, p3=p3-p1
-        for(int i=0; i<3; ++i) {
-          p2[i] = p1[i] - p2[i];
-          p3[i] = p1[i] - p3[i];
-        }
-        // p1=p2xp3
-        p1[0] = p2[1]*p3[2]-p2[2]*p3[1];
-        p1[1] = p2[2]*p3[0]-p2[0]*p3[2];
-        p1[2] = p2[0]*p3[1]-p2[1]*p3[0];
-        // if p1=0, then degenerate
-        return geomr_pnt_zero(p1);
+        return geomr_pnt_zero(vec3_cross_product(vec3_diff(p1, p2), vec3_diff(p1, p3)));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if points are coplanar */
@@ -509,22 +570,7 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if points are coplanar */
       bool geomr_pts_coplanar(pnt_t p1, pnt_t p2, pnt_t p3, pnt_t p4) const {
-        // P2=P2-P1, P3=P3-P1, P4=P4-P1
-        for(int i=0; i<3; ++i) {
-          p2[i] = p2[i] - p1[i];
-          p3[i] = p3[i] - p1[i];
-          p4[i] = p4[i] - p1[i];
-        }
-        // p1=p2xp4
-        p1[0] = p2[1]*p4[2]-p2[2]*p4[1];
-        p1[1] = p2[2]*p4[0]-p2[0]*p4[2];
-        p1[2] = p2[0]*p4[1]-p2[1]*p4[0];
-        // dotp=p1.p3
-        double dotp = 0.0;
-        for(int i=0; i<3; ++i) 
-          dotp += std::abs(p1[i] * p3[i]);
-        // if dotp==0, then coplainer
-        return (dotp<eps);
+        return (std::abs(vec3_scalar_triple_product(vec3_diff(p3, p1), vec3_diff(p2, p1), vec3_diff(p4, p1))) < eps);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute intersection of a segment and a triangle */
@@ -930,7 +976,7 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Convert cell_stat_t enum value to a string. */
-      std::string cell_stat_to_str(cell_stat_t cell_stat) const {
+      std::string cell_stat_to_string(cell_stat_t cell_stat) const {
         switch(cell_stat) {
           case cell_stat_t::GOOD:            return (std::string("GOOD"));            break;
           case cell_stat_t::TOO_FEW_PNT:     return (std::string("TOO_FEW_PNT"));     break;
