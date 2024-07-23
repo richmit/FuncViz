@@ -104,7 +104,7 @@ grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/complex_magn
 
 #+BEGIN_CENTER
 [[file:media/complex_magnitude_surface-2D_100.png][file:media/complex_magnitude_surface-2D_10.png]]
-[[file:media/complex_magnitude_surface_rot_50.gif][file:media/complex_magnitude_surface_rot_10.gif]]
+[[file:media/complex_magnitude_surface_rot_100.html][file:media/complex_magnitude_surface_rot_10.gif]]
 #+END_CENTER
 
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/complex_magnitude_surface.cpp
@@ -378,7 +378,7 @@ grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/implicit_sur
 
 
 #+BEGIN_CENTER
-[[file:media/implicit_surface_rt_rot_50.gif][file:media/implicit_surface_rt_rot_10.gif]]
+[[file:media/implicit_surface_rt_rot_100.html][file:media/implicit_surface_rt_rot_10.gif]]
 [[file:media/implicit_surface_make_50.gif][file:media/implicit_surface_make_10.gif]]
 #+END_CENTER
 
@@ -1142,7 +1142,7 @@ grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/trefoil.cpp 
   This example doesn't really demonstrate anything not found in the other examples.  It's just a neat surface. ;)
 
 #+BEGIN_CENTER
-[[file:media/trefoil_rot_50.gif][file:media/trefoil_rot_10.gif]]
+[[file:media/trefoil_rot_50.html][file:media/trefoil_rot_10.gif]]
 #+END_CENTER
 
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/trefoil.cpp
@@ -1436,3 +1436,72 @@ NEWER: ../../examples/surface_plot_edge.cpp
 NEWER: ../../examples/surface_with_normals.cpp
 NEWER: ../../examples/vector_field_3d.cpp
 #+end_example
+
+* Image Processing: WEBMs                                          :noexport:
+
+** Put media in place
+
+#+begin_src sh  :results output verbatum :exports both
+for f in ../../paraview/*.webm; do
+  b=$(echo $f | sed 's/^.*\///')
+  fn="media/${b}"
+  if [ $f -nt $fn ]; then
+    echo make $fn
+    cp $f $fn
+  else
+    echo skip $fn
+  fi
+done
+#+end_src
+
+#+RESULTS:
+#+begin_example
+skip media/complex_magnitude_surface_rot_100.webm
+skip media/complex_magnitude_surface_rot_25.webm
+skip media/complex_magnitude_surface_rot_50.webm
+skip media/implicit_surface_rt_rot_100.webm
+skip media/implicit_surface_rt_rot_25.webm
+skip media/implicit_surface_rt_rot_50.webm
+make media/lorenz_rot_25.webm
+skip media/trefoil_rot_100.webm
+skip media/trefoil_rot_25.webm
+skip media/trefoil_rot_50.webm
+#+end_example
+
+** Create HTML Wrappers
+
+#+begin_src sh :results output verbatum
+for e in complex_magnitude_surface implicit_surface lorenz trefoil; do
+  echo Processing Example $e
+  he=$(echo $e | sed 's/_/ /g; s/\b\(.\)/\u\1/g')
+  for f in media/$e*.webm; do
+    b=$(echo $f | sed 's/\.webm$//; s/^.*\///')
+    fn="media/${b}.html"
+    if [ "$f" -nt "$fn" -o 'misc/movie_template.html' -nt "$fn" ]; then
+      echo "  make $fn"
+      sed "s/LINKT/$e/; s/TITLE/$he/; s/MOVIEFILE/$b/;" < 'misc/movie_template.html' > "$fn"
+    else
+      echo "  skip $fn"
+    fi
+  done
+done
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Processing Example complex_magnitude_surface
+  skip media/complex_magnitude_surface_rot_100.html
+  skip media/complex_magnitude_surface_rot_25.html
+  skip media/complex_magnitude_surface_rot_50.html
+Processing Example implicit_surface
+  skip media/implicit_surface_rt_rot_100.html
+  skip media/implicit_surface_rt_rot_25.html
+  skip media/implicit_surface_rt_rot_50.html
+Processing Example lorenz
+  make media/lorenz_rot_25.html
+Processing Example trefoil
+  skip media/trefoil_rot_100.html
+  skip media/trefoil_rot_25.html
+  skip media/trefoil_rot_50.html
+#+end_example
+
