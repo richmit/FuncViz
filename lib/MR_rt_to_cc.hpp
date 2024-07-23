@@ -189,10 +189,12 @@ namespace mjr {
         typename rt_t::rrpt_t    rPts = rtree.get_sample(diti);
         typename cc_t::pnt_t     pnt  = get_vector(rtree, point_src, dPts, rPts);
         typename cc_t::pnt_idx_t pnti = ccplx.add_point(pnt);
-        for (auto s : scalar_data_src_lst) 
-          ccplx.add_data_if_new(std::get<0>(s), get_scalar(rtree, s, dPts, rPts));
-        for (auto v : vector_data_src_lst)
-          ccplx.add_data_if_new(std::get<0>(v), get_vector(rtree, v, dPts, rPts));
+        if (ccplx.last_point_added_was_new()) { // Logically unnecessary, but speeds things up.
+          for (auto s : scalar_data_src_lst) 
+            ccplx.add_data_if_new(std::get<0>(s), get_scalar(rtree, s, dPts, rPts));
+          for (auto v : vector_data_src_lst)
+            ccplx.add_data_if_new(std::get<0>(v), get_vector(rtree, v, dPts, rPts));
+        }
         return (pnti);
       }
       //@}

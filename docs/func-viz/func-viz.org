@@ -1004,6 +1004,130 @@ int main() {
 #+end_src
 
 
+* High Resolution Parametric Surface
+:PROPERTIES:
+:CUSTOM_ID: performance_with_large_surface
+:END:
+
+#+begin_src sh :results output raw :exports results 
+grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/performance_with_large_surface.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!]\)/\\)\1/g;'
+#+end_src
+
+#+RESULTS:
+
+  Just a nice parametric surface without any weirdness.  Some things demonstrated:
+
+   - How to time various operations. 
+     - Try with a large mesh (use a 9 in refine_grid).
+     - Try reducing the number of data variables stored in the cell complex
+     - Try removing the normal vector from the output
+     - Try both MRccT5 & MRccF5 for cc_t
+   - How to include a synthetic value that can be used for color mapping --  c(u,v) can be used to render stripes on the surface.
+   - How to compute a normal to a parametric surface
+   - How to include a normal in the cell complex
+
+#+BEGIN_CENTER
+Surfaces with and without normals \\
+[[file:media/performance_with_large_surface_withN_100.png][file:media/performance_with_large_surface_withN_10.png]]
+[[file:media/performance_with_large_surface_withoutN_100.png][file:media/performance_with_large_surface_withoutN_10.png]] \\
+Stripes!! \\
+[[file:media/performance_with_large_surface_stripes_100.png][file:media/performance_with_large_surface_stripes_10.png]]
+#+END_CENTER
+
+Source code: https://github.com/richmit/MRPTree/blob/main/examples/parametric_surface_with_defects.cpp
+
+#+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
+grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/performance_with_large_surface.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+#+end_src
+
+#+RESULTS:
+#+begin_src c++ :eval never :tangle no
+
+#include <chrono>
+
+#include "MR_rect_tree.hpp"
+#include "MR_cell_cplx.hpp"
+#include "MR_rt_to_cc.hpp"
+
+typedef mjr::tree15b2d15rT           tt_t;
+typedef mjr::MRccT5                  cc_t;   // Replace with mjr::MRccF5, and compare treeConverter performance.
+typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
+
+tt_t::rrpt_t shellStripes2(tt_t::drpt_t xvec) {
+  double u    = std::numbers::pi   * xvec[0] + std::numbers::pi + 0.1; // U transformed from unit interval
+  double v    = std::numbers::pi/2 * xvec[1] + std::numbers::pi/2;     // V transformed from unit interval
+  double x    = u*std::sin(u)*std::cos(v);                             // X
+  double y    = u*std::cos(u)*std::cos(v);                             // Y
+  double z    = u*std::sin(v);                                         // Z
+  double c    = std::fmod(u*sin(v), 2);                                // Stripes
+  double dxdu = std::sin(u)*std::cos(v)+u*std::cos(u)*std::cos(v);     // dX/du
+  double dxdv = -u*std::sin(u)*std::sin(v);                            // dX/dv
+  double dydu = std::cos(u)*std::cos(v)-u*std::sin(u)*std::cos(v);     // dY/du
+  double dydv = -u*std::cos(u)*std::sin(v);                            // dY/dv
+  double dzdu = std::sin(v);                                           // dZ/du
+  double dzdv = u*std::cos(v);                                         // dZ/dv
+  double nx   = dydu*dzdv-dydv*dzdu;                                   // normal_X     This noraml 
+  double ny   = dxdv*dzdu-dxdu*dzdv;                                   // normal_Y     will not be of 
+  double nz   = dxdu*dydv-dxdv*dydu;                                   // normal_Z     unit length
+  return {x, y, z, c, dxdu, dxdv, dydu, dydv, dzdu, dzdv, nx, ny, nz};
+}                          
+
+int main() {
+  std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
+  tt_t tree;
+  cc_t ccplx;
+  tc_t treeConverter;
+  std::chrono::time_point<std::chrono::system_clock> constructTime = std::chrono::system_clock::now();
+
+  tree.refine_grid(6, shellStripes2);
+  std::chrono::time_point<std::chrono::system_clock> sampleTime = std::chrono::system_clock::now();
+
+  tree.dump_tree(20);
+  std::chrono::time_point<std::chrono::system_clock> dumpTime = std::chrono::system_clock::now();
+
+  treeConverter.construct_geometry(ccplx,
+                                   tree,
+                                   tc_t::cell_structure_t::FANS, 
+                                   2,
+                                   { "points", 
+                                     tc_t::tree_val_src_t::RANGE,  0,
+                                     tc_t::tree_val_src_t::RANGE,  1,
+                                     tc_t::tree_val_src_t::RANGE,   2},
+                                   {{"u",           tc_t::tree_val_src_t::DOMAIN, 0},
+                                    {"v",           tc_t::tree_val_src_t::DOMAIN, 1},
+                                    {"x(u,v)",      tc_t::tree_val_src_t::RANGE,  0},
+                                    {"y(u,v)",      tc_t::tree_val_src_t::RANGE,  1},
+                                    {"z(u,v)",      tc_t::tree_val_src_t::RANGE,  2},
+                                    {"c(u,v)",      tc_t::tree_val_src_t::RANGE,  3},
+                                    {"dx(u,v)/du",  tc_t::tree_val_src_t::RANGE,  4},
+                                    {"dx(u,v)/dv",  tc_t::tree_val_src_t::RANGE,  5},
+                                    {"dy(u,v)/du",  tc_t::tree_val_src_t::RANGE,  6},
+                                    {"dy(u,v)/dv",  tc_t::tree_val_src_t::RANGE,  7},
+                                    {"dz(u,v)/du",  tc_t::tree_val_src_t::RANGE,  8},
+                                    {"dz(u,v)/dv",  tc_t::tree_val_src_t::RANGE,  9},
+                                    {"nx",          tc_t::tree_val_src_t::RANGE, 10},
+                                    {"ny",          tc_t::tree_val_src_t::RANGE, 11},
+                                    {"nz",          tc_t::tree_val_src_t::RANGE, 12}},
+                                   {{"NORMALS", 
+                                     tc_t::tree_val_src_t::RANGE, 10,
+                                     tc_t::tree_val_src_t::RANGE, 11,
+                                     tc_t::tree_val_src_t::RANGE, 12}});
+  std::chrono::time_point<std::chrono::system_clock> vtkFanTime = std::chrono::system_clock::now();
+
+  ccplx.write_xml_vtk("performance_with_large_surface.vtu", "performance_with_large_surface");
+  std::chrono::time_point<std::chrono::system_clock> vtkWriteTime = std::chrono::system_clock::now();
+
+  std::cout << "constructTime time ... " << static_cast<std::chrono::duration<double>>(constructTime-startTime)     << " sec" << std::endl;
+  std::cout << "sampleTime time ...... " << static_cast<std::chrono::duration<double>>(sampleTime-constructTime)    << " sec" << std::endl;
+  std::cout << "dumpTime time ........ " << static_cast<std::chrono::duration<double>>(dumpTime-sampleTime)         << " sec" << std::endl;
+  std::cout << "treeConverter time ... " << static_cast<std::chrono::duration<double>>(vtkFanTime-dumpTime)         << " sec" << std::endl;
+  std::cout << "write_vtk time ....... " << static_cast<std::chrono::duration<double>>(vtkWriteTime-vtkFanTime)     << " sec" << std::endl;
+  std::cout << "Total Run Time ....... " << static_cast<std::chrono::duration<double>>(vtkWriteTime-startTime)      << " sec" << std::endl;
+}
+#+end_src
+
+
+
 * Image Processing: Resize PNGs                                    :noexport:
 
 #+begin_src sh  :results output verbatum :exports both
@@ -1051,38 +1175,50 @@ skip media/parametric_surface_with_defects-tri_100.png
 skip media/parametric_surface_with_defects-tri_50.png
 skip media/parametric_surface_with_defects-tri_25.png
 skip media/parametric_surface_with_defects-tri_10.png
-make media/sq_surface_with_normals-withN_100.png
-make media/sq_surface_with_normals-withN_50.png
-make media/sq_surface_with_normals-withN_25.png
-make media/sq_surface_with_normals-withN_10.png
-make media/sq_surface_with_normals-withoutN_100.png
-make media/sq_surface_with_normals-withoutN_50.png
-make media/sq_surface_with_normals-withoutN_25.png
-make media/sq_surface_with_normals-withoutN_10.png
+make media/performance_with_large_surface_stripes_100.png
+make media/performance_with_large_surface_stripes_50.png
+make media/performance_with_large_surface_stripes_25.png
+make media/performance_with_large_surface_stripes_10.png
+skip media/performance_with_large_surface_withN_100.png
+skip media/performance_with_large_surface_withN_50.png
+skip media/performance_with_large_surface_withN_25.png
+skip media/performance_with_large_surface_withN_10.png
+skip media/performance_with_large_surface_withoutN_100.png
+skip media/performance_with_large_surface_withoutN_50.png
+skip media/performance_with_large_surface_withoutN_25.png
+skip media/performance_with_large_surface_withoutN_10.png
+skip media/sq_surface_with_normals-withN_100.png
+skip media/sq_surface_with_normals-withN_50.png
+skip media/sq_surface_with_normals-withN_25.png
+skip media/sq_surface_with_normals-withN_10.png
+skip media/sq_surface_with_normals-withoutN_100.png
+skip media/sq_surface_with_normals-withoutN_50.png
+skip media/sq_surface_with_normals-withoutN_25.png
+skip media/sq_surface_with_normals-withoutN_10.png
 skip media/sq_surface_with_normals_grid_100.png
 skip media/sq_surface_with_normals_grid_50.png
 skip media/sq_surface_with_normals_grid_25.png
 skip media/sq_surface_with_normals_grid_10.png
-make media/sq_surface_with_normals_grid_dd_100.png
-make media/sq_surface_with_normals_grid_dd_50.png
-make media/sq_surface_with_normals_grid_dd_25.png
-make media/sq_surface_with_normals_grid_dd_10.png
-make media/sq_surface_with_normals_grid_ddu_100.png
-make media/sq_surface_with_normals_grid_ddu_50.png
-make media/sq_surface_with_normals_grid_ddu_25.png
-make media/sq_surface_with_normals_grid_ddu_10.png
-make media/sq_surface_with_normals_grid_noref_100.png
-make media/sq_surface_with_normals_grid_noref_50.png
-make media/sq_surface_with_normals_grid_noref_25.png
-make media/sq_surface_with_normals_grid_noref_10.png
-make media/sq_surface_with_normals_grid_pd_100.png
-make media/sq_surface_with_normals_grid_pd_50.png
-make media/sq_surface_with_normals_grid_pd_25.png
-make media/sq_surface_with_normals_grid_pd_10.png
-make media/sq_surface_with_normals_grid_sdf_100.png
-make media/sq_surface_with_normals_grid_sdf_50.png
-make media/sq_surface_with_normals_grid_sdf_25.png
-make media/sq_surface_with_normals_grid_sdf_10.png
+skip media/sq_surface_with_normals_grid_dd_100.png
+skip media/sq_surface_with_normals_grid_dd_50.png
+skip media/sq_surface_with_normals_grid_dd_25.png
+skip media/sq_surface_with_normals_grid_dd_10.png
+skip media/sq_surface_with_normals_grid_ddu_100.png
+skip media/sq_surface_with_normals_grid_ddu_50.png
+skip media/sq_surface_with_normals_grid_ddu_25.png
+skip media/sq_surface_with_normals_grid_ddu_10.png
+skip media/sq_surface_with_normals_grid_noref_100.png
+skip media/sq_surface_with_normals_grid_noref_50.png
+skip media/sq_surface_with_normals_grid_noref_25.png
+skip media/sq_surface_with_normals_grid_noref_10.png
+skip media/sq_surface_with_normals_grid_pd_100.png
+skip media/sq_surface_with_normals_grid_pd_50.png
+skip media/sq_surface_with_normals_grid_pd_25.png
+skip media/sq_surface_with_normals_grid_pd_10.png
+skip media/sq_surface_with_normals_grid_sdf_100.png
+skip media/sq_surface_with_normals_grid_sdf_50.png
+skip media/sq_surface_with_normals_grid_sdf_25.png
+skip media/sq_surface_with_normals_grid_sdf_10.png
 skip media/sq_surface_with_normals_grid_unbal_100.png
 skip media/sq_surface_with_normals_grid_unbal_50.png
 skip media/sq_surface_with_normals_grid_unbal_25.png

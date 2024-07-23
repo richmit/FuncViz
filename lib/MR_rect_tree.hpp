@@ -1616,6 +1616,21 @@ namespace mjr {
     typedef mjr::MR_rect_tree<15, double, 3, 12> tree15b3d12rT;
     typedef mjr::MR_rect_tree<15, double, 4, 12> tree15b4d12rT;
 
+    typedef mjr::MR_rect_tree<15, double, 1, 13> tree15b1d13rT;
+    typedef mjr::MR_rect_tree<15, double, 2, 13> tree15b2d13rT;
+    typedef mjr::MR_rect_tree<15, double, 3, 13> tree15b3d13rT;
+    typedef mjr::MR_rect_tree<15, double, 4, 13> tree15b4d13rT;
+
+    typedef mjr::MR_rect_tree<15, double, 1, 14> tree15b1d14rT;
+    typedef mjr::MR_rect_tree<15, double, 2, 14> tree15b2d14rT;
+    typedef mjr::MR_rect_tree<15, double, 3, 14> tree15b3d14rT;
+    typedef mjr::MR_rect_tree<15, double, 4, 14> tree15b4d14rT;
+
+    typedef mjr::MR_rect_tree<15, double, 1, 15> tree15b1d15rT;
+    typedef mjr::MR_rect_tree<15, double, 2, 15> tree15b2d15rT;
+    typedef mjr::MR_rect_tree<15, double, 3, 15> tree15b3d15rT;
+    typedef mjr::MR_rect_tree<15, double, 4, 15> tree15b4d15rT;
+
     //--------------------------------------------------------------------------------------------------------------------------------------------------------
     /* 31-bit per coordinate */
     typedef mjr::MR_rect_tree<31, double, 1, 1> tree31b1d1rT;

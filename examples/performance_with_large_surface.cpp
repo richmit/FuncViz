@@ -3,7 +3,7 @@
 /**
  @file      performance_with_large_surface.cpp
  @author    Mitch Richling http://www.mitchr.me/
- @date      2024-07-14
+ @date      2024-07-23
  @brief     Stress test with a large surface object.@EOL
  @std       C++23
  @copyright 
@@ -29,8 +29,16 @@
   @endparblock
  @filedetails   
 
-  Just a nice parametric surface without any weirdness.  Because we use a large mesh for this one, I have including timing code.  Note c(u,v) can be used to
-  render stripes on the surface.
+  Just a nice parametric surface without any weirdness.  Some things demonstrated:
+
+   - How to time various operations. 
+     - Try with a large mesh (use a 9 in refine_grid).
+     - Try reducing the number of data variables stored in the cell complex
+     - Try removing the normal vector from the output
+     - Try both MRccT5 & MRccF5 for cc_t
+   - How to include a synthetic value that can be used for color mapping --  c(u,v) can be used to render stripes on the surface.
+   - How to compute a normal to a parametric surface
+   - How to include a normal in the cell complex
 */
 /*******************************************************************************************************************************************************.H.E.**/
 /** @cond exj */
@@ -44,19 +52,28 @@
 #include "MR_rt_to_cc.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef mjr::tree15b2d4rT            tt_t;
+typedef mjr::tree15b2d15rT           tt_t;
 typedef mjr::MRccT5                  cc_t;   // Replace with mjr::MRccF5, and compare treeConverter performance.
 typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 tt_t::rrpt_t shellStripes2(tt_t::drpt_t xvec) {
-  double u = std::numbers::pi   * xvec[0] + std::numbers::pi + 0.1;
-  double v = std::numbers::pi/2 * xvec[1] + std::numbers::pi/2;
-  return {u*sin(u)*cos(v), 
-          u*std::cos(u)*std::cos(v), 
-          u*sin(v), 
-          std::fmod(u*sin(v), 2)
-         };
+  double u    = std::numbers::pi   * xvec[0] + std::numbers::pi + 0.1; // U transformed from unit interval
+  double v    = std::numbers::pi/2 * xvec[1] + std::numbers::pi/2;     // V transformed from unit interval
+  double x    = u*std::sin(u)*std::cos(v);                             // X
+  double y    = u*std::cos(u)*std::cos(v);                             // Y
+  double z    = u*std::sin(v);                                         // Z
+  double c    = std::fmod(u*sin(v), 2);                                // Stripes
+  double dxdu = std::sin(u)*std::cos(v)+u*std::cos(u)*std::cos(v);     // dX/du
+  double dxdv = -u*std::sin(u)*std::sin(v);                            // dX/dv
+  double dydu = std::cos(u)*std::cos(v)-u*std::sin(u)*std::cos(v);     // dY/du
+  double dydv = -u*std::cos(u)*std::sin(v);                            // dY/dv
+  double dzdu = std::sin(v);                                           // dZ/du
+  double dzdv = u*std::cos(v);                                         // dZ/dv
+  double nx   = dydu*dzdv-dydv*dzdu;                                   // normal_X     This noraml 
+  double ny   = dxdv*dzdu-dxdu*dzdv;                                   // normal_Y     will not be of 
+  double nz   = dxdu*dydv-dxdv*dydu;                                   // normal_Z     unit length
+  return {x, y, z, c, dxdu, dxdv, dydu, dydv, dzdu, dzdv, nx, ny, nz};
 }                          
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -67,7 +84,7 @@ int main() {
   tc_t treeConverter;
   std::chrono::time_point<std::chrono::system_clock> constructTime = std::chrono::system_clock::now();
 
-  tree.refine_grid(9, shellStripes2);
+  tree.refine_grid(6, shellStripes2);
   std::chrono::time_point<std::chrono::system_clock> sampleTime = std::chrono::system_clock::now();
 
   tree.dump_tree(20);
@@ -81,13 +98,25 @@ int main() {
                                      tc_t::tree_val_src_t::RANGE,  0,
                                      tc_t::tree_val_src_t::RANGE,  1,
                                      tc_t::tree_val_src_t::RANGE,   2},
-                                   {{"u",       tc_t::tree_val_src_t::DOMAIN, 0},
-                                    {"v",       tc_t::tree_val_src_t::DOMAIN, 1},
-                                    {"x(u,v)",  tc_t::tree_val_src_t::RANGE,  0},
-                                    {"y(u,v)",  tc_t::tree_val_src_t::RANGE,  1},
-                                    {"z(u,v)",  tc_t::tree_val_src_t::RANGE,  2},
-                                    {"c(u,v)",  tc_t::tree_val_src_t::RANGE,  3}},
-                                   {});
+                                   {{"u",           tc_t::tree_val_src_t::DOMAIN, 0},
+                                    {"v",           tc_t::tree_val_src_t::DOMAIN, 1},
+                                    {"x(u,v)",      tc_t::tree_val_src_t::RANGE,  0},
+                                    {"y(u,v)",      tc_t::tree_val_src_t::RANGE,  1},
+                                    {"z(u,v)",      tc_t::tree_val_src_t::RANGE,  2},
+                                    {"c(u,v)",      tc_t::tree_val_src_t::RANGE,  3},
+                                    {"dx(u,v)/du",  tc_t::tree_val_src_t::RANGE,  4},
+                                    {"dx(u,v)/dv",  tc_t::tree_val_src_t::RANGE,  5},
+                                    {"dy(u,v)/du",  tc_t::tree_val_src_t::RANGE,  6},
+                                    {"dy(u,v)/dv",  tc_t::tree_val_src_t::RANGE,  7},
+                                    {"dz(u,v)/du",  tc_t::tree_val_src_t::RANGE,  8},
+                                    {"dz(u,v)/dv",  tc_t::tree_val_src_t::RANGE,  9},
+                                    {"nx",          tc_t::tree_val_src_t::RANGE, 10},
+                                    {"ny",          tc_t::tree_val_src_t::RANGE, 11},
+                                    {"nz",          tc_t::tree_val_src_t::RANGE, 12}},
+                                   {{"NORMALS", 
+                                     tc_t::tree_val_src_t::RANGE, 10,
+                                     tc_t::tree_val_src_t::RANGE, 11,
+                                     tc_t::tree_val_src_t::RANGE, 12}});
   std::chrono::time_point<std::chrono::system_clock> vtkFanTime = std::chrono::system_clock::now();
 
   ccplx.write_xml_vtk("performance_with_large_surface.vtu", "performance_with_large_surface");

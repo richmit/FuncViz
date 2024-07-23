@@ -305,6 +305,37 @@ namespace mjr {
       inline double vec3_scalar_triple_product(const pnt_t& pnt1, const pnt_t& pnt2, const pnt_t& pnt3) const {
         return vec3_dot_product(pnt1, vec3_cross_product(pnt2, pnt3));
       }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Unitize the given point in place.  Return true if the result is valid, and false otherwise */
+      inline bool vec3_unitize(pnt_t& pnt) const {
+        double length = vec3_two_norm(pnt);
+        if (std::abs(length) > eps) {
+          for(int i=0; i<3; ++i) 
+            pnt[i] = pnt[i]/length;
+          return true;
+        } else {
+          return false;
+        }
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Compute the linear combination */
+      inline pnt_t vec3_linear_combination(double scl1, const pnt_t& pnt1, double scl2, const pnt_t& pnt2) const {
+        pnt_t tmp;
+        for(int i=0; i<3; ++i)
+          tmp[i] = scl1 * pnt1[i] + scl2 * pnt2[i];
+        return tmp;
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Determinant of 3x3 matrix with given vectors as columns/rows. */
+      inline double vec3_det3(const pnt_t& pnt1, const pnt_t& pnt2, const pnt_t& pnt3) const {
+        //  MJR TODO NOTE <2024-07-22T15:48:31-0500> vec3_det3: UNTESTED! UNTESTED! UNTESTED! UNTESTED! 
+        return (pnt1[0] * pnt2[1] * pnt3[2] - 
+                pnt1[0] * pnt2[2] * pnt3[1] - 
+                pnt1[1] * pnt2[0] * pnt3[2] + 
+                pnt1[1] * pnt2[2] * pnt3[0] + 
+                pnt1[2] * pnt2[0] * pnt3[1] - 
+                pnt1[2] * pnt2[1] * pnt3[0]);
+      }
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -378,25 +409,15 @@ namespace mjr {
         } else if (points_sorted.size() == 3) { // .............................................. REMAINING CASES: C1_VERTEX1, CI_VERTEX1          
           pnt_idx_t ipnt1, ipnt2, ipntc;
           if (ilin1pnt1 == ilin2pnt1) {
-            ipntc = ilin1pnt1;
-            ipnt1 = ilin1pnt2;
-            ipnt2 = ilin2pnt2;
+            ipntc = ilin1pnt1; ipnt1 = ilin1pnt2; ipnt2 = ilin2pnt2;
           } else if (ilin1pnt1 == ilin2pnt2) {
-            ipntc = ilin1pnt1;
-            ipnt1 = ilin1pnt2;
-            ipnt2 = ilin2pnt1;
+            ipntc = ilin1pnt1; ipnt1 = ilin1pnt2; ipnt2 = ilin2pnt1;
           } else if (ilin1pnt2 == ilin2pnt1) {
-            ipntc = ilin1pnt2;
-            ipnt1 = ilin1pnt1;
-            ipnt2 = ilin2pnt2;
+            ipntc = ilin1pnt2; ipnt1 = ilin1pnt1; ipnt2 = ilin2pnt2;
           } else if (ilin1pnt2 == ilin2pnt2) {
-            ipntc = ilin1pnt2;
-            ipnt1 = ilin1pnt1;
-            ipnt2 = ilin2pnt1;
+            ipntc = ilin1pnt2; ipnt1 = ilin1pnt1; ipnt2 = ilin2pnt1;
           } else { // Never get here.  Silences compiler warnings.
-            ipntc = 0; 
-            ipnt1 = 0; 
-            ipnt2 = 0; 
+            ipntc = 0;         ipnt1 = 0;         ipnt2 = 0; 
           }
           if (geomi_pts_colinear(ipnt1, ipnt2, ipntc)) { // ..................................... REMAINING CASES: C1_VERTEX1, CI_VERTEX1          
             if ( (geomi_pnt_line_distance(ipnt1, ipntc, ipnt2, true) < eps) ||  
@@ -424,39 +445,21 @@ namespace mjr {
       /** Check if two line segments intersect in a single point */
       bool geomr_seg_isect1(const pnt_t& lin1pnt1, const pnt_t& lin1pnt2, const pnt_t& lin2pnt1, const pnt_t& lin2pnt2) const {
         double denom = 
-          lin1pnt1[0] * lin2pnt1[1] - 
-          lin1pnt1[0] * lin2pnt2[1] - 
-          lin1pnt1[1] * lin2pnt1[0] + 
-          lin1pnt1[1] * lin2pnt2[0] - 
-          lin1pnt2[0] * lin2pnt1[1] + 
-          lin1pnt2[0] * lin2pnt2[1] + 
-          lin1pnt2[1] * lin2pnt1[0] - 
-          lin1pnt2[1] * lin2pnt2[0];
+          lin1pnt1[0] * lin2pnt1[1] - lin1pnt1[0] * lin2pnt2[1] - lin1pnt1[1] * lin2pnt1[0] + lin1pnt1[1] * lin2pnt2[0] - 
+          lin1pnt2[0] * lin2pnt1[1] + lin1pnt2[0] * lin2pnt2[1] + lin1pnt2[1] * lin2pnt1[0] - lin1pnt2[1] * lin2pnt2[0];
         if (std::abs(denom) < eps) // Lines are parallel
           return false;
         double numera = 
-          lin1pnt1[0]*lin2pnt1[1] - 
-          lin1pnt1[0]*lin2pnt2[1] - 
-          lin1pnt1[1]*lin2pnt1[0] + 
-          lin1pnt1[1]*lin2pnt2[0] + 
-          lin2pnt1[0]*lin2pnt2[1] - 
-          lin2pnt1[1]*lin2pnt2[0];
+          lin1pnt1[0]*lin2pnt1[1] - lin1pnt1[0]*lin2pnt2[1] - 
+          lin1pnt1[1]*lin2pnt1[0] + lin1pnt1[1]*lin2pnt2[0] + 
+          lin2pnt1[0]*lin2pnt2[1] - lin2pnt1[1]*lin2pnt2[0];
         double numerb = 
-          -(lin1pnt1[0]*lin1pnt2[1] - 
-            lin1pnt1[0]*lin2pnt1[1] - 
-            lin1pnt1[1]*lin1pnt2[0] + 
-            lin1pnt1[1]*lin2pnt1[0] + 
-            lin1pnt2[0]*lin2pnt1[1] - 
-            lin1pnt2[1]*lin2pnt1[0]);
+          -(lin1pnt1[0]*lin1pnt2[1] - lin1pnt1[0]*lin2pnt1[1] - 
+            lin1pnt1[1]*lin1pnt2[0] + lin1pnt1[1]*lin2pnt1[0] + 
+            lin1pnt2[0]*lin2pnt1[1] - lin1pnt2[1]*lin2pnt1[0]);
         double ua = numera/denom;
         double ub = numerb/denom;
-        if (ua < 0)
-          return false;
-        if (ub < 0)
-          return false;
-        if (ua > 1)
-          return false;
-        if (ub > 1)
+        if ( (ua < 0) || (ub < 0) || (ua > 1) || (ub > 1) )
           return false;
         double eq3 = numera/denom * (lin1pnt2[2] - lin1pnt1[2]) - numerb/denom * (lin2pnt2[2] - lin2pnt1[2]) + lin2pnt1[2] + lin1pnt1[2];
         if (std::abs(eq3) < eps) // Equation in third coordinate is satisfied
@@ -506,12 +509,8 @@ namespace mjr {
         pnt_t basisv1 = vec3_diff(tripnt1, tripnt2);  // basis vectors for pln containing triagnel
         pnt_t basisv2 = vec3_diff(tripnt3, tripnt2);  // basis vectors for pln containing triagnel
         pnt_t normal = vec3_cross_product(basisv1, basisv2); // normal vector for tri. n=pld1xpld2
-        if (unit) {
-          double normal_length = vec3_two_norm(normal);
-          if (std::abs(normal_length) > eps)
-            for(int i=0; i<3; ++i) 
-              normal[i] = normal[i]/normal_length;
-        }
+        if (unit)
+          vec3_unitize(normal);
         return normal;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -523,8 +522,26 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the distance between a point and a triangle */
       double geomr_pnt_tri_distance(const pnt_t& tripnt1, const pnt_t& tripnt2, const pnt_t& tripnt3, const pnt_t& pnt) const {
-        //  MJR TODO NOTE geomr_pnt_tri_distance: Implement
-        return 1.0;
+        //  MJR TODO NOTE <2024-07-22T15:48:31-0500> geomr_pnt_tri_distance: UNTESTED! UNTESTED! UNTESTED! UNTESTED! 
+        pnt_t basisv1 = vec3_diff(tripnt1, tripnt2);  // basis vectors for pln containing triagnel
+        pnt_t basisv2 = vec3_diff(tripnt3, tripnt2);  // basis vectors for pln containing triagnel
+        pnt_t normal = vec3_cross_product(basisv1, basisv2); // normal vector for tri. ax+by+cz+d=0, a=normal[0], b=normal[1], c=normal[2]
+        vec3_unitize(normal); 
+        double d = -vec3_dot_product(normal, tripnt2);            // ax+by+cz+d=0
+        double lambda = vec3_dot_product(normal, pnt) + d;
+        pnt_t q = vec3_linear_combination(1.0, pnt, lambda, normal); // q is the point in the plane closest to pnt
+        double denom =  basisv1[0] * basisv2[1] - basisv2[0] * basisv1[1]; // If zero, then triangle is broken!
+        double u     = (q[0]       * basisv2[1] - basisv2[0] *       q[1]) / denom;
+        double v     = (basisv1[0] *       q[1] -       q[0] * basisv1[1]) / denom;
+        double dd    = std::abs(u*basisv1[2] + v*basisv2[2] - q[2]);
+        if ( (u>=0) && (v>=0) && ((u+v)<=1) && (dd<eps) ) { // q is in the triangle =>  Use the plane distance
+          return std::abs(lambda);
+        } else {                                            // q is not in the triangle =>  Distance will be minimum distance to an edge.
+          double d1 = geomr_pnt_line_distance(tripnt1, tripnt2, pnt, true);
+          double d2 = geomr_pnt_line_distance(tripnt2, tripnt3, pnt, true);
+          double d3 = geomr_pnt_line_distance(tripnt3, tripnt1, pnt, true);
+          return std::min(std::min(d1, d2), d3);
+        }
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if points (just one point for this function) are zero.
@@ -607,32 +624,39 @@ namespace mjr {
         return last_point_idx;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Retruns the index of the last point given to the add_point() method. */
+      /** Retruns true if the last point given to the add_point() method was a new point. */
       pnt_idx_t last_point_added_was_new() const {
         return last_point_new;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Add a point.
-          Baring memory issues, this function should never fail to put a new point on the master point list.  If the point is already on the master point
-          list, then master point list is unchanged.  This function updates last_point_idx & last_point_new.  Returns the index of the point
-          on the master list. */
+          Cases
+           - Any of the coordinate values in the given point are NaN: last_point_idx=-1, last_point_new=false.
+           - The given point is already on the list: last_point_idx is ste to the existing point's index, and last_point_new=false
+           - The given point is not on the list: last_point_idx is set to th enew piont's index, and last_point_new=true
+          Note that last_point_idx is always the resturn value. */
       pnt_idx_t add_point(pnt_t new_pnt) {
-        if constexpr (uniq_points) {
-          if (pnt_to_pnt_idx_map.contains(new_pnt)) {
-            /* Point is already in list */
-            last_point_idx = pnt_to_pnt_idx_map[new_pnt];
-            last_point_new = false;
+        if (std::isnan(new_pnt[0]) || std::isnan(new_pnt[0]) || std::isnan(new_pnt[0])) {
+          last_point_idx = -1;
+          last_point_new = false;
+        } else {
+          if constexpr (uniq_points) {
+            if (pnt_to_pnt_idx_map.contains(new_pnt)) {
+              /* Point is already in list */
+              last_point_idx = pnt_to_pnt_idx_map[new_pnt];
+              last_point_new = false;
+            } else {
+              /* Point is not already in list */
+              last_point_idx = static_cast<pnt_idx_t>(pnt_idx_to_pnt.size());
+              pnt_to_pnt_idx_map[new_pnt] = last_point_idx;
+              pnt_idx_to_pnt.push_back(new_pnt);
+              last_point_new = true;
+            }
           } else {
-            /* Point is not already in list */
-            last_point_idx = static_cast<pnt_idx_t>(pnt_idx_to_pnt.size());
-            pnt_to_pnt_idx_map[new_pnt] = last_point_idx;
+            last_point_idx = static_cast<pnt_idx_t>(pnt_idx_to_pnt.size()); 
             pnt_idx_to_pnt.push_back(new_pnt);
             last_point_new = true;
           }
-        } else {
-          last_point_idx = static_cast<pnt_idx_t>(pnt_idx_to_pnt.size()); 
-          pnt_idx_to_pnt.push_back(new_pnt);
-          last_point_new = true;
         }
         return last_point_idx;
       }
