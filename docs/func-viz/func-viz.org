@@ -1378,7 +1378,7 @@ done
 #+begin_example
 skip media/complex_magnitude_surface_rot_10.gif
 skip media/complex_magnitude_surface_rot_25.gif
-skip media/complex_magnitude_surface_rot_50.gif
+make media/complex_magnitude_surface_rot_50.gif
 skip media/implicit_surface_make_10.gif
 skip media/implicit_surface_make_25.gif
 skip media/implicit_surface_make_50.gif
@@ -1387,7 +1387,7 @@ skip media/implicit_surface_rt_rot_25.gif
 skip media/implicit_surface_rt_rot_50.gif
 skip media/lorenz_rot_rot_10.gif
 skip media/lorenz_rot_rot_25.gif
-skip media/lorenz_rot_rot_50.gif
+make media/lorenz_rot_rot_50.gif
 skip media/sq_complex_magnitude_surface_rot_10.gif
 skip media/sq_implicit_surface_rt_rot_10.gif
 skip media/sq_lorenz_rot_rot_10.gif
