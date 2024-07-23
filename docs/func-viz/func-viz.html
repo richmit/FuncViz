@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-07-23 Tue 13:16 -->
+<!-- 2024-07-23 Tue 13:26 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Function Visualization</title>
@@ -272,12 +272,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-07-23 13:16:28</i></td>
+<td class="org-left"><i>2024-07-23 13:26:22</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-07-23 13:16:29</i></td>
+<td class="org-left"><i>2024-07-23 13:26:23</i></td>
 </tr>
 </tbody>
 </table>
@@ -299,6 +299,7 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <li><a href="#curve_plot">8. Curve Plot</a></li>
 <li><a href="#parametric_surface_with_defects">9. Parametric Surface With Defects</a></li>
 <li><a href="#performance_with_large_surface">10. High Resolution Parametric Surface</a></li>
+<li><a href="#trefoil">11. Trefoil Parametric Surface</a></li>
 </ul>
 </div>
 </div>
@@ -1093,7 +1094,7 @@ Note that most of the items above are listed TBD.  A few features need to be add
 
 <div class="org-center">
 
-<div id="orgaa6def6" class="figure">
+<div id="orgcada4ef" class="figure">
 <p><a href="media/curve_plot_100.png"><img src="media/curve_plot_10.png" alt="curve_plot_10.png" /></a>
 </p>
 </div>
@@ -1310,7 +1311,7 @@ Stripes!! <br />
 </div>
 
 <p>
-Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/parametric_surface_with_defects.cpp">https://github.com/richmit/MRPTree/blob/main/examples/parametric_surface_with_defects.cpp</a>
+Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/performance_with_large_surface.cpp">https://github.com/richmit/MRPTree/blob/main/examples/performance_with_large_surface.cpp</a>
 </p>
 
 <div class="org-src-container">
@@ -1395,6 +1396,102 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/para
   <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"treeConverter time ... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(vtkFanTime-dumpTime)         &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
   <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"write_vtk time ....... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(vtkWriteTime-vtkFanTime)     &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
   <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"Total Run Time ....... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(vtkWriteTime-startTime)      &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+}
+</pre>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-trefoil" class="outline-2">
+<h2 id="trefoil"><span class="section-number-2">11.</span> Trefoil Parametric Surface</h2>
+<div class="outline-text-2" id="text-trefoil">
+<p>
+This example doesn't really demonstrate anything not found in the other examples.  It's just a neat surface. ;)
+</p>
+
+<div class="org-center">
+
+<div id="org35b0483" class="figure">
+<p><a href="media/trefoil_rot_50.gif"><img src="media/trefoil_rot_10.gif" alt="trefoil_rot_10.gif" /></a>
+</p>
+</div>
+</div>
+
+<p>
+Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/trefoil.cpp">https://github.com/richmit/MRPTree/blob/main/examples/trefoil.cpp</a>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c++">
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
+
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b2d6rT</span>            <span style="color: #63b8ff;">tt_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
+
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">trefoil</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">u</span> = xvec[0] * <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">v</span> = xvec[1] * <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">r</span> = 5;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x</span> = r * <span style="color: #8470ff; font-weight: bold;">std</span>::sin(3 * u) / (2 + <span style="color: #8470ff; font-weight: bold;">std</span>::cos(v));
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y</span> = r * (<span style="color: #8470ff; font-weight: bold;">std</span>::sin(u) + 2 * <span style="color: #8470ff; font-weight: bold;">std</span>::sin(2 * u)) / (2 + <span style="color: #8470ff; font-weight: bold;">std</span>::cos(v + <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi * 2 / 3));
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z</span> = r / 2 * (<span style="color: #8470ff; font-weight: bold;">std</span>::cos(u) - 2 * <span style="color: #8470ff; font-weight: bold;">std</span>::cos(2 * u)) * (2 + <span style="color: #8470ff; font-weight: bold;">std</span>::cos(v)) * (2 + <span style="color: #8470ff; font-weight: bold;">std</span>::cos(v + <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi * 2 / 3)) / 4;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">dxdu</span> = (3*r*<span style="color: #8470ff; font-weight: bold;">std</span>::cos(3*u))/(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v)+2);
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">dxdv</span> = (r*<span style="color: #8470ff; font-weight: bold;">std</span>::sin(3*u)*<span style="color: #8470ff; font-weight: bold;">std</span>::sin(v))/(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v)+2)/(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v)+2);
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">dydu</span> = (r*(4*<span style="color: #8470ff; font-weight: bold;">std</span>::cos(2*u)+<span style="color: #8470ff; font-weight: bold;">std</span>::cos(u)))/(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v+(2*<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi)/3)+2);
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">dydv</span> = (r*(2*<span style="color: #8470ff; font-weight: bold;">std</span>::sin(2*u)+<span style="color: #8470ff; font-weight: bold;">std</span>::sin(u))*<span style="color: #8470ff; font-weight: bold;">std</span>::sin(v+(2*<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi)/3))/
+    ((<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v+(2*<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi)/3)+2)*(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v+(2*<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi)/3)+2));
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">dzdu</span> = (r*(4*<span style="color: #8470ff; font-weight: bold;">std</span>::sin(2*u)-<span style="color: #8470ff; font-weight: bold;">std</span>::sin(u))*(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v)+2)*(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v+(2*<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi)/3)+2))/8;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">dzdv</span> = (-(r*(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(u)-2*<span style="color: #8470ff; font-weight: bold;">std</span>::cos(2*u))*(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v)+2)*<span style="color: #8470ff; font-weight: bold;">std</span>::sin(v+(2*<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi)/3))/8) -
+    (r*(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(u)-2*<span style="color: #8470ff; font-weight: bold;">std</span>::cos(2*u))*<span style="color: #8470ff; font-weight: bold;">std</span>::sin(v)*(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v+(2*<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi)/3)+2))/8;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">nx</span>   = dydu*dzdv-dydv*dzdu;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">ny</span>   = dxdv*dzdu-dxdu*dzdv;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">nz</span>   = dxdu*dydv-dxdv*dydu;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">nm</span>   = <span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(nx*nx+ny*ny+nz*nz);
+  nm = (nm &gt; 0 ? nm : 1);
+  nx = nx / nm;
+  ny = ny / nm;
+  nz = nz / nm;
+  <span style="color: #00ffff;">return</span> {x, y, z, nx, ny, nz};
+}                          
+
+<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
+  <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">tree</span>;
+
+  <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">ccplx</span>;
+  <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">treeConverter</span>;
+
+  tree.refine_grid(7, trefoil);
+
+  tree.dump_tree(20);
+
+  treeConverter.construct_geometry(ccplx,
+                                   tree,
+                                   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::FANS, 
+                                   2,
+                                   { <span style="color: #fa8072;">"points"</span>, 
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0,
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1,
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2},
+                                   {{<span style="color: #fa8072;">"u"</span>,           <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
+                                    {<span style="color: #fa8072;">"v"</span>,           <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
+                                    {<span style="color: #fa8072;">"x(u,v)"</span>,      <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
+                                    {<span style="color: #fa8072;">"y(u,v)"</span>,      <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1},
+                                    {<span style="color: #fa8072;">"z(u,v)"</span>,      <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2},
+                                    {<span style="color: #fa8072;">"nx"</span>,          <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  3},
+                                    {<span style="color: #fa8072;">"ny"</span>,          <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  4},
+                                    {<span style="color: #fa8072;">"nz"</span>,          <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  5}},
+                                   {{<span style="color: #fa8072;">"NORMALS"</span>, 
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 3,
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 4,
+                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 5}});
+
+  ccplx.write_xml_vtk(<span style="color: #fa8072;">"trefoil.vtu"</span>, <span style="color: #fa8072;">"trefoil"</span>);
+
 }
 </pre>
 </div>

@@ -1034,7 +1034,7 @@ Stripes!! \\
 [[file:media/performance_with_large_surface_stripes_100.png][file:media/performance_with_large_surface_stripes_10.png]]
 #+END_CENTER
 
-Source code: https://github.com/richmit/MRPTree/blob/main/examples/parametric_surface_with_defects.cpp
+Source code: https://github.com/richmit/MRPTree/blob/main/examples/performance_with_large_surface.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
 grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/performance_with_large_surface.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
@@ -1123,6 +1123,104 @@ int main() {
   std::cout << "treeConverter time ... " << static_cast<std::chrono::duration<double>>(vtkFanTime-dumpTime)         << " sec" << std::endl;
   std::cout << "write_vtk time ....... " << static_cast<std::chrono::duration<double>>(vtkWriteTime-vtkFanTime)     << " sec" << std::endl;
   std::cout << "Total Run Time ....... " << static_cast<std::chrono::duration<double>>(vtkWriteTime-startTime)      << " sec" << std::endl;
+}
+#+end_src
+
+
+
+* Trefoil Parametric Surface
+:PROPERTIES:
+:CUSTOM_ID: trefoil
+:END:
+
+#+begin_src sh :results output raw :exports results 
+grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/trefoil.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!]\)/\\)\1/g;'
+#+end_src
+
+#+RESULTS:
+
+  This example doesn't really demonstrate anything not found in the other examples.  It's just a neat surface. ;)
+
+#+BEGIN_CENTER
+[[file:media/trefoil_rot_50.gif][file:media/trefoil_rot_10.gif]]
+#+END_CENTER
+
+Source code: https://github.com/richmit/MRPTree/blob/main/examples/trefoil.cpp
+
+#+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
+grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/trefoil.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+#+end_src
+
+#+RESULTS:
+#+begin_src c++ :eval never :tangle no
+
+#include "MR_rect_tree.hpp"
+#include "MR_cell_cplx.hpp"
+#include "MR_rt_to_cc.hpp"
+
+typedef mjr::tree15b2d6rT            tt_t;
+typedef mjr::MRccT5                  cc_t;
+typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
+
+tt_t::rrpt_t trefoil(tt_t::drpt_t xvec) {
+  double u = xvec[0] * std::numbers::pi;
+  double v = xvec[1] * std::numbers::pi;
+  double r = 5;
+  double x = r * std::sin(3 * u) / (2 + std::cos(v));
+  double y = r * (std::sin(u) + 2 * std::sin(2 * u)) / (2 + std::cos(v + std::numbers::pi * 2 / 3));
+  double z = r / 2 * (std::cos(u) - 2 * std::cos(2 * u)) * (2 + std::cos(v)) * (2 + std::cos(v + std::numbers::pi * 2 / 3)) / 4;
+  double dxdu = (3*r*std::cos(3*u))/(std::cos(v)+2);
+  double dxdv = (r*std::sin(3*u)*std::sin(v))/(std::cos(v)+2)/(std::cos(v)+2);
+  double dydu = (r*(4*std::cos(2*u)+std::cos(u)))/(std::cos(v+(2*std::numbers::pi)/3)+2);
+  double dydv = (r*(2*std::sin(2*u)+std::sin(u))*std::sin(v+(2*std::numbers::pi)/3))/
+    ((std::cos(v+(2*std::numbers::pi)/3)+2)*(std::cos(v+(2*std::numbers::pi)/3)+2));
+  double dzdu = (r*(4*std::sin(2*u)-std::sin(u))*(std::cos(v)+2)*(std::cos(v+(2*std::numbers::pi)/3)+2))/8;
+  double dzdv = (-(r*(std::cos(u)-2*std::cos(2*u))*(std::cos(v)+2)*std::sin(v+(2*std::numbers::pi)/3))/8) -
+    (r*(std::cos(u)-2*std::cos(2*u))*std::sin(v)*(std::cos(v+(2*std::numbers::pi)/3)+2))/8;
+  double nx   = dydu*dzdv-dydv*dzdu;
+  double ny   = dxdv*dzdu-dxdu*dzdv;
+  double nz   = dxdu*dydv-dxdv*dydu;
+  double nm   = std::sqrt(nx*nx+ny*ny+nz*nz);
+  nm = (nm > 0 ? nm : 1);
+  nx = nx / nm;
+  ny = ny / nm;
+  nz = nz / nm;
+  return {x, y, z, nx, ny, nz};
+}                          
+
+int main() {
+  tt_t tree;
+
+  cc_t ccplx;
+  tc_t treeConverter;
+
+  tree.refine_grid(7, trefoil);
+
+  tree.dump_tree(20);
+
+  treeConverter.construct_geometry(ccplx,
+                                   tree,
+                                   tc_t::cell_structure_t::FANS, 
+                                   2,
+                                   { "points", 
+                                     tc_t::tree_val_src_t::RANGE,  0,
+                                     tc_t::tree_val_src_t::RANGE,  1,
+                                     tc_t::tree_val_src_t::RANGE,  2},
+                                   {{"u",           tc_t::tree_val_src_t::DOMAIN, 0},
+                                    {"v",           tc_t::tree_val_src_t::DOMAIN, 1},
+                                    {"x(u,v)",      tc_t::tree_val_src_t::RANGE,  0},
+                                    {"y(u,v)",      tc_t::tree_val_src_t::RANGE,  1},
+                                    {"z(u,v)",      tc_t::tree_val_src_t::RANGE,  2},
+                                    {"nx",          tc_t::tree_val_src_t::RANGE,  3},
+                                    {"ny",          tc_t::tree_val_src_t::RANGE,  4},
+                                    {"nz",          tc_t::tree_val_src_t::RANGE,  5}},
+                                   {{"NORMALS", 
+                                     tc_t::tree_val_src_t::RANGE, 3,
+                                     tc_t::tree_val_src_t::RANGE, 4,
+                                     tc_t::tree_val_src_t::RANGE, 5}});
+
+  ccplx.write_xml_vtk("trefoil.vtu", "trefoil");
+
 }
 #+end_src
 
@@ -1293,6 +1391,9 @@ skip media/lorenz_rot_rot_50.gif
 skip media/sq_complex_magnitude_surface_rot_10.gif
 skip media/sq_implicit_surface_rt_rot_10.gif
 skip media/sq_lorenz_rot_rot_10.gif
+make media/trefoil_rot_10.gif
+make media/trefoil_rot_25.gif
+make media/trefoil_rot_50.gif
 #+end_example
 
 * PROGRAM_EXAMPLE                                                  :noexport:
