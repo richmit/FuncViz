@@ -92,11 +92,11 @@ int main() {
   // Balance the three to the traditional level of 1 (no cell borders a cell more than half it's size)
   tree.balance_tree(1, halfSphere2);
 
-  tree.dump_tree(20);
+  tree.dump_tree(10);
 
   treeConverter.construct_geometry(ccplx,
                                    tree,
-                                   tc_t::cell_structure_t::FANS, 
+                                   tc_t::cell_structure_t::RECTANGLES, 
                                    2,
                                    { "points", 
                                      tc_t::tree_val_src_t::DOMAIN, 0, 
@@ -106,6 +106,8 @@ int main() {
                                     { "y",      tc_t::tree_val_src_t::DOMAIN, 1},
                                     { "f(x,y)", tc_t::tree_val_src_t::RANGE,  0}},
                                    {});
+
+  ccplx.dump_cplx(10);
 
   ccplx.write_xml_vtk("surface_plot_edge.vtu", "surface_plot_edge");
 }

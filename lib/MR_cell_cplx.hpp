@@ -53,13 +53,13 @@
 namespace mjr {
   /** @brief Template Class used hold tessellations of MR_rect_tree geometric data as well as MR_rect_tree point data sets.
 
-      This class's primary use case is to hold tessellations of MR_rect_tree geometric data as well as MR_rect_tree point data sets.  For many applications the
-      final goal is to produce a file (usually an unstructured VTK file).  That said, this class is generally useful by itself.
+      This class's primary use case is to hold tessellations of MR_rect_tree geometric data as well as MR_rect_tree point data sets.  For many applications
+      the final goal is to produce a geometry file.
 
       This code is a quick-n-dirty hack job.  I simply wanted to quickly get to a point where I could visually test MR_rect_tree objects.  Logically this
-      class should be split into several classes (unique point list, unique cell list, 3D analytic geometry, etc...).  It also has some significant
-      limitations:
+      class should be split into several classes (unique point list, unique cell list, 3D vectors, 3D analytic geometry, etc...).  It's a bit of a mess.
 
+      Significant limitations:
         - VTK files generated from MR_rect_tree objects don't require all of the capability of VTK files
           - Only Unstructured_Grid files are supported
           - Only four types of cells are supported: points, segments, triangles, quads, pyramids, & hexahedrons.
@@ -70,10 +70,11 @@ namespace mjr {
           - NaN's in legacy files are not properly handled by many VTK applications
         - Performance isn't a priority
           - Especially true for 0-cells
-          - Geometry checks are slow (may be avoided by using add_cell without cell_type_t argument)
-          - Point de-duplication is slow (may be turned off via uniq_points template parameter)
-          - Cell de-duplication is slow (may be turned off via uniq_cells template parameter)
-          - In general expect a 5x speedup by turning off de-duplication & geometry checks.
+        - Various saftey checks are slow (may be turned off via template parameter)
+          - Geometry checks
+          - Point de-duplication
+          - Cell de-duplication
+          - In general expect a 5x speedup by turning off all checks
         - Things we don't check
           - Memory allocation -- you run out, the thing crashes
           - Cells that are a part of other cells may be added (i.e. a segment that is part of an existing triangle)
@@ -247,7 +248,6 @@ namespace mjr {
       typedef std::vector<pnt_t> pnt_idx_to_pnt_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Used to uniquify points and assign point index values */
-      // typedef std::map<pnt_t, pnt_idx_t> pnt_to_pnt_idx_map_t;
       typedef std::map<pnt_t, pnt_idx_t, pnt_less> pnt_to_pnt_idx_map_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Maps points to point index -- used to detect physically identical points in R^3 */
@@ -256,7 +256,6 @@ namespace mjr {
       /** Maps point index to points -- the master point list */
       pnt_idx_to_pnt_t pnt_idx_to_pnt;
       //@}
-
 
     public:
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -329,6 +328,7 @@ namespace mjr {
       /** Determinant of 3x3 matrix with given vectors as columns/rows. */
       inline double vec3_det3(const pnt_t& pnt1, const pnt_t& pnt2, const pnt_t& pnt3) const {
         //  MJR TODO NOTE <2024-07-22T15:48:31-0500> vec3_det3: UNTESTED! UNTESTED! UNTESTED! UNTESTED! 
+        static_assert(false, "vec3_det3: Under active development.  Untested!");
         return (pnt1[0] * pnt2[1] * pnt3[2] - 
                 pnt1[0] * pnt2[2] * pnt3[1] - 
                 pnt1[1] * pnt2[0] * pnt3[2] + 
@@ -594,6 +594,7 @@ namespace mjr {
       bool geomr_seg_tri_intersection(pnt_t tp1, pnt_t tp2, pnt_t tp3, pnt_t sp1, pnt_t sp2) const {
         //  MJR TODO NOTE <2024-07-11T16:08:16-0500> geomr_seg_tri_intersection: implement
         //  MJR TODO NOTE <2024-07-11T16:08:27-0500> geomr_seg_tri_intersection: Should this be a bool or an enum?
+        static_assert(false, "geomr_seg_tri_intersection: Not yet implemented!");
         return (tp1[0]+tp2[0]+tp3[0]+sp1[0]+sp2[0]>1.0);
       }
       //@}
@@ -636,7 +637,7 @@ namespace mjr {
            - The given point is not on the list: last_point_idx is set to th enew piont's index, and last_point_new=true
           Note that last_point_idx is always the resturn value. */
       pnt_idx_t add_point(pnt_t new_pnt) {
-        if (std::isnan(new_pnt[0]) || std::isnan(new_pnt[0]) || std::isnan(new_pnt[0])) {
+        if (std::isnan(new_pnt[0]) || std::isnan(new_pnt[1]) || std::isnan(new_pnt[2])) {
           last_point_idx = -1;
           last_point_new = false;
         } else {
