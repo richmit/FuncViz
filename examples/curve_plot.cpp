@@ -100,19 +100,21 @@ int main() {
   tree.refine_leaves_recursive_cell_pred(8, f, [&tree](tt_t::diti_t i) { return (tree.cell_close_to_domain_point(0.8775087009, 1.0e-2, i)); });
   // TODO: Use derivative test for this
 
-  tree.dump_tree(20);
+  tree.dump_tree(10);
 
   treeConverter.construct_geometry(ccplx,
                                    tree,
                                    tc_t::cell_structure_t::FANS, 
                                    1,
                                    { "points", 
-                                     tc_t::tree_val_src_t::DOMAIN, 0, 
-                                     tc_t::tree_val_src_t::RANGE,  0,
-                                     tc_t::tree_val_src_t::ZERO,   0},
+                                     tc_t::tree_val_src_t::DOMAIN,   0, 
+                                     tc_t::tree_val_src_t::RANGE,    0,
+                                     tc_t::tree_val_src_t::CONSTANT, 0.0},
                                    {{ "x",    tc_t::tree_val_src_t::DOMAIN, 0},
                                     { "f(x)", tc_t::tree_val_src_t::RANGE,  0}},
                                    {});
+
+  ccplx.dump_cplx(10);
 
   ccplx.write_xml_vtk("curve_plot.vtu", "curve_plot");
 }

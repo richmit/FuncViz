@@ -39,6 +39,7 @@
 #include <tuple>                                                         /* STL tuples              C++11    */
 #include <vector>                                                        /* STL vector              C++11    */ 
 #include <string>                                                        /* C++ strings             C++11    */
+#include <variant>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Put everything in the mjr namespace
@@ -71,19 +72,23 @@ namespace mjr {
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Specify a source space for a data index. */
-      enum class tree_val_src_t { DOMAIN,   //!< The domain space.
-                                  RANGE,    //!< The range space.
-                                  ZERO      //!< A pseudo-source that always returns 0.0.  Note that an index provided with this one is ignored.
+      enum class tree_val_src_t { DOMAIN,    //!< The domain space.
+                                  RANGE,     //!< The range space.
+                                  CONSTANT   //!< A pseudo-source that returns a constant.
                                 };
+
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type used to hold a description of how to extract a scalar value from the attached tree object */
-      typedef std::tuple<typename cc_t::pdata_name_t, tree_val_src_t, int> tree_scl_val_desc_t;
+      /** Type used to hold a description of how to extract a scalar value from a tree object */
+      typedef std::variant<int, typename cc_t::pnt_crd_t> iorf_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Type used to hold a description of how to extract a scalar value from a tree object */
+      typedef std::tuple<typename cc_t::pdata_name_t, tree_val_src_t, iorf_t> tree_scl_val_desc_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** A list of tree_scl_val_desc_t objects.  */
       typedef std::vector<tree_scl_val_desc_t> tree_scl_val_desc_lst_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type used to hold a description of how to extract a 3-vector value from  the attached tree object. */
-      typedef std::tuple<typename cc_t::pdata_name_t, tree_val_src_t, int, tree_val_src_t, int, tree_val_src_t, int> tree_vec_val_desc_t;
+      /** Type used to hold a description of how to extract a 3-vector value from a tree object. */
+      typedef std::tuple<typename cc_t::pdata_name_t, tree_val_src_t, iorf_t, tree_val_src_t, iorf_t, tree_val_src_t, iorf_t> tree_vec_val_desc_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** A list of tree_vec_val_desc_t objects. */
       typedef std::vector<tree_vec_val_desc_t> tree_vec_val_desc_lst_t;
@@ -98,35 +103,49 @@ namespace mjr {
       /** Convert a tree_val_src to a string */
       static std::string tree_val_src_to_string(tree_val_src_t tree_val_src) { 
         switch(tree_val_src) {
-          case tree_val_src_t::DOMAIN: return("DOMAIN"); break;
-          case tree_val_src_t::RANGE:  return("RANGE");  break;
-          case tree_val_src_t::ZERO:   return("ZERO");   break;
+          case tree_val_src_t::DOMAIN:   return("DOMAIN"); break;
+          case tree_val_src_t::RANGE:    return("RANGE");  break;
+          case tree_val_src_t::CONSTANT: return("CONSTANT");   break;
         }
         return("ERROR"); // Never get here if the switch above is correct..
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Convert a tree_scl_val_desc_t to a string */
       static std::string tree_scl_val_desc_to_string(tree_scl_val_desc_t scl_desc) { 
-        return (std::get<0>(scl_desc) + ":" + tree_val_src_to_string(get<1>(scl_desc)) + "/" + std::to_string(get<2>(scl_desc)));
+        if (std::get<2>(scl_desc).index() == 0)
+          return (std::get<0>(scl_desc) + ":" + tree_val_src_to_string(get<1>(scl_desc)) + "/" + std::to_string(get<int>(get<2>(scl_desc))));
+        else
+          return (std::get<0>(scl_desc) + ":" + tree_val_src_to_string(get<1>(scl_desc)) + "/" + std::to_string(get<typename cc_t::pnt_crd_t>(get<2>(scl_desc))));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Validate a tree_scl_val_desc_t object
           @param rtree    The MR_rect_tree with source data
           @param scl_desc Object to valudate */
       static bool invalid_tree_scl_val_desc(const rt_t& rtree, tree_scl_val_desc_t scl_desc) { 
-        if (std::get<2>(scl_desc) < 0) {
-          std::cout << "ERROR: Invalid val_desc: " << tree_scl_val_desc_to_string(scl_desc) << std::endl;
-          return true;
-        }
-        if (std::get<1>(scl_desc) == tree_val_src_t::DOMAIN) {
-          if (std::get<2>(scl_desc) >= rtree.domain_dimension) {
-            std::cout << "ERROR: Invalid val_desc: " << tree_scl_val_desc_to_string(scl_desc) << std::endl;
+        if (std::get<1>(scl_desc) == tree_val_src_t::CONSTANT) {
+          if (std::get<2>(scl_desc).index() != 1) {
+            std::cout << "ERROR: Invalid val_desc (const must be double): " << tree_scl_val_desc_to_string(scl_desc) << std::endl;
             return true;
           }
         } else {
-          if (std::get<2>(scl_desc) >= rtree.range_dimension) {
-            std::cout << "ERROR: Invalid val_desc: " << tree_scl_val_desc_to_string(scl_desc) << std::endl;
+          if (std::get<2>(scl_desc).index() != 0) {
+            std::cout << "ERROR: Invalid val_desc (idx must be int): " << tree_scl_val_desc_to_string(scl_desc) << std::endl;
             return true;
+          }
+          if (std::get<int>(std::get<2>(scl_desc)) < 0) {
+            std::cout << "ERROR: Invalid val_desc (idx too small): " << tree_scl_val_desc_to_string(scl_desc) << std::endl;
+            return true;
+          }
+          if (std::get<1>(scl_desc) == tree_val_src_t::DOMAIN) {
+            if (std::get<int>(std::get<2>(scl_desc)) >= rtree.domain_dimension) {
+              std::cout << "ERROR: Invalid val_desc (idx too large): " << tree_scl_val_desc_to_string(scl_desc) << std::endl;
+              return true;
+            }
+          } else {
+            if (std::get<int>(std::get<2>(scl_desc)) >= rtree.range_dimension) {
+              std::cout << "ERROR: Invalid val_desc (idx too large): " << tree_scl_val_desc_to_string(scl_desc) << std::endl;
+              return true;
+            }
           }
         }
         return false;
@@ -148,11 +167,11 @@ namespace mjr {
           @param rangeValue    Data for the range value */
       static typename cc_t::pnt_crd_t get_scalar(const rt_t& rtree, tree_scl_val_desc_t index, typename rt_t::drpt_t& domainValue, typename rt_t::rrpt_t& rangeValue) {
         if (std::get<1>(index) == tree_val_src_t::DOMAIN) {
-          return (rtree.dom_at(domainValue, std::get<2>(index)));
+          return (rtree.dom_at(domainValue, std::get<int>(std::get<2>(index))));
         } else if (std::get<1>(index) == tree_val_src_t::RANGE) {
-          return (rtree.rng_at(rangeValue, std::get<2>(index)));
-        } else if (std::get<1>(index) == tree_val_src_t::ZERO) {
-          return (0.0);
+          return (rtree.rng_at(rangeValue, std::get<int>(std::get<2>(index))));
+        } else if (std::get<1>(index) == tree_val_src_t::CONSTANT) {
+          return (std::get<typename cc_t::pnt_crd_t>(std::get<2>(index)));
         } else {
           std::cout << "ERROR: Invalid index source" << std::endl;
           return (0.0);
