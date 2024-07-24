@@ -285,8 +285,8 @@ namespace mjr {
             }
           }
         } else { // if(output_dimension > 0) {
-          if (rtree.domain_dimension == 3) {
-            std::cout << "ERROR: construct_geometry: output_dimension >3 not supported for output_dimension>0!" << std::endl;
+          if (rtree.domain_dimension > 3) {
+            std::cout << "ERROR: construct_geometry: output_dimension>3 not supported for output_dimension>0!" << std::endl;
             return 1;
           }
           if (cell_structure == cell_structure_t::FANS) {
@@ -328,6 +328,8 @@ namespace mjr {
                 }
               }
             } else { // if (rtree.domain_dimension == 3) {
+              std::cout << "ERROR: construct_geometry: domain_dimension==3 not supported for cell_structure==cell_structure_t::FANS!" << std::endl;
+              return 1;
               if (output_dimension == 3) {
                 //  MJR TODO NOTE construct_geometry: ADD CODE
               } else if (output_dimension == 2) {
