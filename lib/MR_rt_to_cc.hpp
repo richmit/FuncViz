@@ -276,7 +276,6 @@ namespace mjr {
                         [rtree](auto v) { return invalid_tree_vec_val_desc(rtree, v); })) {
           return 1;
         }
-        ccplx.clear();
         if (output_dimension == 0) {
           for(auto& cell: cells) {
             typename rt_t::diti_list_t verts = (cell_structure == cell_structure_t::FANS ? rtree.ccc_get_vertexes(cell) : rtree.ccc_get_corners(cell));

@@ -92,6 +92,7 @@ int main() {
   ccplx.write_xml_vtk("parametric_surface_with_defects-tri.vtu", "parametric_surface_with_defects-tri");
 
   /* Next we dump a tessellation made of rectangles */
+  ccplx.clear(); // We need to clear out the old contents first!
   treeConverter.construct_geometry(ccplx,
                                    tree,
                                    tc_t::cell_structure_t::RECTANGLES, 
