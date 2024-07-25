@@ -113,23 +113,22 @@ int main() {
 
   tree.dump_tree(5);
 
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   tc_t::cell_structure_t::FANS, 
-                                   2,
-                                   { "points", 
-                                     tc_t::tree_val_src_t::DOMAIN, 0, 
-                                     tc_t::tree_val_src_t::DOMAIN, 1,
-                                     tc_t::tree_val_src_t::RANGE,  0},
-                                   {{ "x",      tc_t::tree_val_src_t::DOMAIN, 0},
-                                    { "y",      tc_t::tree_val_src_t::DOMAIN, 1},
-                                    { "f(x,y)", tc_t::tree_val_src_t::RANGE,  0},
-                                    { "-df/dx", tc_t::tree_val_src_t::RANGE,  1},
-                                    { "-df/dy", tc_t::tree_val_src_t::RANGE,  2}},
-                                   {{"NORMALS",
-                                     tc_t::tree_val_src_t::RANGE, 1,
-                                     tc_t::tree_val_src_t::RANGE, 2,
-                                     tc_t::tree_val_src_t::RANGE, 3}});
+  treeConverter.construct_geometry_fans(ccplx,
+                                        tree,
+                                        2,
+                                        { "points", 
+                                          tc_t::tree_val_src_t::DOMAIN, 0, 
+                                          tc_t::tree_val_src_t::DOMAIN, 1,
+                                          tc_t::tree_val_src_t::RANGE,  0},
+                                        {{ "x",      tc_t::tree_val_src_t::DOMAIN, 0},
+                                         { "y",      tc_t::tree_val_src_t::DOMAIN, 1},
+                                         { "f(x,y)", tc_t::tree_val_src_t::RANGE,  0},
+                                         { "-df/dx", tc_t::tree_val_src_t::RANGE,  1},
+                                         { "-df/dy", tc_t::tree_val_src_t::RANGE,  2}},
+                                        {{"NORMALS",
+                                          tc_t::tree_val_src_t::RANGE, 1,
+                                          tc_t::tree_val_src_t::RANGE, 2,
+                                          tc_t::tree_val_src_t::RANGE, 3}});
 
   ccplx.dump_cplx(5);
   ccplx.write_legacy_vtk("surface_with_normals.vtk", "surface_with_normals");

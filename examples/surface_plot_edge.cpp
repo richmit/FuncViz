@@ -94,18 +94,17 @@ int main() {
 
   tree.dump_tree(10);
 
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   tc_t::cell_structure_t::RECTANGLES, 
-                                   2,
-                                   { "points", 
-                                     tc_t::tree_val_src_t::DOMAIN, 0, 
-                                     tc_t::tree_val_src_t::DOMAIN, 1,
-                                     tc_t::tree_val_src_t::RANGE,  0},
-                                   {{ "x",      tc_t::tree_val_src_t::DOMAIN, 0},
-                                    { "y",      tc_t::tree_val_src_t::DOMAIN, 1},
-                                    { "f(x,y)", tc_t::tree_val_src_t::RANGE,  0}},
-                                   {});
+  treeConverter.construct_geometry_fans(ccplx,
+                                        tree,
+                                        2,
+                                        { "points", 
+                                          tc_t::tree_val_src_t::DOMAIN, 0, 
+                                          tc_t::tree_val_src_t::DOMAIN, 1,
+                                          tc_t::tree_val_src_t::RANGE,  0},
+                                        {{ "x",      tc_t::tree_val_src_t::DOMAIN, 0},
+                                         //{ "y",      tc_t::tree_val_src_t::DOMAIN, 1},
+                                         { "f(x,y)", tc_t::tree_val_src_t::RANGE,  0}},
+                                        {});
 
   ccplx.dump_cplx(10);
 

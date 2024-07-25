@@ -77,6 +77,8 @@ foreach(CURTGT IN LISTS TARGETS_ALL)
 
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/examples/${CURTGT}.cpp")
     add_executable(${CURTGT} "examples/${CURTGT}.cpp")
+  elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ftests/${CURTGT}.cpp")
+    add_executable(${CURTGT} "ftests/${CURTGT}.cpp")
   elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/utests/${CURTGT}.cpp")
     add_executable(${CURTGT} "utests/${CURTGT}.cpp")
   else()

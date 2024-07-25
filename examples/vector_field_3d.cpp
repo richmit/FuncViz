@@ -70,24 +70,22 @@ int main() {
   vftree.refine_grid(5, vf);
 
   /* Dump the vector field */
-  vftreeConverter.construct_geometry(vfccplx,
-                                     vftree,
-                                     tc_t::cell_structure_t::RECTANGLES, 
-                                     0,
-                                     { "points", 
-                                       tc_t::tree_val_src_t::DOMAIN,  0,
-                                       tc_t::tree_val_src_t::DOMAIN,  1,
-                                       tc_t::tree_val_src_t::DOMAIN,  2},
-                                     {{"x",   tc_t::tree_val_src_t::DOMAIN, 0},
-                                      {"y",   tc_t::tree_val_src_t::DOMAIN, 1},
-                                      {"z",   tc_t::tree_val_src_t::DOMAIN, 2}},
-                                     {{"d",
-                                       tc_t::tree_val_src_t::RANGE,  0,
-                                       tc_t::tree_val_src_t::RANGE,  1,
-                                       tc_t::tree_val_src_t::RANGE,  2}});
+  vftreeConverter.construct_geometry_rects(vfccplx,
+                                           vftree,
+                                           0,
+                                           { "points", 
+                                             tc_t::tree_val_src_t::DOMAIN,  0,
+                                             tc_t::tree_val_src_t::DOMAIN,  1,
+                                             tc_t::tree_val_src_t::DOMAIN,  2},
+                                           {{"x",   tc_t::tree_val_src_t::DOMAIN, 0},
+                                            {"y",   tc_t::tree_val_src_t::DOMAIN, 1},
+                                            {"z",   tc_t::tree_val_src_t::DOMAIN, 2}},
+                                           {{"d",
+                                             tc_t::tree_val_src_t::RANGE,  0,
+                                             tc_t::tree_val_src_t::RANGE,  1,
+                                             tc_t::tree_val_src_t::RANGE,  2}});
   vfccplx.dump_cplx(5);
   vfccplx.write_xml_vtk("vector_field_3d-f.vtu", "vector_field_3d-f");
-
 
   cc_t cvccplx;
 

@@ -63,17 +63,15 @@ int main() {
   tree.dump_tree(5);                   // Dump some of the tree
 
   // Convert the tree to poly data
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   tc_t::cell_structure_t::FANS, 
-                                   2,
-                                   { "points", 
-                                     tc_t::tree_val_src_t::DOMAIN, 0, 
-                                     tc_t::tree_val_src_t::DOMAIN, 1,
-                                     tc_t::tree_val_src_t::RANGE,  0},
-                                   {},
-                                   {});
-
+  treeConverter.construct_geometry_fans(ccplx,
+                                        tree,
+                                        2,
+                                        { "points", 
+                                          tc_t::tree_val_src_t::DOMAIN, 0, 
+                                          tc_t::tree_val_src_t::DOMAIN, 1,
+                                          tc_t::tree_val_src_t::RANGE,  0},
+                                        {},
+                                        {});
 
   ccplx.write_xml_vtk("hello_world.vtu", "hello_world");
 }

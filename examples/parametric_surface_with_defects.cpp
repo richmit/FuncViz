@@ -74,39 +74,37 @@ int main() {
   tree.refine_grid(6, parSphere2);
 
   /* First we dump a tessellation made of triangles */
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   tc_t::cell_structure_t::FANS, 
-                                   2,
-                                   { "points", 
-                                     tc_t::tree_val_src_t::RANGE,  0,
-                                     tc_t::tree_val_src_t::RANGE,  1,
-                                     tc_t::tree_val_src_t::RANGE,  2},
-                                   {{"u",       tc_t::tree_val_src_t::DOMAIN, 0},
-                                    {"v",       tc_t::tree_val_src_t::DOMAIN, 1},
-                                    {"x(u,v)",  tc_t::tree_val_src_t::RANGE,  0},
-                                    {"y(u,v)",  tc_t::tree_val_src_t::RANGE,  1},
-                                    {"z(u,v)",  tc_t::tree_val_src_t::RANGE,  2}},
-                                   {});
+  treeConverter.construct_geometry_fans(ccplx,
+                                        tree,
+                                        2,
+                                        { "points", 
+                                          tc_t::tree_val_src_t::RANGE,  0,
+                                          tc_t::tree_val_src_t::RANGE,  1,
+                                          tc_t::tree_val_src_t::RANGE,  2},
+                                        {{"u",       tc_t::tree_val_src_t::DOMAIN, 0},
+                                         {"v",       tc_t::tree_val_src_t::DOMAIN, 1},
+                                         {"x(u,v)",  tc_t::tree_val_src_t::RANGE,  0},
+                                         {"y(u,v)",  tc_t::tree_val_src_t::RANGE,  1},
+                                         {"z(u,v)",  tc_t::tree_val_src_t::RANGE,  2}},
+                                        {});
   ccplx.dump_cplx(5);
   ccplx.write_xml_vtk("parametric_surface_with_defects-tri.vtu", "parametric_surface_with_defects-tri");
 
   /* Next we dump a tessellation made of rectangles */
   ccplx.clear(); // We need to clear out the old contents first!
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   tc_t::cell_structure_t::RECTANGLES, 
-                                   2,
-                                   { "points", 
-                                     tc_t::tree_val_src_t::RANGE,  0,
-                                     tc_t::tree_val_src_t::RANGE,  1,
-                                     tc_t::tree_val_src_t::RANGE,  2},
-                                   {{"u",       tc_t::tree_val_src_t::DOMAIN, 0},
-                                    {"v",       tc_t::tree_val_src_t::DOMAIN, 1},
-                                    {"x(u,v)",  tc_t::tree_val_src_t::RANGE,  0},
-                                    {"y(u,v)",  tc_t::tree_val_src_t::RANGE,  1},
-                                    {"z(u,v)",  tc_t::tree_val_src_t::RANGE,  2}},
-                                   {});
+  treeConverter.construct_geometry_rects(ccplx,
+                                         tree,
+                                         2,
+                                         { "points", 
+                                           tc_t::tree_val_src_t::RANGE,  0,
+                                           tc_t::tree_val_src_t::RANGE,  1,
+                                           tc_t::tree_val_src_t::RANGE,  2},
+                                         {{"u",       tc_t::tree_val_src_t::DOMAIN, 0},
+                                          {"v",       tc_t::tree_val_src_t::DOMAIN, 1},
+                                          {"x(u,v)",  tc_t::tree_val_src_t::RANGE,  0},
+                                          {"y(u,v)",  tc_t::tree_val_src_t::RANGE,  1},
+                                          {"z(u,v)",  tc_t::tree_val_src_t::RANGE,  2}},
+                                         {});
   ccplx.dump_cplx(5);
   ccplx.write_xml_vtk("parametric_surface_with_defects-rect.vtu", "parametric_surface_with_defects-rect");
 }

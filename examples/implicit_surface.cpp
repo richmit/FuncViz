@@ -72,20 +72,19 @@ int main() {
   tree.dump_tree(5);
 
   /* Convert our tree to a cell complex.  Note that we use an SDF to export only cells that contain our surface */
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, isf)); }),
-                                   tc_t::cell_structure_t::RECTANGLES, 
-                                   3,
-                                   { "points", 
-                                     tc_t::tree_val_src_t::DOMAIN, 0, 
-                                     tc_t::tree_val_src_t::DOMAIN, 1,
-                                     tc_t::tree_val_src_t::DOMAIN, 2},
-                                   {{ "x",        tc_t::tree_val_src_t::DOMAIN, 0},
-                                    { "y",        tc_t::tree_val_src_t::DOMAIN, 1},
-                                    { "z",        tc_t::tree_val_src_t::DOMAIN, 2},
-                                    { "f(x,y,z)", tc_t::tree_val_src_t::RANGE,  0}},
-                                   {});
+  treeConverter.construct_geometry_rects(ccplx,
+                                         tree,
+                                         tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, isf)); }),
+                                         3,
+                                         { "points", 
+                                           tc_t::tree_val_src_t::DOMAIN, 0, 
+                                           tc_t::tree_val_src_t::DOMAIN, 1,
+                                           tc_t::tree_val_src_t::DOMAIN, 2},
+                                         {{ "x",        tc_t::tree_val_src_t::DOMAIN, 0},
+                                          { "y",        tc_t::tree_val_src_t::DOMAIN, 1},
+                                          { "z",        tc_t::tree_val_src_t::DOMAIN, 2},
+                                          { "f(x,y,z)", tc_t::tree_val_src_t::RANGE,  0}},
+                                         {});
 
   /* Display some data about the cell complex */
   ccplx.dump_cplx(5);

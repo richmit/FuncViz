@@ -159,6 +159,28 @@ namespace mjr {
                 invalid_tree_scl_val_desc(rtree, {std::get<0>(vec_desc), std::get<3>(vec_desc), std::get<4>(vec_desc)}) ||
                 invalid_tree_scl_val_desc(rtree, {std::get<0>(vec_desc), std::get<5>(vec_desc), std::get<6>(vec_desc)}));
       }
+
+
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Validate a common source arguments
+          @param rtree                  The MR_rect_tree with source data
+          @param point_src              Point source vector
+          @param scalar_data_src_lst    List of scalar data sources
+          @param vector_data_src_lst    List of vector data sources */
+      static int invalid_sources(const rt_t& rtree, tree_vec_val_desc_t point_src, tree_scl_val_desc_lst_t scalar_data_src_lst, tree_vec_val_desc_lst_t vector_data_src_lst) {
+        if (invalid_tree_vec_val_desc(rtree, point_src)) {
+          return 1;
+        }
+        if (std::any_of(scalar_data_src_lst.cbegin(), scalar_data_src_lst.cend(), 
+                        [rtree](auto s) { return invalid_tree_scl_val_desc(rtree, s); })) {
+          return 1;
+        }
+        if (std::any_of(vector_data_src_lst.cbegin(), vector_data_src_lst.cend(), 
+                        [rtree](auto v) { return invalid_tree_vec_val_desc(rtree, v); })) {
+          return 1;
+        }
+        return 0;
+      }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Extract data described by a tree_scl_val_desc_t
           @param rtree    The MR_rect_tree with source data
@@ -231,150 +253,198 @@ namespace mjr {
              |------------+---------+---------+--------------------|
              | POINTS     |     1-3 |       1 | All Cell Points    |
              |------------+---------+---------+--------------------|
-             | RECTANGLES |     1-3 |       0 | Cell Corner Points |
+             | RECTANGLES |     1-3 |       0 | Cell Corner Points | 
              | RECTANGLES |     2-3 |       1 | Cell Edges         |
              | RECTANGLES |       2 |       2 | 2D Rectangles      |
              | RECTANGLES |       3 |       2 | Cell Faces         |
              | RECTANGLES |       3 |       3 | Solid Hexahedra    |
              |------------+---------+---------+--------------------|
              | FANS       |       2 |       1 | Triangle Edges     |
-             | FANS       |       3 |       1 | Pyramid Edges      |
              | FANS       |       2 |       2 | Triangles          |
-             | FANS       |       3 |       2 | Pyramid Faces      |
-             | FANS       |       3 |       3 | Solid Pyramids     |
+             | FANS       |       3 |       1 | Pyramid Edges      | TODO: Not currently implemented
+             | FANS       |       3 |       2 | Pyramid Faces      | TODO: Not currently implemented
+             | FANS       |       3 |       3 | Solid Pyramids     | TODO: Not currently implemented
           @endverbatim
 
           @param ccplx                The MR_cell_cplx to populate with geometry
           @param rtree                The MR_rect_tree with source data
           @param cells                List of cells to output from rtree
-          @param cell_structure       Type of cell data to output
           @param output_dimension     Parts of cells to output
           @param point_src            Point sources
           @param scalar_data_src_lst  List of point data sources (scalars)
           @param vector_data_src_lst  List of point data sources (vectors) */
-      static int construct_geometry(cc_t&                         ccplx,
-                                    const rt_t&                   rtree, 
-                                    typename rt_t::diti_list_t    cells,
-                                    cell_structure_t              cell_structure,
-                                    int                           output_dimension,
-                                    tree_vec_val_desc_t           point_src, 
-                                    tree_scl_val_desc_lst_t       scalar_data_src_lst, 
-                                    tree_vec_val_desc_lst_t       vector_data_src_lst
+      static int construct_geometry_fans(cc_t&                      ccplx,
+                                         const rt_t&                rtree, 
+                                         typename rt_t::diti_list_t cells,
+                                         int                        output_dimension,
+                                         tree_vec_val_desc_t        point_src, 
+                                         tree_scl_val_desc_lst_t    scalar_data_src_lst, 
+                                         tree_vec_val_desc_lst_t    vector_data_src_lst
                                    ) {
+        if (invalid_sources(rtree, point_src, scalar_data_src_lst, vector_data_src_lst)) {
+          std::cout << "ERROR: construct_geometry_points: source error!" << std::endl;
+          return 1;
+        }
         if (output_dimension < 0) {
-          std::cout << "ERROR: construct_geometry: output_dimension < 0!" << std::endl;
+          std::cout << "ERROR: construct_geometry_fans: output_dimension < 0!" << std::endl;
           return 1;
-        }
-        if (invalid_tree_vec_val_desc(rtree, point_src)) {
-          return 1;
-        }
-        if (std::any_of(scalar_data_src_lst.cbegin(), scalar_data_src_lst.cend(), 
-                        [rtree](auto s) { return invalid_tree_scl_val_desc(rtree, s); })) {
-          return 1;
-        }
-        if (std::any_of(vector_data_src_lst.cbegin(), vector_data_src_lst.cend(), 
-                        [rtree](auto v) { return invalid_tree_vec_val_desc(rtree, v); })) {
-          return 1;
-        }
-        if (output_dimension == 0) {
+        } else if (rtree.domain_dimension == 1) {
           for(auto& cell: cells) {
-            typename rt_t::diti_list_t verts = (cell_structure == cell_structure_t::FANS ? rtree.ccc_get_vertexes(cell) : rtree.ccc_get_corners(cell));
-            for(auto& vert: verts) {
-              typename cc_t::pnt_idx_t pnti = add_point_and_data_from_tree(rtree, ccplx, vert, point_src, scalar_data_src_lst, vector_data_src_lst);
-              ccplx.add_cell(cc_t::cell_type_t::POINT, {pnti});
-            }
+            typename cc_t::pnt_idx_t ctr_pnti = add_point_and_data_from_tree(rtree, ccplx, cell, point_src, scalar_data_src_lst, vector_data_src_lst);
+            typename rt_t::diti_list_t corners = rtree.ccc_get_corners(cell);
+            typename cc_t::pnt_idx_t cn0_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[0], point_src, scalar_data_src_lst, vector_data_src_lst);
+            typename cc_t::pnt_idx_t cn1_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[1], point_src, scalar_data_src_lst, vector_data_src_lst);
+            ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {cn0_pnti, ctr_pnti}, output_dimension);
+            ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {ctr_pnti, cn1_pnti}, output_dimension);
           }
-        } else { // if(output_dimension > 0) {
-          if (rtree.domain_dimension > 3) {
-            std::cout << "ERROR: construct_geometry: output_dimension>3 not supported for output_dimension>0!" << std::endl;
-            return 1;
-          }
-          if (cell_structure == cell_structure_t::FANS) {
-            if (rtree.domain_dimension == 1) {
-              for(auto& cell: cells) {
-                typename cc_t::pnt_idx_t ctr_pnti = add_point_and_data_from_tree(rtree, ccplx, cell, point_src, scalar_data_src_lst, vector_data_src_lst);
-                typename rt_t::diti_list_t corners = rtree.ccc_get_corners(cell);
-                typename cc_t::pnt_idx_t cn0_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[0], point_src, scalar_data_src_lst, vector_data_src_lst);
-                typename cc_t::pnt_idx_t cn1_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[1], point_src, scalar_data_src_lst, vector_data_src_lst);
-                ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {cn0_pnti, ctr_pnti}, output_dimension);
-                ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {ctr_pnti, cn1_pnti}, output_dimension);
-              }
-            } else if (rtree.domain_dimension == 2) {
-              for(auto& cell: cells) {
-                typename cc_t::pnt_idx_t ctr_pnti = add_point_and_data_from_tree(rtree, ccplx, cell, point_src, scalar_data_src_lst, vector_data_src_lst);
-                for(int i=0; i<2; i++) {
-                  for(int j=-1; j<2; j+=2) {
-                    typename rt_t::diti_list_t nbrs = rtree.get_existing_neighbor(cell, i, j);
-                    if (nbrs.size() > 1) {
-                      for(auto n: nbrs) {
-                        typename rt_t::diti_list_t corners = rtree.ccc_get_corners(n, i, -j);
-                        typename cc_t::pnt_idx_t cn0_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[0], point_src, scalar_data_src_lst, vector_data_src_lst);
-                        typename cc_t::pnt_idx_t cn1_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[1], point_src, scalar_data_src_lst, vector_data_src_lst);
-                        if( ((i == 0) && (j == -1)) || ((i == 1) && (j == 1)) )
-                          ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cn1_pnti, cn0_pnti, ctr_pnti}, output_dimension);
-                        else
-                          ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cn0_pnti, cn1_pnti, ctr_pnti}, output_dimension);
-                      }
-                    } else {
-                      typename rt_t::diti_list_t corners = rtree.ccc_get_corners(cell, i, j);
-                      typename cc_t::pnt_idx_t cn0_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[0], point_src, scalar_data_src_lst, vector_data_src_lst);
-                      typename cc_t::pnt_idx_t cn1_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[1], point_src, scalar_data_src_lst, vector_data_src_lst);
-                      if( ((i == 0) && (j == -1)) || ((i == 1) && (j == 1)) )
-                        ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cn1_pnti, cn0_pnti, ctr_pnti}, output_dimension);
-                      else
-                        ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cn0_pnti, cn1_pnti, ctr_pnti}, output_dimension);
-                    }
+        } else if (rtree.domain_dimension == 2) {
+          for(auto& cell: cells) {
+            typename cc_t::pnt_idx_t ctr_pnti = add_point_and_data_from_tree(rtree, ccplx, cell, point_src, scalar_data_src_lst, vector_data_src_lst);
+            for(int i=0; i<2; i++) {
+              for(int j=-1; j<2; j+=2) {
+                typename rt_t::diti_list_t nbrs = rtree.get_existing_neighbor(cell, i, j);
+                if (nbrs.size() > 1) {
+                  for(auto n: nbrs) {
+                    typename rt_t::diti_list_t corners = rtree.ccc_get_corners(n, i, -j);
+                    typename cc_t::pnt_idx_t cn0_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[0], point_src, scalar_data_src_lst, vector_data_src_lst);
+                    typename cc_t::pnt_idx_t cn1_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[1], point_src, scalar_data_src_lst, vector_data_src_lst);
+                    if( ((i == 0) && (j == -1)) || ((i == 1) && (j == 1)) )
+                      ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cn1_pnti, cn0_pnti, ctr_pnti}, output_dimension);
+                    else
+                      ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cn0_pnti, cn1_pnti, ctr_pnti}, output_dimension);
                   }
+                } else {
+                  typename rt_t::diti_list_t corners = rtree.ccc_get_corners(cell, i, j);
+                  typename cc_t::pnt_idx_t cn0_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[0], point_src, scalar_data_src_lst, vector_data_src_lst);
+                  typename cc_t::pnt_idx_t cn1_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[1], point_src, scalar_data_src_lst, vector_data_src_lst);
+                  if( ((i == 0) && (j == -1)) || ((i == 1) && (j == 1)) )
+                    ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cn1_pnti, cn0_pnti, ctr_pnti}, output_dimension);
+                  else
+                    ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cn0_pnti, cn1_pnti, ctr_pnti}, output_dimension);
                 }
               }
-            } else { // if (rtree.domain_dimension == 3) {
-              std::cout << "ERROR: construct_geometry: domain_dimension==3 not supported for cell_structure==cell_structure_t::FANS!" << std::endl;
-              return 1;
-              if (output_dimension == 3) {
-                //  MJR TODO NOTE construct_geometry: ADD CODE
-              } else if (output_dimension == 2) {
-                //  MJR TODO NOTE construct_geometry: ADD CODE
-              } else { // (output_dimension == 1)
-                //  MJR TODO NOTE construct_geometry: ADD CODE
-              }
-            }          
-          } else { // if (cell_structure == cell_structure_t::RECTANGLES) {
-            for(auto& cell: cells) {
-              std::vector<typename cc_t::pnt_idx_t> cnr_pti;
-              typename rt_t::diti_list_t corners = rtree.ccc_get_corners(cell);
-              for(auto& corner: corners) {
-                typename cc_t::pnt_idx_t pnti = add_point_and_data_from_tree(rtree, ccplx, corner, point_src, scalar_data_src_lst, vector_data_src_lst);
-                cnr_pti.push_back(pnti);
-              }
-              if (rtree.domain_dimension == 1) {
-                ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {cnr_pti[0], cnr_pti[1]}, output_dimension);
-              } else if (rtree.domain_dimension == 2) {
-                ccplx.add_cell(cc_t::cell_type_t::QUAD, {cnr_pti[0], cnr_pti[1], cnr_pti[3], cnr_pti[2]}, output_dimension);
-              } else { // if(rtree.domain_dimension == 3) {
-                ccplx.add_cell(cc_t::cell_type_t::HEXAHEDRON, 
-                               {cnr_pti[0], cnr_pti[1], cnr_pti[3], cnr_pti[2],
-                                cnr_pti[4], cnr_pti[5], cnr_pti[7], cnr_pti[6]},
-                               output_dimension);
-              } 
             }
           }
+        } else if (rtree.domain_dimension == 3) {
+          std::cout << "ERROR: construct_geometry_fans: domain_dimension==3 not supported!" << std::endl;
+          return 1;
+          //  MJR TODO NOTE construct_geometry_fans: Implement
+        } else { //if (rtree.domain_dimension > 3) {
+          std::cout << "ERROR: construct_geometry_fans: output_dimension>3 not supported for output_dimension>0!" << std::endl;
+          return 1;
+        }          
+        return 0;
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** @overload */
+      static int construct_geometry_fans(cc_t&                    ccplx,
+                                         const rt_t&              rtree, 
+                                         int                      output_dimension,
+                                         tree_vec_val_desc_t      point_src, 
+                                         tree_scl_val_desc_lst_t  scalar_data_src_lst, 
+                                         tree_vec_val_desc_lst_t  vector_data_src_lst
+                                   ) {
+        return construct_geometry_fans(ccplx,
+                                  rtree,
+                                  rtree.get_leaf_cells(rtree.ccc_get_top_cell()),
+                                  output_dimension,
+                                  point_src, 
+                                  scalar_data_src_lst, 
+                                  vector_data_src_lst);
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Populate attached MR_cell_cplx object from data in attached MR_rect_tree object.
+
+          Only 0D vertex cells are produced.  While vertex cells may be obtained by setting the output_dimension to zero and calling construct_geometry_fan or
+          construct_geometry_rects, this method is much faster.  This method also provides the option of only outputting centers -- no corners.
+
+          @param ccplx                The MR_cell_cplx to populate with geometry
+          @param rtree                The MR_rect_tree with source data
+          @param cells                List of cells to output from rtree
+          @param point_src            Point sources
+          @param scalar_data_src_lst  List of point data sources (scalars)
+          @param vector_data_src_lst  List of point data sources (vectors) 
+          @param output_centers       Create vertexes for cell  centers
+          @param output_corners       Create vertexes for cell corners */
+      static int construct_geometry_points(cc_t&                         ccplx,
+                                           const rt_t&                   rtree, 
+                                           typename rt_t::diti_list_t    cells,
+                                           tree_vec_val_desc_t           point_src, 
+                                           tree_scl_val_desc_lst_t       scalar_data_src_lst, 
+                                           tree_vec_val_desc_lst_t       vector_data_src_lst,
+                                           bool                          output_centers,
+                                           bool                          output_corners
+                                          ) {
+        if (invalid_sources(rtree, point_src, scalar_data_src_lst, vector_data_src_lst)) {
+          std::cout << "ERROR: construct_geometry_points: source error!" << std::endl;
+          return 1;
+        }
+        if (output_centers && output_corners) {
+          for(auto& cell: cells)
+            for(auto& vert: rtree.ccc_get_vertexes(cell)) 
+              ccplx.add_cell(cc_t::cell_type_t::POINT, {add_point_and_data_from_tree(rtree, ccplx, vert, point_src, scalar_data_src_lst, vector_data_src_lst)});
+        } else if (output_centers) {
+          for(auto& cell: cells)
+            ccplx.add_cell(cc_t::cell_type_t::POINT, {add_point_and_data_from_tree(rtree, ccplx, cell, point_src, scalar_data_src_lst, vector_data_src_lst)});
+        } else if (output_corners) {
+          for(auto& cell: cells)
+            for(auto& vert: rtree.ccc_get_corners(cell)) 
+              ccplx.add_cell(cc_t::cell_type_t::POINT, {add_point_and_data_from_tree(rtree, ccplx, vert, point_src, scalar_data_src_lst, vector_data_src_lst)});
+        } else {
+          std::cout << "WARNING: construct_geometry_points: Both output_centers & output_corners are FALSE.  No geometry created!" << std::endl;
+          return 1;
+        }
+        return 0;
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      static int construct_geometry_rects(cc_t&                         ccplx,
+                                          const rt_t&                   rtree, 
+                                          typename rt_t::diti_list_t    cells,
+                                          int                           output_dimension,
+                                          tree_vec_val_desc_t           point_src, 
+                                          tree_scl_val_desc_lst_t       scalar_data_src_lst, 
+                                          tree_vec_val_desc_lst_t       vector_data_src_lst
+                                         ) {
+        if (output_dimension < 0) {
+          std::cout << "ERROR: construct_geometry_rects: output_dimension < 0!" << std::endl;
+          return 1;
+        }
+        if (invalid_sources(rtree, point_src, scalar_data_src_lst, vector_data_src_lst)) {
+          std::cout << "ERROR: construct_geometry_rects: source error!" << std::endl;
+          return 1;
+        }
+        for(auto& cell: cells) {
+          std::vector<typename cc_t::pnt_idx_t> cnr_pti;
+          typename rt_t::diti_list_t corners = rtree.ccc_get_corners(cell);
+          for(auto& corner: corners) {
+            typename cc_t::pnt_idx_t pnti = add_point_and_data_from_tree(rtree, ccplx, corner, point_src, scalar_data_src_lst, vector_data_src_lst);
+            cnr_pti.push_back(pnti);
+          }
+          if (rtree.domain_dimension == 1) {
+            ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {cnr_pti[0], cnr_pti[1]}, output_dimension);
+          } else if (rtree.domain_dimension == 2) {
+            ccplx.add_cell(cc_t::cell_type_t::QUAD, {cnr_pti[0], cnr_pti[1], cnr_pti[3], cnr_pti[2]}, output_dimension);
+          } else { // if(rtree.domain_dimension == 3) {
+            ccplx.add_cell(cc_t::cell_type_t::HEXAHEDRON, 
+                           {cnr_pti[0], cnr_pti[1], cnr_pti[3], cnr_pti[2],
+                            cnr_pti[4], cnr_pti[5], cnr_pti[7], cnr_pti[6]},
+                           output_dimension);
+          } 
         }
         return 0;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** @overload */
-      static int construct_geometry(cc_t&                           ccplx,
-                                    const rt_t&                     rtree, 
-                                    cell_structure_t                cell_structure,
-                                    int                             output_dimension,
-                                    tree_vec_val_desc_t             point_src, 
-                                    tree_scl_val_desc_lst_t         scalar_data_src_lst, 
-                                    tree_vec_val_desc_lst_t         vector_data_src_lst
-                                   ) {
-        return construct_geometry(ccplx,
+      static int construct_geometry_rects(cc_t&                    ccplx,
+                                          const rt_t&              rtree, 
+                                          int                      output_dimension,
+                                          tree_vec_val_desc_t      point_src, 
+                                          tree_scl_val_desc_lst_t  scalar_data_src_lst, 
+                                          tree_vec_val_desc_lst_t  vector_data_src_lst
+                                         ) {
+        return construct_geometry_rects(ccplx,
                                   rtree,
                                   rtree.get_leaf_cells(rtree.ccc_get_top_cell()),
-                                  cell_structure,
                                   output_dimension,
                                   point_src, 
                                   scalar_data_src_lst, 
@@ -389,3 +459,15 @@ namespace mjr {
 #endif
  
 
+
+ // This is how we can figure out where the domain data is stored in the MR_cell_cplx object.  This could then be exported
+ // to the MR_cell_cplx object so that it can do various computations on the mesh...
+        // // Figure out how to construct MR_rect_tree domain points from MR_cell_cplx point data sets.
+        // std::array<int, rtree.domain_dimension> dom_indexes;
+        // dom_indexes.fill(-1);
+        // for(int i=0; i<static_cast<int>(scalar_data_src_lst.size()); ++i) 
+        //   if (std::get<1>(scalar_data_src_lst[i]) == tree_val_src_t::DOMAIN)
+        //     dom_indexes[std::get<int>(std::get<2>(scalar_data_src_lst[i]))] = i;
+        // if (std::any_of(dom_indexes.cbegin(), dom_indexes.cend(), [](int i) { return (i<0); }))
+        //   std::cout << "WARNING: construct_geometry_fans: All domain variables not captured.  Unable to heal broken edges!" << std::endl;
+        // // Traverse the cells and construct geometry
