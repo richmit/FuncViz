@@ -33,29 +33,26 @@ endif()
 ######################################################################################################################################################
 
 
-set(TARGETS_EXAMPLE "MR_cell_cplx_test_mpl" "MR_cell_cplx_test_wedge" 
-                    "MR_cell_cplx_test_surf_wave_hole" 
-                    "hello_world" 
-                    "surface_with_normals" 
-                    "performance_with_large_surface" 
-                    "trefoil" 
-                    "parametric_surface_with_defects"
+set(TARGETS_EXAMPLE "hello_world" 
+                    "surface_with_normals" "surface_plot_edge" 
+                    "parametric_surface_with_defects" "performance_with_large_surface" "trefoil" 
                     "implicit_surface" 
                     "implicit_curve_2d" 
-                    "surface_plot_edge" 
                     "vector_field_3d"
                     "curve_plot"
-                    "MR_rect_tree_test_surf_corner"
-                    "MR_rect_tree_test_flat1"
                     "complex_magnitude_surface"
                   )
 set(TARGETS_TEST "check_cell_hexahedron" "check_cell_pyramid" "check_cell_quad" "check_cell_triangle" "check_cell_segment"
                  "geomi_pnt_line_distance"
                  "geomi_seg_isect_type"
-                 "geomr_pnt_pln_distance"
+                 "geomr_pnt_pln_distance" "geomr_pnt_tri_distance"
                  "tree_basics_7b1" "tree_basics_7b2" "tree_basics_7b3" "tree_basics_7b4" "tree_basics_7b5"
                  "tree_basics_15b1" "tree_basics_15b3"
                  "zzz_tbd_MRPTree"
+               )
+set(TARGETS_FTEST "MR_cell_cplx_test_mpl" "MR_cell_cplx_test_wedge" "MR_cell_cplx_test_surf_wave_hole" 
+                  #"MR_rect_tree_test_surf_corner" 
+                  "MR_rect_tree_test_flat1"
                )
 
 # Construct list of targets we can build
