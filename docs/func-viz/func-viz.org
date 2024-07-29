@@ -227,28 +227,18 @@ int main() {
 
   tree.dump_tree(5);
 
-  auto tcret = treeConverter.construct_geometry(ccplx,
-                                                tree,
-                                                tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), 
-                                                                         [&tree](tt_t::diti_t i) { return !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
-                                                tc_t::cell_structure_t::FANS, 
-                                                2,
-                                                { "points", 
-                                                  tc_t::tree_val_src_t::DOMAIN, 0, 
-                                                  tc_t::tree_val_src_t::DOMAIN, 1,
-                                                  tc_t::tree_val_src_t::RANGE,  4},
-                                                {{ "Re(z)",     tc_t::tree_val_src_t::DOMAIN, 0},
-                                                 { "Im(z)",     tc_t::tree_val_src_t::DOMAIN, 1},
-                                                 { "abs(z)",    tc_t::tree_val_src_t::RANGE,  0},
-                                                 { "arg(z)",    tc_t::tree_val_src_t::RANGE,  1},
-                                                 { "Re(f(z))",  tc_t::tree_val_src_t::RANGE,  2},
-                                                 { "Im(f(z))",  tc_t::tree_val_src_t::RANGE,  3},
-                                                 { "abs(f(z))", tc_t::tree_val_src_t::RANGE,  4},
-                                                 { "arg(f(z))", tc_t::tree_val_src_t::RANGE,  5}},
-                                                {{"COLORS",
-                                                  tc_t::tree_val_src_t::RANGE, 6,
-                                                  tc_t::tree_val_src_t::RANGE, 7,
-                                                  tc_t::tree_val_src_t::RANGE, 8}});
+  auto tcret = treeConverter.construct_geometry_fans(ccplx,
+                                                     tree,
+                                                     tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), 
+                                                                              [&tree](tt_t::diti_t i) { return !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
+                                                     2,
+                                                     {{tc_t::tree_val_src_t::DOMAIN, 0}, 
+                                                      {tc_t::tree_val_src_t::DOMAIN, 1},
+                                                      {tc_t::tree_val_src_t::RANGE,  4}});
+
+  // Note the first argument need not name *every* data element, just the first ones.
+  ccplx.create_named_datasets({"Re(z)", "Im(z)", "abs(z)", "arg(z)", "Re(f(z))", "Im(f(z))", "abs(f(z))", "arg(f(z))"}, {{"COLORS", {8, 9, 10}}});
+
   std::cout << "TC Return: " << tcret << std::endl;
 
   ccplx.dump_cplx(5);
@@ -342,18 +332,14 @@ int main() {
   tree.dump_tree(20);
 
   // Convert the geometry into a 3D dataset so we can see the contour on the surface
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   tc_t::cell_structure_t::FANS, 
-                                   2,
-                                   { "points", 
-                                     tc_t::tree_val_src_t::DOMAIN, 0,
-                                     tc_t::tree_val_src_t::DOMAIN, 1,
-                                     tc_t::tree_val_src_t::RANGE,  0},
-                                   {{"x",       tc_t::tree_val_src_t::DOMAIN, 0},
-                                    {"y",       tc_t::tree_val_src_t::DOMAIN, 1},
-                                    {"f(x,y)",  tc_t::tree_val_src_t::RANGE,  0}},
-                                   {});
+  treeConverter.construct_geometry_fans(ccplx,
+                                        tree,
+                                        2,
+                                        {{tc_t::tree_val_src_t::DOMAIN, 0},
+                                         {tc_t::tree_val_src_t::DOMAIN, 1},
+                                         {tc_t::tree_val_src_t::RANGE,  0}});
+
+  ccplx.create_named_datasets({"x", "y", "f(x,y)"});
 
   ccplx.write_xml_vtk("implicit_curve_2d.vtu", "implicit_curve_2d");
 }
@@ -421,21 +407,17 @@ int main() {
   tree.dump_tree(5);
 
   /* Convert our tree to a cell complex.  Note that we use an SDF to export only cells that contain our surface */
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, isf)); }),
-                                   tc_t::cell_structure_t::RECTANGLES, 
-                                   3,
-                                   { "points", 
-                                     tc_t::tree_val_src_t::DOMAIN, 0, 
-                                     tc_t::tree_val_src_t::DOMAIN, 1,
-                                     tc_t::tree_val_src_t::DOMAIN, 2},
-                                   {{ "x",        tc_t::tree_val_src_t::DOMAIN, 0},
-                                    { "y",        tc_t::tree_val_src_t::DOMAIN, 1},
-                                    { "z",        tc_t::tree_val_src_t::DOMAIN, 2},
-                                    { "f(x,y,z)", tc_t::tree_val_src_t::RANGE,  0}},
-                                   {});
+  treeConverter.construct_geometry_rects(ccplx,
+                                         tree,
+                                         tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, isf)); }),
+                                         3,
+                                         {{tc_t::tree_val_src_t::DOMAIN, 0}, 
+                                          {tc_t::tree_val_src_t::DOMAIN, 1},
+                                          {tc_t::tree_val_src_t::DOMAIN, 2}});
 
+  /* Name the data points */
+  ccplx.create_named_datasets({"x", "y", "z", "f(x,y,z)"});
+  
   /* Display some data about the cell complex */
   ccplx.dump_cplx(5);
 
@@ -503,24 +485,17 @@ int main() {
   vftree.refine_grid(5, vf);
 
   /* Dump the vector field */
-  vftreeConverter.construct_geometry(vfccplx,
-                                     vftree,
-                                     tc_t::cell_structure_t::RECTANGLES, 
-                                     0,
-                                     { "points", 
-                                       tc_t::tree_val_src_t::DOMAIN,  0,
-                                       tc_t::tree_val_src_t::DOMAIN,  1,
-                                       tc_t::tree_val_src_t::DOMAIN,  2},
-                                     {{"x",   tc_t::tree_val_src_t::DOMAIN, 0},
-                                      {"y",   tc_t::tree_val_src_t::DOMAIN, 1},
-                                      {"z",   tc_t::tree_val_src_t::DOMAIN, 2}},
-                                     {{"d",
-                                       tc_t::tree_val_src_t::RANGE,  0,
-                                       tc_t::tree_val_src_t::RANGE,  1,
-                                       tc_t::tree_val_src_t::RANGE,  2}});
+  vftreeConverter.construct_geometry_rects(vfccplx,
+                                           vftree,
+                                           0,
+                                           {{tc_t::tree_val_src_t::DOMAIN,  0},
+                                            {tc_t::tree_val_src_t::DOMAIN,  1},
+                                            {tc_t::tree_val_src_t::DOMAIN,  2}});
+
+  vfccplx.create_named_datasets({"x", "y", "z"},
+                                {{"d", {0, 1, 2}}});
   vfccplx.dump_cplx(5);
   vfccplx.write_xml_vtk("vector_field_3d-f.vtu", "vector_field_3d-f");
-
 
   cc_t cvccplx;
 
@@ -534,15 +509,13 @@ int main() {
   double b      = 28.0;
   double c      = 8.0 / 3.0;
 
-  auto p_old = cvccplx.add_point({x_old, y_old, z_old});
-  cvccplx.add_data_if_new("t", t);
+  auto p_old = cvccplx.add_point({x_old, y_old, z_old, t});
   for(int num_steps=0;num_steps<max_steps;num_steps++) {    
     double x_new = x_old + a*(y_old-x_old)*delta;
     double y_new = y_old + (x_old*(b-z_old)-y_old)*delta;
     double z_new = z_old + (x_old*y_old-c*z_old)*delta;
     t += delta;
-    auto p_new = cvccplx.add_point({x_new, y_new, z_new});
-    cvccplx.add_data_if_new("t", t);
+    auto p_new = cvccplx.add_point({x_new, y_new, z_new, t});
     cvccplx.add_cell(cc_t::cell_type_t::SEGMENT, {p_old, p_new});
     x_old=x_new;
     y_old=y_new;
@@ -646,47 +619,45 @@ int main() {
             { 2.1,  2.1});
   cc_t ccplx;
   tc_t treeConverter;
-
+  
   // Make a few samples on a uniform grid
   tree.refine_grid(2, dampCosWave2);
 
   // The humps need extra samples.  We know where they are, and we could sample on them with an SDF like this:
-  for(double i: {0, 1, 2, 3}) {
-    double r = i*std::numbers::pi/4;
-    tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&tree, r](int i) { return (tree.cell_cross_sdf(i, std::bind_front(circleSDF2, r))); });
-  }
+  // for(double i: {0, 1, 2, 3}) {
+  //   double r = i*std::numbers::pi/4;
+  //   tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&tree, r](int i) { return (tree.cell_cross_sdf(i, std::bind_front(circleSDF2, r))); });
+  // }
 
   // Alternately, we can test the derivative values to identify the humps
   // tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 1, 0.0); });
   // tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 2, 0.0); });
 
   // Lastly we can use the directional derivative radiating from the origin
-  // tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 4, 0.0); });
+  tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 4, 0.0); });
 
   // Balance the three to the traditional level of 1 (no  cell borders a cell more than half it's size)
   tree.balance_tree(1, dampCosWave2);
 
   tree.dump_tree(5);
 
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   tc_t::cell_structure_t::FANS, 
-                                   2,
-                                   { "points", 
-                                     tc_t::tree_val_src_t::DOMAIN, 0, 
-                                     tc_t::tree_val_src_t::DOMAIN, 1,
-                                     tc_t::tree_val_src_t::RANGE,  0},
-                                   {{ "x",      tc_t::tree_val_src_t::DOMAIN, 0},
-                                    { "y",      tc_t::tree_val_src_t::DOMAIN, 1},
-                                    { "f(x,y)", tc_t::tree_val_src_t::RANGE,  0},
-                                    { "-df/dx", tc_t::tree_val_src_t::RANGE,  1},
-                                    { "-df/dy", tc_t::tree_val_src_t::RANGE,  2}},
-                                   {{"NORMALS",
-                                     tc_t::tree_val_src_t::RANGE, 1,
-                                     tc_t::tree_val_src_t::RANGE, 2,
-                                     tc_t::tree_val_src_t::RANGE, 3}});
+  treeConverter.construct_geometry_fans(ccplx,
+                                        tree,
+                                        2,
+                                        {{tc_t::tree_val_src_t::DOMAIN, 0}, 
+                                         {tc_t::tree_val_src_t::DOMAIN, 1},
+                                         {tc_t::tree_val_src_t::RANGE,  0}});
+
+  // Note we use the single argument version of create_named_datasets() because we don't want to name elements 3, 4, & 5 (the components of the normal
+  // Note if we had placed the ddiv component right after z, then we could have used the two argument version...
+  ccplx.set_data_name_to_data_idx_lst({{"x",        {0}},
+                                       {"y",        {1}},
+                                       {"z=f(x,y)", {2}},
+                                       {"ddiv",     {6}},
+                                       {"NORMALS",  {3,4,5}}});
 
   ccplx.dump_cplx(5);
+
   ccplx.write_legacy_vtk("surface_with_normals.vtk", "surface_with_normals");
   ccplx.write_xml_vtk(   "surface_with_normals.vtu", "surface_with_normals");
   ccplx.write_ply(       "surface_with_normals.ply", "surface_with_normals");
@@ -776,20 +747,18 @@ int main() {
   // Balance the three to the traditional level of 1 (no cell borders a cell more than half it's size)
   tree.balance_tree(1, halfSphere2);
 
-  tree.dump_tree(20);
+  tree.dump_tree(10);
 
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   tc_t::cell_structure_t::FANS, 
-                                   2,
-                                   { "points", 
-                                     tc_t::tree_val_src_t::DOMAIN, 0, 
-                                     tc_t::tree_val_src_t::DOMAIN, 1,
-                                     tc_t::tree_val_src_t::RANGE,  0},
-                                   {{ "x",      tc_t::tree_val_src_t::DOMAIN, 0},
-                                    { "y",      tc_t::tree_val_src_t::DOMAIN, 1},
-                                    { "f(x,y)", tc_t::tree_val_src_t::RANGE,  0}},
-                                   {});
+  treeConverter.construct_geometry_fans(ccplx,
+                                        tree,
+                                        2,
+                                        {{tc_t::tree_val_src_t::DOMAIN, 0}, 
+                                         {tc_t::tree_val_src_t::DOMAIN, 1},
+                                         {tc_t::tree_val_src_t::RANGE,  0}});
+
+  ccplx.create_named_datasets({"x", "y", "f(x,y)"});
+
+  ccplx.dump_cplx(10);
 
   ccplx.write_xml_vtk("surface_plot_edge.vtu", "surface_plot_edge");
 }
@@ -885,19 +854,19 @@ int main() {
   tree.refine_leaves_recursive_cell_pred(8, f, [&tree](tt_t::diti_t i) { return (tree.cell_close_to_domain_point(0.8775087009, 1.0e-2, i)); });
   // TODO: Use derivative test for this
 
-  tree.dump_tree(20);
+  tree.dump_tree(10);
 
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   tc_t::cell_structure_t::FANS, 
-                                   1,
-                                   { "points", 
-                                     tc_t::tree_val_src_t::DOMAIN, 0, 
-                                     tc_t::tree_val_src_t::RANGE,  0,
-                                     tc_t::tree_val_src_t::ZERO,   0},
-                                   {{ "x",    tc_t::tree_val_src_t::DOMAIN, 0},
-                                    { "f(x)", tc_t::tree_val_src_t::RANGE,  0}},
-                                   {});
+  treeConverter.construct_geometry_fans(ccplx,
+                                        tree,
+                                        1,
+                                        {{tc_t::tree_val_src_t::DOMAIN,   0  }, 
+                                         {tc_t::tree_val_src_t::RANGE,    0  },
+                                         {tc_t::tree_val_src_t::CONSTANT, 0.0}});
+
+  // Note the first argument need not name *every* data element, just the first ones.
+  ccplx.create_named_datasets({"x", "f(x)"});
+
+  ccplx.dump_cplx(10);
 
   ccplx.write_xml_vtk("curve_plot.vtu", "curve_plot");
 }
@@ -965,39 +934,27 @@ int main() {
   /* Uniform sampling */
   tree.refine_grid(6, parSphere2);
 
+
   /* First we dump a tessellation made of triangles */
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   tc_t::cell_structure_t::FANS, 
-                                   2,
-                                   { "points", 
-                                     tc_t::tree_val_src_t::RANGE,  0,
-                                     tc_t::tree_val_src_t::RANGE,  1,
-                                     tc_t::tree_val_src_t::RANGE,  2},
-                                   {{"u",       tc_t::tree_val_src_t::DOMAIN, 0},
-                                    {"v",       tc_t::tree_val_src_t::DOMAIN, 1},
-                                    {"x(u,v)",  tc_t::tree_val_src_t::RANGE,  0},
-                                    {"y(u,v)",  tc_t::tree_val_src_t::RANGE,  1},
-                                    {"z(u,v)",  tc_t::tree_val_src_t::RANGE,  2}},
-                                   {});
+  treeConverter.construct_geometry_fans(ccplx,
+                                        tree,
+                                        2,
+                                        {{tc_t::tree_val_src_t::RANGE, 0},
+                                         {tc_t::tree_val_src_t::RANGE, 1},
+                                         {tc_t::tree_val_src_t::RANGE, 2}});
+  ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)"});
   ccplx.dump_cplx(5);
   ccplx.write_xml_vtk("parametric_surface_with_defects-tri.vtu", "parametric_surface_with_defects-tri");
 
   /* Next we dump a tessellation made of rectangles */
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   tc_t::cell_structure_t::RECTANGLES, 
-                                   2,
-                                   { "points", 
-                                     tc_t::tree_val_src_t::RANGE,  0,
-                                     tc_t::tree_val_src_t::RANGE,  1,
-                                     tc_t::tree_val_src_t::RANGE,  2},
-                                   {{"u",       tc_t::tree_val_src_t::DOMAIN, 0},
-                                    {"v",       tc_t::tree_val_src_t::DOMAIN, 1},
-                                    {"x(u,v)",  tc_t::tree_val_src_t::RANGE,  0},
-                                    {"y(u,v)",  tc_t::tree_val_src_t::RANGE,  1},
-                                    {"z(u,v)",  tc_t::tree_val_src_t::RANGE,  2}},
-                                   {});
+  ccplx.clear(); // We need to clear out the old contents first!
+  treeConverter.construct_geometry_rects(ccplx,
+                                         tree,
+                                         2,
+                                         {{tc_t::tree_val_src_t::RANGE, 0},
+                                          {tc_t::tree_val_src_t::RANGE, 1},
+                                          {tc_t::tree_val_src_t::RANGE, 2}});
+  ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)"});
   ccplx.dump_cplx(5);
   ccplx.write_xml_vtk("parametric_surface_with_defects-rect.vtu", "parametric_surface_with_defects-rect");
 }
@@ -1079,40 +1036,23 @@ int main() {
   tc_t treeConverter;
   std::chrono::time_point<std::chrono::system_clock> constructTime = std::chrono::system_clock::now();
 
-  tree.refine_grid(6, shellStripes2);
+  tree.refine_grid(7, shellStripes2);
   std::chrono::time_point<std::chrono::system_clock> sampleTime = std::chrono::system_clock::now();
 
   tree.dump_tree(20);
   std::chrono::time_point<std::chrono::system_clock> dumpTime = std::chrono::system_clock::now();
 
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   tc_t::cell_structure_t::FANS, 
-                                   2,
-                                   { "points", 
-                                     tc_t::tree_val_src_t::RANGE,  0,
-                                     tc_t::tree_val_src_t::RANGE,  1,
-                                     tc_t::tree_val_src_t::RANGE,   2},
-                                   {{"u",           tc_t::tree_val_src_t::DOMAIN, 0},
-                                    {"v",           tc_t::tree_val_src_t::DOMAIN, 1},
-                                    {"x(u,v)",      tc_t::tree_val_src_t::RANGE,  0},
-                                    {"y(u,v)",      tc_t::tree_val_src_t::RANGE,  1},
-                                    {"z(u,v)",      tc_t::tree_val_src_t::RANGE,  2},
-                                    {"c(u,v)",      tc_t::tree_val_src_t::RANGE,  3},
-                                    {"dx(u,v)/du",  tc_t::tree_val_src_t::RANGE,  4},
-                                    {"dx(u,v)/dv",  tc_t::tree_val_src_t::RANGE,  5},
-                                    {"dy(u,v)/du",  tc_t::tree_val_src_t::RANGE,  6},
-                                    {"dy(u,v)/dv",  tc_t::tree_val_src_t::RANGE,  7},
-                                    {"dz(u,v)/du",  tc_t::tree_val_src_t::RANGE,  8},
-                                    {"dz(u,v)/dv",  tc_t::tree_val_src_t::RANGE,  9},
-                                    {"nx",          tc_t::tree_val_src_t::RANGE, 10},
-                                    {"ny",          tc_t::tree_val_src_t::RANGE, 11},
-                                    {"nz",          tc_t::tree_val_src_t::RANGE, 12}},
-                                   {{"NORMALS", 
-                                     tc_t::tree_val_src_t::RANGE, 10,
-                                     tc_t::tree_val_src_t::RANGE, 11,
-                                     tc_t::tree_val_src_t::RANGE, 12}});
+  treeConverter.construct_geometry_fans(ccplx,
+                                        tree,
+                                        2,
+                                        {{tc_t::tree_val_src_t::RANGE,  0},
+                                         {tc_t::tree_val_src_t::RANGE,  1},
+                                         {tc_t::tree_val_src_t::RANGE,  2}});
   std::chrono::time_point<std::chrono::system_clock> vtkFanTime = std::chrono::system_clock::now();
+
+  ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)", "c(u,v)", "dx(u,v)/du", "dx(u,v)/dv", "dy(u,v)/du", "dy(u,v)/dv", "dz(u,v)/du", "dz(u,v)/dv", "nx", "ny", "nz"}, 
+                              {{"NORMALS", {12, 13, 14}}});
+  std::chrono::time_point<std::chrono::system_clock> datAnnoTime = std::chrono::system_clock::now();
 
   ccplx.write_xml_vtk("performance_with_large_surface.vtu", "performance_with_large_surface");
   std::chrono::time_point<std::chrono::system_clock> vtkWriteTime = std::chrono::system_clock::now();
@@ -1121,7 +1061,8 @@ int main() {
   std::cout << "sampleTime time ...... " << static_cast<std::chrono::duration<double>>(sampleTime-constructTime)    << " sec" << std::endl;
   std::cout << "dumpTime time ........ " << static_cast<std::chrono::duration<double>>(dumpTime-sampleTime)         << " sec" << std::endl;
   std::cout << "treeConverter time ... " << static_cast<std::chrono::duration<double>>(vtkFanTime-dumpTime)         << " sec" << std::endl;
-  std::cout << "write_vtk time ....... " << static_cast<std::chrono::duration<double>>(vtkWriteTime-vtkFanTime)     << " sec" << std::endl;
+  std::cout << "dataset anno time .... " << static_cast<std::chrono::duration<double>>(datAnnoTime-vtkFanTime)      << " sec" << std::endl;
+  std::cout << "write_vtk time ....... " << static_cast<std::chrono::duration<double>>(vtkWriteTime-datAnnoTime)    << " sec" << std::endl;
   std::cout << "Total Run Time ....... " << static_cast<std::chrono::duration<double>>(vtkWriteTime-startTime)      << " sec" << std::endl;
 }
 #+end_src
@@ -1198,26 +1139,15 @@ int main() {
 
   tree.dump_tree(20);
 
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   tc_t::cell_structure_t::FANS, 
-                                   2,
-                                   { "points", 
-                                     tc_t::tree_val_src_t::RANGE,  0,
-                                     tc_t::tree_val_src_t::RANGE,  1,
-                                     tc_t::tree_val_src_t::RANGE,  2},
-                                   {{"u",           tc_t::tree_val_src_t::DOMAIN, 0},
-                                    {"v",           tc_t::tree_val_src_t::DOMAIN, 1},
-                                    {"x(u,v)",      tc_t::tree_val_src_t::RANGE,  0},
-                                    {"y(u,v)",      tc_t::tree_val_src_t::RANGE,  1},
-                                    {"z(u,v)",      tc_t::tree_val_src_t::RANGE,  2},
-                                    {"nx",          tc_t::tree_val_src_t::RANGE,  3},
-                                    {"ny",          tc_t::tree_val_src_t::RANGE,  4},
-                                    {"nz",          tc_t::tree_val_src_t::RANGE,  5}},
-                                   {{"NORMALS", 
-                                     tc_t::tree_val_src_t::RANGE, 3,
-                                     tc_t::tree_val_src_t::RANGE, 4,
-                                     tc_t::tree_val_src_t::RANGE, 5}});
+  treeConverter.construct_geometry_fans(ccplx,
+                                        tree,
+                                        2,
+                                        {{tc_t::tree_val_src_t::RANGE,  0},
+                                         {tc_t::tree_val_src_t::RANGE,  1},
+                                         {tc_t::tree_val_src_t::RANGE,  2}});
+
+  ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)", "nx", "ny", "nz"},
+                              {{"NORMALS", {5, 6, 7}}});
 
   ccplx.write_xml_vtk("trefoil.vtu", "trefoil");
 

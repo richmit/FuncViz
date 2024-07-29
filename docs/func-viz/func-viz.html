@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-07-23 Tue 16:50 -->
+<!-- 2024-07-29 Mon 15:26 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Function Visualization</title>
@@ -272,12 +272,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-07-23 16:48:43</i></td>
+<td class="org-left"><i>2024-07-29 15:26:46</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-07-23 16:50:38</i></td>
+<td class="org-left"><i>2024-07-29 15:26:47</i></td>
 </tr>
 </tbody>
 </table>
@@ -498,28 +498,18 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/comp
 
   tree.dump_tree(5);
 
-  <span style="color: #00ffff;">auto</span> <span style="color: #7fffd4;">tcret</span> = treeConverter.construct_geometry(ccplx,
-                                                tree,
-                                                tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), 
-                                                                         [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
-                                                <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::FANS, 
-                                                2,
-                                                { <span style="color: #fa8072;">"points"</span>, 
-                                                  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0, 
-                                                  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1,
-                                                  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  4},
-                                                {{ <span style="color: #fa8072;">"Re(z)"</span>,     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
-                                                 { <span style="color: #fa8072;">"Im(z)"</span>,     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
-                                                 { <span style="color: #fa8072;">"abs(z)"</span>,    <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
-                                                 { <span style="color: #fa8072;">"arg(z)"</span>,    <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1},
-                                                 { <span style="color: #fa8072;">"Re(f(z))"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2},
-                                                 { <span style="color: #fa8072;">"Im(f(z))"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  3},
-                                                 { <span style="color: #fa8072;">"abs(f(z))"</span>, <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  4},
-                                                 { <span style="color: #fa8072;">"arg(f(z))"</span>, <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  5}},
-                                                {{<span style="color: #fa8072;">"COLORS"</span>,
-                                                  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 6,
-                                                  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 7,
-                                                  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 8}});
+  <span style="color: #00ffff;">auto</span> <span style="color: #7fffd4;">tcret</span> = treeConverter.construct_geometry_fans(ccplx,
+                                                     tree,
+                                                     tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), 
+                                                                              [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
+                                                     2,
+                                                     {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0}, 
+                                                      {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
+                                                      {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  4}});
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Note the first argument need not name *every* data element, just the first ones.</span>
+  ccplx.create_named_datasets({<span style="color: #fa8072;">"Re(z)"</span>, <span style="color: #fa8072;">"Im(z)"</span>, <span style="color: #fa8072;">"abs(z)"</span>, <span style="color: #fa8072;">"arg(z)"</span>, <span style="color: #fa8072;">"Re(f(z))"</span>, <span style="color: #fa8072;">"Im(f(z))"</span>, <span style="color: #fa8072;">"abs(f(z))"</span>, <span style="color: #fa8072;">"arg(f(z))"</span>}, {{<span style="color: #fa8072;">"COLORS"</span>, {8, 9, 10}}});
+
   <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"TC Return: "</span> &lt;&lt; tcret &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
 
   ccplx.dump_cplx(5);
@@ -619,18 +609,14 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/impl
   tree.dump_tree(20);
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Convert the geometry into a 3D dataset so we can see the contour on the surface</span>
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::FANS, 
-                                   2,
-                                   { <span style="color: #fa8072;">"points"</span>, 
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
-                                   {{<span style="color: #fa8072;">"x"</span>,       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
-                                    {<span style="color: #fa8072;">"y"</span>,       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
-                                    {<span style="color: #fa8072;">"f(x,y)"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0}},
-                                   {});
+  treeConverter.construct_geometry_fans(ccplx,
+                                        tree,
+                                        2,
+                                        {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
+                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
+                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0}});
+
+  ccplx.create_named_datasets({<span style="color: #fa8072;">"x"</span>, <span style="color: #fa8072;">"y"</span>, <span style="color: #fa8072;">"f(x,y)"</span>});
 
   ccplx.write_xml_vtk(<span style="color: #fa8072;">"implicit_curve_2d.vtu"</span>, <span style="color: #fa8072;">"implicit_curve_2d"</span>);
 }
@@ -696,20 +682,16 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/impl
   tree.dump_tree(5);
 
   <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Convert our tree to a cell complex.  Note that we use an SDF to export only cells that contain our surface</span><span style="color: #ffa500;"> */</span>
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_cross_sdf(i, isf)); }),
-                                   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::RECTANGLES, 
-                                   3,
-                                   { <span style="color: #fa8072;">"points"</span>, 
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0, 
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 2},
-                                   {{ <span style="color: #fa8072;">"x"</span>,        <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
-                                    { <span style="color: #fa8072;">"y"</span>,        <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
-                                    { <span style="color: #fa8072;">"z"</span>,        <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 2},
-                                    { <span style="color: #fa8072;">"f(x,y,z)"</span>, <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0}},
-                                   {});
+  treeConverter.construct_geometry_rects(ccplx,
+                                         tree,
+                                         tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_cross_sdf(i, isf)); }),
+                                         3,
+                                         {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0}, 
+                                          {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
+                                          {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 2}});
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Name the data points</span><span style="color: #ffa500;"> */</span>
+  ccplx.create_named_datasets({<span style="color: #fa8072;">"x"</span>, <span style="color: #fa8072;">"y"</span>, <span style="color: #fa8072;">"z"</span>, <span style="color: #fa8072;">"f(x,y,z)"</span>});
 
   <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Display some data about the cell complex</span><span style="color: #ffa500;"> */</span>
   ccplx.dump_cplx(5);
@@ -774,24 +756,17 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/vect
   vftree.refine_grid(5, vf);
 
   <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Dump the vector field</span><span style="color: #ffa500;"> */</span>
-  vftreeConverter.construct_geometry(vfccplx,
-                                     vftree,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::RECTANGLES, 
-                                     0,
-                                     { <span style="color: #fa8072;">"points"</span>, 
-                                       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN,  0,
-                                       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN,  1,
-                                       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN,  2},
-                                     {{<span style="color: #fa8072;">"x"</span>,   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
-                                      {<span style="color: #fa8072;">"y"</span>,   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
-                                      {<span style="color: #fa8072;">"z"</span>,   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 2}},
-                                     {{<span style="color: #fa8072;">"d"</span>,
-                                       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0,
-                                       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1,
-                                       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2}});
+  vftreeConverter.construct_geometry_rects(vfccplx,
+                                           vftree,
+                                           0,
+                                           {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN,  0},
+                                            {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN,  1},
+                                            {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN,  2}});
+
+  vfccplx.create_named_datasets({<span style="color: #fa8072;">"x"</span>, <span style="color: #fa8072;">"y"</span>, <span style="color: #fa8072;">"z"</span>},
+                                {{<span style="color: #fa8072;">"d"</span>, {0, 1, 2}}});
   vfccplx.dump_cplx(5);
   vfccplx.write_xml_vtk(<span style="color: #fa8072;">"vector_field_3d-f.vtu"</span>, <span style="color: #fa8072;">"vector_field_3d-f"</span>);
-
 
   <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">cvccplx</span>;
 
@@ -805,15 +780,13 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/vect
   <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">b</span>      = 28.0;
   <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">c</span>      = 8.0 / 3.0;
 
-  <span style="color: #00ffff;">auto</span> <span style="color: #7fffd4;">p_old</span> = cvccplx.add_point({x_old, y_old, z_old});
-  cvccplx.add_data_if_new(<span style="color: #fa8072;">"t"</span>, t);
+  <span style="color: #00ffff;">auto</span> <span style="color: #7fffd4;">p_old</span> = cvccplx.add_point({x_old, y_old, z_old, t});
   <span style="color: #00ffff;">for</span>(<span style="color: #63b8ff;">int</span> <span style="color: #7fffd4;">num_steps</span>=0;num_steps&lt;max_steps;num_steps++) {    
     <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x_new</span> = x_old + a*(y_old-x_old)*delta;
     <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y_new</span> = y_old + (x_old*(b-z_old)-y_old)*delta;
     <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z_new</span> = z_old + (x_old*y_old-c*z_old)*delta;
     t += delta;
-    <span style="color: #00ffff;">auto</span> <span style="color: #7fffd4;">p_new</span> = cvccplx.add_point({x_new, y_new, z_new});
-    cvccplx.add_data_if_new(<span style="color: #fa8072;">"t"</span>, t);
+    <span style="color: #00ffff;">auto</span> <span style="color: #7fffd4;">p_new</span> = cvccplx.add_point({x_new, y_new, z_new, t});
     cvccplx.add_cell(<span style="color: #8470ff; font-weight: bold;">cc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_type_t</span>::SEGMENT, {p_old, p_new});
     x_old=x_new;
     y_old=y_new;
@@ -920,42 +893,40 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
   tree.refine_grid(2, dampCosWave2);
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">The humps need extra samples.  We know where they are, and we could sample on them with an SDF like this:</span>
-  <span style="color: #00ffff;">for</span>(<span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">i</span>: {0, 1, 2, 3}) {
-    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">r</span> = i*<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi/4;
-    tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&amp;<span style="color: #7fffd4;">tree</span>, <span style="color: #8470ff; font-weight: bold;">r</span>](<span style="color: #63b8ff;">int</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_cross_sdf(i, <span style="color: #8470ff; font-weight: bold;">std</span>::bind_front(circleSDF2, r))); });
-  }
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">for(double i: {0, 1, 2, 3}) {</span>
+  <span style="color: #ffa500;">//   </span><span style="color: #ff7f24;">double r = i*std::numbers::pi/4;</span>
+  <span style="color: #ffa500;">//   </span><span style="color: #ff7f24;">tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&amp;tree, r](int i) { return (tree.cell_cross_sdf(i, std::bind_front(circleSDF2, r))); });</span>
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">}</span>
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Alternately, we can test the derivative values to identify the humps</span>
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&amp;tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 1, 0.0); });</span>
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&amp;tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 2, 0.0); });</span>
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Lastly we can use the directional derivative radiating from the origin</span>
-  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&amp;tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 4, 0.0); });</span>
+  tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> tree.cell_cross_range_level(i, 4, 0.0); });
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Balance the three to the traditional level of 1 (no  cell borders a cell more than half it's size)</span>
   tree.balance_tree(1, dampCosWave2);
 
   tree.dump_tree(5);
 
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::FANS, 
-                                   2,
-                                   { <span style="color: #fa8072;">"points"</span>, 
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0, 
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
-                                   {{ <span style="color: #fa8072;">"x"</span>,      <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
-                                    { <span style="color: #fa8072;">"y"</span>,      <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
-                                    { <span style="color: #fa8072;">"f(x,y)"</span>, <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
-                                    { <span style="color: #fa8072;">"-df/dx"</span>, <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1},
-                                    { <span style="color: #fa8072;">"-df/dy"</span>, <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2}},
-                                   {{<span style="color: #fa8072;">"NORMALS"</span>,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 1,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 2,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 3}});
+  treeConverter.construct_geometry_fans(ccplx,
+                                        tree,
+                                        2,
+                                        {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0}, 
+                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
+                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0}});
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Note we use the single argument version of create_named_datasets() because we don't want to name elements 3, 4, &amp; 5 (the components of the normal</span>
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Note if we had placed the ddiv component right after z, then we could have used the two argument version...</span>
+  ccplx.set_data_name_to_data_idx_lst({{<span style="color: #fa8072;">"x"</span>,        {0}},
+                                       {<span style="color: #fa8072;">"y"</span>,        {1}},
+                                       {<span style="color: #fa8072;">"z=f(x,y)"</span>, {2}},
+                                       {<span style="color: #fa8072;">"ddiv"</span>,     {6}},
+                                       {<span style="color: #fa8072;">"NORMALS"</span>,  {3,4,5}}});
 
   ccplx.dump_cplx(5);
+
   ccplx.write_legacy_vtk(<span style="color: #fa8072;">"surface_with_normals.vtk"</span>, <span style="color: #fa8072;">"surface_with_normals"</span>);
   ccplx.write_xml_vtk(   <span style="color: #fa8072;">"surface_with_normals.vtu"</span>, <span style="color: #fa8072;">"surface_with_normals"</span>);
   ccplx.write_ply(       <span style="color: #fa8072;">"surface_with_normals.ply"</span>, <span style="color: #fa8072;">"surface_with_normals"</span>);
@@ -1049,20 +1020,18 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Balance the three to the traditional level of 1 (no cell borders a cell more than half it's size)</span>
   tree.balance_tree(1, halfSphere2);
 
-  tree.dump_tree(20);
+  tree.dump_tree(10);
 
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::FANS, 
-                                   2,
-                                   { <span style="color: #fa8072;">"points"</span>, 
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0, 
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
-                                   {{ <span style="color: #fa8072;">"x"</span>,      <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
-                                    { <span style="color: #fa8072;">"y"</span>,      <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
-                                    { <span style="color: #fa8072;">"f(x,y)"</span>, <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0}},
-                                   {});
+  treeConverter.construct_geometry_fans(ccplx,
+                                        tree,
+                                        2,
+                                        {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0}, 
+                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
+                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0}});
+
+  ccplx.create_named_datasets({<span style="color: #fa8072;">"x"</span>, <span style="color: #fa8072;">"y"</span>, <span style="color: #fa8072;">"f(x,y)"</span>});
+
+  ccplx.dump_cplx(10);
 
   ccplx.write_xml_vtk(<span style="color: #fa8072;">"surface_plot_edge.vtu"</span>, <span style="color: #fa8072;">"surface_plot_edge"</span>);
 }
@@ -1094,7 +1063,7 @@ Note that most of the items above are listed TBD.  A few features need to be add
 
 <div class="org-center">
 
-<div id="org1ee0aef" class="figure">
+<div id="org1b48f4b" class="figure">
 <p><a href="media/curve_plot_100.png"><img src="media/curve_plot_10.png" alt="curve_plot_10.png" /></a>
 </p>
 </div>
@@ -1160,19 +1129,19 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/curv
   tree.refine_leaves_recursive_cell_pred(8, f, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_close_to_domain_point(0.8775087009, 1.0e-2, i)); });
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">TODO: Use derivative test for this</span>
 
-  tree.dump_tree(20);
+  tree.dump_tree(10);
 
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::FANS, 
-                                   1,
-                                   { <span style="color: #fa8072;">"points"</span>, 
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0, 
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::ZERO,   0},
-                                   {{ <span style="color: #fa8072;">"x"</span>,    <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
-                                    { <span style="color: #fa8072;">"f(x)"</span>, <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0}},
-                                   {});
+  treeConverter.construct_geometry_fans(ccplx,
+                                        tree,
+                                        1,
+                                        {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN,   0  }, 
+                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,    0  },
+                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::CONSTANT, 0.0}});
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Note the first argument need not name *every* data element, just the first ones.</span>
+  ccplx.create_named_datasets({<span style="color: #fa8072;">"x"</span>, <span style="color: #fa8072;">"f(x)"</span>});
+
+  ccplx.dump_cplx(10);
 
   ccplx.write_xml_vtk(<span style="color: #fa8072;">"curve_plot.vtu"</span>, <span style="color: #fa8072;">"curve_plot"</span>);
 }
@@ -1238,39 +1207,27 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/para
   <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Uniform sampling</span><span style="color: #ffa500;"> */</span>
   tree.refine_grid(6, parSphere2);
 
+
   <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">First we dump a tessellation made of triangles</span><span style="color: #ffa500;"> */</span>
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::FANS, 
-                                   2,
-                                   { <span style="color: #fa8072;">"points"</span>, 
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2},
-                                   {{<span style="color: #fa8072;">"u"</span>,       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
-                                    {<span style="color: #fa8072;">"v"</span>,       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
-                                    {<span style="color: #fa8072;">"x(u,v)"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
-                                    {<span style="color: #fa8072;">"y(u,v)"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1},
-                                    {<span style="color: #fa8072;">"z(u,v)"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2}},
-                                   {});
+  treeConverter.construct_geometry_fans(ccplx,
+                                        tree,
+                                        2,
+                                        {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 0},
+                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 1},
+                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 2}});
+  ccplx.create_named_datasets({<span style="color: #fa8072;">"u"</span>, <span style="color: #fa8072;">"v"</span>, <span style="color: #fa8072;">"x(u,v)"</span>, <span style="color: #fa8072;">"y(u,v)"</span>, <span style="color: #fa8072;">"z(u,v)"</span>});
   ccplx.dump_cplx(5);
   ccplx.write_xml_vtk(<span style="color: #fa8072;">"parametric_surface_with_defects-tri.vtu"</span>, <span style="color: #fa8072;">"parametric_surface_with_defects-tri"</span>);
 
   <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Next we dump a tessellation made of rectangles</span><span style="color: #ffa500;"> */</span>
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::RECTANGLES, 
-                                   2,
-                                   { <span style="color: #fa8072;">"points"</span>, 
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2},
-                                   {{<span style="color: #fa8072;">"u"</span>,       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
-                                    {<span style="color: #fa8072;">"v"</span>,       <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
-                                    {<span style="color: #fa8072;">"x(u,v)"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
-                                    {<span style="color: #fa8072;">"y(u,v)"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1},
-                                    {<span style="color: #fa8072;">"z(u,v)"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2}},
-                                   {});
+  ccplx.clear(); <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">We need to clear out the old contents first!</span>
+  treeConverter.construct_geometry_rects(ccplx,
+                                         tree,
+                                         2,
+                                         {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 0},
+                                          {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 1},
+                                          {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 2}});
+  ccplx.create_named_datasets({<span style="color: #fa8072;">"u"</span>, <span style="color: #fa8072;">"v"</span>, <span style="color: #fa8072;">"x(u,v)"</span>, <span style="color: #fa8072;">"y(u,v)"</span>, <span style="color: #fa8072;">"z(u,v)"</span>});
   ccplx.dump_cplx(5);
   ccplx.write_xml_vtk(<span style="color: #fa8072;">"parametric_surface_with_defects-rect.vtu"</span>, <span style="color: #fa8072;">"parametric_surface_with_defects-rect"</span>);
 }
@@ -1352,40 +1309,23 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/perf
   <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">treeConverter</span>;
   <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">constructTime</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
 
-  tree.refine_grid(6, shellStripes2);
+  tree.refine_grid(7, shellStripes2);
   <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">sampleTime</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
 
   tree.dump_tree(20);
   <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">dumpTime</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
 
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::FANS, 
-                                   2,
-                                   { <span style="color: #fa8072;">"points"</span>, 
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,   2},
-                                   {{<span style="color: #fa8072;">"u"</span>,           <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
-                                    {<span style="color: #fa8072;">"v"</span>,           <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
-                                    {<span style="color: #fa8072;">"x(u,v)"</span>,      <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
-                                    {<span style="color: #fa8072;">"y(u,v)"</span>,      <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1},
-                                    {<span style="color: #fa8072;">"z(u,v)"</span>,      <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2},
-                                    {<span style="color: #fa8072;">"c(u,v)"</span>,      <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  3},
-                                    {<span style="color: #fa8072;">"dx(u,v)/du"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  4},
-                                    {<span style="color: #fa8072;">"dx(u,v)/dv"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  5},
-                                    {<span style="color: #fa8072;">"dy(u,v)/du"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  6},
-                                    {<span style="color: #fa8072;">"dy(u,v)/dv"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  7},
-                                    {<span style="color: #fa8072;">"dz(u,v)/du"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  8},
-                                    {<span style="color: #fa8072;">"dz(u,v)/dv"</span>,  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  9},
-                                    {<span style="color: #fa8072;">"nx"</span>,          <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 10},
-                                    {<span style="color: #fa8072;">"ny"</span>,          <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 11},
-                                    {<span style="color: #fa8072;">"nz"</span>,          <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 12}},
-                                   {{<span style="color: #fa8072;">"NORMALS"</span>, 
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 10,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 11,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 12}});
+  treeConverter.construct_geometry_fans(ccplx,
+                                        tree,
+                                        2,
+                                        {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
+                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1},
+                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2}});
   <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">vtkFanTime</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
+
+  ccplx.create_named_datasets({<span style="color: #fa8072;">"u"</span>, <span style="color: #fa8072;">"v"</span>, <span style="color: #fa8072;">"x(u,v)"</span>, <span style="color: #fa8072;">"y(u,v)"</span>, <span style="color: #fa8072;">"z(u,v)"</span>, <span style="color: #fa8072;">"c(u,v)"</span>, <span style="color: #fa8072;">"dx(u,v)/du"</span>, <span style="color: #fa8072;">"dx(u,v)/dv"</span>, <span style="color: #fa8072;">"dy(u,v)/du"</span>, <span style="color: #fa8072;">"dy(u,v)/dv"</span>, <span style="color: #fa8072;">"dz(u,v)/du"</span>, <span style="color: #fa8072;">"dz(u,v)/dv"</span>, <span style="color: #fa8072;">"nx"</span>, <span style="color: #fa8072;">"ny"</span>, <span style="color: #fa8072;">"nz"</span>}, 
+                              {{<span style="color: #fa8072;">"NORMALS"</span>, {12, 13, 14}}});
+  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">datAnnoTime</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
 
   ccplx.write_xml_vtk(<span style="color: #fa8072;">"performance_with_large_surface.vtu"</span>, <span style="color: #fa8072;">"performance_with_large_surface"</span>);
   <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">vtkWriteTime</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
@@ -1394,7 +1334,8 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/perf
   <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"sampleTime time ...... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(sampleTime-constructTime)    &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
   <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"dumpTime time ........ "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(dumpTime-sampleTime)         &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
   <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"treeConverter time ... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(vtkFanTime-dumpTime)         &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
-  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"write_vtk time ....... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(vtkWriteTime-vtkFanTime)     &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"dataset anno time .... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(datAnnoTime-vtkFanTime)      &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"write_vtk time ....... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(vtkWriteTime-datAnnoTime)    &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
   <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"Total Run Time ....... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(vtkWriteTime-startTime)      &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
 }
 </pre>
@@ -1413,7 +1354,7 @@ This example doesn't really demonstrate anything not found in the other examples
 
 <div class="org-center">
 
-<div id="orgaa2c4ec" class="figure">
+<div id="org4e31cd1" class="figure">
 <p><a href="media/trefoil_rot_50.html"><img src="media/trefoil_rot_10.gif" alt="trefoil_rot_10.gif" /></a>
 </p>
 </div>
@@ -1469,26 +1410,15 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/tref
 
   tree.dump_tree(20);
 
-  treeConverter.construct_geometry(ccplx,
-                                   tree,
-                                   <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">cell_structure_t</span>::FANS, 
-                                   2,
-                                   { <span style="color: #fa8072;">"points"</span>, 
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2},
-                                   {{<span style="color: #fa8072;">"u"</span>,           <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
-                                    {<span style="color: #fa8072;">"v"</span>,           <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
-                                    {<span style="color: #fa8072;">"x(u,v)"</span>,      <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
-                                    {<span style="color: #fa8072;">"y(u,v)"</span>,      <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1},
-                                    {<span style="color: #fa8072;">"z(u,v)"</span>,      <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2},
-                                    {<span style="color: #fa8072;">"nx"</span>,          <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  3},
-                                    {<span style="color: #fa8072;">"ny"</span>,          <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  4},
-                                    {<span style="color: #fa8072;">"nz"</span>,          <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  5}},
-                                   {{<span style="color: #fa8072;">"NORMALS"</span>, 
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 3,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 4,
-                                     <span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 5}});
+  treeConverter.construct_geometry_fans(ccplx,
+                                        tree,
+                                        2,
+                                        {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
+                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1},
+                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2}});
+
+  ccplx.create_named_datasets({<span style="color: #fa8072;">"u"</span>, <span style="color: #fa8072;">"v"</span>, <span style="color: #fa8072;">"x(u,v)"</span>, <span style="color: #fa8072;">"y(u,v)"</span>, <span style="color: #fa8072;">"z(u,v)"</span>, <span style="color: #fa8072;">"nx"</span>, <span style="color: #fa8072;">"ny"</span>, <span style="color: #fa8072;">"nz"</span>},
+                              {{<span style="color: #fa8072;">"NORMALS"</span>, {5, 6, 7}}});
 
   ccplx.write_xml_vtk(<span style="color: #fa8072;">"trefoil.vtu"</span>, <span style="color: #fa8072;">"trefoil"</span>);
 
