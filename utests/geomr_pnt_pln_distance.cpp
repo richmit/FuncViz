@@ -48,4 +48,5 @@ BOOST_AUTO_TEST_CASE(geomr_pnt_pln_distance) {
 
   BOOST_TEST_CHECK(aPoly.geomr_pnt_pln_distance({0.0, 0.0, -7.0}, {0.0, 1.0, -11.0}, {1.0, 0.0, -10.0}, {1.0, 2.0, 5.0}) ==  4.510671108178232,    boost::test_tools::tolerance(0.001) );  
   BOOST_TEST_CHECK(aPoly.geomr_pnt_pln_distance({0.0, 0.0,  0.0}, {0.0, 1.0,  -2.0}, {1.0, 0.0,  -2.0}, {1.0, 1.0, 1.0}) ==  1.666666666666666,    boost::test_tools::tolerance(0.001) );  
+
 }

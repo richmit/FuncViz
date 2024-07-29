@@ -91,22 +91,22 @@ int main() {
             { 2.1,  2.1});
   cc_t ccplx;
   tc_t treeConverter;
-
+  
   // Make a few samples on a uniform grid
   tree.refine_grid(2, dampCosWave2);
 
   // The humps need extra samples.  We know where they are, and we could sample on them with an SDF like this:
-  for(double i: {0, 1, 2, 3}) {
-    double r = i*std::numbers::pi/4;
-    tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&tree, r](int i) { return (tree.cell_cross_sdf(i, std::bind_front(circleSDF2, r))); });
-  }
+  // for(double i: {0, 1, 2, 3}) {
+  //   double r = i*std::numbers::pi/4;
+  //   tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&tree, r](int i) { return (tree.cell_cross_sdf(i, std::bind_front(circleSDF2, r))); });
+  // }
 
   // Alternately, we can test the derivative values to identify the humps
   // tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 1, 0.0); });
   // tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 2, 0.0); });
 
   // Lastly we can use the directional derivative radiating from the origin
-  // tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 4, 0.0); });
+  tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 4, 0.0); });
 
   // Balance the three to the traditional level of 1 (no  cell borders a cell more than half it's size)
   tree.balance_tree(1, dampCosWave2);
@@ -116,21 +116,20 @@ int main() {
   treeConverter.construct_geometry_fans(ccplx,
                                         tree,
                                         2,
-                                        { "points", 
-                                          tc_t::tree_val_src_t::DOMAIN, 0, 
-                                          tc_t::tree_val_src_t::DOMAIN, 1,
-                                          tc_t::tree_val_src_t::RANGE,  0},
-                                        {{ "x",      tc_t::tree_val_src_t::DOMAIN, 0},
-                                         { "y",      tc_t::tree_val_src_t::DOMAIN, 1},
-                                         { "f(x,y)", tc_t::tree_val_src_t::RANGE,  0},
-                                         { "-df/dx", tc_t::tree_val_src_t::RANGE,  1},
-                                         { "-df/dy", tc_t::tree_val_src_t::RANGE,  2}},
-                                        {{"NORMALS",
-                                          tc_t::tree_val_src_t::RANGE, 1,
-                                          tc_t::tree_val_src_t::RANGE, 2,
-                                          tc_t::tree_val_src_t::RANGE, 3}});
+                                        {{tc_t::tree_val_src_t::DOMAIN, 0}, 
+                                         {tc_t::tree_val_src_t::DOMAIN, 1},
+                                         {tc_t::tree_val_src_t::RANGE,  0}});
+
+  // Note we use the single argument version of create_named_datasets() because we don't want to name elements 3, 4, & 5 (the components of the normal
+  // Note if we had placed the ddiv component right after z, then we could have used the two argument version...
+  ccplx.set_data_name_to_data_idx_lst({{"x",        {0}},
+                                       {"y",        {1}},
+                                       {"z=f(x,y)", {2}},
+                                       {"ddiv",     {6}},
+                                       {"NORMALS",  {3,4,5}}});
 
   ccplx.dump_cplx(5);
+
   ccplx.write_legacy_vtk("surface_with_normals.vtk", "surface_with_normals");
   ccplx.write_xml_vtk(   "surface_with_normals.vtu", "surface_with_normals");
   ccplx.write_ply(       "surface_with_normals.ply", "surface_with_normals");

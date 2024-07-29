@@ -66,12 +66,9 @@ int main() {
   treeConverter.construct_geometry_fans(ccplx,
                                         tree,
                                         2,
-                                        { "points", 
-                                          tc_t::tree_val_src_t::DOMAIN, 0, 
-                                          tc_t::tree_val_src_t::DOMAIN, 1,
-                                          tc_t::tree_val_src_t::RANGE,  0},
-                                        {},
-                                        {});
+                                        {{tc_t::tree_val_src_t::DOMAIN, 0}, 
+                                         {tc_t::tree_val_src_t::DOMAIN, 1},
+                                         {tc_t::tree_val_src_t::RANGE,  0}});
 
   ccplx.write_xml_vtk("hello_world.vtu", "hello_world");
 }

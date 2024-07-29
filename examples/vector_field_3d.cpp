@@ -73,17 +73,12 @@ int main() {
   vftreeConverter.construct_geometry_rects(vfccplx,
                                            vftree,
                                            0,
-                                           { "points", 
-                                             tc_t::tree_val_src_t::DOMAIN,  0,
-                                             tc_t::tree_val_src_t::DOMAIN,  1,
-                                             tc_t::tree_val_src_t::DOMAIN,  2},
-                                           {{"x",   tc_t::tree_val_src_t::DOMAIN, 0},
-                                            {"y",   tc_t::tree_val_src_t::DOMAIN, 1},
-                                            {"z",   tc_t::tree_val_src_t::DOMAIN, 2}},
-                                           {{"d",
-                                             tc_t::tree_val_src_t::RANGE,  0,
-                                             tc_t::tree_val_src_t::RANGE,  1,
-                                             tc_t::tree_val_src_t::RANGE,  2}});
+                                           {{tc_t::tree_val_src_t::DOMAIN,  0},
+                                            {tc_t::tree_val_src_t::DOMAIN,  1},
+                                            {tc_t::tree_val_src_t::DOMAIN,  2}});
+
+  vfccplx.create_named_datasets({"x", "y", "z"},
+                                {{"d", {0, 1, 2}}});
   vfccplx.dump_cplx(5);
   vfccplx.write_xml_vtk("vector_field_3d-f.vtu", "vector_field_3d-f");
 
@@ -99,15 +94,13 @@ int main() {
   double b      = 28.0;
   double c      = 8.0 / 3.0;
 
-  auto p_old = cvccplx.add_point({x_old, y_old, z_old});
-  cvccplx.add_data_if_new("t", t);
+  auto p_old = cvccplx.add_point({x_old, y_old, z_old, t});
   for(int num_steps=0;num_steps<max_steps;num_steps++) {    
     double x_new = x_old + a*(y_old-x_old)*delta;
     double y_new = y_old + (x_old*(b-z_old)-y_old)*delta;
     double z_new = z_old + (x_old*y_old-c*z_old)*delta;
     t += delta;
-    auto p_new = cvccplx.add_point({x_new, y_new, z_new});
-    cvccplx.add_data_if_new("t", t);
+    auto p_new = cvccplx.add_point({x_new, y_new, z_new, t});
     cvccplx.add_cell(cc_t::cell_type_t::SEGMENT, {p_old, p_new});
     x_old=x_new;
     y_old=y_new;

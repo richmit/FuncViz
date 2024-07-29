@@ -85,22 +85,12 @@ int main() {
   treeConverter.construct_geometry_fans(ccplx,
                                         tree,
                                         2,
-                                        { "points", 
-                                          tc_t::tree_val_src_t::RANGE,  0,
-                                          tc_t::tree_val_src_t::RANGE,  1,
-                                          tc_t::tree_val_src_t::RANGE,  2},
-                                        {{"u",           tc_t::tree_val_src_t::DOMAIN, 0},
-                                         {"v",           tc_t::tree_val_src_t::DOMAIN, 1},
-                                         {"x(u,v)",      tc_t::tree_val_src_t::RANGE,  0},
-                                         {"y(u,v)",      tc_t::tree_val_src_t::RANGE,  1},
-                                         {"z(u,v)",      tc_t::tree_val_src_t::RANGE,  2},
-                                         {"nx",          tc_t::tree_val_src_t::RANGE,  3},
-                                         {"ny",          tc_t::tree_val_src_t::RANGE,  4},
-                                         {"nz",          tc_t::tree_val_src_t::RANGE,  5}},
-                                        {{"NORMALS", 
-                                          tc_t::tree_val_src_t::RANGE, 3,
-                                          tc_t::tree_val_src_t::RANGE, 4,
-                                          tc_t::tree_val_src_t::RANGE, 5}});
+                                        {{tc_t::tree_val_src_t::RANGE,  0},
+                                         {tc_t::tree_val_src_t::RANGE,  1},
+                                         {tc_t::tree_val_src_t::RANGE,  2}});
+
+  ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)", "nx", "ny", "nz"},
+                              {{"NORMALS", {5, 6, 7}}});
 
   ccplx.write_xml_vtk("trefoil.vtu", "trefoil");
 

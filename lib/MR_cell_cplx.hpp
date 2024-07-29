@@ -201,22 +201,61 @@ namespace mjr {
     public:
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /** @name Global Types */
+      //@{
+      /** Universal floating point type -- used for point components, scalar data values, vector components, all computation, etc.... */
+      typedef double uft_t;
+      //@}
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      public:
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /** @name Master point list.
 
-          cell complex objects have a master list of points.  Cells & data elements defined by referencing point indexes on this master list.  
+          Cell complex objects have a master list of points.  Cells & data elements defined by referencing point indexes on this master list.  
 
           Points consist of three double values, think (x, y, z) in R^3.  Indexes in this list are used to identify points.  The first point added gets index
           0, and each successive point gets the next integer. */
       //@{
-      /** Base field type for the vector space we use for points. */
-      typedef double pnt_crd_t;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Hold a tuple of real values defining a point. */
-      typedef std::array<pnt_crd_t, 3> pnt_t;
+      typedef std::array<uft_t, 3> pnt_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Integer type used to indentify/index points. */
       typedef int pnt_idx_t;
       //@}
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /** @name Point data sets. */
+      //@{
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Type to hold a dataset for a single point. */
+      typedef std::vector<uft_t> pnt_data_t;
+      //@}
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /** @name Named Datasets.
+
+          Each point's data payload may be grouped into named datasets. These named datasets are written to geometry files. */
+      //@{
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      typedef std::string pdata_name_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Type to hold a single vector data value for a single point */
+      typedef pnt_t vdat_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Type used to hold an index into a pnt_data_t or a constant float */
+      typedef std::variant<int, uft_t> data_idx_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Type to hold a list of data indexes -- one element for scalars, 3 for vectors, etc.... */
+      typedef std::vector<data_idx_t> data_idx_lst_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Type to hold scalar data set names to a data index lists. */
+      typedef std::map<pdata_name_t, data_idx_lst_t> data_name_to_data_idx_lst_t;
 
     private:
 
@@ -257,27 +296,201 @@ namespace mjr {
       pnt_idx_to_pnt_t pnt_idx_to_pnt;
       //@}
 
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /** @name Point data sets. */
+      //@{
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Type to hold a all point datasets. */
+      typedef std::vector<pnt_data_t> pnt_idx_to_pnt_data_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /* Hold all point data sets */
+      pnt_idx_to_pnt_data_t pnt_idx_to_pnt_data;
+      //@}
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /** @name Named Datasets. */
+      //@{
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /* Hold named descriptions of data (scalars & vectors) */
+      data_name_to_data_idx_lst_t data_name_to_data_idx_lst;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** How to construct a spatial point from a point dataset */
+      data_idx_lst_t data_to_pnt;
+      //@}
+
+    public:
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /** @name Named Point data sets. */
+      //@{
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /* Return the number of named scalar datasets */
+      int named_scalar_datasets_count() const {
+        return static_cast<int>(std::count_if(data_name_to_data_idx_lst.cbegin(), data_name_to_data_idx_lst.cend(), [](auto x) { return x.second.size()==1; }));
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /* Return the number of named vector datasets */
+      int named_vector_datasets_count() const {
+        return static_cast<int>(std::count_if(data_name_to_data_idx_lst.cbegin(), data_name_to_data_idx_lst.cend(), [](auto x) { return x.second.size()!=1; }));
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /* Return the number of named datasets */
+      int named_datasets_count() const {
+        return static_cast<int>(data_name_to_data_idx_lst.size());
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      void set_data_name_to_data_idx_lst(data_name_to_data_idx_lst_t names) {
+        data_name_to_data_idx_lst = names;
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** @overload */
+      void create_named_datasets(std::vector<pdata_name_t> scalar_name_strings) {
+        data_name_to_data_idx_lst.clear();
+        for(int i=0; i<static_cast<int>(scalar_name_strings.size()); ++i) 
+          data_name_to_data_idx_lst[scalar_name_strings[i]] = {i};
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** @overload */
+      void create_named_datasets(std::vector<pdata_name_t>   scalar_name_strings,
+                                 data_name_to_data_idx_lst_t names) {
+        data_name_to_data_idx_lst.clear();
+        for(int i=0; i<static_cast<int>(scalar_name_strings.size()); ++i) 
+          data_name_to_data_idx_lst[scalar_name_strings[i]] = {i};
+        for(auto kv : names)
+          data_name_to_data_idx_lst[kv.first] = kv.second;
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      void create_dataset_to_point_mapping(data_idx_lst_t point_data_index) {
+        data_to_pnt = point_data_index;
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      vdat_t get_dataset_vector(data_idx_lst_t data_idx_lst, pnt_data_t pnt_data) const {
+        vdat_t v;
+        for(int i=0; i<3; ++i) 
+          if (data_idx_lst[i].index() == 0) 
+            v[i] = pnt_data[std::get<int>(data_idx_lst[i])];
+          else 
+            v[i] = std::get<uft_t>(data_idx_lst[i]);
+        return v;
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      uft_t get_data_scalar(data_idx_t data_idx, pnt_data_t pnt_data) const {
+        if (data_idx.index() == 0)
+          return (pnt_data[std::get<int>(data_idx)]);
+        else 
+          return (std::get<int>(data_idx));
+      }
+      //@}
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /** @name Master point list. */
+      //@{
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Retruns the index of the last point given to the add_point() method. */
+      pnt_idx_t idx_of_last_point_added() const {
+        return last_point_idx;
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Retruns true if the last point given to the add_point() method was a new point. */
+      pnt_idx_t last_point_added_was_new() const {
+        return last_point_new;
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Add a point.
+          Cases
+           - Any of the coordinate values in the given point are NaN: last_point_idx=-1, last_point_new=false.
+           - The given point is already on the list: last_point_idx is ste to the existing point's index, and last_point_new=false
+           - The given point is not on the list: last_point_idx is set to th enew piont's index, and last_point_new=true
+          Note that last_point_idx is always the resturn value. */
+      pnt_idx_t add_point(pnt_data_t pnt_data) {
+        if (data_to_pnt.empty())
+          data_to_pnt = {0, 1, 2};
+        pnt_t new_pnt = get_dataset_vector(data_to_pnt, pnt_data);
+        if (std::isnan(new_pnt[0]) || std::isnan(new_pnt[1]) || std::isnan(new_pnt[2])) {
+          last_point_idx = -1;
+          last_point_new = false;
+        } else {
+          if constexpr (uniq_points) {
+            if (pnt_to_pnt_idx_map.contains(new_pnt)) {
+              /* Point is already in list */
+              last_point_idx = pnt_to_pnt_idx_map[new_pnt];
+              last_point_new = false;
+            } else {
+              /* Point is not already in list */
+              last_point_idx = num_points();
+              pnt_to_pnt_idx_map[new_pnt] = last_point_idx;
+              pnt_idx_to_pnt.push_back(new_pnt);
+              pnt_idx_to_pnt_data.push_back(pnt_data);
+              last_point_new = true;
+            }
+          } else {
+            /* Add point without regard to uniqueness */
+            last_point_idx = num_points();
+            pnt_idx_to_pnt.push_back(new_pnt);
+            pnt_idx_to_pnt_data.push_back(pnt_data);
+            last_point_new = true;
+          }
+        }
+        return last_point_idx;
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Print number of points in master point list.
+          Note the return type is pnt_idx_t (a signed integer type) and not a size_t. */
+      pnt_idx_t num_points() const {
+        return static_cast<pnt_idx_t>(pnt_idx_to_pnt.size());
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Convert a pnt_t to a string representation */
+      std::string pnt_to_string(pnt_t x) const {
+        std::ostringstream convert;
+        convert << "[ ";
+        for(auto c: x)
+          convert << std::setprecision(5) << static_cast<uft_t>(c) << " ";
+        convert << "]";
+        return(convert.str());
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Print all points to STDOUT. 
+
+          @param max_num_print Maximum number of points to print.  Use 0 to print all points. */
+      void print_all_points(int max_num_print) const {
+        int numPrinted = 0;
+        if (num_points() > 0) {
+          std::cout << "POINTS BEGIN (" << num_points() << ")" << std::endl;
+          for(pnt_idx_t pnt_idx = 0; pnt_idx<num_points(); ++pnt_idx) {
+            std::cout << "  " << pnt_idx << ": " << pnt_to_string(pnt_idx_to_pnt[pnt_idx]) << std::endl;
+            numPrinted++;
+            if ((max_num_print > 0) && (numPrinted >= max_num_print)) {
+              std::cout << "  Maximum number of points reached.  Halting tree dump." << std::endl;
+              break;
+            }
+          }
+          std::cout << "POINTS END" << std::endl;
+        }
+      }
+      //@}
+
     public:
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /** @name 3D Vector Computations. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the magnitude */
-      inline double vec3_two_norm(const pnt_t& pnt) const {
+      inline uft_t vec3_two_norm(const pnt_t& pnt) const {
         return std::sqrt(vec3_self_dot_product(pnt));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the self dot product -- i.e. magnitude squared */
-      inline double vec3_self_dot_product(const pnt_t& pnt) const {
-        double tmp = 0.0;
+      inline uft_t vec3_self_dot_product(const pnt_t& pnt) const {
+        uft_t tmp = 0.0;
         for(int i=0; i<3; ++i)
           tmp += pnt[i]*pnt[i];
         return tmp;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the cross prodcut */
-      inline double vec3_dot_product(const pnt_t& pnt1, const pnt_t& pnt2) const {
-        double tmp = 0.0;
+      inline uft_t vec3_dot_product(const pnt_t& pnt1, const pnt_t& pnt2) const {
+        uft_t tmp = 0.0;
         for(int i=0; i<3; ++i)
           tmp += pnt1[i]*pnt2[i];
         return tmp;
@@ -301,13 +514,13 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the vector diffrence */
-      inline double vec3_scalar_triple_product(const pnt_t& pnt1, const pnt_t& pnt2, const pnt_t& pnt3) const {
+      inline uft_t vec3_scalar_triple_product(const pnt_t& pnt1, const pnt_t& pnt2, const pnt_t& pnt3) const {
         return vec3_dot_product(pnt1, vec3_cross_product(pnt2, pnt3));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Unitize the given point in place.  Return true if the result is valid, and false otherwise */
       inline bool vec3_unitize(pnt_t& pnt) const {
-        double length = vec3_two_norm(pnt);
+        uft_t length = vec3_two_norm(pnt);
         if (std::abs(length) > eps) {
           for(int i=0; i<3; ++i) 
             pnt[i] = pnt[i]/length;
@@ -318,7 +531,7 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the linear combination */
-      inline pnt_t vec3_linear_combination(double scl1, const pnt_t& pnt1, double scl2, const pnt_t& pnt2) const {
+      inline pnt_t vec3_linear_combination(uft_t scl1, const pnt_t& pnt1, uft_t scl2, const pnt_t& pnt2) const {
         pnt_t tmp;
         for(int i=0; i<3; ++i)
           tmp[i] = scl1 * pnt1[i] + scl2 * pnt2[i];
@@ -326,7 +539,7 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Determinant of 3x3 matrix with given vectors as columns/rows. */
-      inline double vec3_det3(const pnt_t& pnt1, const pnt_t& pnt2, const pnt_t& pnt3) const {
+      inline uft_t vec3_det3(const pnt_t& pnt1, const pnt_t& pnt2, const pnt_t& pnt3) const {
         //  MJR TODO NOTE <2024-07-22T15:48:31-0500> vec3_det3: UNTESTED! UNTESTED! UNTESTED! UNTESTED! 
         static_assert(false, "vec3_det3: Under active development.  Untested!");
         return (pnt1[0] * pnt2[1] * pnt3[2] - 
@@ -444,24 +657,24 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if two line segments intersect in a single point */
       bool geomr_seg_isect1(const pnt_t& lin1pnt1, const pnt_t& lin1pnt2, const pnt_t& lin2pnt1, const pnt_t& lin2pnt2) const {
-        double denom = 
+        uft_t denom = 
           lin1pnt1[0] * lin2pnt1[1] - lin1pnt1[0] * lin2pnt2[1] - lin1pnt1[1] * lin2pnt1[0] + lin1pnt1[1] * lin2pnt2[0] - 
           lin1pnt2[0] * lin2pnt1[1] + lin1pnt2[0] * lin2pnt2[1] + lin1pnt2[1] * lin2pnt1[0] - lin1pnt2[1] * lin2pnt2[0];
         if (std::abs(denom) < eps) // Lines are parallel
           return false;
-        double numera = 
+        uft_t numera = 
           lin1pnt1[0]*lin2pnt1[1] - lin1pnt1[0]*lin2pnt2[1] - 
           lin1pnt1[1]*lin2pnt1[0] + lin1pnt1[1]*lin2pnt2[0] + 
           lin2pnt1[0]*lin2pnt2[1] - lin2pnt1[1]*lin2pnt2[0];
-        double numerb = 
+        uft_t numerb = 
           -(lin1pnt1[0]*lin1pnt2[1] - lin1pnt1[0]*lin2pnt1[1] - 
             lin1pnt1[1]*lin1pnt2[0] + lin1pnt1[1]*lin2pnt1[0] + 
             lin1pnt2[0]*lin2pnt1[1] - lin1pnt2[1]*lin2pnt1[0]);
-        double ua = numera/denom;
-        double ub = numerb/denom;
+        uft_t ua = numera/denom;
+        uft_t ub = numerb/denom;
         if ( (ua < 0) || (ub < 0) || (ua > 1) || (ub > 1) )
           return false;
-        double eq3 = numera/denom * (lin1pnt2[2] - lin1pnt1[2]) - numerb/denom * (lin2pnt2[2] - lin2pnt1[2]) + lin2pnt1[2] + lin1pnt1[2];
+        uft_t eq3 = numera/denom * (lin1pnt2[2] - lin1pnt1[2]) - numerb/denom * (lin2pnt2[2] - lin2pnt1[2]) + lin2pnt1[2] + lin1pnt1[2];
         if (std::abs(eq3) < eps) // Equation in third coordinate is satisfied
           return true;
         else
@@ -470,7 +683,7 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Distance between a point and a line. 
           See: geomr_pnt_line_distance(). */
-      double geomi_pnt_line_distance(pnt_idx_t ilinpnt1, pnt_idx_t ilinpnt2, pnt_idx_t ipnt, bool seg_distance) const {
+      uft_t geomi_pnt_line_distance(pnt_idx_t ilinpnt1, pnt_idx_t ilinpnt2, pnt_idx_t ipnt, bool seg_distance) const {
         return geomr_pnt_line_distance(pnt_idx_to_pnt[ilinpnt1], pnt_idx_to_pnt[ilinpnt2], pnt_idx_to_pnt[ipnt], seg_distance);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -478,10 +691,10 @@ namespace mjr {
           The result depends on the value of seg_distance:
            - seg_distance==false: Distance between the point pnt and the line containing linpnt1 & linpnt2.
            - seg_distance==true:  Distance between the point pnt and the line segment with endpoints linpnt1 & linpnt2. */
-      double geomr_pnt_line_distance(const pnt_t& linpnt1, const pnt_t& linpnt2, const pnt_t& pnt, bool seg_distance) const {
-        double segd = geomr_pnt_pnt_distance(linpnt1, linpnt2);
+      uft_t geomr_pnt_line_distance(const pnt_t& linpnt1, const pnt_t& linpnt2, const pnt_t& pnt, bool seg_distance) const {
+        uft_t segd = geomr_pnt_pnt_distance(linpnt1, linpnt2);
         pnt_t d, p;
-        double t = 0;
+        uft_t t = 0;
         for(int i=0; i<3; i++) {
           d[i] = (linpnt2[i] - linpnt1[i]) / segd;
           t += (pnt[i] - linpnt1[i])*d[i];
@@ -491,8 +704,8 @@ namespace mjr {
         }
         // p is the point on the line nearest pnt
         if (seg_distance) {
-          double dp1 = geomr_pnt_pnt_distance(linpnt1, p);
-          double dp2 = geomr_pnt_pnt_distance(linpnt2, p);
+          uft_t dp1 = geomr_pnt_pnt_distance(linpnt1, p);
+          uft_t dp2 = geomr_pnt_pnt_distance(linpnt2, p);
           if (std::abs((dp1+dp2)-segd) > eps) // MJR TODO NOTE: check logic -- dp1>segd || dp2>segd?
             return std::min(geomr_pnt_pnt_distance(linpnt1, pnt), geomr_pnt_pnt_distance(linpnt2, pnt));
         }
@@ -500,7 +713,7 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the euculedian (2 norm) distance between two points */
-      double geomr_pnt_pnt_distance(const pnt_t& pnt1, const pnt_t& pnt2) const {
+      uft_t geomr_pnt_pnt_distance(const pnt_t& pnt1, const pnt_t& pnt2) const {
         return vec3_two_norm(vec3_diff(pnt1, pnt2));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -515,31 +728,34 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the distance between a point and a plane */
-      double geomr_pnt_pln_distance(const pnt_t& plnpnt1, const pnt_t& plnpnt2, const pnt_t& plnpnt3, const pnt_t& pnt) const {
+      uft_t geomr_pnt_pln_distance(const pnt_t& plnpnt1, const pnt_t& plnpnt2, const pnt_t& plnpnt3, const pnt_t& pnt) const {
         pnt_t n = geomr_tri_normal(plnpnt1, plnpnt2, plnpnt3, true);
         return std::abs(vec3_dot_product(n, pnt) - vec3_dot_product(n, plnpnt2));
+
+
+
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the distance between a point and a triangle */
-      double geomr_pnt_tri_distance(const pnt_t& tripnt1, const pnt_t& tripnt2, const pnt_t& tripnt3, const pnt_t& pnt) const {
-        //  MJR TODO NOTE <2024-07-22T15:48:31-0500> geomr_pnt_tri_distance: UNTESTED! UNTESTED! UNTESTED! UNTESTED! 
+      uft_t geomr_pnt_tri_distance(const pnt_t& tripnt1, const pnt_t& tripnt2, const pnt_t& tripnt3, const pnt_t& pnt) const {
+        //  MJR TODO NOTE <2024-07-22T15:48:31-0500> geomr_pnt_tri_distance: NOT PASSING UNIT TESTS!!!
         pnt_t basisv1 = vec3_diff(tripnt1, tripnt2);  // basis vectors for pln containing triagnel
         pnt_t basisv2 = vec3_diff(tripnt3, tripnt2);  // basis vectors for pln containing triagnel
         pnt_t normal = vec3_cross_product(basisv1, basisv2); // normal vector for tri. ax+by+cz+d=0, a=normal[0], b=normal[1], c=normal[2]
         vec3_unitize(normal); 
-        double d = -vec3_dot_product(normal, tripnt2);            // ax+by+cz+d=0
-        double lambda = vec3_dot_product(normal, pnt) + d;
-        pnt_t q = vec3_linear_combination(1.0, pnt, lambda, normal); // q is the point in the plane closest to pnt
-        double denom =  basisv1[0] * basisv2[1] - basisv2[0] * basisv1[1]; // If zero, then triangle is broken!
-        double u     = (q[0]       * basisv2[1] - basisv2[0] *       q[1]) / denom;
-        double v     = (basisv1[0] *       q[1] -       q[0] * basisv1[1]) / denom;
-        double dd    = std::abs(u*basisv1[2] + v*basisv2[2] - q[2]);
+        uft_t d = -vec3_dot_product(normal, tripnt2);            // ax+by+cz+d=0
+        uft_t lambda = vec3_dot_product(normal, pnt) + d;
+        pnt_t q = vec3_diff(vec3_linear_combination(1.0, pnt, lambda, normal), tripnt2); // q is the point in the plane closest to pnt
+        uft_t denom =  basisv1[0] * basisv2[1] - basisv2[0] * basisv1[1]; // If zero, then triangle is broken!
+        uft_t u     = (q[0]       * basisv2[1] - basisv2[0] *       q[1]) / denom;
+        uft_t v     = (basisv1[0] *       q[1] -       q[0] * basisv1[1]) / denom;
+        uft_t dd    = std::abs(u*basisv1[2] + v*basisv2[2] - q[2]);
         if ( (u>=0) && (v>=0) && ((u+v)<=1) && (dd<eps) ) { // q is in the triangle =>  Use the plane distance
           return std::abs(lambda);
         } else {                                            // q is not in the triangle =>  Distance will be minimum distance to an edge.
-          double d1 = geomr_pnt_line_distance(tripnt1, tripnt2, pnt, true);
-          double d2 = geomr_pnt_line_distance(tripnt2, tripnt3, pnt, true);
-          double d3 = geomr_pnt_line_distance(tripnt3, tripnt1, pnt, true);
+          uft_t d1 = geomr_pnt_line_distance(tripnt1, tripnt2, pnt, true);
+          uft_t d2 = geomr_pnt_line_distance(tripnt2, tripnt3, pnt, true);
+          uft_t d3 = geomr_pnt_line_distance(tripnt3, tripnt1, pnt, true);
           return std::min(std::min(d1, d2), d3);
         }
       }
@@ -609,174 +825,10 @@ namespace mjr {
         last_point_new = true;
         pnt_to_pnt_idx_map.clear();
         pnt_idx_to_pnt.clear();
-        pdata_sdat.clear();
-        pdata_vdat.clear();
+        pnt_idx_to_pnt_data.clear();
+        data_name_to_data_idx_lst.clear();
         cell_lst.clear();
         uniq_cell_lst.clear();
-      }
-      //@}
-
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Master point list. */
-      //@{
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Retruns the index of the last point given to the add_point() method. */
-      pnt_idx_t idx_of_last_point_added() const {
-        return last_point_idx;
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Retruns true if the last point given to the add_point() method was a new point. */
-      pnt_idx_t last_point_added_was_new() const {
-        return last_point_new;
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Add a point.
-          Cases
-           - Any of the coordinate values in the given point are NaN: last_point_idx=-1, last_point_new=false.
-           - The given point is already on the list: last_point_idx is ste to the existing point's index, and last_point_new=false
-           - The given point is not on the list: last_point_idx is set to th enew piont's index, and last_point_new=true
-          Note that last_point_idx is always the resturn value. */
-      pnt_idx_t add_point(pnt_t new_pnt) {
-        if (std::isnan(new_pnt[0]) || std::isnan(new_pnt[1]) || std::isnan(new_pnt[2])) {
-          last_point_idx = -1;
-          last_point_new = false;
-        } else {
-          if constexpr (uniq_points) {
-            if (pnt_to_pnt_idx_map.contains(new_pnt)) {
-              /* Point is already in list */
-              last_point_idx = pnt_to_pnt_idx_map[new_pnt];
-              last_point_new = false;
-            } else {
-              /* Point is not already in list */
-              last_point_idx = static_cast<pnt_idx_t>(pnt_idx_to_pnt.size());
-              pnt_to_pnt_idx_map[new_pnt] = last_point_idx;
-              pnt_idx_to_pnt.push_back(new_pnt);
-              last_point_new = true;
-            }
-          } else {
-            last_point_idx = static_cast<pnt_idx_t>(pnt_idx_to_pnt.size()); 
-            pnt_idx_to_pnt.push_back(new_pnt);
-            last_point_new = true;
-          }
-        }
-        return last_point_idx;
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Print number of points in master point list.
-          Note the return type is pnt_idx_t (a signed integer type) and not a size_t. */
-      pnt_idx_t num_points() const {
-        return static_cast<pnt_idx_t>(pnt_idx_to_pnt.size());
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Convert a pnt_t to a string representation */
-      std::string pnt_to_string(pnt_t x) const {
-        std::ostringstream convert;
-        convert << "[ ";
-        for(auto c: x)
-          convert << std::setprecision(5) << static_cast<double>(c) << " ";
-        convert << "]";
-        return(convert.str());
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Print all points to STDOUT. 
-
-          @param max_num_print Maximum number of points to print.  Use 0 to print all points. */
-      void print_all_points(int max_num_print) const {
-        int numPrinted = 0;
-        if (num_points() > 0) {
-          std::cout << "POINTS BEGIN (" << num_points() << ")" << std::endl;
-          for(pnt_idx_t pnt_idx = 0; pnt_idx<num_points(); ++pnt_idx) {
-            std::cout << "  " << pnt_idx << ": " << pnt_to_string(pnt_idx_to_pnt[pnt_idx]) << std::endl;
-            numPrinted++;
-            if ((max_num_print > 0) && (numPrinted >= max_num_print)) {
-              std::cout << "  Maximum number of points reached.  Halting tree dump." << std::endl;
-              break;
-            }
-          }
-          std::cout << "POINTS END" << std::endl;
-        }
-      }
-      //@}
-
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public:
-
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Point data sets.
-
-          Cell complex objects may have data sets associated with points.  Each dataset has a name (an std::string), and a type (scalar or 3D vector).  */
-      //@{
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      typedef std::string pdata_name_t;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type to hold a single scalar data value for a single point */
-      typedef pnt_crd_t sdat_t;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type to hold a single vector data value for a single point */
-      typedef pnt_t vdat_t;
-      //@}
-
-    private:
-
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Point data sets. */
-      //@{
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type to hold a scalar value for each point in the master point list. */
-      typedef std::vector<pnt_crd_t> pnt_idx_to_sdat_t;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type to hold a group of named scalar data sets. */
-      typedef std::map<pdata_name_t, pnt_idx_to_sdat_t> dat_name_to_sdat_lst_t;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type to hold a 3D vector value for each point in the master point list. */
-      typedef std::vector<pnt_t> pnt_idx_to_vdat_t;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type to hold a group of named vector data sets. */
-      typedef std::map<pdata_name_t, pnt_idx_to_vdat_t> dat_name_to_vdat_lst_t;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** House all scalar data sets. */
-      dat_name_to_sdat_lst_t pdata_sdat;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** House all vector data sets. */
-      dat_name_to_vdat_lst_t pdata_vdat;
-      //@}
-
-    public:
-
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Point data sets. */
-      //@{
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Add a scalar point data value */
-      void add_data(pdata_name_t pdata_name, pnt_idx_t pnt_idx, sdat_t da_data) {
-        int num_dat = static_cast<int>(pdata_sdat[pdata_name].size());
-        if (pnt_idx >= num_dat)
-          pdata_sdat[pdata_name].resize(pnt_idx+1);
-        pdata_sdat[pdata_name][pnt_idx] = da_data;
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Add a vector point data value */
-      void add_data(pdata_name_t pdata_name, pnt_idx_t pnt_idx, vdat_t da_data) {
-        int num_dat = static_cast<int>(pdata_vdat[pdata_name].size());
-        if (pnt_idx >= num_dat)
-          pdata_vdat[pdata_name].resize(pnt_idx+1);
-        pdata_vdat[pdata_name][pnt_idx] = da_data;
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Add a vector point data value to last point added if the point was new */
-      void add_data_if_new(pdata_name_t pdata_name, vdat_t da_data) {
-        if (last_point_new)
-          add_data(pdata_name, last_point_idx, da_data);
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Add a scalar point data value to last point added if the point was new */
-      void add_data_if_new(pdata_name_t pdata_name, sdat_t da_data) {
-        if (last_point_new)
-          add_data(pdata_name, last_point_idx, da_data);
       }
       //@}
 
@@ -1306,51 +1358,32 @@ namespace mjr {
         outStream << "<!-- " << description << " -->" << std::endl;
         outStream << "  <UnstructuredGrid>" << std::endl;
         outStream << "    <Piece NumberOfPoints='" << num_points() << "' NumberOfCells='" << num_cells() << "'>" << std::endl;
-        if ((pdata_sdat.size() > 0) || (pdata_vdat.size() > 0)) {
-          bool firstName;
-          outStream << "      <PointData Scalars='";
-          firstName = true;
-          if ( !(pdata_sdat.empty())) {
-            for (auto& kv : pdata_sdat) {
-              outStream << (firstName ? "" : " ") << kv.first;
-              firstName = false;
-            }
-            outStream << "'";
-          }
-          firstName = true;
-          outStream << " ";
-          if ( !(pdata_vdat.empty())) {
-            if (pdata_vdat.contains("NORMALS"))
-              outStream << "Normals='" << "NORMALS" << "' ";
-            outStream << "Vectors='";
-            for (auto& kv : pdata_vdat) {
-              if (kv.first != "NORMALS") {
-                outStream << (firstName ? "" : " ") << kv.first;
-                firstName = false;
-              }
-            }
-            outStream << "'";
-          }
+        if ( !(data_name_to_data_idx_lst.empty())) {
+          std::string scalars_attr_value, vectors_attr_value, normals_attr_value;
+          for (auto& kv : data_name_to_data_idx_lst) 
+            if (kv.second.size()==1) 
+              scalars_attr_value += (scalars_attr_value.empty() ? "" : " ") + kv.first;
+            else 
+              if (kv.first == "NORMALS")
+                normals_attr_value = "NORMALS";
+              else
+                vectors_attr_value += (vectors_attr_value.empty() ? "" : " ") + kv.first;
+          outStream << "      <PointData";
+          if ( !(scalars_attr_value.empty()))
+            outStream << " Scalars='" << scalars_attr_value << "'";
+          if ( !(normals_attr_value.empty()))
+            outStream << " Normals='" << normals_attr_value << "'";
+          if ( !(vectors_attr_value.empty()))
+            outStream << " Vectors='" << vectors_attr_value << "'";
           outStream << ">" << std::endl;
-          if (pdata_sdat.size() > 0) {
-            for (auto& kv : pdata_sdat) {
-              kv.second.resize(num_points()); // Just in case we don't have data for all points. ;)
-              outStream << "        <DataArray Name='" << kv.first << "' type='Float64' format='ascii' NumberOfComponents='1'>" << std::endl;
-              outStream << "          ";
-              for (const auto& dv : kv.second) 
-                outStream << std::setprecision(10) << dv << " ";
-              outStream << std::endl;
-              outStream << "        </DataArray>" << std::endl;
+          for (auto& kv : data_name_to_data_idx_lst) {
+            outStream << "        <DataArray Name='" << kv.first << "' type='Float64' format='ascii' NumberOfComponents='" << kv.second.size() << "'>" << std::endl;
+            outStream << "          ";
+            for (const auto& dv : pnt_idx_to_pnt_data) {
+              for (auto& idx : kv.second)
+                outStream << std::setprecision(10) << get_data_scalar(idx, dv) << " ";
             }
-          }
-          if (pdata_vdat.size() > 0) {
-            for (auto& kv : pdata_vdat) {
-              kv.second.resize(num_points()); // Just in case we don't have data for all points. ;)
-              outStream << "        <DataArray Name='" << kv.first << "' type='Float64' format='ascii' NumberOfComponents='3'>" << std::endl;
-              for (const auto& dv : kv.second) 
-                outStream << "          " << std::setprecision(10) << dv[0] << " " << dv[1] << " " << dv[2] << std::endl;
-              outStream << "        </DataArray>" << std::endl;
-            }
+            outStream << std::endl << "        </DataArray>" << std::endl;
           }
           outStream << "      </PointData>" << std::endl;
         }
@@ -1369,7 +1402,7 @@ namespace mjr {
           outStream << std::endl;
         }
         outStream << "        </DataArray>" << std::endl;
-        outStream << "        <DataArray type='Int32' Name='offsets'      format='ascii'>" << std::endl;
+        outStream << "        <DataArray type='Int32' Name='offsets' format='ascii'>" << std::endl;
         outStream << "          ";
         std::vector<int>::size_type j = 0;
         for(auto& poly: cell_lst) {
@@ -1378,7 +1411,7 @@ namespace mjr {
         }
         outStream << std::endl;
         outStream << "        </DataArray>" << std::endl;
-        outStream << "        <DataArray type='Int8' Name='types'      format='ascii'>" << std::endl;
+        outStream << "        <DataArray type='Int8' Name='types' format='ascii'>" << std::endl;
         outStream << "          ";
         for(auto& poly: cell_lst)
           outStream << cell_type_to_vtk_type(req_pt_cnt_to_cell_type(poly.size())) << " ";
@@ -1448,31 +1481,35 @@ namespace mjr {
           for(auto& poly: cell_lst)
             outStream << cell_type_to_vtk_type(req_pt_cnt_to_cell_type(poly.size())) << std::endl;
           /* Dump point scalar data */
-          if ((pdata_sdat.size() > 0) || (pdata_vdat.size() > 0)) {
+          if (data_name_to_data_idx_lst.size() > 0) {
             outStream << "POINT_DATA " << num_points() << std::endl;
-            if (pdata_sdat.size() > 0) {
-              for (auto& kv : pdata_sdat) {
-                kv.second.resize(num_points()); // Just in case we don't have data for all points. ;)
-                outStream << "SCALARS " << kv.first << " double 1" << std::endl;
-                outStream << "LOOKUP_TABLE default" << std::endl;
-                for (const auto& dv : kv.second) {
-                  outStream << std::setprecision(10) << dv << std::endl;
+            if (named_scalar_datasets_count() > 0) {
+              for (auto& kv : data_name_to_data_idx_lst) {
+                if (kv.second.size() == 1) {
+                  outStream << "SCALARS " << kv.first << " double 1" << std::endl;
+                  outStream << "LOOKUP_TABLE default" << std::endl;
+                  for (const auto& dv : pnt_idx_to_pnt_data) {
+                    uft_t v = get_data_scalar(kv.second[0], dv);
+                    outStream << std::setprecision(10) << v << std::endl;
+                  }
                 }
               }
             }
-            /* Dump point vector data */
-            if (pdata_vdat.size() > 0) {
-              for (auto& kv : pdata_vdat) {
-                kv.second.resize(num_points()); // Just in case we don't have data for all points. ;)
-                if ("NORMALS" == kv.first) {
-                  outStream << "NORMALS " << kv.first << " double" << std::endl;
-                } else if ("COLORS" == kv.first) {
-                  outStream << "COLOR_SCALARS " << kv.first << " 3" << std::endl;
-                } else {
-                  outStream << "VECTORS " << kv.first << " double" << std::endl;
+            if (named_vector_datasets_count() > 0) {
+              for (auto& kv : data_name_to_data_idx_lst) {
+                if (kv.second.size() == 3) {
+                  if ("NORMALS" == kv.first) {
+                    outStream << "NORMALS " << kv.first << " double" << std::endl;
+                  } else if ("COLORS" == kv.first) {
+                    outStream << "COLOR_SCALARS " << kv.first << " 3" << std::endl;
+                  } else {
+                    outStream << "VECTORS " << kv.first << " double" << std::endl;
+                  }
+                  for (const auto& dv : pnt_idx_to_pnt_data) {
+                    vdat_t v = get_dataset_vector(kv.second, dv);
+                    outStream << std::setprecision(10) << v[0] << " " << v[1] << " " << v[2] << std::endl;
+                  }
                 }
-                for (const auto& dv : kv.second) 
-                  outStream << std::setprecision(10) << dv[0] << " " << dv[1] << " " << dv[2] << std::endl;
               }
             }
           }
@@ -1488,9 +1525,11 @@ namespace mjr {
       void dump_cplx(int max_num_print) const {
         std::cout << "Meta Data" << std::endl;
         std::cout << "  Points ............. " << num_points() << std::endl;
-        std::cout << "  Scalar Data Sets ... " << pdata_sdat.size() << std::endl;
-        std::cout << "  Vector Data Sets ... " << pdata_vdat.size() << std::endl;
-        std::cout << "  Cells .............. " << num_cells() << std::endl;
+        std::cout << "  Data Points Per Point ... " << pnt_idx_to_pnt_data.size() << std::endl;
+        std::cout << "  Named Data Sets ......... " << named_datasets_count() << std::endl;
+        std::cout << "    Scalar Data Sets ...... " << named_scalar_datasets_count() << std::endl;
+        std::cout << "    Vector Data Sets ...... " << named_vector_datasets_count() << std::endl;
+        std::cout << "  Cells ................... " << num_cells() << std::endl;
         print_all_points(max_num_print);
         print_all_cells(max_num_print);
       }
@@ -1529,8 +1568,8 @@ namespace mjr {
           std::cout << "ERROR(write_ply): Could not open file!" << std::endl;
           return 3;
         }
-        bool have_color_data = pdata_vdat.contains("COLORS");
-        bool have_normal_data = pdata_vdat.contains("NORMALS");
+        bool have_colors_data = data_name_to_data_idx_lst.contains("COLORS");
+        bool have_normal_data = data_name_to_data_idx_lst.contains("NORMALS");
         outStream << "ply" << std::endl;
         outStream << "format ascii 1.0" << std::endl;
         outStream << "comment software: Mitch Richling's MR_rect_tree package" << std::endl;
@@ -1539,7 +1578,7 @@ namespace mjr {
         outStream << "property float x" << std::endl;
         outStream << "property float y" << std::endl;
         outStream << "property float z" << std::endl;
-        if (have_color_data) {
+        if (have_colors_data) {
           outStream << "property uchar red" << std::endl;
           outStream << "property uchar green" << std::endl;
           outStream << "property uchar blue" << std::endl;
@@ -1556,16 +1595,14 @@ namespace mjr {
         for (int i=0; i<num_points(); i++) {
           pnt_t pnt = pnt_idx_to_pnt[i];
           outStream << std::setprecision(10) << pnt[0] << " " << pnt[1] << " " << pnt[2];
-          if (have_color_data) {
-            vdat_t clr = pdata_vdat["COLORS"][i];
+          if (have_colors_data) {
+            vdat_t clr = get_dataset_vector(data_name_to_data_idx_lst["COLORS"], pnt_idx_to_pnt_data[i]);
             outStream << " " << static_cast<int>(255*clr[0]) << " " << static_cast<int>(255*clr[1]) << " " << static_cast<int>(255*clr[2]);
           }
           if (have_normal_data) {
-            vdat_t nml = pdata_vdat["NORMALS"][i];
-            double nmll = std::sqrt(nml[0]*nml[0]+nml[1]*nml[1]+nml[2]*nml[2]);
-            if (nmll < eps)
-              nmll = 1.0;
-            outStream << " " << std::setprecision(10) << (nml[0]/nmll) << " " << (nml[1]/nmll) << " " << (nml[2]/nmll);
+            vdat_t nml = get_dataset_vector(data_name_to_data_idx_lst["NORMALS"], pnt_idx_to_pnt_data[i]);
+            vec3_unitize(nml);
+            outStream << " " << std::setprecision(10) << nml[0] << " " << nml[1] << " " << nml[2];
           }
           outStream << std::endl;
         }

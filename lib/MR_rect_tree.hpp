@@ -408,13 +408,19 @@ namespace mjr {
       inline drpt_t get_aspect() const       { return (aspect); }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Return the sample value for vertex.
-          @warning Faster than get_sample_at(), but will invalidate the object's data if vertex wasn't sampled!  Use very carefully.
           @param vertex Input vertex */
-      inline rrpt_t get_sample_unsafe(diti_t vertex) const { return samples.at(vertex); /*samples[vertex];*/ }
+      inline rrpt_t get_sample(diti_t vertex) const { return samples.at(vertex); }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Return the sample value for vertex.
+      /** Return the sample value for vertex as an rrta_t (an std::array)
           @param vertex Input vertex */
-      inline rrpt_t get_sample(diti_t vertex) const { return samples.at(vertex); /*samples[vertex];*/ }
+      inline rrta_t get_sample_rrta(diti_t vertex) const {
+        rrta_t ret;
+        if constexpr (rng_dim == 1) 
+          ret[0] = get_sample(vertex);
+        else 
+          ret = get_sample(vertex);
+        return ret;
+      }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Provide a constant forward iterator for the sample data.
           Sample data is stored as a pair with the first element being the packed integer domain coordinates and the second being the sampled data. */
@@ -845,7 +851,7 @@ namespace mjr {
           @param func Function to sample
           @return true if we sampled the point, and false otherwise. */
       inline bool sample_point_maybe(diti_t diti, std::function<rrpt_t(drpt_t)> func) {
-        if ( !(samples.contains(diti))) {
+        if ( !(vertex_exists(diti))) {
           drpt_t xvec = diti_to_drpt(diti);
           rrpt_t val = func(xvec);
           samples[diti] = val;
@@ -1137,7 +1143,7 @@ namespace mjr {
           @warning Simply checks that cell has been sampled -- identical to vertex_exists().
           @param cell Input cell*/
       inline bool cell_exists(diti_t cell) const {
-        return (samples.contains(cell));
+        return (vertex_exists(cell));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Test if a cell has been sampled.

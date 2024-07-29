@@ -96,14 +96,11 @@ int main() {
   treeConverter.construct_geometry_fans(ccplx,
                                         tree,
                                         2,
-                                        { "points", 
-                                          tc_t::tree_val_src_t::DOMAIN, 0,
-                                          tc_t::tree_val_src_t::DOMAIN, 1,
-                                          tc_t::tree_val_src_t::RANGE,  0},
-                                        {{"x",       tc_t::tree_val_src_t::DOMAIN, 0},
-                                         {"y",       tc_t::tree_val_src_t::DOMAIN, 1},
-                                         {"f(x,y)",  tc_t::tree_val_src_t::RANGE,  0}},
-                                        {});
+                                        {{tc_t::tree_val_src_t::DOMAIN, 0},
+                                         {tc_t::tree_val_src_t::DOMAIN, 1},
+                                         {tc_t::tree_val_src_t::RANGE,  0}});
+
+  ccplx.create_named_datasets({"x", "y", "f(x,y)"});
 
   ccplx.write_xml_vtk("implicit_curve_2d.vtu", "implicit_curve_2d");
 }

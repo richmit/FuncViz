@@ -182,22 +182,13 @@ int main() {
                                                      tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), 
                                                                               [&tree](tt_t::diti_t i) { return !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
                                                      2,
-                                                     { "points", 
-                                                       tc_t::tree_val_src_t::DOMAIN, 0, 
-                                                       tc_t::tree_val_src_t::DOMAIN, 1,
-                                                       tc_t::tree_val_src_t::RANGE,  4},
-                                                     {{ "Re(z)",     tc_t::tree_val_src_t::DOMAIN, 0},
-                                                      { "Im(z)",     tc_t::tree_val_src_t::DOMAIN, 1},
-                                                      { "abs(z)",    tc_t::tree_val_src_t::RANGE,  0},
-                                                      { "arg(z)",    tc_t::tree_val_src_t::RANGE,  1},
-                                                      { "Re(f(z))",  tc_t::tree_val_src_t::RANGE,  2},
-                                                      { "Im(f(z))",  tc_t::tree_val_src_t::RANGE,  3},
-                                                      { "abs(f(z))", tc_t::tree_val_src_t::RANGE,  4},
-                                                      { "arg(f(z))", tc_t::tree_val_src_t::RANGE,  5}},
-                                                     {{"COLORS",
-                                                       tc_t::tree_val_src_t::RANGE, 6,
-                                                       tc_t::tree_val_src_t::RANGE, 7,
-                                                       tc_t::tree_val_src_t::RANGE, 8}});
+                                                     {{tc_t::tree_val_src_t::DOMAIN, 0}, 
+                                                      {tc_t::tree_val_src_t::DOMAIN, 1},
+                                                      {tc_t::tree_val_src_t::RANGE,  4}});
+
+  // Note the first argument need not name *every* data element, just the first ones.
+  ccplx.create_named_datasets({"Re(z)", "Im(z)", "abs(z)", "arg(z)", "Re(f(z))", "Im(f(z))", "abs(f(z))", "arg(f(z))"}, {{"COLORS", {8, 9, 10}}});
+
   std::cout << "TC Return: " << tcret << std::endl;
 
   ccplx.dump_cplx(5);

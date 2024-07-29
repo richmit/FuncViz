@@ -57,18 +57,7 @@ namespace mjr {
     public:
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Describe geometric structure. */
-      //@{
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Geometric Structure */
-      enum class cell_structure_t { RECTANGLES,   //!< hyper-rectangles made up of a cell's corners.
-                                    FANS,         //!< hyper-triangles containing the center point and shared corner points of neighboring cells
-                                  };
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      //@}
-
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Describe tree value sources. */
+      /** @name Describe point source. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Specify a source space for a data index. */
@@ -76,166 +65,52 @@ namespace mjr {
                                   RANGE,     //!< The range space.
                                   CONSTANT   //!< A pseudo-source that returns a constant.
                                 };
-
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Type to hold an integer or double */
+      typedef std::variant<int, typename cc_t::uft_t> iorf_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Type used to hold a description of how to extract a scalar value from a tree object */
-      typedef std::variant<int, typename cc_t::pnt_crd_t> iorf_t;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type used to hold a description of how to extract a scalar value from a tree object */
-      typedef std::tuple<typename cc_t::pdata_name_t, tree_val_src_t, iorf_t> tree_scl_val_desc_t;
+      typedef std::tuple<tree_val_src_t, iorf_t> tree_scl_val_desc_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** A list of tree_scl_val_desc_t objects.  */
       typedef std::vector<tree_scl_val_desc_t> tree_scl_val_desc_lst_t;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type used to hold a description of how to extract a 3-vector value from a tree object. */
-      typedef std::tuple<typename cc_t::pdata_name_t, tree_val_src_t, iorf_t, tree_val_src_t, iorf_t, tree_val_src_t, iorf_t> tree_vec_val_desc_t;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** A list of tree_vec_val_desc_t objects. */
-      typedef std::vector<tree_vec_val_desc_t> tree_vec_val_desc_lst_t;
       //@}
 
     private:
-
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Describe tree value sources. */
+      /** @name Utility Functions. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Convert a tree_val_src to a string */
-      static std::string tree_val_src_to_string(tree_val_src_t tree_val_src) { 
-        switch(tree_val_src) {
-          case tree_val_src_t::DOMAIN:   return("DOMAIN"); break;
-          case tree_val_src_t::RANGE:    return("RANGE");  break;
-          case tree_val_src_t::CONSTANT: return("CONSTANT");   break;
-        }
-        return("ERROR"); // Never get here if the switch above is correct..
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Convert a tree_scl_val_desc_t to a string */
-      static std::string tree_scl_val_desc_to_string(tree_scl_val_desc_t scl_desc) { 
-        if (std::get<2>(scl_desc).index() == 0)
-          return (std::get<0>(scl_desc) + ":" + tree_val_src_to_string(get<1>(scl_desc)) + "/" + std::to_string(get<int>(get<2>(scl_desc))));
-        else
-          return (std::get<0>(scl_desc) + ":" + tree_val_src_to_string(get<1>(scl_desc)) + "/" + std::to_string(get<typename cc_t::pnt_crd_t>(get<2>(scl_desc))));
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Validate a tree_scl_val_desc_t object
-          @param rtree    The MR_rect_tree with source data
-          @param scl_desc Object to valudate */
-      static bool invalid_tree_scl_val_desc(const rt_t& rtree, tree_scl_val_desc_t scl_desc) { 
-        if (std::get<1>(scl_desc) == tree_val_src_t::CONSTANT) {
-          if (std::get<2>(scl_desc).index() != 1) {
-            std::cout << "ERROR: Invalid val_desc (const must be double): " << tree_scl_val_desc_to_string(scl_desc) << std::endl;
-            return true;
-          }
-        } else {
-          if (std::get<2>(scl_desc).index() != 0) {
-            std::cout << "ERROR: Invalid val_desc (idx must be int): " << tree_scl_val_desc_to_string(scl_desc) << std::endl;
-            return true;
-          }
-          if (std::get<int>(std::get<2>(scl_desc)) < 0) {
-            std::cout << "ERROR: Invalid val_desc (idx too small): " << tree_scl_val_desc_to_string(scl_desc) << std::endl;
-            return true;
-          }
-          if (std::get<1>(scl_desc) == tree_val_src_t::DOMAIN) {
-            if (std::get<int>(std::get<2>(scl_desc)) >= rtree.domain_dimension) {
-              std::cout << "ERROR: Invalid val_desc (idx too large): " << tree_scl_val_desc_to_string(scl_desc) << std::endl;
-              return true;
-            }
-          } else {
-            if (std::get<int>(std::get<2>(scl_desc)) >= rtree.range_dimension) {
-              std::cout << "ERROR: Invalid val_desc (idx too large): " << tree_scl_val_desc_to_string(scl_desc) << std::endl;
-              return true;
-            }
-          }
-        }
-        return false;
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Validate a tree_vec_val_desc_t object
-          @param rtree    The MR_rect_tree with source data
-          @param vec_desc Object to valudate */
-      static bool invalid_tree_vec_val_desc(const rt_t& rtree, tree_vec_val_desc_t vec_desc) { 
-        return (invalid_tree_scl_val_desc(rtree, {std::get<0>(vec_desc), std::get<1>(vec_desc), std::get<2>(vec_desc)}) ||
-                invalid_tree_scl_val_desc(rtree, {std::get<0>(vec_desc), std::get<3>(vec_desc), std::get<4>(vec_desc)}) ||
-                invalid_tree_scl_val_desc(rtree, {std::get<0>(vec_desc), std::get<5>(vec_desc), std::get<6>(vec_desc)}));
-      }
+      /** A list of tree_scl_val_desc_t objects.  */
+      static void create_dataset_to_point_mapping(const rt_t& rtree, cc_t& ccplx, const tree_scl_val_desc_lst_t& rt_dil) {
 
-
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Validate a common source arguments
-          @param rtree                  The MR_rect_tree with source data
-          @param point_src              Point source vector
-          @param scalar_data_src_lst    List of scalar data sources
-          @param vector_data_src_lst    List of vector data sources */
-      static int invalid_sources(const rt_t& rtree, tree_vec_val_desc_t point_src, tree_scl_val_desc_lst_t scalar_data_src_lst, tree_vec_val_desc_lst_t vector_data_src_lst) {
-        if (invalid_tree_vec_val_desc(rtree, point_src)) {
-          return 1;
-        }
-        if (std::any_of(scalar_data_src_lst.cbegin(), scalar_data_src_lst.cend(), 
-                        [rtree](auto s) { return invalid_tree_scl_val_desc(rtree, s); })) {
-          return 1;
-        }
-        if (std::any_of(vector_data_src_lst.cbegin(), vector_data_src_lst.cend(), 
-                        [rtree](auto v) { return invalid_tree_vec_val_desc(rtree, v); })) {
-          return 1;
-        }
-        return 0;
+        typename cc_t::data_idx_lst_t cc_data_idx_lst(3);
+        for(int i=0; i<3; ++i)
+          if(get<0>(rt_dil[i]) == tree_val_src_t::DOMAIN) 
+            cc_data_idx_lst[i] = get<int>(get<1>(rt_dil[i]));
+          else if(get<0>(rt_dil[i]) == tree_val_src_t::RANGE) 
+            cc_data_idx_lst[i] = get<int>(get<1>(rt_dil[i])) + rtree.domain_dimension;
+          else if(get<0>(rt_dil[i]) == tree_val_src_t::CONSTANT) 
+            cc_data_idx_lst[i] = get<typename cc_t::uft_t>(get<1>(rt_dil[i]));
+        ccplx.create_dataset_to_point_mapping(cc_data_idx_lst);
       }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Extract data described by a tree_scl_val_desc_t
-          @param rtree    The MR_rect_tree with source data
-          @param index         The input tree_scl_val_desc_t object
-          @param domainValue   Data for the domain value
-          @param rangeValue    Data for the range value */
-      static typename cc_t::pnt_crd_t get_scalar(const rt_t& rtree, tree_scl_val_desc_t index, typename rt_t::drpt_t& domainValue, typename rt_t::rrpt_t& rangeValue) {
-        if (std::get<1>(index) == tree_val_src_t::DOMAIN) {
-          return (rtree.dom_at(domainValue, std::get<int>(std::get<2>(index))));
-        } else if (std::get<1>(index) == tree_val_src_t::RANGE) {
-          return (rtree.rng_at(rangeValue, std::get<int>(std::get<2>(index))));
-        } else if (std::get<1>(index) == tree_val_src_t::CONSTANT) {
-          return (std::get<typename cc_t::pnt_crd_t>(std::get<2>(index)));
-        } else {
-          std::cout << "ERROR: Invalid index source" << std::endl;
-          return (0.0);
-        }
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Extract data described by a tree_vec_val_desc_t
-          @param rtree         The MR_rect_tree with source data
-          @param index         The input tree_vec_val_desc_t object
-          @param domainValue   Data for the domain value
-          @param rangeValue    Data for the range value */
-      static typename cc_t::pnt_t get_vector(const rt_t& rtree, tree_vec_val_desc_t index, typename rt_t::drpt_t& domainValue, typename rt_t::rrpt_t& rangeValue) {
-        return typename cc_t::pnt_t({get_scalar(rtree, tree_scl_val_desc_t({std::get<0>(index), std::get<1>(index), std::get<2>(index)}), domainValue, rangeValue),
-                                     get_scalar(rtree, tree_scl_val_desc_t({std::get<0>(index), std::get<3>(index), std::get<4>(index)}), domainValue, rangeValue),
-                                     get_scalar(rtree, tree_scl_val_desc_t({std::get<0>(index), std::get<5>(index), std::get<6>(index)}), domainValue, rangeValue)});
-      }
-
-
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Given rt coordinates, extract point/scalar/vector data, and add point/data to cc 
           @param ccplx                The MR_cell_cplx to populate with geometry
           @param rtree                The MR_rect_tree with source data
-          @param diti                 The point coordinate in rtree
-          @param point_src            Point descriptor
-          @param scalar_data_src_lst  Scalar data descriptors
-          @param vector_data_src_lst  Vector data descriptors */
+          @param diti                 The point coordinate in rtree */
       static typename cc_t::pnt_idx_t add_point_and_data_from_tree(const rt_t&  rtree, 
                                                                    cc_t&        ccplx,
-                                                                   rt_t::diti_t diti,
-                                                                   tree_vec_val_desc_t     const& point_src, 
-                                                                   tree_scl_val_desc_lst_t const& scalar_data_src_lst, 
-                                                                   tree_vec_val_desc_lst_t const& vector_data_src_lst) {
-        typename rt_t::drpt_t    dPts = rtree.diti_to_drpt(diti);
-        typename rt_t::rrpt_t    rPts = rtree.get_sample(diti);
-        typename cc_t::pnt_t     pnt  = get_vector(rtree, point_src, dPts, rPts);
-        typename cc_t::pnt_idx_t pnti = ccplx.add_point(pnt);
-        if (ccplx.last_point_added_was_new()) { // Logically unnecessary, but speeds things up.
-          for (auto s : scalar_data_src_lst) 
-            ccplx.add_data_if_new(std::get<0>(s), get_scalar(rtree, s, dPts, rPts));
-          for (auto v : vector_data_src_lst)
-            ccplx.add_data_if_new(std::get<0>(v), get_vector(rtree, v, dPts, rPts));
-        }
+                                                                   rt_t::diti_t diti) {
+
+
+
+        typename rt_t::drta_t     dPts = rtree.diti_to_drta(diti);
+        typename rt_t::rrta_t     rPts = rtree.get_sample_rrta(diti);
+        typename cc_t::pnt_data_t pd;
+        pd.insert(std::end(pd), std::begin(dPts), std::end(dPts));
+        pd.insert(std::end(pd), std::begin(rPts), std::end(rPts));
+        typename cc_t::pnt_idx_t  pnti = ccplx.add_point(pd);
         return (pnti);
       }
       //@}
@@ -270,44 +145,35 @@ namespace mjr {
           @param rtree                The MR_rect_tree with source data
           @param cells                List of cells to output from rtree
           @param output_dimension     Parts of cells to output
-          @param point_src            Point sources
-          @param scalar_data_src_lst  List of point data sources (scalars)
-          @param vector_data_src_lst  List of point data sources (vectors) */
-      static int construct_geometry_fans(cc_t&                      ccplx,
-                                         const rt_t&                rtree, 
-                                         typename rt_t::diti_list_t cells,
-                                         int                        output_dimension,
-                                         tree_vec_val_desc_t        point_src, 
-                                         tree_scl_val_desc_lst_t    scalar_data_src_lst, 
-                                         tree_vec_val_desc_lst_t    vector_data_src_lst
+          @param point_src            Point sources */
+      static int construct_geometry_fans(cc_t&                         ccplx,
+                                         const rt_t&                   rtree, 
+                                         typename rt_t::diti_list_t    cells,
+                                         int                           output_dimension,
+                                         tree_scl_val_desc_lst_t       point_src
+                                         
                                    ) {
-        if (invalid_sources(rtree, point_src, scalar_data_src_lst, vector_data_src_lst)) {
-          std::cout << "ERROR: construct_geometry_points: source error!" << std::endl;
-          return 1;
-        }
-        if (output_dimension < 0) {
-          std::cout << "ERROR: construct_geometry_fans: output_dimension < 0!" << std::endl;
-          return 1;
-        } else if (rtree.domain_dimension == 1) {
+        create_dataset_to_point_mapping(rtree, ccplx, point_src);
+        if (rtree.domain_dimension == 1) {
           for(auto& cell: cells) {
-            typename cc_t::pnt_idx_t ctr_pnti = add_point_and_data_from_tree(rtree, ccplx, cell, point_src, scalar_data_src_lst, vector_data_src_lst);
+            typename cc_t::pnt_idx_t ctr_pnti = add_point_and_data_from_tree(rtree, ccplx, cell);
             typename rt_t::diti_list_t corners = rtree.ccc_get_corners(cell);
-            typename cc_t::pnt_idx_t cn0_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[0], point_src, scalar_data_src_lst, vector_data_src_lst);
-            typename cc_t::pnt_idx_t cn1_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[1], point_src, scalar_data_src_lst, vector_data_src_lst);
+            typename cc_t::pnt_idx_t cn0_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[0]);
+            typename cc_t::pnt_idx_t cn1_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[1]);
             ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {cn0_pnti, ctr_pnti}, output_dimension);
             ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {ctr_pnti, cn1_pnti}, output_dimension);
           }
         } else if (rtree.domain_dimension == 2) {
           for(auto& cell: cells) {
-            typename cc_t::pnt_idx_t ctr_pnti = add_point_and_data_from_tree(rtree, ccplx, cell, point_src, scalar_data_src_lst, vector_data_src_lst);
+            typename cc_t::pnt_idx_t ctr_pnti = add_point_and_data_from_tree(rtree, ccplx, cell);
             for(int i=0; i<2; i++) {
               for(int j=-1; j<2; j+=2) {
                 typename rt_t::diti_list_t nbrs = rtree.get_existing_neighbor(cell, i, j);
                 if (nbrs.size() > 1) {
                   for(auto n: nbrs) {
                     typename rt_t::diti_list_t corners = rtree.ccc_get_corners(n, i, -j);
-                    typename cc_t::pnt_idx_t cn0_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[0], point_src, scalar_data_src_lst, vector_data_src_lst);
-                    typename cc_t::pnt_idx_t cn1_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[1], point_src, scalar_data_src_lst, vector_data_src_lst);
+                    typename cc_t::pnt_idx_t cn0_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[0]);
+                    typename cc_t::pnt_idx_t cn1_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[1]);
                     if( ((i == 0) && (j == -1)) || ((i == 1) && (j == 1)) )
                       ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cn1_pnti, cn0_pnti, ctr_pnti}, output_dimension);
                     else
@@ -315,8 +181,8 @@ namespace mjr {
                   }
                 } else {
                   typename rt_t::diti_list_t corners = rtree.ccc_get_corners(cell, i, j);
-                  typename cc_t::pnt_idx_t cn0_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[0], point_src, scalar_data_src_lst, vector_data_src_lst);
-                  typename cc_t::pnt_idx_t cn1_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[1], point_src, scalar_data_src_lst, vector_data_src_lst);
+                  typename cc_t::pnt_idx_t cn0_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[0]);
+                  typename cc_t::pnt_idx_t cn1_pnti = add_point_and_data_from_tree(rtree, ccplx, corners[1]);
                   if( ((i == 0) && (j == -1)) || ((i == 1) && (j == 1)) )
                     ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cn1_pnti, cn0_pnti, ctr_pnti}, output_dimension);
                   else
@@ -337,20 +203,16 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** @overload */
-      static int construct_geometry_fans(cc_t&                    ccplx,
-                                         const rt_t&              rtree, 
-                                         int                      output_dimension,
-                                         tree_vec_val_desc_t      point_src, 
-                                         tree_scl_val_desc_lst_t  scalar_data_src_lst, 
-                                         tree_vec_val_desc_lst_t  vector_data_src_lst
+      static int construct_geometry_fans(cc_t&                         ccplx,
+                                         const rt_t&                   rtree, 
+                                         int                           output_dimension,
+                                         tree_scl_val_desc_lst_t        point_src
                                    ) {
         return construct_geometry_fans(ccplx,
-                                  rtree,
-                                  rtree.get_leaf_cells(rtree.ccc_get_top_cell()),
-                                  output_dimension,
-                                  point_src, 
-                                  scalar_data_src_lst, 
-                                  vector_data_src_lst);
+                                       rtree,
+                                       rtree.get_leaf_cells(rtree.ccc_get_top_cell()),
+                                       output_dimension,
+                                       point_src);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Populate attached MR_cell_cplx object from data in attached MR_rect_tree object.
@@ -361,35 +223,28 @@ namespace mjr {
           @param ccplx                The MR_cell_cplx to populate with geometry
           @param rtree                The MR_rect_tree with source data
           @param cells                List of cells to output from rtree
-          @param point_src            Point sources
-          @param scalar_data_src_lst  List of point data sources (scalars)
-          @param vector_data_src_lst  List of point data sources (vectors) 
+          @param point_src            Point sources 
           @param output_centers       Create vertexes for cell  centers
-          @param output_corners       Create vertexes for cell corners */
+          @param output_corners       Create vertexes for cell corners*/
       static int construct_geometry_points(cc_t&                         ccplx,
                                            const rt_t&                   rtree, 
                                            typename rt_t::diti_list_t    cells,
-                                           tree_vec_val_desc_t           point_src, 
-                                           tree_scl_val_desc_lst_t       scalar_data_src_lst, 
-                                           tree_vec_val_desc_lst_t       vector_data_src_lst,
+                                           tree_scl_val_desc_lst_t       point_src,
                                            bool                          output_centers,
                                            bool                          output_corners
                                           ) {
-        if (invalid_sources(rtree, point_src, scalar_data_src_lst, vector_data_src_lst)) {
-          std::cout << "ERROR: construct_geometry_points: source error!" << std::endl;
-          return 1;
-        }
+        create_dataset_to_point_mapping(rtree, ccplx, point_src);
         if (output_centers && output_corners) {
           for(auto& cell: cells)
             for(auto& vert: rtree.ccc_get_vertexes(cell)) 
-              ccplx.add_cell(cc_t::cell_type_t::POINT, {add_point_and_data_from_tree(rtree, ccplx, vert, point_src, scalar_data_src_lst, vector_data_src_lst)});
+              ccplx.add_cell(cc_t::cell_type_t::POINT, {add_point_and_data_from_tree(rtree, ccplx, vert)});
         } else if (output_centers) {
           for(auto& cell: cells)
-            ccplx.add_cell(cc_t::cell_type_t::POINT, {add_point_and_data_from_tree(rtree, ccplx, cell, point_src, scalar_data_src_lst, vector_data_src_lst)});
+            ccplx.add_cell(cc_t::cell_type_t::POINT, {add_point_and_data_from_tree(rtree, ccplx, cell)});
         } else if (output_corners) {
           for(auto& cell: cells)
             for(auto& vert: rtree.ccc_get_corners(cell)) 
-              ccplx.add_cell(cc_t::cell_type_t::POINT, {add_point_and_data_from_tree(rtree, ccplx, vert, point_src, scalar_data_src_lst, vector_data_src_lst)});
+              ccplx.add_cell(cc_t::cell_type_t::POINT, {add_point_and_data_from_tree(rtree, ccplx, vert)});
         } else {
           std::cout << "WARNING: construct_geometry_points: Both output_centers & output_corners are FALSE.  No geometry created!" << std::endl;
           return 1;
@@ -401,23 +256,14 @@ namespace mjr {
                                           const rt_t&                   rtree, 
                                           typename rt_t::diti_list_t    cells,
                                           int                           output_dimension,
-                                          tree_vec_val_desc_t           point_src, 
-                                          tree_scl_val_desc_lst_t       scalar_data_src_lst, 
-                                          tree_vec_val_desc_lst_t       vector_data_src_lst
+                                          tree_scl_val_desc_lst_t       point_src
                                          ) {
-        if (output_dimension < 0) {
-          std::cout << "ERROR: construct_geometry_rects: output_dimension < 0!" << std::endl;
-          return 1;
-        }
-        if (invalid_sources(rtree, point_src, scalar_data_src_lst, vector_data_src_lst)) {
-          std::cout << "ERROR: construct_geometry_rects: source error!" << std::endl;
-          return 1;
-        }
+        create_dataset_to_point_mapping(rtree, ccplx, point_src);
         for(auto& cell: cells) {
           std::vector<typename cc_t::pnt_idx_t> cnr_pti;
           typename rt_t::diti_list_t corners = rtree.ccc_get_corners(cell);
           for(auto& corner: corners) {
-            typename cc_t::pnt_idx_t pnti = add_point_and_data_from_tree(rtree, ccplx, corner, point_src, scalar_data_src_lst, vector_data_src_lst);
+            typename cc_t::pnt_idx_t pnti = add_point_and_data_from_tree(rtree, ccplx, corner);
             cnr_pti.push_back(pnti);
           }
           if (rtree.domain_dimension == 1) {
@@ -438,17 +284,13 @@ namespace mjr {
       static int construct_geometry_rects(cc_t&                    ccplx,
                                           const rt_t&              rtree, 
                                           int                      output_dimension,
-                                          tree_vec_val_desc_t      point_src, 
-                                          tree_scl_val_desc_lst_t  scalar_data_src_lst, 
-                                          tree_vec_val_desc_lst_t  vector_data_src_lst
+                                          tree_scl_val_desc_lst_t  point_src
                                          ) {
         return construct_geometry_rects(ccplx,
                                   rtree,
                                   rtree.get_leaf_cells(rtree.ccc_get_top_cell()),
                                   output_dimension,
-                                  point_src, 
-                                  scalar_data_src_lst, 
-                                  vector_data_src_lst);
+                                  point_src);
       }
       //@}
 

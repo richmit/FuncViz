@@ -84,7 +84,7 @@ int main() {
   tc_t treeConverter;
   std::chrono::time_point<std::chrono::system_clock> constructTime = std::chrono::system_clock::now();
 
-  tree.refine_grid(6, shellStripes2);
+  tree.refine_grid(7, shellStripes2);
   std::chrono::time_point<std::chrono::system_clock> sampleTime = std::chrono::system_clock::now();
 
   tree.dump_tree(20);
@@ -93,30 +93,14 @@ int main() {
   treeConverter.construct_geometry_fans(ccplx,
                                         tree,
                                         2,
-                                        { "points", 
-                                          tc_t::tree_val_src_t::RANGE,  0,
-                                          tc_t::tree_val_src_t::RANGE,  1,
-                                          tc_t::tree_val_src_t::RANGE,   2},
-                                        {{"u",           tc_t::tree_val_src_t::DOMAIN, 0},
-                                         {"v",           tc_t::tree_val_src_t::DOMAIN, 1},
-                                         {"x(u,v)",      tc_t::tree_val_src_t::RANGE,  0},
-                                         {"y(u,v)",      tc_t::tree_val_src_t::RANGE,  1},
-                                         {"z(u,v)",      tc_t::tree_val_src_t::RANGE,  2},
-                                         {"c(u,v)",      tc_t::tree_val_src_t::RANGE,  3},
-                                         {"dx(u,v)/du",  tc_t::tree_val_src_t::RANGE,  4},
-                                         {"dx(u,v)/dv",  tc_t::tree_val_src_t::RANGE,  5},
-                                         {"dy(u,v)/du",  tc_t::tree_val_src_t::RANGE,  6},
-                                         {"dy(u,v)/dv",  tc_t::tree_val_src_t::RANGE,  7},
-                                         {"dz(u,v)/du",  tc_t::tree_val_src_t::RANGE,  8},
-                                         {"dz(u,v)/dv",  tc_t::tree_val_src_t::RANGE,  9},
-                                         {"nx",          tc_t::tree_val_src_t::RANGE, 10},
-                                         {"ny",          tc_t::tree_val_src_t::RANGE, 11},
-                                         {"nz",          tc_t::tree_val_src_t::RANGE, 12}},
-                                        {{"NORMALS", 
-                                          tc_t::tree_val_src_t::RANGE, 10,
-                                          tc_t::tree_val_src_t::RANGE, 11,
-                                          tc_t::tree_val_src_t::RANGE, 12}});
+                                        {{tc_t::tree_val_src_t::RANGE,  0},
+                                         {tc_t::tree_val_src_t::RANGE,  1},
+                                         {tc_t::tree_val_src_t::RANGE,  2}});
   std::chrono::time_point<std::chrono::system_clock> vtkFanTime = std::chrono::system_clock::now();
+
+  ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)", "c(u,v)", "dx(u,v)/du", "dx(u,v)/dv", "dy(u,v)/du", "dy(u,v)/dv", "dz(u,v)/du", "dz(u,v)/dv", "nx", "ny", "nz"}, 
+                              {{"NORMALS", {12, 13, 14}}});
+  std::chrono::time_point<std::chrono::system_clock> datAnnoTime = std::chrono::system_clock::now();
 
   ccplx.write_xml_vtk("performance_with_large_surface.vtu", "performance_with_large_surface");
   std::chrono::time_point<std::chrono::system_clock> vtkWriteTime = std::chrono::system_clock::now();
@@ -125,7 +109,8 @@ int main() {
   std::cout << "sampleTime time ...... " << static_cast<std::chrono::duration<double>>(sampleTime-constructTime)    << " sec" << std::endl;
   std::cout << "dumpTime time ........ " << static_cast<std::chrono::duration<double>>(dumpTime-sampleTime)         << " sec" << std::endl;
   std::cout << "treeConverter time ... " << static_cast<std::chrono::duration<double>>(vtkFanTime-dumpTime)         << " sec" << std::endl;
-  std::cout << "write_vtk time ....... " << static_cast<std::chrono::duration<double>>(vtkWriteTime-vtkFanTime)     << " sec" << std::endl;
+  std::cout << "dataset anno time .... " << static_cast<std::chrono::duration<double>>(datAnnoTime-vtkFanTime)      << " sec" << std::endl;
+  std::cout << "write_vtk time ....... " << static_cast<std::chrono::duration<double>>(vtkWriteTime-datAnnoTime)    << " sec" << std::endl;
   std::cout << "Total Run Time ....... " << static_cast<std::chrono::duration<double>>(vtkWriteTime-startTime)      << " sec" << std::endl;
 }
 /** @endcond */
