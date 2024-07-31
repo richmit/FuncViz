@@ -42,7 +42,7 @@ set(TARGETS_EXAMPLE "hello_world"
                     "curve_plot"
                     "complex_magnitude_surface"
                   )
-set(TARGETS_TEST "check_cell_hexahedron" "check_cell_pyramid" "check_cell_quad" "check_cell_triangle" "check_cell_segment"
+set(TARGETS_UTEST "check_cell_hexahedron" "check_cell_pyramid" "check_cell_quad" "check_cell_triangle" "check_cell_segment"
                  "geomi_pnt_line_distance"
                  "geomi_seg_isect_type"
                  "geomr_pnt_pln_distance" "geomr_pnt_tri_distance" "geomr_pnt_line_distance"
@@ -53,18 +53,19 @@ set(TARGETS_TEST "check_cell_hexahedron" "check_cell_pyramid" "check_cell_quad" 
 set(TARGETS_FTEST "MR_cell_cplx_test_mpl" "MR_cell_cplx_test_wedge" "MR_cell_cplx_test_surf_wave_hole" 
                   #"MR_rect_tree_test_surf_corner" 
                   "MR_rect_tree_test_flat1"
+                  "nan_solver"
                )
 
 # Construct list of targets we can build
-set(TARGETS_ALL ${TARGETS_EXAMPLE} ${TARGETS_TEST})
+set(TARGETS_ALL ${TARGETS_EXAMPLE} ${TARGETS_UTEST} ${TARGETS_FTEST})
 
 list(REMOVE_DUPLICATES TARGETS_ALL)
 
-if(TARGETS_TEST)
+if(TARGETS_UTEST)
   if(Boost_FOUND)
     enable_testing()
   else()
-    list(REMOVE_ITEM TARGETS_ALL ${TARGETS_TEST})
+    list(REMOVE_ITEM TARGETS_ALL ${TARGETS_UTEST})
     message(WARNING "Unit tests will NOT be built!")
   endif()
 endif()
@@ -112,7 +113,7 @@ endforeach(CURTGT)
 ######################################################################################################################################################
 
 add_custom_target(test-build 
-  DEPENDS ${TARGETS_TEST}
+  DEPENDS ${TARGETS_UTEST}
   COMMENT "Building Unit Tests"
 )
 
