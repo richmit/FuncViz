@@ -183,7 +183,7 @@ namespace mjr {
               if (ctr_pnti < 0) { // Center: Broken. Left: 
                 if(cn0_pnti >= 0) { // Center: Broken.  Left: Good.
                   typename cc_t::pnt_idx_t np = nan_edge_solver(ccplx, rtree, cn0_pnti, corners[0], cell, func);
-                  auto r = ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {cn0_pnti, np}, output_dimension);
+                  ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {cn0_pnti, np}, output_dimension);
                 }
                 if(cn1_pnti >= 0) { // Center: Broken.  Right: Good.
                   typename cc_t::pnt_idx_t np = nan_edge_solver(ccplx, rtree, cn1_pnti, corners[1], cell, func);
