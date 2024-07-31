@@ -201,10 +201,14 @@ namespace mjr {
     public:
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Global Types */
+      /** @name Global Types & Constants*/
       //@{
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Universal floating point type -- used for point components, scalar data values, vector components, all computation, etc.... */
       typedef double uft_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** epsilon */
+      uft_t epsilon = eps;
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -222,6 +226,7 @@ namespace mjr {
           Points consist of three double values, think (x, y, z) in R^3.  Indexes in this list are used to identify points.  The first point added gets index
           0, and each successive point gets the next integer. */
       //@{
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Hold a tuple of real values defining a point. */
       typedef std::array<uft_t, 3> pnt_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -441,12 +446,16 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Convert a pnt_t to a string representation */
-      std::string pnt_to_string(pnt_t x) const {
+      std::string pnt_to_string(pnt_idx_t pnt_idx) const {
         std::ostringstream convert;
+        if (pnt_idx >= 0) {
         convert << "[ ";
-        for(auto c: x)
+        for(auto c: pnt_idx_to_pnt[pnt_idx])
           convert << std::setprecision(5) << static_cast<uft_t>(c) << " ";
         convert << "]";
+        } else {
+          convert << "[ DNE ]";
+        }        
         return(convert.str());
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -458,7 +467,7 @@ namespace mjr {
         if (num_points() > 0) {
           std::cout << "POINTS BEGIN (" << num_points() << ")" << std::endl;
           for(pnt_idx_t pnt_idx = 0; pnt_idx<num_points(); ++pnt_idx) {
-            std::cout << "  " << pnt_idx << ": " << pnt_to_string(pnt_idx_to_pnt[pnt_idx]) << std::endl;
+            std::cout << "  " << pnt_idx << ": " << pnt_to_string(pnt_idx) << std::endl;
             numPrinted++;
             if ((max_num_print > 0) && (numPrinted >= max_num_print)) {
               std::cout << "  Maximum number of points reached.  Halting tree dump." << std::endl;

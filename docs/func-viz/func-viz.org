@@ -682,16 +682,15 @@ grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_plot
   Right now this example illustrates two things:
 
     - How to drive up the sample rate near NaNs.
-    - How to add a strip to the edge of the NaN region to "seal up" triangles.
-
-  In the future, after I implement the NaN edge solver in MR_rt_to_cc, I'll add:
-
     - How to repair triangles containing NaNs.
 
-
 #+BEGIN_CENTER
-[[file:media/surface_plot_edge_foot_100.png][file:media/surface_plot_edge_foot_10.png]]
+Typical Jagged Edge vs Healed Edge \\
 [[file:media/surface_plot_edge_jag_100.png][file:media/surface_plot_edge_jag_10.png]]
+[[file:media/surface_plot_edge_heal_100.png][file:media/surface_plot_edge_heal_10.png]] \\
+Examples From Matlab (Coarse & Fine Mesh) \\
+[[file:media/matlab_sphere_01_100.png][file:media/matlab_sphere_01_10.png]]
+[[file:media/matlab_sphere_02_100.png][file:media/matlab_sphere_02_10.png]]
 #+END_CENTER
 
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/surface_plot_edge.cpp
@@ -714,10 +713,7 @@ typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
 tt_t::rrpt_t halfSphere2(tt_t::drpt_t xvec) {
   double m = xvec[0] * xvec[0] + xvec[1] * xvec[1];
   if (m > 1) {
-    if (m < 1.02) // This small strip provides a landing for very small triangles that cross over the NaN region boundary.
-      return 0;
-    else
-      return std::numeric_limits<double>::quiet_NaN();
+    return std::numeric_limits<double>::quiet_NaN();
   } else {
     return std::sqrt(1-m);
   }
@@ -729,12 +725,12 @@ int main() {
   cc_t ccplx;
   tc_t treeConverter;
 
-  // Sample a uniform grid across teh domain
-  tree.refine_grid(4, halfSphere2);
+  // Sample a uniform grid across the domain
+  tree.refine_grid(5, halfSphere2);
 
   /* halfSphere2 produces NaNs outside the unit circle.  
      We can refine cells that cross the unit circle using refine_recursive_if_cell_vertex_is_nan */
-  tree.refine_recursive_if_cell_vertex_is_nan(8, halfSphere2);
+  tree.refine_recursive_if_cell_vertex_is_nan(7, halfSphere2);
 
   /* halfSphere2 produces NaNs outside the unit circle.  
      We can refine cells that cross the unit circle using refine_leaves_recursive_cell_pred & cell_vertex_is_nan.
@@ -744,17 +740,20 @@ int main() {
   /* Note: Instead of looking for NaNs, we could have used a SDF to simply tell the tree to sample anything that crosses
      the unit circle.  This is the technique used in MR_rect_tree_test_surf_corner.cpp. */
 
-  // Balance the three to the traditional level of 1 (no cell borders a cell more than half it's size)
+  /* Balance the three to the traditional level of 1 (no cell borders a cell more than half it's size) */
   tree.balance_tree(1, halfSphere2);
 
   tree.dump_tree(10);
 
+  /* By passing halfSphere2() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired. */
   treeConverter.construct_geometry_fans(ccplx,
                                         tree,
                                         2,
                                         {{tc_t::tree_val_src_t::DOMAIN, 0}, 
                                          {tc_t::tree_val_src_t::DOMAIN, 1},
-                                         {tc_t::tree_val_src_t::RANGE,  0}});
+                                         {tc_t::tree_val_src_t::RANGE,  0}},
+                                        halfSphere2
+                                       );
 
   ccplx.create_named_datasets({"x", "y", "f(x,y)"});
 
@@ -780,15 +779,14 @@ grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/curve_plot.c
 
    - Jump discontinuities & Vertical asymptotes: Resolved with higher sampling near the discontinuities and a cutting edge (TBD)
    - Isolated, non-differentiable points:  Resolved with higher sampling near the points and a folding edge (TBD)
-   - Undefined intervals:  Resolved with higher sampling near the edges and NaN edge repair (TBD)
+   - Undefined intervals:  Resolved with higher sampling near the edges and NaN edge repair
    - Regions of high oscillation: Resolved with higher sampling on the regions
    - Extrema: Resolved with higher sampling near the extrema
 
   Note that most of the items above are listed TBD.  A few features need to be added to MR_rt_to_cc. ;)  Note the TODO comments in the body of main().
 
-
 #+BEGIN_CENTER
-[[file:media/curve_plot_100.png][file:media/curve_plot_10.png]]
+[[file:media/sq_curve_plot_heal_100.png][file:media/sq_curve_plot_heal_10.png]]
 #+END_CENTER
 
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/curve_plot.cpp
@@ -861,7 +859,9 @@ int main() {
                                         1,
                                         {{tc_t::tree_val_src_t::DOMAIN,   0  }, 
                                          {tc_t::tree_val_src_t::RANGE,    0  },
-                                         {tc_t::tree_val_src_t::CONSTANT, 0.0}});
+                                         {tc_t::tree_val_src_t::CONSTANT, 0.0}},
+                                        f
+                                       );
 
   // Note the first argument need not name *every* data element, just the first ones.
   ccplx.create_named_datasets({"x", "f(x)"});
@@ -1159,134 +1159,40 @@ int main() {
 * Image Processing: Resize PNGs                                    :noexport:
 
 #+begin_src sh  :results output verbatum :exports both
-for f in ../../paraview/*.png; do
-  b=$(echo $f | sed 's/\.png//; s/^.*\///')
-  for s in 100 50 25 10; do
-    fn="media/${b}_$s.png"
-  if [ "$f" -nt "$fn" ]; then
-    echo make "$fn"
-    magick "$f" -resize $s% "$fn"
-  else
-    echo skip "$fn"
-  fi
+for d in ../../paraview/ ../../misc/; do
+  for f in $d/*.png; do
+    b=$(echo $f | sed 's/\.png//; s/^.*\///')
+    for s in 100 50 25 10; do
+      fn="media/${b}_$s.png"
+      if [ "$f" -nt "$fn" ]; then
+        echo make "$fn"
+        magick "$f" -resize $s% "$fn"
+        # else
+        #   echo skip "$fn"
+      fi
+    done
   done
 done
 #+end_src
 
 #+RESULTS:
 #+begin_example
-skip media/complex_magnitude_surface-2D_100.png
-skip media/complex_magnitude_surface-2D_50.png
-skip media/complex_magnitude_surface-2D_25.png
-skip media/complex_magnitude_surface-2D_10.png
-skip media/curve_plot_100.png
-skip media/curve_plot_50.png
-skip media/curve_plot_25.png
-skip media/curve_plot_10.png
-skip media/implicit_curve_2d-2D_100.png
-skip media/implicit_curve_2d-2D_50.png
-skip media/implicit_curve_2d-2D_25.png
-skip media/implicit_curve_2d-2D_10.png
-skip media/implicit_curve_2d-3D_100.png
-skip media/implicit_curve_2d-3D_50.png
-skip media/implicit_curve_2d-3D_25.png
-skip media/implicit_curve_2d-3D_10.png
-skip media/lorenz_100.png
-skip media/lorenz_50.png
-skip media/lorenz_25.png
-skip media/lorenz_10.png
-skip media/parametric_surface_with_defects-rect_100.png
-skip media/parametric_surface_with_defects-rect_50.png
-skip media/parametric_surface_with_defects-rect_25.png
-skip media/parametric_surface_with_defects-rect_10.png
-skip media/parametric_surface_with_defects-tri_100.png
-skip media/parametric_surface_with_defects-tri_50.png
-skip media/parametric_surface_with_defects-tri_25.png
-skip media/parametric_surface_with_defects-tri_10.png
-make media/performance_with_large_surface_stripes_100.png
-make media/performance_with_large_surface_stripes_50.png
-make media/performance_with_large_surface_stripes_25.png
-make media/performance_with_large_surface_stripes_10.png
-skip media/performance_with_large_surface_withN_100.png
-skip media/performance_with_large_surface_withN_50.png
-skip media/performance_with_large_surface_withN_25.png
-skip media/performance_with_large_surface_withN_10.png
-skip media/performance_with_large_surface_withoutN_100.png
-skip media/performance_with_large_surface_withoutN_50.png
-skip media/performance_with_large_surface_withoutN_25.png
-skip media/performance_with_large_surface_withoutN_10.png
-skip media/sq_surface_with_normals-withN_100.png
-skip media/sq_surface_with_normals-withN_50.png
-skip media/sq_surface_with_normals-withN_25.png
-skip media/sq_surface_with_normals-withN_10.png
-skip media/sq_surface_with_normals-withoutN_100.png
-skip media/sq_surface_with_normals-withoutN_50.png
-skip media/sq_surface_with_normals-withoutN_25.png
-skip media/sq_surface_with_normals-withoutN_10.png
-skip media/sq_surface_with_normals_grid_100.png
-skip media/sq_surface_with_normals_grid_50.png
-skip media/sq_surface_with_normals_grid_25.png
-skip media/sq_surface_with_normals_grid_10.png
-skip media/sq_surface_with_normals_grid_dd_100.png
-skip media/sq_surface_with_normals_grid_dd_50.png
-skip media/sq_surface_with_normals_grid_dd_25.png
-skip media/sq_surface_with_normals_grid_dd_10.png
-skip media/sq_surface_with_normals_grid_ddu_100.png
-skip media/sq_surface_with_normals_grid_ddu_50.png
-skip media/sq_surface_with_normals_grid_ddu_25.png
-skip media/sq_surface_with_normals_grid_ddu_10.png
-skip media/sq_surface_with_normals_grid_noref_100.png
-skip media/sq_surface_with_normals_grid_noref_50.png
-skip media/sq_surface_with_normals_grid_noref_25.png
-skip media/sq_surface_with_normals_grid_noref_10.png
-skip media/sq_surface_with_normals_grid_pd_100.png
-skip media/sq_surface_with_normals_grid_pd_50.png
-skip media/sq_surface_with_normals_grid_pd_25.png
-skip media/sq_surface_with_normals_grid_pd_10.png
-skip media/sq_surface_with_normals_grid_sdf_100.png
-skip media/sq_surface_with_normals_grid_sdf_50.png
-skip media/sq_surface_with_normals_grid_sdf_25.png
-skip media/sq_surface_with_normals_grid_sdf_10.png
-skip media/sq_surface_with_normals_grid_unbal_100.png
-skip media/sq_surface_with_normals_grid_unbal_50.png
-skip media/sq_surface_with_normals_grid_unbal_25.png
-skip media/sq_surface_with_normals_grid_unbal_10.png
-skip media/surface_plot_edge_foot_100.png
-skip media/surface_plot_edge_foot_50.png
-skip media/surface_plot_edge_foot_25.png
-skip media/surface_plot_edge_foot_10.png
-skip media/surface_plot_edge_jag_100.png
-skip media/surface_plot_edge_jag_50.png
-skip media/surface_plot_edge_jag_25.png
-skip media/surface_plot_edge_jag_10.png
-skip media/surface_with_normals-withN_100.png
-skip media/surface_with_normals-withN_50.png
-skip media/surface_with_normals-withN_25.png
-skip media/surface_with_normals-withN_10.png
-skip media/surface_with_normals-withoutN_100.png
-skip media/surface_with_normals-withoutN_50.png
-skip media/surface_with_normals-withoutN_25.png
-skip media/surface_with_normals-withoutN_10.png
-skip media/surface_with_normals_grid_dd_100.png
-skip media/surface_with_normals_grid_dd_50.png
-skip media/surface_with_normals_grid_dd_25.png
-skip media/surface_with_normals_grid_dd_10.png
-skip media/surface_with_normals_grid_ddu_100.png
-skip media/surface_with_normals_grid_ddu_50.png
-skip media/surface_with_normals_grid_ddu_25.png
-skip media/surface_with_normals_grid_ddu_10.png
-skip media/surface_with_normals_grid_noref_100.png
-skip media/surface_with_normals_grid_noref_50.png
-skip media/surface_with_normals_grid_noref_25.png
-skip media/surface_with_normals_grid_noref_10.png
-skip media/surface_with_normals_grid_pd_100.png
-skip media/surface_with_normals_grid_pd_50.png
-skip media/surface_with_normals_grid_pd_25.png
-skip media/surface_with_normals_grid_pd_10.png
-skip media/surface_with_normals_grid_sdf_100.png
-skip media/surface_with_normals_grid_sdf_50.png
-skip media/surface_with_normals_grid_sdf_25.png
-skip media/surface_with_normals_grid_sdf_10.png
+make media/curve_plot_heal_100.png
+make media/curve_plot_heal_50.png
+make media/curve_plot_heal_25.png
+make media/curve_plot_heal_10.png
+make media/curve_plot_jag_100.png
+make media/curve_plot_jag_50.png
+make media/curve_plot_jag_25.png
+make media/curve_plot_jag_10.png
+make media/sq_curve_plot_heal_100.png
+make media/sq_curve_plot_heal_50.png
+make media/sq_curve_plot_heal_25.png
+make media/sq_curve_plot_heal_10.png
+make media/sq_curve_plot_jag_100.png
+make media/sq_curve_plot_jag_50.png
+make media/sq_curve_plot_jag_25.png
+make media/sq_curve_plot_jag_10.png
 #+end_example
 
 * Image Processing: GIFs                                           :noexport:

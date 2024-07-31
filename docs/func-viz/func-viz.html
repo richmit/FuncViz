@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-07-29 Mon 15:26 -->
+<!-- 2024-07-31 Wed 12:26 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Function Visualization</title>
@@ -272,12 +272,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-07-29 15:26:46</i></td>
+<td class="org-left"><i>2024-07-31 12:26:47</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-07-29 15:26:47</i></td>
+<td class="org-left"><i>2024-07-31 12:26:48</i></td>
 </tr>
 </tbody>
 </table>
@@ -951,22 +951,17 @@ Right now this example illustrates two things:
 
 <ul class="org-ul">
 <li>How to drive up the sample rate near NaNs.</li>
-<li>How to add a strip to the edge of the NaN region to "seal up" triangles.</li>
-</ul>
-
-<p>
-In the future, after I implement the NaN edge solver in MR_rt_to_cc, I'll add:
-</p>
-
-<ul class="org-ul">
 <li>How to repair triangles containing NaNs.</li>
 </ul>
 
-
 <div class="org-center">
 <p>
-<a href="media/surface_plot_edge_foot_100.png"><img src="media/surface_plot_edge_foot_10.png" alt="surface_plot_edge_foot_10.png" /></a>
+Typical Jagged Edge vs Healed Edge <br />
 <a href="media/surface_plot_edge_jag_100.png"><img src="media/surface_plot_edge_jag_10.png" alt="surface_plot_edge_jag_10.png" /></a>
+<a href="media/surface_plot_edge_heal_100.png"><img src="media/surface_plot_edge_heal_10.png" alt="surface_plot_edge_heal_10.png" /></a> <br />
+Examples From Matlab (Coarse &amp; Fine Mesh) <br />
+<a href="media/matlab_sphere_01_100.png"><img src="media/matlab_sphere_01_10.png" alt="matlab_sphere_01_10.png" /></a>
+<a href="media/matlab_sphere_02_100.png"><img src="media/matlab_sphere_02_10.png" alt="matlab_sphere_02_10.png" /></a>
 </p>
 </div>
 
@@ -987,10 +982,7 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
 <span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">halfSphere2</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
   <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">m</span> = xvec[0] * xvec[0] + xvec[1] * xvec[1];
   <span style="color: #00ffff;">if</span> (m &gt; 1) {
-    <span style="color: #00ffff;">if</span> (m &lt; 1.02) <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">This small strip provides a landing for very small triangles that cross over the NaN region boundary.</span>
-      <span style="color: #00ffff;">return</span> 0;
-    <span style="color: #00ffff;">else</span>
-      <span style="color: #00ffff;">return</span> <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numeric_limits</span>&lt;<span style="color: #63b8ff;">double</span>&gt;::quiet_NaN();
+    <span style="color: #00ffff;">return</span> <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numeric_limits</span>&lt;<span style="color: #63b8ff;">double</span>&gt;::quiet_NaN();
   } <span style="color: #00ffff;">else</span> {
     <span style="color: #00ffff;">return</span> <span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(1-m);
   }
@@ -1002,12 +994,12 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
   <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">ccplx</span>;
   <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">treeConverter</span>;
 
-  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Sample a uniform grid across teh domain</span>
-  tree.refine_grid(4, halfSphere2);
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Sample a uniform grid across the domain</span>
+  tree.refine_grid(5, halfSphere2);
 
   <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">halfSphere2 produces NaNs outside the unit circle.  </span>
 <span style="color: #ff7f24;">     We can refine cells that cross the unit circle using refine_recursive_if_cell_vertex_is_nan</span><span style="color: #ffa500;"> */</span>
-  tree.refine_recursive_if_cell_vertex_is_nan(8, halfSphere2);
+  tree.refine_recursive_if_cell_vertex_is_nan(7, halfSphere2);
 
   <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">halfSphere2 produces NaNs outside the unit circle.  </span>
 <span style="color: #ff7f24;">     We can refine cells that cross the unit circle using refine_leaves_recursive_cell_pred &amp; cell_vertex_is_nan.</span>
@@ -1017,17 +1009,20 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
   <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Note: Instead of looking for NaNs, we could have used a SDF to simply tell the tree to sample anything that crosses</span>
 <span style="color: #ff7f24;">     the unit circle.  This is the technique used in MR_rect_tree_test_surf_corner.cpp.</span><span style="color: #ffa500;"> */</span>
 
-  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Balance the three to the traditional level of 1 (no cell borders a cell more than half it's size)</span>
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Balance the three to the traditional level of 1 (no cell borders a cell more than half it's size)</span><span style="color: #ffa500;"> */</span>
   tree.balance_tree(1, halfSphere2);
 
   tree.dump_tree(10);
 
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">By passing halfSphere2() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired.</span><span style="color: #ffa500;"> */</span>
   treeConverter.construct_geometry_fans(ccplx,
                                         tree,
                                         2,
                                         {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0}, 
                                          {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
-                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0}});
+                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0}},
+                                        halfSphere2
+                                       );
 
   ccplx.create_named_datasets({<span style="color: #fa8072;">"x"</span>, <span style="color: #fa8072;">"y"</span>, <span style="color: #fa8072;">"f(x,y)"</span>});
 
@@ -1051,7 +1046,7 @@ done quite nicely.  Still, a few things can come up:
 <ul class="org-ul">
 <li>Jump discontinuities &amp; Vertical asymptotes: Resolved with higher sampling near the discontinuities and a cutting edge (TBD)</li>
 <li>Isolated, non-differentiable points:  Resolved with higher sampling near the points and a folding edge (TBD)</li>
-<li>Undefined intervals:  Resolved with higher sampling near the edges and NaN edge repair (TBD)</li>
+<li>Undefined intervals:  Resolved with higher sampling near the edges and NaN edge repair</li>
 <li>Regions of high oscillation: Resolved with higher sampling on the regions</li>
 <li>Extrema: Resolved with higher sampling near the extrema</li>
 </ul>
@@ -1060,11 +1055,10 @@ done quite nicely.  Still, a few things can come up:
 Note that most of the items above are listed TBD.  A few features need to be added to MR_rt_to_cc. ;)  Note the TODO comments in the body of main().
 </p>
 
-
 <div class="org-center">
 
-<div id="org1b48f4b" class="figure">
-<p><a href="media/curve_plot_100.png"><img src="media/curve_plot_10.png" alt="curve_plot_10.png" /></a>
+<div id="org720d876" class="figure">
+<p><a href="media/sq_curve_plot_heal_100.png"><img src="media/sq_curve_plot_heal_10.png" alt="sq_curve_plot_heal_10.png" /></a>
 </p>
 </div>
 </div>
@@ -1136,7 +1130,9 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/curv
                                         1,
                                         {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN,   0  }, 
                                          {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,    0  },
-                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::CONSTANT, 0.0}});
+                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::CONSTANT, 0.0}},
+                                        f
+                                       );
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Note the first argument need not name *every* data element, just the first ones.</span>
   ccplx.create_named_datasets({<span style="color: #fa8072;">"x"</span>, <span style="color: #fa8072;">"f(x)"</span>});
@@ -1354,7 +1350,7 @@ This example doesn't really demonstrate anything not found in the other examples
 
 <div class="org-center">
 
-<div id="org4e31cd1" class="figure">
+<div id="org40ae05e" class="figure">
 <p><a href="media/trefoil_rot_50.html"><img src="media/trefoil_rot_10.gif" alt="trefoil_rot_10.gif" /></a>
 </p>
 </div>

@@ -35,10 +35,6 @@
   Right now this example illustrates two things:
 
     - How to drive up the sample rate near NaNs.
-    - How to add a strip to the edge of the NaN region to "seal up" triangles.
-
-  In the future, after I implement the NaN edge solver in MR_rt_to_cc, I'll add:
-
     - How to repair triangles containing NaNs.
 */
 /*******************************************************************************************************************************************************.H.E.**/
@@ -58,10 +54,7 @@ typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
 tt_t::rrpt_t halfSphere2(tt_t::drpt_t xvec) {
   double m = xvec[0] * xvec[0] + xvec[1] * xvec[1];
   if (m > 1) {
-    if (m < 1.02) // This small strip provides a landing for very small triangles that cross over the NaN region boundary.
-      return 0;
-    else
-      return std::numeric_limits<double>::quiet_NaN();
+    return std::numeric_limits<double>::quiet_NaN();
   } else {
     return std::sqrt(1-m);
   }
@@ -74,12 +67,12 @@ int main() {
   cc_t ccplx;
   tc_t treeConverter;
 
-  // Sample a uniform grid across teh domain
-  tree.refine_grid(4, halfSphere2);
+  // Sample a uniform grid across the domain
+  tree.refine_grid(5, halfSphere2);
 
   /* halfSphere2 produces NaNs outside the unit circle.  
      We can refine cells that cross the unit circle using refine_recursive_if_cell_vertex_is_nan */
-  tree.refine_recursive_if_cell_vertex_is_nan(8, halfSphere2);
+  tree.refine_recursive_if_cell_vertex_is_nan(7, halfSphere2);
 
   /* halfSphere2 produces NaNs outside the unit circle.  
      We can refine cells that cross the unit circle using refine_leaves_recursive_cell_pred & cell_vertex_is_nan.
@@ -89,17 +82,20 @@ int main() {
   /* Note: Instead of looking for NaNs, we could have used a SDF to simply tell the tree to sample anything that crosses
      the unit circle.  This is the technique used in MR_rect_tree_test_surf_corner.cpp. */
 
-  // Balance the three to the traditional level of 1 (no cell borders a cell more than half it's size)
+  /* Balance the three to the traditional level of 1 (no cell borders a cell more than half it's size) */
   tree.balance_tree(1, halfSphere2);
 
   tree.dump_tree(10);
 
+  /* By passing halfSphere2() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired. */
   treeConverter.construct_geometry_fans(ccplx,
                                         tree,
                                         2,
                                         {{tc_t::tree_val_src_t::DOMAIN, 0}, 
                                          {tc_t::tree_val_src_t::DOMAIN, 1},
-                                         {tc_t::tree_val_src_t::RANGE,  0}});
+                                         {tc_t::tree_val_src_t::RANGE,  0}},
+                                        halfSphere2
+                                       );
 
   ccplx.create_named_datasets({"x", "y", "f(x,y)"});
 

@@ -33,7 +33,7 @@
 
    - Jump discontinuities & Vertical asymptotes: Resolved with higher sampling near the discontinuities and a cutting edge (TBD)
    - Isolated, non-differentiable points:  Resolved with higher sampling near the points and a folding edge (TBD)
-   - Undefined intervals:  Resolved with higher sampling near the edges and NaN edge repair (TBD)
+   - Undefined intervals:  Resolved with higher sampling near the edges and NaN edge repair
    - Regions of high oscillation: Resolved with higher sampling on the regions
    - Extrema: Resolved with higher sampling near the extrema
 
@@ -107,7 +107,9 @@ int main() {
                                         1,
                                         {{tc_t::tree_val_src_t::DOMAIN,   0  }, 
                                          {tc_t::tree_val_src_t::RANGE,    0  },
-                                         {tc_t::tree_val_src_t::CONSTANT, 0.0}});
+                                         {tc_t::tree_val_src_t::CONSTANT, 0.0}},
+                                        f
+                                       );
 
   // Note the first argument need not name *every* data element, just the first ones.
   ccplx.create_named_datasets({"x", "f(x)"});

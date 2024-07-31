@@ -890,6 +890,54 @@ namespace mjr {
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /** @name Real Range Space Computation */
+      //@{
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Test if a point in the range space contains a NaN coordinate value
+          @param val Value in  space */
+      inline bool rrpt_is_nan(rrpt_t val) const {
+        if constexpr (rng_dim == 1) {
+          return std::isnan(val);
+        } else {
+          return (std::any_of(val.cbegin(), val.cend(), [this](src_t v) { return (std::isnan(v)); }));
+        }
+      }
+      //@}
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /** @name Real Domain Space Computation */
+      //@{
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Distance between two points in the domain space using the infinity norm (max absolute value)
+          @param val1 Value in domain space 
+          @param val2 Value in domain space */
+      inline src_t drpt_distance_inf(drpt_t val1, drpt_t val2) const {
+        if constexpr (dom_dim == 1) {
+          return std::abs(val1-val2);
+        } else {
+          src_t ret = 0;
+          for(int i=0; i<dom_dim; ++i)
+            ret = std::max(ret, std::abs(val1[i]-val2[i]));
+          return ret;
+        }
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Return the midpoint between two points in the domain space
+          @param val1 Value in domain space 
+          @param val2 Value in domain space */
+      inline drpt_t drpt_midpoint(drpt_t val1, drpt_t val2) const {
+        if constexpr (dom_dim == 1) {
+          return (val1+val2)/static_cast<src_t>(2.0);
+        } else {
+          drpt_t ret;
+          for(int i=0; i<dom_dim; ++i)
+            ret[i] = (val1[i] + val2[i])/static_cast<src_t>(2.0);
+          return ret;
+        }
+      }
+      //@}
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /** @name Tree/Cell Refinement
 
           Three general function smalpling stratigies are provided:
