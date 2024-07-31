@@ -97,7 +97,8 @@ int main() {
                                         halfSphere2
                                        );
 
-  ccplx.create_named_datasets({"x", "y", "f(x,y)"});
+  ccplx.create_named_datasets({"x", "y", "f(x,y)"},
+                             {{"NORMALS", {0, 1, 2}}});
 
   ccplx.dump_cplx(10);
 
