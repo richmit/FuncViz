@@ -690,7 +690,10 @@ Typical Jagged Edge vs Healed Edge \\
 [[file:media/surface_plot_edge_heal_100.png][file:media/surface_plot_edge_heal_10.png]] \\
 Examples From Matlab (Coarse & Fine Mesh) \\
 [[file:media/matlab_sphere_01_100.png][file:media/matlab_sphere_01_10.png]]
-[[file:media/matlab_sphere_02_100.png][file:media/matlab_sphere_02_10.png]]
+[[file:media/matlab_sphere_02_100.png][file:media/matlab_sphere_02_10.png]] \\
+Examples From Maple (With & Without Adaptive Mesh) \\
+[[file:media/maple_sphere_adap_100.png][file:media/maple_sphere_adap_10.png]]
+[[file:media/maple_sphere_no_adap_100.png][file:media/maple_sphere_no_adap_10.png]]
 #+END_CENTER
 
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/surface_plot_edge.cpp
@@ -1177,22 +1180,14 @@ done
 
 #+RESULTS:
 #+begin_example
-make media/curve_plot_heal_100.png
-make media/curve_plot_heal_50.png
-make media/curve_plot_heal_25.png
-make media/curve_plot_heal_10.png
-make media/curve_plot_jag_100.png
-make media/curve_plot_jag_50.png
-make media/curve_plot_jag_25.png
-make media/curve_plot_jag_10.png
-make media/sq_curve_plot_heal_100.png
-make media/sq_curve_plot_heal_50.png
-make media/sq_curve_plot_heal_25.png
-make media/sq_curve_plot_heal_10.png
-make media/sq_curve_plot_jag_100.png
-make media/sq_curve_plot_jag_50.png
-make media/sq_curve_plot_jag_25.png
-make media/sq_curve_plot_jag_10.png
+make media/maple_sphere_adap_100.png
+make media/maple_sphere_adap_50.png
+make media/maple_sphere_adap_25.png
+make media/maple_sphere_adap_10.png
+make media/maple_sphere_no_adap_100.png
+make media/maple_sphere_no_adap_50.png
+make media/maple_sphere_no_adap_25.png
+make media/maple_sphere_no_adap_10.png
 #+end_example
 
 * Image Processing: GIFs                                           :noexport:
