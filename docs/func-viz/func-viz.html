@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-07-31 Wed 13:26 -->
+<!-- 2024-07-31 Wed 15:52 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Function Visualization</title>
@@ -272,12 +272,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-07-31 13:26:26</i></td>
+<td class="org-left"><i>2024-07-31 15:51:58</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-07-31 13:26:26</i></td>
+<td class="org-left"><i>2024-07-31 15:51:59</i></td>
 </tr>
 </tbody>
 </table>
@@ -296,10 +296,11 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <li><a href="#vector_field_3d">5. 3D Vector Field</a></li>
 <li><a href="#surface_with_normals">6. Surface Plot With Normals</a></li>
 <li><a href="#surface_plot_edge">7. Surface Plot With An Edge</a></li>
-<li><a href="#curve_plot">8. Curve Plot</a></li>
-<li><a href="#parametric_surface_with_defects">9. Parametric Surface With Defects</a></li>
-<li><a href="#performance_with_large_surface">10. High Resolution Parametric Surface</a></li>
-<li><a href="#trefoil">11. Trefoil Parametric Surface</a></li>
+<li><a href="#surface_branch_glue">8. Surface Branchs &amp; Glue</a></li>
+<li><a href="#curve_plot">9. Curve Plot</a></li>
+<li><a href="#parametric_surface_with_defects">10. Parametric Surface With Defects</a></li>
+<li><a href="#performance_with_large_surface">11. High Resolution Parametric Surface</a></li>
+<li><a href="#trefoil">12. Trefoil Parametric Surface</a></li>
 </ul>
 </div>
 </div>
@@ -1038,8 +1039,34 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
 </div>
 </div>
 
+
+<div id="outline-container-surface_branch_glue" class="outline-2">
+<h2 id="surface_branch_glue"><span class="section-number-2">8.</span> Surface Branchs &amp; Glue</h2>
+<div class="outline-text-2" id="text-surface_branch_glue">
+<p>
+In surface_plot_edge.cpp we encountered the unit sphere defined by the zeros of \(1^2=x^2+y^2+z^2\), and the related function 
+\(f(x,y)=\sqrt{1-x^2-y^2}\) obtained by "solving" for \(z\).  Note that if \(z=f(x, y)\), then both \(z\) and \(-z\) satisfy the original equation.
+While the square root function is positive by definition, we might wish to think of  \(f(x, y)\) as a multi-valued function with two branches &#x2013; a
+positive one and a negative one.
+</p>
+
+<p>
+In simple cases like this, where the two branches are reflections across an axis plane, we can use MR_cell_cplx::mirror() to mirror the geometry and seal up
+any holes.  This is really the only change from surface_plot_edge.cpp.
+</p>
+
+<div class="org-center">
+
+<div id="org27a1b3e" class="figure">
+<p><a href="media/surface_branch_glue_100.png"><img src="media/surface_branch_glue_10.png" alt="surface_branch_glue_10.png" /></a>
+</p>
+</div>
+</div>
+</div>
+</div>
+
 <div id="outline-container-curve_plot" class="outline-2">
-<h2 id="curve_plot"><span class="section-number-2">8.</span> Curve Plot</h2>
+<h2 id="curve_plot"><span class="section-number-2">9.</span> Curve Plot</h2>
 <div class="outline-text-2" id="text-curve_plot">
 <p>
 Univariate function plots are the bread-and-butter of the plotting world.  Normally a simple, uniformly spaced, sequence is enough to get the job 
@@ -1060,7 +1087,7 @@ Note that most of the items above are listed TBD.  A few features need to be add
 
 <div class="org-center">
 
-<div id="orgcdb1585" class="figure">
+<div id="orgeb03721" class="figure">
 <p><a href="media/sq_curve_plot_heal_100.png"><img src="media/sq_curve_plot_heal_10.png" alt="sq_curve_plot_heal_10.png" /></a>
 </p>
 </div>
@@ -1150,7 +1177,7 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/curv
 </div>
 
 <div id="outline-container-parametric_surface_with_defects" class="outline-2">
-<h2 id="parametric_surface_with_defects"><span class="section-number-2">9.</span> Parametric Surface With Defects</h2>
+<h2 id="parametric_surface_with_defects"><span class="section-number-2">10.</span> Parametric Surface With Defects</h2>
 <div class="outline-text-2" id="text-parametric_surface_with_defects">
 <p>
 This example illustrates some of the things that can go wrong when generating parametric surfaces.  We dump two version of the tessellation &#x2013; one with
@@ -1237,7 +1264,7 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/para
 
 
 <div id="outline-container-performance_with_large_surface" class="outline-2">
-<h2 id="performance_with_large_surface"><span class="section-number-2">10.</span> High Resolution Parametric Surface</h2>
+<h2 id="performance_with_large_surface"><span class="section-number-2">11.</span> High Resolution Parametric Surface</h2>
 <div class="outline-text-2" id="text-performance_with_large_surface">
 <p>
 Just a nice parametric surface without any weirdness.  Some things demonstrated:
@@ -1345,7 +1372,7 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/perf
 
 
 <div id="outline-container-trefoil" class="outline-2">
-<h2 id="trefoil"><span class="section-number-2">11.</span> Trefoil Parametric Surface</h2>
+<h2 id="trefoil"><span class="section-number-2">12.</span> Trefoil Parametric Surface</h2>
 <div class="outline-text-2" id="text-trefoil">
 <p>
 This example doesn't really demonstrate anything not found in the other examples.  It's just a neat surface. ;)
@@ -1353,7 +1380,7 @@ This example doesn't really demonstrate anything not found in the other examples
 
 <div class="org-center">
 
-<div id="org5d2c883" class="figure">
+<div id="org007c28a" class="figure">
 <p><a href="media/trefoil_rot_50.html"><img src="media/trefoil_rot_10.gif" alt="trefoil_rot_10.gif" /></a>
 </p>
 </div>

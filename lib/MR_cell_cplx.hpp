@@ -248,18 +248,19 @@ namespace mjr {
           Each point's data payload may be grouped into named datasets. These named datasets are written to geometry files. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Type to hold a dataset name */
       typedef std::string pdata_name_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type to hold a single vector data value for a single point */
+      /** Type to hold a single 3-vector data value */
       typedef pnt_t vdat_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type used to hold an index into a pnt_data_t or a constant float */
+      /** Type used to hold an index into a pnt_data_t or a constant float. */
       typedef std::variant<int, uft_t> data_idx_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Type to hold a list of data indexes -- one element for scalars, 3 for vectors, etc.... */
       typedef std::vector<data_idx_t> data_idx_lst_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type to hold scalar data set names to a data index lists. */
+      /** Type to map names to named data sets (index lists). */
       typedef std::map<pdata_name_t, data_idx_lst_t> data_name_to_data_idx_lst_t;
 
     private:
@@ -326,7 +327,7 @@ namespace mjr {
     public:
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Named Point data sets. */
+      /** @name Named Datasets. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /* Return the number of named scalar datasets */
@@ -827,7 +828,7 @@ namespace mjr {
     public:
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Class utilizes. */
+      /** @name Class utilities. */
       //@{
       void clear() {
         last_point_idx = -1;
@@ -836,8 +837,11 @@ namespace mjr {
         pnt_idx_to_pnt.clear();
         pnt_idx_to_pnt_data.clear();
         data_name_to_data_idx_lst.clear();
+        data_to_pnt.clear();
         cell_lst.clear();
         uniq_cell_lst.clear();
+        last_cell_new = true;
+        last_cell_stat = cell_stat_t::GOOD;
       }
       //@}
 
@@ -1337,6 +1341,9 @@ namespace mjr {
       /** @name I/O. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Type returned by I/O functions */
+      typedef int io_result;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Dump to an XML VTK unstructured grid file
 
           Note: A point vector data set named "NORMALS" will be used for normal vectors.
@@ -1344,7 +1351,7 @@ namespace mjr {
           @param file_name   The name of the output file
           @param description This is included as a file comment at the start of the file.
           @return 0 if everything worked, and non-zero otherwise */
-      int write_xml_vtk(std::string file_name, std::string description) { 
+      io_result write_xml_vtk(std::string file_name, std::string description) { 
         /* Check that we have data */
         if (num_points() <= 0) {
           std::cout << "ERROR(write_xml_vtk): No points!" << std::endl;
@@ -1445,7 +1452,7 @@ namespace mjr {
           @param file_name   The name of the output file
           @param description This is the file description.
           @return 0 if everything worked, and non-zero otherwise */
-        int write_legacy_vtk(std::string file_name, std::string description) { 
+        io_result write_legacy_vtk(std::string file_name, std::string description) { 
           /* Check that we have data */
           if (num_points() <= 0) {
             std::cout << "ERROR(write_legacy_vtk): No points!" << std::endl;
@@ -1551,7 +1558,7 @@ namespace mjr {
           @param file_name   The name of the output file
           @param description For legacy files, this is the file description.  For XML files this is included as a file comment at the start of the file.
           @return 0 if everything worked, and non-zero otherwise */
-      int write_ply(std::string file_name, std::string description) { 
+      io_result write_ply(std::string file_name, std::string description) { 
         /* Check that we have data */
         if (num_points() <= 0) {
           std::cout << "ERROR(write_ply): No points!" << std::endl;
@@ -1629,6 +1636,40 @@ namespace mjr {
         return 0;
       }
       //@}
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /** @name Complex Computation. */
+      //@{
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Add new cells with points from existing cells with the given coordinates negated. 
+          @param flip_list    A vector of booleans (0 or 1).  1 indicates the coordinate in a pnt_data_t vector should be negated.
+          @param zero_epsilon If non-negative, will zero out flipped coorinates near zero.
+       */
+      int mirror(std::vector<int> flip_list, uft_t zero_epsilon) {
+        int num_start_cells = num_cells();
+        for(int i=0; i<num_start_cells; ++i) {
+          cell_t new_cell;
+          for(auto pidx: cell_lst[i]) {
+            pnt_data_t od = pnt_idx_to_pnt_data[pidx];
+            for(int j=0; j<static_cast<int>(flip_list.size()); ++j)
+              if ((flip_list[j]) && (std::abs(od[j]) < zero_epsilon))
+                od[j] = 0;
+            pnt_idx_to_pnt_data[pidx] = od;
+            pnt_idx_to_pnt[pidx] = get_dataset_vector(data_to_pnt, od);
+            pnt_data_t nd = od;
+            for(int j=0; j<static_cast<int>(flip_list.size()); ++j) 
+              if (flip_list[j])
+                nd[j] = -nd[j];
+            pnt_idx_t p = add_point(nd);
+            new_cell.push_back(p);
+          }
+          std::reverse(new_cell.begin(), new_cell.end());
+          add_cell(req_pt_cnt_to_cell_type(new_cell.size()), new_cell);
+        }
+        return 0;
+      }
+      //@}
+
 
   };
 

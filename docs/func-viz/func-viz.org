@@ -766,6 +766,35 @@ int main() {
 }
 #+end_src
 
+
+* Surface Branchs & Glue
+:PROPERTIES:
+:CUSTOM_ID: surface_branch_glue
+:END:
+
+#+begin_src sh :results output raw :exports results 
+grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_branch_glue.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!]\)/\\)\1/g;'
+#+end_src
+
+#+RESULTS:
+
+  In surface_plot_edge.cpp we encountered the unit sphere defined by the zeros of \(1^2=x^2+y^2+z^2\), and the related function 
+  \(f(x,y)=\sqrt{1-x^2-y^2}\) obtained by "solving" for \(z\).  Note that if \(z=f(x, y)\), then both \(z\) and \(-z\) satisfy the original equation.
+  While the square root function is positive by definition, we might wish to think of  \(f(x, y)\) as a multi-valued function with two branches -- a
+  positive one and a negative one.
+
+  In simple cases like this, where the two branches are reflections across an axis plane, we can use MR_cell_cplx::mirror() to mirror the geometry and seal up
+  any holes.  This is really the only change from surface_plot_edge.cpp.
+
+#+BEGIN_CENTER
+[[file:media/surface_branch_glue_100.png][file:media/surface_branch_glue_10.png]]
+#+END_CENTER
+
+#+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
+grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_branch_glue.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+#+end_src
+
+
 * Curve Plot
 :PROPERTIES:
 :CUSTOM_ID: curve_plot
@@ -1180,14 +1209,14 @@ done
 
 #+RESULTS:
 #+begin_example
-make media/maple_sphere_adap_100.png
-make media/maple_sphere_adap_50.png
-make media/maple_sphere_adap_25.png
-make media/maple_sphere_adap_10.png
-make media/maple_sphere_no_adap_100.png
-make media/maple_sphere_no_adap_50.png
-make media/maple_sphere_no_adap_25.png
-make media/maple_sphere_no_adap_10.png
+make media/curve_plot_heal_smo_100.png
+make media/curve_plot_heal_smo_50.png
+make media/curve_plot_heal_smo_25.png
+make media/curve_plot_heal_smo_10.png
+make media/surface_branch_glue_100.png
+make media/surface_branch_glue_50.png
+make media/surface_branch_glue_25.png
+make media/surface_branch_glue_10.png
 #+end_example
 
 * Image Processing: GIFs                                           :noexport:
@@ -1293,7 +1322,7 @@ skip media/complex_magnitude_surface_rot_50.webm
 skip media/implicit_surface_rt_rot_100.webm
 skip media/implicit_surface_rt_rot_25.webm
 skip media/implicit_surface_rt_rot_50.webm
-make media/lorenz_rot_25.webm
+skip media/lorenz_rot_25.webm
 skip media/trefoil_rot_100.webm
 skip media/trefoil_rot_25.webm
 skip media/trefoil_rot_50.webm
