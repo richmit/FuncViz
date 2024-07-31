@@ -1,0 +1,88 @@
+#!/usr/bin/env -S bash
+# -*- Mode:Shell-script; Coding:us-ascii-unix; fill-column:158 -*-
+#########################################################################################################################################################.H.S.##
+##
+# @file      configure.sh
+# @author    Mitch Richling http://www.mitchr.me/
+# @date      2024-07-31
+# @brief     Just a little helper for people accustomed to GNU autotools.@EOL
+# @std       bash
+# @copyright 
+#  @parblock
+#  Copyright (c) 2024, Mitchell Jay Richling <http://www.mitchr.me/> All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+#
+#  1. Redistributions of source code must retain the above copyright notice, this list of conditions, and the following disclaimer.
+#
+#  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions, and the following disclaimer in the documentation
+#     and/or other materials provided with the distribution.
+#
+#  3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without
+#     specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+#  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+#  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+#  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#  @endparblock
+#########################################################################################################################################################.H.E.##
+
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------
+if [[ "${@}" == *'-h'* ]]; then
+  cat <<EOF
+
+  Run this script from the 'build' directory.
+
+  If you don't have a 'build' directory yet, then
+  create one!
+
+  Use: configure.sh [cmake arguments]
+
+    Common Arguments:
+     * Target -- leave it off and get 'MSYS Makefiles'
+       - -G 'MSYS Makefiles' 
+       - -G 'Visual Studio 17 2022'
+       - -G 'Unix Makefiles'
+       - -G Ninja
+     * Compiler -- leave it off to get the default
+       - -DCMAKE_CXX_COMPILER=clang++
+       - -DCMAKE_CXX_COMPILER=g++
+     * Optional features -- leave them off to enable everythign
+       - -DO_DOXYGEN=[YES|NO]  -- For documentation
+       - -DO_O_BTEST=[YES|NO]  -- Used for BOOT unit tests
+EOF
+exit
+fi
+
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------
+if [ -e ../CMakeLists.txt ]; then
+  if [ "$(basename $(pwd))" == "build" ]; then
+    CMAKE_G=''
+    if [[ "$CMD_LINE_ARGS" != *'-G'* ]]; then
+      CMAKE_G='MSYS Makefiles'
+    fi
+    if [ -n "${@}" ]; then
+      echo cmake -G "$CMAKE_G" "$@" ../
+      cmake -G "$CMAKE_G" "$@" ../
+    else
+      echo cmake -G "$CMAKE_G" -DCMAKE_CXX_COMPILER=g++.exe ..
+      cmake -G "$CMAKE_G" -DCMAKE_CXX_COMPILER=g++.exe ..
+    fi
+  else
+    echo "ERROR: Must run from build directory"
+  fi
+else
+  if [ -e ./CMakeLists.txt ]; then
+    echo "ERROR: It looks like you are running from the base of the repo"
+    if [ -d ./build ]; then
+      echo "ERROR: cd into the build directory to run this script"
+    else
+      echo "ERROR: Create a directory called 'bulid'."
+      echo "ERROR: cd into the build directory to run this script"
+    fi
+  else
+    echo "ERROR: Missing ../CMakeLists.txt"
+  fi
+fi
