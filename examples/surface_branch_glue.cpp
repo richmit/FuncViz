@@ -89,7 +89,7 @@ int main() {
                              {{"NORMALS", {0, 1, 2}}});
 
   /* This is the magic.  We add new cells with the third element of each point data vector negated. */
-  ccplx.mirror({0, 0, 1}, 0.01);
+  ccplx.mirror({0, 0, 1});
 
   ccplx.dump_cplx(10);
 

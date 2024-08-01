@@ -208,7 +208,7 @@ namespace mjr {
       typedef double uft_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** epsilon */
-      uft_t epsilon = eps;
+      constexpr static uft_t epsilon = eps;
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1645,7 +1645,7 @@ namespace mjr {
           @param flip_list    A vector of booleans (0 or 1).  1 indicates the coordinate in a pnt_data_t vector should be negated.
           @param zero_epsilon If non-negative, will zero out flipped coorinates near zero.
        */
-      int mirror(std::vector<int> flip_list, uft_t zero_epsilon) {
+      int mirror(std::vector<int> flip_list, uft_t zero_epsilon=epsilon*1000, bool reverse_vertex_order=true) {
         int num_start_cells = num_cells();
         for(int i=0; i<num_start_cells; ++i) {
           cell_t new_cell;
@@ -1663,7 +1663,8 @@ namespace mjr {
             pnt_idx_t p = add_point(nd);
             new_cell.push_back(p);
           }
-          std::reverse(new_cell.begin(), new_cell.end());
+          if (reverse_vertex_order)
+            std::reverse(new_cell.begin(), new_cell.end());
           add_cell(req_pt_cnt_to_cell_type(new_cell.size()), new_cell);
         }
         return 0;

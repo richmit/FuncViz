@@ -402,18 +402,20 @@ namespace mjr {
           Note we normally use this function when we detect a NaN in a geometric point (i.e. the things with a pnt_idx_t).  This solver solves until
           the return of func has no NaNs.  Those two criteria might not be the same thing, but it's OK.
 
-          @param ccplx                The MR_cell_cplx to populate with geometry
-          @param rtree                The MR_rect_tree with source data
-          @param gd_point_ccplx_index Good point index in the ccplx object
-          @param gd_point_rtree_index Good point index in the rtree object
-          @param bd_point_rtree_index Bad point index in the rtree object
-          @param func                 The function to use for the solver */
+          @param ccplx                  The MR_cell_cplx to populate with geometry
+          @param rtree                  The MR_rect_tree with source data
+          @param good_point_ccplx_index Good point index in the ccplx object
+          @param good_point_rtree_index Good point index in the rtree object
+          @param sick_point_rtree_index Bad point index in the rtree object
+          @param func                   The function to use for the solver */
       static typename cc_t::pnt_idx_t nan_edge_solver(cc_t&                    ccplx,
                                                       const rt_t&              rtree,
-                                                      typename cc_t::pnt_idx_t gd_point_ccplx_index,
-                                                      typename rt_t::diti_t    gd_point_rtree_index,
-                                                      typename rt_t::diti_t    bd_point_rtree_index,
-                                                      typename rt_t::rsfunc_t  func) {
+                                                      typename cc_t::pnt_idx_t good_point_ccplx_index,
+                                                      typename rt_t::diti_t    good_point_rtree_index,
+                                                      typename rt_t::diti_t    sick_point_rtree_index,
+                                                      typename rt_t::rsfunc_t  func,
+                                                      typename cc_t::uft_t     solver_epsilon=cc_t::epsilon/100
+                                                     ) {
         // Solver cache.  Clear it if we have a different rtree object from last time.
         static std::unordered_map<typename rt_t::diti_t, std::unordered_map<typename rt_t::diti_t, typename cc_t::pnt_idx_t>> nan_solver_cache;
         static const rt_t* rtree_cache = nullptr;
@@ -422,31 +424,31 @@ namespace mjr {
           rtree_cache = &rtree;
         }
         // Check to see if we solved this one before
-        if (nan_solver_cache.contains(bd_point_rtree_index))
-          if (nan_solver_cache[bd_point_rtree_index].contains(gd_point_rtree_index))
-            return  nan_solver_cache[bd_point_rtree_index][gd_point_rtree_index];
+        if (nan_solver_cache.contains(sick_point_rtree_index))
+          if (nan_solver_cache[sick_point_rtree_index].contains(good_point_rtree_index))
+            return  nan_solver_cache[sick_point_rtree_index][good_point_rtree_index];
         // Apparently we need to solve this one as it's not in the case
-        typename rt_t::drpt_t gd_point_drpt = rtree.diti_to_drpt(gd_point_rtree_index);
-        typename rt_t::drpt_t bd_point_drpt = rtree.diti_to_drpt(bd_point_rtree_index);
-        typename rt_t::rrpt_t gd_point_rrpt = rtree.get_sample(gd_point_rtree_index);
-        typename rt_t::drpt_t st_point_drpt = gd_point_drpt;
-        while (rtree.drpt_distance_inf(gd_point_drpt, bd_point_drpt) > (ccplx.epsilon/4)) {
-          typename rt_t::drpt_t md_point_drpt = rtree.drpt_midpoint(gd_point_drpt, bd_point_drpt);
+        typename rt_t::drpt_t good_point_drpt = rtree.diti_to_drpt(good_point_rtree_index);
+        typename rt_t::drpt_t sick_point_drpt = rtree.diti_to_drpt(sick_point_rtree_index);
+        typename rt_t::rrpt_t good_point_rrpt = rtree.get_sample(good_point_rtree_index);
+        typename rt_t::drpt_t init_point_drpt = good_point_drpt;
+        while ( (rtree.drpt_distance_inf(good_point_drpt, sick_point_drpt) > solver_epsilon) ) {
+          typename rt_t::drpt_t md_point_drpt = rtree.drpt_midpoint(good_point_drpt, sick_point_drpt);
           typename rt_t::rrpt_t y = func(md_point_drpt);
           if (rtree.rrpt_is_nan(y)) {
-            bd_point_drpt = md_point_drpt;
+            sick_point_drpt = md_point_drpt;
           } else {
-            gd_point_drpt = md_point_drpt;
-            gd_point_rrpt = y;
+            good_point_drpt = md_point_drpt;
+            good_point_rrpt = y;
           }
         }
         // Figure out what to return, add it to the cache, and return.
         typename cc_t::pnt_idx_t ret;
-        if (rtree.drpt_distance_inf(gd_point_drpt, st_point_drpt) < (ccplx.epsilon))
-          ret = gd_point_ccplx_index;
+        if (rtree.drpt_distance_inf(good_point_drpt, init_point_drpt) < (ccplx.epsilon)) // Use ccplx here!!!
+          ret = good_point_ccplx_index;
         else
-          ret = add_point_and_data_from_data(ccplx, rtree, gd_point_drpt, gd_point_rrpt);
-        nan_solver_cache[bd_point_rtree_index][gd_point_rtree_index] = ret;
+          ret = add_point_and_data_from_data(ccplx, rtree, good_point_drpt, good_point_rrpt);
+        nan_solver_cache[sick_point_rtree_index][good_point_rtree_index] = ret;
         return ret;
       }
       //@}

@@ -902,6 +902,20 @@ namespace mjr {
           return (std::any_of(val.cbegin(), val.cend(), [this](src_t v) { return (std::isnan(v)); }));
         }
       }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Distance between two points in the range space using the infinity norm (max absolute value)
+          @param val1 Value in range space 
+          @param val2 Value in range space */
+      inline src_t rrpt_distance_inf(rrpt_t val1, rrpt_t val2) const {
+        if constexpr (rng_dim == 1) {
+          return std::abs(val1-val2);
+        } else {
+          src_t ret = 0;
+          for(int i=0; i<rng_dim; ++i)
+            ret = std::max(ret, std::abs(val1[i]-val2[i]));
+          return ret;
+        }
+      }
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
