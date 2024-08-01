@@ -96,6 +96,5 @@ int main() {
   ccplx.write_xml_vtk("surface_branch_glue.vtu", "surface_branch_glue");
   ccplx.write_legacy_vtk("surface_branch_glue.vtk", "surface_branch_glue");
   ccplx.write_ply("surface_branch_glue.ply", "surface_branch_glue");
-
 }
 /** @endcond */

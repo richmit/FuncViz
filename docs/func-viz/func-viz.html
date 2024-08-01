@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-07-31 Wed 15:52 -->
+<!-- 2024-08-01 Thu 13:24 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Function Visualization</title>
@@ -272,12 +272,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-07-31 15:51:58</i></td>
+<td class="org-left"><i>2024-08-01 13:24:55</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-07-31 15:51:59</i></td>
+<td class="org-left"><i>2024-08-01 13:24:56</i></td>
 </tr>
 </tbody>
 </table>
@@ -296,7 +296,7 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <li><a href="#vector_field_3d">5. 3D Vector Field</a></li>
 <li><a href="#surface_with_normals">6. Surface Plot With Normals</a></li>
 <li><a href="#surface_plot_edge">7. Surface Plot With An Edge</a></li>
-<li><a href="#surface_branch_glue">8. Surface Branchs &amp; Glue</a></li>
+<li><a href="#surface_branch_glue">8. Surface Branches &amp; Glue</a></li>
 <li><a href="#curve_plot">9. Curve Plot</a></li>
 <li><a href="#parametric_surface_with_defects">10. Parametric Surface With Defects</a></li>
 <li><a href="#performance_with_large_surface">11. High Resolution Parametric Surface</a></li>
@@ -1041,7 +1041,7 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
 
 
 <div id="outline-container-surface_branch_glue" class="outline-2">
-<h2 id="surface_branch_glue"><span class="section-number-2">8.</span> Surface Branchs &amp; Glue</h2>
+<h2 id="surface_branch_glue"><span class="section-number-2">8.</span> Surface Branches &amp; Glue</h2>
 <div class="outline-text-2" id="text-surface_branch_glue">
 <p>
 In surface_plot_edge.cpp we encountered the unit sphere defined by the zeros of \(1^2=x^2+y^2+z^2\), and the related function 
@@ -1057,13 +1057,72 @@ any holes.  This is really the only change from surface_plot_edge.cpp.
 
 <div class="org-center">
 
-<div id="org27a1b3e" class="figure">
+<div id="orgd5697dc" class="figure">
 <p><a href="media/surface_branch_glue_100.png"><img src="media/surface_branch_glue_10.png" alt="surface_branch_glue_10.png" /></a>
 </p>
 </div>
 </div>
+
+<div class="org-src-container">
+<pre class="src src-c++">
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
+
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b2d1rT</span>            <span style="color: #63b8ff;">tt_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
+
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">halfSphere2</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">m</span> = xvec[0] * xvec[0] + xvec[1] * xvec[1];
+  <span style="color: #00ffff;">if</span> (m &gt; 1) {
+    <span style="color: #00ffff;">return</span> <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numeric_limits</span>&lt;<span style="color: #63b8ff;">double</span>&gt;::quiet_NaN();
+  } <span style="color: #00ffff;">else</span> {
+    <span style="color: #00ffff;">return</span> <span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(1-m);
+  }
+}
+
+<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
+  <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">tree</span>({-1.2, -1.2}, 
+            { 1.2,  1.2});
+  <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">ccplx</span>;
+  <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">treeConverter</span>;
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Sample a uniform grid across the domain</span>
+  tree.refine_grid(5, halfSphere2);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Refine near the edge</span><span style="color: #ffa500;"> */</span>
+  tree.refine_recursive_if_cell_vertex_is_nan(6, halfSphere2);
+
+  tree.dump_tree(10);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">By passing halfSphere2() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired.</span><span style="color: #ffa500;"> */</span>
+  treeConverter.construct_geometry_fans(ccplx,
+                                        tree,
+                                        2,
+                                        {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0}, 
+                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
+                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0}},
+                                        halfSphere2
+                                       );
+
+  ccplx.create_named_datasets({<span style="color: #fa8072;">"x"</span>, <span style="color: #fa8072;">"y"</span>, <span style="color: #fa8072;">"f(x,y)"</span>},
+                             {{<span style="color: #fa8072;">"NORMALS"</span>, {0, 1, 2}}});
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">This is the magic.  We add new cells with the third element of each point data vector negated.</span><span style="color: #ffa500;"> */</span>
+  ccplx.mirror({0, 0, 1});
+
+  ccplx.dump_cplx(10);
+
+  ccplx.write_xml_vtk(<span style="color: #fa8072;">"surface_branch_glue.vtu"</span>, <span style="color: #fa8072;">"surface_branch_glue"</span>);
+  ccplx.write_legacy_vtk(<span style="color: #fa8072;">"surface_branch_glue.vtk"</span>, <span style="color: #fa8072;">"surface_branch_glue"</span>);
+  ccplx.write_ply(<span style="color: #fa8072;">"surface_branch_glue.ply"</span>, <span style="color: #fa8072;">"surface_branch_glue"</span>);
+}
+</pre>
 </div>
 </div>
+</div>
+
 
 <div id="outline-container-curve_plot" class="outline-2">
 <h2 id="curve_plot"><span class="section-number-2">9.</span> Curve Plot</h2>
@@ -1087,7 +1146,7 @@ Note that most of the items above are listed TBD.  A few features need to be add
 
 <div class="org-center">
 
-<div id="orgeb03721" class="figure">
+<div id="org3e3b9e6" class="figure">
 <p><a href="media/sq_curve_plot_heal_100.png"><img src="media/sq_curve_plot_heal_10.png" alt="sq_curve_plot_heal_10.png" /></a>
 </p>
 </div>
@@ -1380,7 +1439,7 @@ This example doesn't really demonstrate anything not found in the other examples
 
 <div class="org-center">
 
-<div id="org007c28a" class="figure">
+<div id="org5c59612" class="figure">
 <p><a href="media/trefoil_rot_50.html"><img src="media/trefoil_rot_10.gif" alt="trefoil_rot_10.gif" /></a>
 </p>
 </div>

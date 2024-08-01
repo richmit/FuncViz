@@ -767,7 +767,7 @@ int main() {
 #+end_src
 
 
-* Surface Branchs & Glue
+* Surface Branches & Glue
 :PROPERTIES:
 :CUSTOM_ID: surface_branch_glue
 :END:
@@ -792,6 +792,64 @@ grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_bran
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
 grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_branch_glue.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+#+end_src
+
+#+RESULTS:
+#+begin_src c++ :eval never :tangle no
+
+#include "MR_rect_tree.hpp"
+#include "MR_cell_cplx.hpp"
+#include "MR_rt_to_cc.hpp"
+
+typedef mjr::tree15b2d1rT            tt_t;
+typedef mjr::MRccT5                  cc_t;
+typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
+
+tt_t::rrpt_t halfSphere2(tt_t::drpt_t xvec) {
+  double m = xvec[0] * xvec[0] + xvec[1] * xvec[1];
+  if (m > 1) {
+    return std::numeric_limits<double>::quiet_NaN();
+  } else {
+    return std::sqrt(1-m);
+  }
+}
+
+int main() {
+  tt_t tree({-1.2, -1.2}, 
+            { 1.2,  1.2});
+  cc_t ccplx;
+  tc_t treeConverter;
+
+  // Sample a uniform grid across the domain
+  tree.refine_grid(5, halfSphere2);
+
+  /* Refine near the edge */
+  tree.refine_recursive_if_cell_vertex_is_nan(6, halfSphere2);
+
+  tree.dump_tree(10);
+
+  /* By passing halfSphere2() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired. */
+  treeConverter.construct_geometry_fans(ccplx,
+                                        tree,
+                                        2,
+                                        {{tc_t::tree_val_src_t::DOMAIN, 0}, 
+                                         {tc_t::tree_val_src_t::DOMAIN, 1},
+                                         {tc_t::tree_val_src_t::RANGE,  0}},
+                                        halfSphere2
+                                       );
+
+  ccplx.create_named_datasets({"x", "y", "f(x,y)"},
+                             {{"NORMALS", {0, 1, 2}}});
+
+  /* This is the magic.  We add new cells with the third element of each point data vector negated. */
+  ccplx.mirror({0, 0, 1});
+
+  ccplx.dump_cplx(10);
+
+  ccplx.write_xml_vtk("surface_branch_glue.vtu", "surface_branch_glue");
+  ccplx.write_legacy_vtk("surface_branch_glue.vtk", "surface_branch_glue");
+  ccplx.write_ply("surface_branch_glue.ply", "surface_branch_glue");
+}
 #+end_src
 
 
