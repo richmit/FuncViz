@@ -38,15 +38,16 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include <algorithm>                                                     /* STL algorithm           C++11    */
 #include <array>                                                         /* array template          C++11    */
-#include <set>                                                           /* STL set                 C++98    */
-#include <unordered_map>                                                 /* STL hash map            C++11    */
-#include <map>                                                           /* STL map                 C++11    */
-#include <vector>                                                        /* STL vector              C++11    */ 
-#include <iostream>                                                      /* C++ iostream            C++11    */
-#include <string>                                                        /* C++ strings             C++11    */
-#include <fstream>                                                       /* C++ fstream             C++98    */
-#include <iomanip>                                                       /* C++ stream formatting   C++11    */
 #include <cmath>                                                         /* std:: C math.h          C++11    */
+#include <fstream>                                                       /* C++ fstream             C++98    */
+#include <functional>                                                    /* STL funcs               C++98    */
+#include <iomanip>                                                       /* C++ stream formatting   C++11    */
+#include <iostream>                                                      /* C++ iostream            C++11    */
+#include <map>                                                           /* STL map                 C++11    */
+#include <set>                                                           /* STL set                 C++98    */
+#include <string>                                                        /* C++ strings             C++11    */
+#include <unordered_map>                                                 /* STL hash map            C++11    */
+#include <vector>                                                        /* STL vector              C++11    */ 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Put everything in the mjr namespace
