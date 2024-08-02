@@ -116,37 +116,6 @@ namespace mjr {
         - rrpt_t/drpt_t (range/domain real psudo-tuple) -- As a src_t when dim==1, and an array otherwise
     Function arguments of type 'foo_t' are frequently called 'foo'.
 
-    Future Development Plans (TODO)
-    ===============================
-
-     Note todos specific to a particular bit of code (a method for example) may be found with the code in question as a TODO comment.
-     The following items are of a more global, forward looking nature.
-
-     - Adaptive function sample (cell angle, cell aspect ratio, & cell width)
-       - bitree
-       - quadtree
-     - Cell segment solver
-       - Takes two points in the TREE, and isolates a point on the segment between them
-       - Stuff we can isolate
-         - SDF zero
-         - Boolean function transition (ex: NaN/non-NaN boundry)
-         - Level transition in range
-         - Level transition in domain
-       - Stuff we can do with an isolated point
-         - Cut around it (for example to make sure a cell won't cross a discontinuity)
-         - Fold on it (to make sharp corners at nondifferentiable points)
-         - Healing broken cells
-     - Examples:
-       - Demonstrate cell healing & edge solver with half sphere example
-       - Demonstrate edge solver & cell folding with SDF for surface with a corner
-       - Demonstrate "cropping" z-axis plot range with crop plane & edge solver
-       - implicit curve
-         - Demonstrate edge solver & SDF to extract level curve with a large grid step size
-         - Demonstrate how to limit output to cells covering curve with cell filtering
-       - bitree examples
-         - Simple y=f(x) graph
-         - 3D parametric curve <x(t), y(t), z(t)>
-
     Details
     =======
 
@@ -668,7 +637,7 @@ namespace mjr {
           @param delta The Distance for the cross product points
           @return Last of cross product points */
       diti_list_t cuc_two_cross(diti_t diti, dic_t delta) const {
-        //  MJR TODO NOTE <2024-07-11T11:50:36-0500> cuc_two_cross: Decide what to do if diti is close to an corner and some of the cross product points may be out of range.
+        //  MJR TODO NOTE <2024-07-11T11:50:36-0500> cuc_two_cross: If diti is close to an corner, some result points may be out of range.
         diti_list_t rv;
         for(int i=0; i<(1 << dom_dim); i++) {
           diti_t tmp = diti;    

@@ -291,7 +291,7 @@ namespace mjr {
         } else if (rtree.domain_dimension == 3) {
           std::cout << "ERROR: construct_geometry_fans: domain_dimension==3 not supported!" << std::endl;
           return 1;
-          //  MJR TODO NOTE construct_geometry_fans: Implement
+          //  MJR TODO NOTE <2024-08-02T09:43:13-0500> construct_geometry_fans: Implement
         } else { //if (rtree.domain_dimension > 3) {
           std::cout << "ERROR: construct_geometry_fans: output_dimension>3 not supported for output_dimension>0!" << std::endl;
           return 1;
