@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-08-01 Thu 13:24 -->
+<!-- 2024-08-02 Fri 17:37 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Function Visualization</title>
@@ -272,12 +272,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-08-01 13:24:55</i></td>
+<td class="org-left"><i>2024-08-02 16:07:13</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-08-01 13:24:56</i></td>
+<td class="org-left"><i>2024-08-02 17:36:58</i></td>
 </tr>
 </tbody>
 </table>
@@ -301,6 +301,7 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <li><a href="#parametric_surface_with_defects">10. Parametric Surface With Defects</a></li>
 <li><a href="#performance_with_large_surface">11. High Resolution Parametric Surface</a></li>
 <li><a href="#trefoil">12. Trefoil Parametric Surface</a></li>
+<li><a href="#parametric_curve_3d">13. Twisted Cubic As A Surface Intersection</a></li>
 </ul>
 </div>
 </div>
@@ -346,7 +347,7 @@ In some cases we preform post processing or use other tools: VisIT, meshlab, POV
 <div class="outline-text-2" id="text-complex_magnitude_surface">
 <p>
 One popular way to plot complex functions is to use a surface plot of \(\vert f(z)\vert\) and color the surface with \(\arg(f(z))\).  This way we can
-simultaneously represent the magnitude and phase over the complex plain.  There are several ways to color the plots, and we will be following the method
+simultaneously represent the magnitude and phase over the complex plane.  There are several ways to color the plots, and we will be following the method
 described by Richardson in 1991.  In this example, we demonstrates several techniques:
 </p>
 
@@ -366,7 +367,7 @@ Eventually we will also demonstrate:
 </p>
 
 <ul class="org-ul">
-<li>Clip with a clipping plain (TBD) &#x2013; requires new functionality in MR_rt_to_cc.</li>
+<li>Clip with a clipping plane (TBD) &#x2013; requires new functionality in MR_rt_to_cc.</li>
 <li>Extract level curves (TBD) &#x2013; requires new functionality in MR_rt_to_cc.</li>
 </ul>
 
@@ -1057,7 +1058,7 @@ any holes.  This is really the only change from surface_plot_edge.cpp.
 
 <div class="org-center">
 
-<div id="orgd5697dc" class="figure">
+<div id="orgebb9465" class="figure">
 <p><a href="media/surface_branch_glue_100.png"><img src="media/surface_branch_glue_10.png" alt="surface_branch_glue_10.png" /></a>
 </p>
 </div>
@@ -1146,7 +1147,7 @@ Note that most of the items above are listed TBD.  A few features need to be add
 
 <div class="org-center">
 
-<div id="org3e3b9e6" class="figure">
+<div id="org5dfd75d" class="figure">
 <p><a href="media/sq_curve_plot_heal_100.png"><img src="media/sq_curve_plot_heal_10.png" alt="sq_curve_plot_heal_10.png" /></a>
 </p>
 </div>
@@ -1439,7 +1440,7 @@ This example doesn't really demonstrate anything not found in the other examples
 
 <div class="org-center">
 
-<div id="org5c59612" class="figure">
+<div id="org65153b9" class="figure">
 <p><a href="media/trefoil_rot_50.html"><img src="media/trefoil_rot_10.gif" alt="trefoil_rot_10.gif" /></a>
 </p>
 </div>
@@ -1507,6 +1508,97 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/tref
 
   ccplx.write_xml_vtk(<span style="color: #fa8072;">"trefoil.vtu"</span>, <span style="color: #fa8072;">"trefoil"</span>);
 
+}
+</pre>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-parametric_curve_3d" class="outline-2">
+<h2 id="parametric_curve_3d"><span class="section-number-2">13.</span> Twisted Cubic As A Surface Intersection</h2>
+<div class="outline-text-2" id="text-parametric_curve_3d">
+<div class="org-center">
+
+<div id="org3927143" class="figure">
+<p><a href="media/parametric_curve_3d_rot_100_crf30.html"><img src="media/parametric_curve_3d_rot_10.gif" alt="parametric_curve_3d_rot_10.gif" /></a>
+</p>
+</div>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-c++">
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
+
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b1d3rT</span>              <span style="color: #63b8ff;">tt1_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                    <span style="color: #63b8ff;">cc1_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt1_t</span>, <span style="color: #63b8ff;">cc1_t</span>&gt; <span style="color: #63b8ff;">tc1_t</span>;
+
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b2d3rT</span>              <span style="color: #63b8ff;">tt2_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                    <span style="color: #63b8ff;">cc2_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt2_t</span>, <span style="color: #63b8ff;">cc2_t</span>&gt; <span style="color: #63b8ff;">tc2_t</span>;
+
+<span style="color: #8470ff; font-weight: bold;">tt1_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">twisted_cubic_crv</span>(<span style="color: #8470ff; font-weight: bold;">tt1_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">t</span>) {
+  <span style="color: #00ffff;">return</span> { t, t*t, t*t*t };
+}                          
+
+<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">twisted_cubic_srf1</span>(<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">uvvec</span>) {
+  <span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">u</span> = uvvec[0];
+  <span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">v</span> = uvvec[1];
+  <span style="color: #00ffff;">return</span> { u, u*u, v };
+}                          
+
+<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">twisted_cubic_srf2</span>(<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">uvvec</span>) {
+  <span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">u</span> = uvvec[0];
+  <span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">v</span> = uvvec[1];
+  <span style="color: #00ffff;">return</span> { u, v, u*u*u };
+}                          
+
+<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
+  <span style="color: #63b8ff;">tt1_t</span> <span style="color: #7fffd4;">crv_tree</span>;
+  <span style="color: #63b8ff;">cc1_t</span> <span style="color: #7fffd4;">crv_ccplx</span>;
+  <span style="color: #63b8ff;">tc1_t</span> <span style="color: #7fffd4;">crv_tree_conv</span>;
+  crv_tree.refine_grid(8, twisted_cubic_crv);
+  crv_tree_conv.construct_geometry_fans(crv_ccplx,
+                                        crv_tree,
+                                        1,
+                                        {{<span style="color: #8470ff; font-weight: bold;">tc1_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 0},
+                                         {<span style="color: #8470ff; font-weight: bold;">tc1_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 1},
+                                         {<span style="color: #8470ff; font-weight: bold;">tc1_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 2}});
+  crv_ccplx.create_named_datasets({<span style="color: #fa8072;">"t"</span>, <span style="color: #fa8072;">"x(t)"</span>, <span style="color: #fa8072;">"y(t)"</span>, <span style="color: #fa8072;">"z(t)"</span>});
+  crv_ccplx.dump_cplx(5);
+  crv_ccplx.write_xml_vtk(<span style="color: #fa8072;">"parametric_curve_3d-crv.vtu"</span>, <span style="color: #fa8072;">"parametric_curve_3d-crv"</span>);
+
+  <span style="color: #63b8ff;">tt2_t</span> <span style="color: #7fffd4;">srf1_tree</span>;
+  <span style="color: #63b8ff;">cc2_t</span> <span style="color: #7fffd4;">srf1_ccplx</span>;
+  <span style="color: #63b8ff;">tc2_t</span> <span style="color: #7fffd4;">srf1_tree_conv</span>;
+  srf1_tree.refine_grid(5, twisted_cubic_srf1);
+  srf1_tree_conv.construct_geometry_fans(srf1_ccplx,
+                                         srf1_tree,
+                                         2,
+                                         {{<span style="color: #8470ff; font-weight: bold;">tc2_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 0},
+                                          {<span style="color: #8470ff; font-weight: bold;">tc2_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 1},
+                                          {<span style="color: #8470ff; font-weight: bold;">tc2_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 2}});
+  srf1_ccplx.create_named_datasets({<span style="color: #fa8072;">"u"</span>, <span style="color: #fa8072;">"v"</span>, <span style="color: #fa8072;">"x(u,v)"</span>, <span style="color: #fa8072;">"y(u,v)"</span>, <span style="color: #fa8072;">"z(u,v)"</span>});
+  srf1_ccplx.dump_cplx(5);
+  srf1_ccplx.write_xml_vtk(<span style="color: #fa8072;">"parametric_curve_3d-srf1.vtu"</span>, <span style="color: #fa8072;">"parametric_curve_3d-srf1"</span>);
+
+  <span style="color: #63b8ff;">tt2_t</span> <span style="color: #7fffd4;">srf2_tree</span>;
+  <span style="color: #63b8ff;">cc2_t</span> <span style="color: #7fffd4;">srf2_ccplx</span>;
+  <span style="color: #63b8ff;">tc2_t</span> <span style="color: #7fffd4;">srf2_tree_conv</span>;
+  srf2_tree.refine_grid(5, twisted_cubic_srf2);
+  srf2_tree_conv.construct_geometry_fans(srf2_ccplx,
+                                         srf2_tree,
+                                         2,
+                                         {{<span style="color: #8470ff; font-weight: bold;">tc2_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 0},
+                                          {<span style="color: #8470ff; font-weight: bold;">tc2_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 1},
+                                          {<span style="color: #8470ff; font-weight: bold;">tc2_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 2}});
+  srf2_ccplx.create_named_datasets({<span style="color: #fa8072;">"u"</span>, <span style="color: #fa8072;">"v"</span>, <span style="color: #fa8072;">"x(u,v)"</span>, <span style="color: #fa8072;">"y(u,v)"</span>, <span style="color: #fa8072;">"z(u,v)"</span>});
+  srf2_ccplx.dump_cplx(5);
+  srf2_ccplx.write_xml_vtk(<span style="color: #fa8072;">"parametric_curve_3d-srf2.vtu"</span>, <span style="color: #fa8072;">"parametric_curve_3d-srf2"</span>);
 }
 </pre>
 </div>

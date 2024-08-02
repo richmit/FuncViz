@@ -82,7 +82,7 @@ grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/complex_magn
 #+RESULTS:
 
   One popular way to plot complex functions is to use a surface plot of \(\vert f(z)\vert\) and color the surface with \(\arg(f(z))\).  This way we can
-  simultaneously represent the magnitude and phase over the complex plain.  There are several ways to color the plots, and we will be following the method
+  simultaneously represent the magnitude and phase over the complex plane.  There are several ways to color the plots, and we will be following the method
   described by Richardson in 1991.  In this example, we demonstrates several techniques:
 
    - Alternate ways to do an initial sample (grid vs recursive)
@@ -96,7 +96,7 @@ grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/complex_magn
 
   Eventually we will also demonstrate:
 
-   - Clip with a clipping plain (TBD) -- requires new functionality in MR_rt_to_cc.
+   - Clip with a clipping plane (TBD) -- requires new functionality in MR_rt_to_cc.
    - Extract level curves (TBD) -- requires new functionality in MR_rt_to_cc.
 
   References:
@@ -1246,6 +1246,102 @@ int main() {
 
 
 
+* Twisted Cubic As A Surface Intersection
+:PROPERTIES:
+:CUSTOM_ID: parametric_curve_3d
+:END:
+
+#+begin_src sh :results output raw :exports results 
+grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/parametric_curve_3d.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!]\)/\\)\1/g;'
+#+end_src
+
+#+BEGIN_CENTER
+[[file:media/parametric_curve_3d_rot_100_crf30.html][file:media/parametric_curve_3d_rot_10.gif]]
+#+END_CENTER
+
+#+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
+grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/parametric_curve_3d.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+#+end_src
+
+#+RESULTS:
+#+begin_src c++ :eval never :tangle no
+
+#include "MR_rect_tree.hpp"
+#include "MR_cell_cplx.hpp"
+#include "MR_rt_to_cc.hpp"
+
+typedef mjr::tree15b1d3rT              tt1_t;
+typedef mjr::MRccT5                    cc1_t;
+typedef mjr::MR_rt_to_cc<tt1_t, cc1_t> tc1_t;
+
+typedef mjr::tree15b2d3rT              tt2_t;
+typedef mjr::MRccT5                    cc2_t;
+typedef mjr::MR_rt_to_cc<tt2_t, cc2_t> tc2_t;
+
+tt1_t::rrpt_t twisted_cubic_crv(tt1_t::drpt_t t) {
+  return { t, t*t, t*t*t };
+}                          
+
+tt2_t::rrpt_t twisted_cubic_srf1(tt2_t::drpt_t uvvec) {
+  tt2_t::src_t u = uvvec[0];
+  tt2_t::src_t v = uvvec[1];
+  return { u, u*u, v };
+}                          
+
+tt2_t::rrpt_t twisted_cubic_srf2(tt2_t::drpt_t uvvec) {
+  tt2_t::src_t u = uvvec[0];
+  tt2_t::src_t v = uvvec[1];
+  return { u, v, u*u*u };
+}                          
+
+int main() {
+  tt1_t crv_tree;
+  cc1_t crv_ccplx;
+  tc1_t crv_tree_conv;
+  crv_tree.refine_grid(8, twisted_cubic_crv);
+  crv_tree_conv.construct_geometry_fans(crv_ccplx,
+                                        crv_tree,
+                                        1,
+                                        {{tc1_t::tree_val_src_t::RANGE, 0},
+                                         {tc1_t::tree_val_src_t::RANGE, 1},
+                                         {tc1_t::tree_val_src_t::RANGE, 2}});
+  crv_ccplx.create_named_datasets({"t", "x(t)", "y(t)", "z(t)"});
+  crv_ccplx.dump_cplx(5);
+  crv_ccplx.write_xml_vtk("parametric_curve_3d-crv.vtu", "parametric_curve_3d-crv");
+
+  tt2_t srf1_tree;
+  cc2_t srf1_ccplx;
+  tc2_t srf1_tree_conv;
+  srf1_tree.refine_grid(5, twisted_cubic_srf1);
+  srf1_tree_conv.construct_geometry_fans(srf1_ccplx,
+                                         srf1_tree,
+                                         2,
+                                         {{tc2_t::tree_val_src_t::RANGE, 0},
+                                          {tc2_t::tree_val_src_t::RANGE, 1},
+                                          {tc2_t::tree_val_src_t::RANGE, 2}});
+  srf1_ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)"});
+  srf1_ccplx.dump_cplx(5);
+  srf1_ccplx.write_xml_vtk("parametric_curve_3d-srf1.vtu", "parametric_curve_3d-srf1");
+
+  tt2_t srf2_tree;
+  cc2_t srf2_ccplx;
+  tc2_t srf2_tree_conv;
+  srf2_tree.refine_grid(5, twisted_cubic_srf2);
+  srf2_tree_conv.construct_geometry_fans(srf2_ccplx,
+                                         srf2_tree,
+                                         2,
+                                         {{tc2_t::tree_val_src_t::RANGE, 0},
+                                          {tc2_t::tree_val_src_t::RANGE, 1},
+                                          {tc2_t::tree_val_src_t::RANGE, 2}});
+  srf2_ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)"});
+  srf2_ccplx.dump_cplx(5);
+  srf2_ccplx.write_xml_vtk("parametric_curve_3d-srf2.vtu", "parametric_curve_3d-srf2");
+}
+#+end_src
+
+
+
+
 * Image Processing: Resize PNGs                                    :noexport:
 
 #+begin_src sh  :results output verbatum :exports both
@@ -1296,7 +1392,7 @@ done
 #+begin_example
 skip media/complex_magnitude_surface_rot_10.gif
 skip media/complex_magnitude_surface_rot_25.gif
-make media/complex_magnitude_surface_rot_50.gif
+skip media/complex_magnitude_surface_rot_50.gif
 skip media/implicit_surface_make_10.gif
 skip media/implicit_surface_make_25.gif
 skip media/implicit_surface_make_50.gif
@@ -1305,13 +1401,16 @@ skip media/implicit_surface_rt_rot_25.gif
 skip media/implicit_surface_rt_rot_50.gif
 skip media/lorenz_rot_rot_10.gif
 skip media/lorenz_rot_rot_25.gif
-make media/lorenz_rot_rot_50.gif
+skip media/lorenz_rot_rot_50.gif
+make media/parametric_curve_3d_rot_10.gif
+make media/parametric_curve_3d_rot_25.gif
+make media/parametric_curve_3d_rot_50.gif
 skip media/sq_complex_magnitude_surface_rot_10.gif
 skip media/sq_implicit_surface_rt_rot_10.gif
 skip media/sq_lorenz_rot_rot_10.gif
-make media/trefoil_rot_10.gif
-make media/trefoil_rot_25.gif
-make media/trefoil_rot_50.gif
+skip media/trefoil_rot_10.gif
+skip media/trefoil_rot_25.gif
+skip media/trefoil_rot_50.gif
 #+end_example
 
 * PROGRAM_EXAMPLE                                                  :noexport:
@@ -1381,6 +1480,12 @@ skip media/implicit_surface_rt_rot_100.webm
 skip media/implicit_surface_rt_rot_25.webm
 skip media/implicit_surface_rt_rot_50.webm
 skip media/lorenz_rot_25.webm
+make media/parametric_curve_3d_rot_100_crf30.webm
+make media/parametric_curve_3d_rot_100_lossless.webm
+make media/parametric_curve_3d_rot_25_crf30.webm
+make media/parametric_curve_3d_rot_25_lossless.webm
+make media/parametric_curve_3d_rot_50_crf30.webm
+make media/parametric_curve_3d_rot_50_lossless.webm
 skip media/trefoil_rot_100.webm
 skip media/trefoil_rot_25.webm
 skip media/trefoil_rot_50.webm
@@ -1389,7 +1494,7 @@ skip media/trefoil_rot_50.webm
 ** Create HTML Wrappers
 
 #+begin_src sh :results output verbatum
-for e in complex_magnitude_surface implicit_surface lorenz trefoil; do
+for e in complex_magnitude_surface implicit_surface lorenz trefoil parametric_curve_3d; do
   echo Processing Example $e
   he=$(echo $e | sed 's/_/ /g; s/\b\(.\)/\u\1/g')
   for f in media/$e*.webm; do
@@ -1416,10 +1521,17 @@ Processing Example implicit_surface
   skip media/implicit_surface_rt_rot_25.html
   skip media/implicit_surface_rt_rot_50.html
 Processing Example lorenz
-  make media/lorenz_rot_25.html
+  skip media/lorenz_rot_25.html
 Processing Example trefoil
   skip media/trefoil_rot_100.html
   skip media/trefoil_rot_25.html
   skip media/trefoil_rot_50.html
+Processing Example parametric_curve_3d
+  make media/parametric_curve_3d_rot_100_crf30.html
+  make media/parametric_curve_3d_rot_100_lossless.html
+  make media/parametric_curve_3d_rot_25_crf30.html
+  make media/parametric_curve_3d_rot_25_lossless.html
+  make media/parametric_curve_3d_rot_50_crf30.html
+  make media/parametric_curve_3d_rot_50_lossless.html
 #+end_example
 
