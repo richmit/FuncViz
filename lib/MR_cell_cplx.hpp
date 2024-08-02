@@ -53,8 +53,10 @@
 namespace mjr {
   /** @brief Template Class used hold tessellations of MR_rect_tree geometric data as well as MR_rect_tree point data sets.
 
-      This class's primary use case is to hold tessellations of MR_rect_tree geometric data as well as MR_rect_tree point data sets.  For many applications
-      the final goal is to produce a geometry file.
+      This class's primary use case is to hold tessellations of MR_rect_tree geometric data as well as MR_rect_tree point data sets.  A secondary goal
+      is to preform tessellation manipulations that take advantage of auxiliary knowledge of the function being approximated -- in particular we do *not*
+      attempt to preform tessellation manipulations commonly found in the many available  mesh packages.  Most of the time the final goal of this class
+      is to produce a geometry file to be imported into some other software.
 
       This code is a quick-n-dirty hack job.  I simply wanted to quickly get to a point where I could visually test MR_rect_tree objects.  Logically this
       class should be split into several classes (unique point list, unique cell list, 3D vectors, 3D analytic geometry, etc...).  It's a bit of a mess.
@@ -298,8 +300,8 @@ namespace mjr {
       /** Maps points to point index -- used to detect physically identical points in R^3 */
       pnt_to_pnt_idx_map_t pnt_to_pnt_idx_map;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Maps point index to points -- the master point list */
-      pnt_idx_to_pnt_t pnt_idx_to_pnt;
+      /** Return point given index */
+      inline pnt_t get_pnt(pnt_idx_t pnt_idx) const { return get_dataset_vector(data_to_pnt, pnt_idx_to_pnt_data[pnt_idx]); }
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -393,12 +395,12 @@ namespace mjr {
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Retruns the index of the last point given to the add_point() method. */
-      pnt_idx_t idx_of_last_point_added() const {
+      inline pnt_idx_t idx_of_last_point_added() const {
         return last_point_idx;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Retruns true if the last point given to the add_point() method was a new point. */
-      pnt_idx_t last_point_added_was_new() const {
+      inline pnt_idx_t last_point_added_was_new() const {
         return last_point_new;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -408,11 +410,11 @@ namespace mjr {
            - The given point is already on the list: last_point_idx is ste to the existing point's index, and last_point_new=false
            - The given point is not on the list: last_point_idx is set to th enew piont's index, and last_point_new=true
           Note that last_point_idx is always the resturn value. */
-      pnt_idx_t add_point(pnt_data_t pnt_data) {
+      inline pnt_idx_t add_point(pnt_data_t pnt_data) {
         if (data_to_pnt.empty())
           data_to_pnt = {0, 1, 2};
         pnt_t new_pnt = get_dataset_vector(data_to_pnt, pnt_data);
-        if (std::isnan(new_pnt[0]) || std::isnan(new_pnt[1]) || std::isnan(new_pnt[2])) {
+        if (pnt_has_nan(new_pnt)) {
           last_point_idx = -1;
           last_point_new = false;
         } else {
@@ -425,14 +427,14 @@ namespace mjr {
               /* Point is not already in list */
               last_point_idx = num_points();
               pnt_to_pnt_idx_map[new_pnt] = last_point_idx;
-              pnt_idx_to_pnt.push_back(new_pnt);
+              //pnt_idx_to_pnt.push_back(new_pnt);
               pnt_idx_to_pnt_data.push_back(pnt_data);
               last_point_new = true;
             }
           } else {
             /* Add point without regard to uniqueness */
             last_point_idx = num_points();
-            pnt_idx_to_pnt.push_back(new_pnt);
+            //pnt_idx_to_pnt.push_back(new_pnt);
             pnt_idx_to_pnt_data.push_back(pnt_data);
             last_point_new = true;
           }
@@ -443,7 +445,7 @@ namespace mjr {
       /** Print number of points in master point list.
           Note the return type is pnt_idx_t (a signed integer type) and not a size_t. */
       pnt_idx_t num_points() const {
-        return static_cast<pnt_idx_t>(pnt_idx_to_pnt.size());
+        return static_cast<pnt_idx_t>(pnt_idx_to_pnt_data.size());  // Yes.  We mean pnt_idx_to_pnt_data.
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Convert a pnt_t to a string representation */
@@ -451,7 +453,7 @@ namespace mjr {
         std::ostringstream convert;
         if (pnt_idx >= 0) {
         convert << "[ ";
-        for(auto c: pnt_idx_to_pnt[pnt_idx])
+        for(auto c: get_pnt(pnt_idx))
           convert << std::setprecision(5) << static_cast<uft_t>(c) << " ";
         convert << "]";
         } else {
@@ -597,9 +599,8 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Determine the nature of the intersection between two line segments */
       seg_isect_t geomi_seg_isect_type(pnt_idx_t ilin1pnt1, pnt_idx_t ilin1pnt2, pnt_idx_t ilin2pnt1, pnt_idx_t ilin2pnt2) const {
-        //  MJR TODO NOTE geomi_seg_isect_type: Repeated point look-up slows things down
-        //  MJR TODO NOTE geomi_seg_isect_type: Optimize
-        //  MJR TODO NOTE geomi_seg_isect_type: Add unit tests for each code branch
+        //  MJR TODO NOTE <2024-08-02T09:41:48-0500> geomi_seg_isect_type: Repeated point look-up slows things down
+        //  MJR TODO NOTE <2024-08-02T09:41:48-0500> geomi_seg_isect_type: Add unit tests for each code branch
         // Check for degenerate segments
         if (ilin1pnt1 == ilin1pnt2)
           return seg_isect_t::BAD_SEGMENT;
@@ -662,7 +663,7 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if two line segments intersect in a single point */
       bool geomi_seg_isect1(pnt_idx_t ilin1pnt1, pnt_idx_t ilin1pnt2, pnt_idx_t ilin2pnt1, pnt_idx_t ilin2pnt2) const {
-        return geomr_seg_isect1(pnt_idx_to_pnt[ilin1pnt1], pnt_idx_to_pnt[ilin1pnt2], pnt_idx_to_pnt[ilin2pnt1], pnt_idx_to_pnt[ilin2pnt2]);
+        return geomr_seg_isect1(get_pnt(ilin1pnt1), get_pnt(ilin1pnt2), get_pnt(ilin2pnt1), get_pnt(ilin2pnt2));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if two line segments intersect in a single point */
@@ -694,7 +695,7 @@ namespace mjr {
       /** Distance between a point and a line. 
           See: geomr_pnt_line_distance(). */
       uft_t geomi_pnt_line_distance(pnt_idx_t ilinpnt1, pnt_idx_t ilinpnt2, pnt_idx_t ipnt, bool seg_distance) const {
-        return geomr_pnt_line_distance(pnt_idx_to_pnt[ilinpnt1], pnt_idx_to_pnt[ilinpnt2], pnt_idx_to_pnt[ipnt], seg_distance);
+        return geomr_pnt_line_distance(get_pnt(ilinpnt1), get_pnt(ilinpnt2), get_pnt(ipnt), seg_distance);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Distance between a point and a line.
@@ -716,7 +717,8 @@ namespace mjr {
         if (seg_distance) {
           uft_t dp1 = geomr_pnt_pnt_distance(linpnt1, p);
           uft_t dp2 = geomr_pnt_pnt_distance(linpnt2, p);
-          if (std::abs((dp1+dp2)-segd) > eps) // MJR TODO NOTE: check logic -- dp1>segd || dp2>segd?
+          //  MJR TODO NOTE <2024-08-02T09:42:19-0500> geomr_pnt_line_distance: check logic -- dp1>segd || dp2>segd?
+          if (std::abs((dp1+dp2)-segd) > eps)
             return std::min(geomr_pnt_pnt_distance(linpnt1, pnt), geomr_pnt_pnt_distance(linpnt2, pnt));
         }
         return geomr_pnt_pnt_distance(p, pnt);
@@ -748,7 +750,7 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the distance between a point and a triangle */
       uft_t geomr_pnt_tri_distance(const pnt_t& tripnt1, const pnt_t& tripnt2, const pnt_t& tripnt3, const pnt_t& pnt) const {
-        //  MJR TODO NOTE <2024-07-22T15:48:31-0500> geomr_pnt_tri_distance: NOT PASSING UNIT TESTS!!!
+        //  MJR TODO NOTE <2024-07-22T15:48:31-0500> geomr_pnt_tri_distance: UNTESTED! UNTESTED! UNTESTED! UNTESTED! UNTESTED! 
         pnt_t basisv1 = vec3_diff(tripnt1, tripnt2);  // basis vectors for pln containing triagnel
         pnt_t basisv2 = vec3_diff(tripnt3, tripnt2);  // basis vectors for pln containing triagnel
         pnt_t normal = vec3_cross_product(basisv1, basisv2); // normal vector for tri. ax+by+cz+d=0, a=normal[0], b=normal[1], c=normal[2]
@@ -780,13 +782,13 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if points are colinear */
       bool geomi_pts_colinear(pnt_idx_t pi1, pnt_idx_t pi2, pnt_idx_t pi3, pnt_idx_t pi4) const {
-        return ( geomr_pts_colinear(pnt_idx_to_pnt[pi1], pnt_idx_to_pnt[pi2], pnt_idx_to_pnt[pi3]) &&
-                 geomr_pts_colinear(pnt_idx_to_pnt[pi1], pnt_idx_to_pnt[pi2], pnt_idx_to_pnt[pi4]) );
+        return ( geomr_pts_colinear(get_pnt(pi1), get_pnt(pi2), get_pnt(pi3)) &&
+                 geomr_pts_colinear(get_pnt(pi1), get_pnt(pi2), get_pnt(pi4)) );
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if points are colinear. */
       bool geomi_pts_colinear(pnt_idx_t pi1, pnt_idx_t pi2, pnt_idx_t pi3) const {
-        return geomr_pts_colinear(pnt_idx_to_pnt[pi1], pnt_idx_to_pnt[pi2], pnt_idx_to_pnt[pi3]);
+        return geomr_pts_colinear(get_pnt(pi1), get_pnt(pi2), get_pnt(pi3));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if points are colinear */
@@ -808,7 +810,7 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if points are coplanar */
       bool geomi_pts_coplanar(pnt_idx_t pi1, pnt_idx_t pi2, pnt_idx_t pi3, pnt_idx_t pi4) const {
-        return geomr_pts_coplanar(pnt_idx_to_pnt[pi1], pnt_idx_to_pnt[pi2], pnt_idx_to_pnt[pi3], pnt_idx_to_pnt[pi4]);
+        return geomr_pts_coplanar(get_pnt(pi1), get_pnt(pi2), get_pnt(pi3), get_pnt(pi4));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if points are coplanar */
@@ -834,7 +836,7 @@ namespace mjr {
         last_point_idx = -1;
         last_point_new = true;
         pnt_to_pnt_idx_map.clear();
-        pnt_idx_to_pnt.clear();
+        //pnt_idx_to_pnt.clear();
         pnt_idx_to_pnt_data.clear();
         data_name_to_data_idx_lst.clear();
         data_to_pnt.clear();
@@ -1184,7 +1186,7 @@ namespace mjr {
           @param cell_type The type for a_cell.
           @param a_cell    The cell to test.  */
       cell_stat_t check_cell_face_intersections(cell_type_t cell_type, cell_t a_cell) const {
-        //  MJR TODO NOTE check_cell_face_intersections: Implement
+        //  MJR TODO NOTE <2024-08-02T09:42:38-0500> check_cell_face_intersections: Implement
         if (cell_type == cell_type_t::HEXAHEDRON) {
           if ( geomi_pts_coplanar(a_cell))
             return cell_stat_t::DIM_LOW;
@@ -1405,8 +1407,10 @@ namespace mjr {
         }
         outStream << "      <Points>" << std::endl;
         outStream << "        <DataArray Name='Points' type='Float64' format='ascii' NumberOfComponents='3'>" << std::endl;
-        for (const auto& pnt : pnt_idx_to_pnt) 
+        for(pnt_idx_t pnt_idx=0; pnt_idx<static_cast<pnt_idx_t>(pnt_idx_to_pnt_data.size()); pnt_idx++) {
+          pnt_t pnt = get_pnt(pnt_idx);
           outStream << "          " << std::setprecision(10) << pnt[0] << " " << pnt[1] << " " << pnt[2] << std::endl;
+        }
         outStream << "        </DataArray>" << std::endl;
         outStream << "      </Points>" << std::endl;
         outStream << "      <Cells>" << std::endl;
@@ -1478,7 +1482,9 @@ namespace mjr {
           outStream << "DATASET UNSTRUCTURED_GRID" << std::endl;
           /* Dump the points */
           outStream << "POINTS " << num_points() << " double" << std::endl;
-          for (const auto& pnt : pnt_idx_to_pnt) {
+          //for (const auto& pnt : pnt_idx_to_pnt) 
+          for(pnt_idx_t pnt_idx=0; pnt_idx<static_cast<pnt_idx_t>(pnt_idx_to_pnt_data.size()); pnt_idx++) {
+            pnt_t pnt = get_pnt(pnt_idx);
             outStream << std::setprecision(10) << pnt[0] << " " << pnt[1] << " " << pnt[2] << std::endl;
           }
           /* Dump the cell data */
@@ -1541,7 +1547,7 @@ namespace mjr {
       void dump_cplx(int max_num_print) const {
         std::cout << "Meta Data" << std::endl;
         std::cout << "  Points ............. " << num_points() << std::endl;
-        std::cout << "  Data Points Per Point ... " << pnt_idx_to_pnt_data.size() << std::endl;
+        std::cout << "  Data Scalars Per Point .. " << pnt_idx_to_pnt_data.size() << std::endl;
         std::cout << "  Named Data Sets ......... " << named_datasets_count() << std::endl;
         std::cout << "    Scalar Data Sets ...... " << named_scalar_datasets_count() << std::endl;
         std::cout << "    Vector Data Sets ...... " << named_vector_datasets_count() << std::endl;
@@ -1609,7 +1615,7 @@ namespace mjr {
         outStream << "end_header" << std::endl;
         // Dump Vertex Data
         for (int i=0; i<num_points(); i++) {
-          pnt_t pnt = pnt_idx_to_pnt[i];
+          pnt_t pnt = get_pnt(i);
           outStream << std::setprecision(10) << pnt[0] << " " << pnt[1] << " " << pnt[2];
           if (have_colors_data) {
             vdat_t clr = get_dataset_vector(data_name_to_data_idx_lst["COLORS"], pnt_idx_to_pnt_data[i]);
@@ -1638,28 +1644,73 @@ namespace mjr {
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /** @name Point Tests & Predicates */
+      //@{
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Return true if any component of the point has a NaN.
+          @param test_pnt The point to test */
+      inline bool pnt_has_nan(const pnt_t& test_pnt) {
+        return (std::isnan(test_pnt[0]) || std::isnan(test_pnt[1]) || std::isnan(test_pnt[2]));
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Return 0 if point is close to the level, -1 if it is below the level, and 1 if it is above the level. 
+          @param test_pnt      The point to test 
+          @param axis_index    Which axis to compare to the level
+          @param level         Level to test aginst
+          @param close_epsilon Epsilon used to check for "closeness". */
+      inline int pnt_vs_level(const pnt_t& test_pnt, int axis_index, uft_t level, uft_t close_epsilon=epsilon) {
+        if (std::abs(test_pnt[axis_index]-level) < close_epsilon) 
+          return 0;
+        else if(test_pnt[axis_index] < level)
+          return -1;
+        else 
+          return 1;
+      }
+      //@}
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /** @name Cell Predicates */
+      //@{
+      //@}
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /** @name Complex Computation. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Function that takes and returns a pnt_data_t */
+      typedef std::function<pnt_data_t(const pnt_data_t&)> pdfunc_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Add new cells with points from existing cells with the given coordinates negated. 
+
+          When zero_epsilon is positive, some existing points may be adjusted such that components on the flipped axis near zero will become zero.  When
+          uniq_points is true, both the original point coordinates and the new point coordinates will be mapped to the same point index -- that is to say if
+          you add a new point to the complex with the old coordinates or the new coordinates, you will get the same index.  Note that a point collision may
+          occur if the adjusted point is equal-ish to another, existing point -- a message is printed when this occurs.
+
           @param flip_list    A vector of booleans (0 or 1).  1 indicates the coordinate in a pnt_data_t vector should be negated.
-          @param zero_epsilon If non-negative, will zero out flipped coorinates near zero.
+          @param zero_epsilon If non-negative, will collapse flipped coorinates near zero to be precicely zero.
        */
-      int mirror(std::vector<int> flip_list, uft_t zero_epsilon=epsilon*1000, bool reverse_vertex_order=true) {
+      void mirror(std::vector<int> flip_list, uft_t zero_epsilon=epsilon*1000, bool reverse_vertex_order=true) {
         int num_start_cells = num_cells();
-        for(int i=0; i<num_start_cells; ++i) {
+        for(int cell_idx=0; cell_idx<num_start_cells; ++cell_idx) {
           cell_t new_cell;
-          for(auto pidx: cell_lst[i]) {
+          for(auto pidx: cell_lst[cell_idx]) {
             pnt_data_t od = pnt_idx_to_pnt_data[pidx];
-            for(int j=0; j<static_cast<int>(flip_list.size()); ++j)
-              if ((flip_list[j]) && (std::abs(od[j]) < zero_epsilon))
-                od[j] = 0;
+            for(int flip_list_idx=0; flip_list_idx<static_cast<int>(flip_list.size()); ++flip_list_idx)
+              if ((flip_list[flip_list_idx]) && (std::abs(od[flip_list_idx]) < zero_epsilon))
+                od[flip_list_idx] = 0;
             pnt_idx_to_pnt_data[pidx] = od;
-            pnt_idx_to_pnt[pidx] = get_dataset_vector(data_to_pnt, od);
+            pnt_t new_old_pnt = get_dataset_vector(data_to_pnt, od);
+            if constexpr (uniq_points) {
+              if (pnt_to_pnt_idx_map.contains(new_old_pnt)) 
+                if (pnt_to_pnt_idx_map[new_old_pnt] != pidx) 
+                  std::cout << "ERROR(mirror): Collapse caused collision!" << std::endl;
+              pnt_to_pnt_idx_map[new_old_pnt] = pidx;
+            }
             pnt_data_t nd = od;
-            for(int j=0; j<static_cast<int>(flip_list.size()); ++j) 
-              if (flip_list[j])
-                nd[j] = -nd[j];
+            for(int flip_list_idx=0; flip_list_idx<static_cast<int>(flip_list.size()); ++flip_list_idx) 
+              if (flip_list[flip_list_idx])
+                nd[flip_list_idx] = -nd[flip_list_idx];
             pnt_idx_t p = add_point(nd);
             new_cell.push_back(p);
           }
@@ -1667,10 +1718,8 @@ namespace mjr {
             std::reverse(new_cell.begin(), new_cell.end());
           add_cell(req_pt_cnt_to_cell_type(new_cell.size()), new_cell);
         }
-        return 0;
       }
       //@}
-
 
   };
 
