@@ -29,9 +29,9 @@
 
 #+BEGIN_CENTER
 [[file:media/complex_magnitude_surface_rot_50.gif][file:media/sq_complex_magnitude_surface_rot_10.gif]]
-[[file:media/implicit_surface_rt_rot_50.gif][file:media/sq_implicit_surface_rt_rot_10.gif]]
+[[file:media/implicit_surface_rot_50.gif][file:media/sq_implicit_surface_rot_10.gif]]
 [[file:media/implicit_surface_make_50.gif][file:media/implicit_surface_make_10.gif]]
-[[file:media/lorenz_rot_rot_50.gif][file:media/sq_lorenz_rot_rot_10.gif]]
+[[file:media/lorenz_rot_50.gif][file:media/sq_lorenz_rot_10.gif]]
 #+END_CENTER
 
 #+ATTR_HTML: :border 2 solid #ccc :frame hsides :align center
@@ -104,7 +104,7 @@ grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/complex_magn
 
 #+BEGIN_CENTER
 [[file:media/complex_magnitude_surface-2D_100.png][file:media/complex_magnitude_surface-2D_10.png]]
-[[file:media/complex_magnitude_surface_rot_100.html][file:media/complex_magnitude_surface_rot_10.gif]]
+[[file:media/complex_magnitude_surface_rot_100_crf30.html][file:media/complex_magnitude_surface_rot_10.gif]]
 #+END_CENTER
 
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/complex_magnitude_surface.cpp
@@ -364,7 +364,7 @@ grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/implicit_sur
 
 
 #+BEGIN_CENTER
-[[file:media/implicit_surface_rt_rot_100.html][file:media/implicit_surface_rt_rot_10.gif]]
+[[file:media/implicit_surface_rot_100_crf30.html][file:media/implicit_surface_rot_10.gif]]
 [[file:media/implicit_surface_make_50.gif][file:media/implicit_surface_make_10.gif]]
 #+END_CENTER
 
@@ -442,7 +442,7 @@ grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/vector_field
 
 #+BEGIN_CENTER
 [[file:media/lorenz_100.png][file:media/lorenz_10.png]]
-[[file:media/lorenz_rot_rot_50.gif][file:media/lorenz_rot_rot_10.gif]]
+[[file:media/lorenz_rot_50.gif][file:media/lorenz_rot_10.gif]]
 #+END_CENTER
 
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/vector_field_3d.cpp
@@ -1173,7 +1173,7 @@ grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/trefoil.cpp 
   This example doesn't really demonstrate anything not found in the other examples.  It's just a neat surface. ;)
 
 #+BEGIN_CENTER
-[[file:media/trefoil_rot_50.html][file:media/trefoil_rot_10.gif]]
+[[file:media/trefoil_rot_50_crf30.html][file:media/trefoil_rot_10.gif]]
 #+END_CENTER
 
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/trefoil.cpp
@@ -1459,7 +1459,7 @@ NEWER: ../../examples/vector_field_3d.cpp
 ** Put media in place
 
 #+begin_src sh  :results output verbatum :exports both
-for f in ../../paraview/*.webm; do
+for f in ../../paraview/*_crf30.webm; do
   b=$(echo $f | sed 's/^.*\///')
   fn="media/${b}"
   if [ $f -nt $fn ]; then
@@ -1473,22 +1473,21 @@ done
 
 #+RESULTS:
 #+begin_example
-skip media/complex_magnitude_surface_rot_100.webm
-skip media/complex_magnitude_surface_rot_25.webm
-skip media/complex_magnitude_surface_rot_50.webm
-skip media/implicit_surface_rt_rot_100.webm
-skip media/implicit_surface_rt_rot_25.webm
-skip media/implicit_surface_rt_rot_50.webm
-skip media/lorenz_rot_25.webm
-make media/parametric_curve_3d_rot_100_crf30.webm
-make media/parametric_curve_3d_rot_100_lossless.webm
-make media/parametric_curve_3d_rot_25_crf30.webm
-make media/parametric_curve_3d_rot_25_lossless.webm
-make media/parametric_curve_3d_rot_50_crf30.webm
-make media/parametric_curve_3d_rot_50_lossless.webm
-skip media/trefoil_rot_100.webm
-skip media/trefoil_rot_25.webm
-skip media/trefoil_rot_50.webm
+skip media/complex_magnitude_surface_rot_100_crf30.webm
+skip media/complex_magnitude_surface_rot_25_crf30.webm
+skip media/complex_magnitude_surface_rot_50_crf30.webm
+skip media/implicit_surface_rot_100_crf30.webm
+skip media/implicit_surface_rot_25_crf30.webm
+skip media/implicit_surface_rot_50_crf30.webm
+skip media/lorenz_rot_100_crf30.webm
+skip media/lorenz_rot_25_crf30.webm
+skip media/lorenz_rot_50_crf30.webm
+skip media/parametric_curve_3d_rot_100_crf30.webm
+skip media/parametric_curve_3d_rot_25_crf30.webm
+skip media/parametric_curve_3d_rot_50_crf30.webm
+make media/trefoil_rot_100_crf30.webm
+make media/trefoil_rot_25_crf30.webm
+make media/trefoil_rot_50_crf30.webm
 #+end_example
 
 ** Create HTML Wrappers
@@ -1497,7 +1496,7 @@ skip media/trefoil_rot_50.webm
 for e in complex_magnitude_surface implicit_surface lorenz trefoil parametric_curve_3d; do
   echo Processing Example $e
   he=$(echo $e | sed 's/_/ /g; s/\b\(.\)/\u\1/g')
-  for f in media/$e*.webm; do
+  for f in media/$e*_crf30.webm; do
     b=$(echo $f | sed 's/\.webm$//; s/^.*\///')
     fn="media/${b}.html"
     if [ "$f" -nt "$fn" -o 'misc/movie_template.html' -nt "$fn" ]; then
@@ -1513,25 +1512,24 @@ done
 #+RESULTS:
 #+begin_example
 Processing Example complex_magnitude_surface
-  skip media/complex_magnitude_surface_rot_100.html
-  skip media/complex_magnitude_surface_rot_25.html
-  skip media/complex_magnitude_surface_rot_50.html
+  make media/complex_magnitude_surface_rot_100_crf30.html
+  make media/complex_magnitude_surface_rot_25_crf30.html
+  make media/complex_magnitude_surface_rot_50_crf30.html
 Processing Example implicit_surface
-  skip media/implicit_surface_rt_rot_100.html
-  skip media/implicit_surface_rt_rot_25.html
-  skip media/implicit_surface_rt_rot_50.html
+  make media/implicit_surface_rot_100_crf30.html
+  make media/implicit_surface_rot_25_crf30.html
+  make media/implicit_surface_rot_50_crf30.html
 Processing Example lorenz
-  skip media/lorenz_rot_25.html
+  make media/lorenz_rot_100_crf30.html
+  make media/lorenz_rot_25_crf30.html
+  make media/lorenz_rot_50_crf30.html
 Processing Example trefoil
-  skip media/trefoil_rot_100.html
-  skip media/trefoil_rot_25.html
-  skip media/trefoil_rot_50.html
+  make media/trefoil_rot_100_crf30.html
+  make media/trefoil_rot_25_crf30.html
+  make media/trefoil_rot_50_crf30.html
 Processing Example parametric_curve_3d
   make media/parametric_curve_3d_rot_100_crf30.html
-  make media/parametric_curve_3d_rot_100_lossless.html
   make media/parametric_curve_3d_rot_25_crf30.html
-  make media/parametric_curve_3d_rot_25_lossless.html
   make media/parametric_curve_3d_rot_50_crf30.html
-  make media/parametric_curve_3d_rot_50_lossless.html
 #+end_example
 
