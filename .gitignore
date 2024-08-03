@@ -5,3 +5,4 @@
 *.log
 /old-media
 /paraview/*_lossless.webm
+/paraview/*readme*

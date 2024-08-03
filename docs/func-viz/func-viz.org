@@ -5,7 +5,7 @@
 #+AUTHOR:      Mitch Richling
 #+EMAIL:       http://www.mitchr.me/
 #+DATE:        2024-07-16
-#+DESCRIPTION: DESCRIPTION FIXME
+#+DESCRIPTION: Notes on function visualization examples that ship with MRPTree
 #+KEYWORDS:    KEYWORDS FIXME
 #+LANGUAGE:    en
 #+OPTIONS:     num:t toc:nil \n:nil @:t ::t |:t ^:nil -:t f:t *:t <:t skip:nil d:nil todo:t pri:nil H:5 p:t author:t html-scripts:nil 
@@ -28,10 +28,10 @@
 # ######################################################################################################################################################.H.E.##
 
 #+BEGIN_CENTER
-[[file:media/complex_magnitude_surface_rot_50.gif][file:media/sq_complex_magnitude_surface_rot_10.gif]]
-[[file:media/implicit_surface_rot_50.gif][file:media/sq_implicit_surface_rot_10.gif]]
-[[file:media/implicit_surface_make_50.gif][file:media/implicit_surface_make_10.gif]]
-[[file:media/lorenz_rot_50.gif][file:media/sq_lorenz_rot_10.gif]]
+[[#complex_magnitude_surface][file:media/sq_complex_magnitude_surface_rot_10.gif]]
+[[#implicit_surface][file:media/sq_implicit_surface_rot_10.gif]]
+[[#implicit_surface][file:media/implicit_surface_make_10.gif]]
+[[#vector_field_3d][file:media/sq_lorenz_rot_10.gif]]
 #+END_CENTER
 
 #+ATTR_HTML: :border 2 solid #ccc :frame hsides :align center
@@ -442,7 +442,7 @@ grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/vector_field
 
 #+BEGIN_CENTER
 [[file:media/lorenz_100.png][file:media/lorenz_10.png]]
-[[file:media/lorenz_rot_50.gif][file:media/lorenz_rot_10.gif]]
+[[file:media/lorenz_rot_50_crf30.html][file:media/lorenz_rot_10.gif]]
 #+END_CENTER
 
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/vector_field_3d.cpp
@@ -1396,21 +1396,21 @@ skip media/complex_magnitude_surface_rot_50.gif
 skip media/implicit_surface_make_10.gif
 skip media/implicit_surface_make_25.gif
 skip media/implicit_surface_make_50.gif
-skip media/implicit_surface_rt_rot_10.gif
-skip media/implicit_surface_rt_rot_25.gif
-skip media/implicit_surface_rt_rot_50.gif
-skip media/lorenz_rot_rot_10.gif
-skip media/lorenz_rot_rot_25.gif
-skip media/lorenz_rot_rot_50.gif
-make media/parametric_curve_3d_rot_10.gif
-make media/parametric_curve_3d_rot_25.gif
-make media/parametric_curve_3d_rot_50.gif
+skip media/implicit_surface_rot_10.gif
+skip media/implicit_surface_rot_25.gif
+skip media/implicit_surface_rot_50.gif
+skip media/lorenz_rot_10.gif
+skip media/lorenz_rot_25.gif
+skip media/lorenz_rot_50.gif
+skip media/parametric_curve_3d_rot_10.gif
+skip media/parametric_curve_3d_rot_25.gif
+skip media/parametric_curve_3d_rot_50.gif
 skip media/sq_complex_magnitude_surface_rot_10.gif
-skip media/sq_implicit_surface_rt_rot_10.gif
-skip media/sq_lorenz_rot_rot_10.gif
-skip media/trefoil_rot_10.gif
-skip media/trefoil_rot_25.gif
-skip media/trefoil_rot_50.gif
+skip media/sq_implicit_surface_rot_10.gif
+skip media/sq_lorenz_rot_10.gif
+make media/trefoil_rot_10.gif
+make media/trefoil_rot_25.gif
+make media/trefoil_rot_50.gif
 #+end_example
 
 * PROGRAM_EXAMPLE                                                  :noexport:
@@ -1479,15 +1479,15 @@ skip media/complex_magnitude_surface_rot_50_crf30.webm
 skip media/implicit_surface_rot_100_crf30.webm
 skip media/implicit_surface_rot_25_crf30.webm
 skip media/implicit_surface_rot_50_crf30.webm
-skip media/lorenz_rot_100_crf30.webm
-skip media/lorenz_rot_25_crf30.webm
-skip media/lorenz_rot_50_crf30.webm
+make media/lorenz_rot_100_crf30.webm
+make media/lorenz_rot_25_crf30.webm
+make media/lorenz_rot_50_crf30.webm
 skip media/parametric_curve_3d_rot_100_crf30.webm
 skip media/parametric_curve_3d_rot_25_crf30.webm
 skip media/parametric_curve_3d_rot_50_crf30.webm
-make media/trefoil_rot_100_crf30.webm
-make media/trefoil_rot_25_crf30.webm
-make media/trefoil_rot_50_crf30.webm
+skip media/trefoil_rot_100_crf30.webm
+skip media/trefoil_rot_25_crf30.webm
+skip media/trefoil_rot_50_crf30.webm
 #+end_example
 
 ** Create HTML Wrappers
@@ -1512,24 +1512,24 @@ done
 #+RESULTS:
 #+begin_example
 Processing Example complex_magnitude_surface
-  make media/complex_magnitude_surface_rot_100_crf30.html
-  make media/complex_magnitude_surface_rot_25_crf30.html
-  make media/complex_magnitude_surface_rot_50_crf30.html
+  skip media/complex_magnitude_surface_rot_100_crf30.html
+  skip media/complex_magnitude_surface_rot_25_crf30.html
+  skip media/complex_magnitude_surface_rot_50_crf30.html
 Processing Example implicit_surface
-  make media/implicit_surface_rot_100_crf30.html
-  make media/implicit_surface_rot_25_crf30.html
-  make media/implicit_surface_rot_50_crf30.html
+  skip media/implicit_surface_rot_100_crf30.html
+  skip media/implicit_surface_rot_25_crf30.html
+  skip media/implicit_surface_rot_50_crf30.html
 Processing Example lorenz
   make media/lorenz_rot_100_crf30.html
   make media/lorenz_rot_25_crf30.html
   make media/lorenz_rot_50_crf30.html
 Processing Example trefoil
-  make media/trefoil_rot_100_crf30.html
-  make media/trefoil_rot_25_crf30.html
-  make media/trefoil_rot_50_crf30.html
+  skip media/trefoil_rot_100_crf30.html
+  skip media/trefoil_rot_25_crf30.html
+  skip media/trefoil_rot_50_crf30.html
 Processing Example parametric_curve_3d
-  make media/parametric_curve_3d_rot_100_crf30.html
-  make media/parametric_curve_3d_rot_25_crf30.html
-  make media/parametric_curve_3d_rot_50_crf30.html
+  skip media/parametric_curve_3d_rot_100_crf30.html
+  skip media/parametric_curve_3d_rot_25_crf30.html
+  skip media/parametric_curve_3d_rot_50_crf30.html
 #+end_example
 
