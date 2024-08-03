@@ -1469,6 +1469,7 @@ for f in ../../paraview/*_crf30.webm; do
     echo skip $fn
   fi
 done
+rm media/lorenz_rot_100_crf30.webm
 #+end_src
 
 #+RESULTS:
@@ -1479,9 +1480,9 @@ skip media/complex_magnitude_surface_rot_50_crf30.webm
 skip media/implicit_surface_rot_100_crf30.webm
 skip media/implicit_surface_rot_25_crf30.webm
 skip media/implicit_surface_rot_50_crf30.webm
-make media/lorenz_rot_100_crf30.webm
-make media/lorenz_rot_25_crf30.webm
-make media/lorenz_rot_50_crf30.webm
+skip media/lorenz_rot_100_crf30.webm
+skip media/lorenz_rot_25_crf30.webm
+skip media/lorenz_rot_50_crf30.webm
 skip media/parametric_curve_3d_rot_100_crf30.webm
 skip media/parametric_curve_3d_rot_25_crf30.webm
 skip media/parametric_curve_3d_rot_50_crf30.webm
@@ -1520,9 +1521,8 @@ Processing Example implicit_surface
   skip media/implicit_surface_rot_25_crf30.html
   skip media/implicit_surface_rot_50_crf30.html
 Processing Example lorenz
-  make media/lorenz_rot_100_crf30.html
-  make media/lorenz_rot_25_crf30.html
-  make media/lorenz_rot_50_crf30.html
+  skip media/lorenz_rot_25_crf30.html
+  skip media/lorenz_rot_50_crf30.html
 Processing Example trefoil
   skip media/trefoil_rot_100_crf30.html
   skip media/trefoil_rot_25_crf30.html
