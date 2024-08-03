@@ -1,4 +1,7 @@
 *~
+#*
+.#*
 *.aux
 *.log
 /old-media
+/paraview/*_lossless.webm
