@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-08-02 Fri 19:45 -->
+<!-- 2024-08-04 Sun 14:46 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Function Visualization</title>
@@ -272,12 +272,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-08-02 19:45:10</i></td>
+<td class="org-left"><i>2024-08-04 14:46:42</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-08-02 19:45:11</i></td>
+<td class="org-left"><i>2024-08-04 14:46:43</i></td>
 </tr>
 </tbody>
 </table>
@@ -290,18 +290,26 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
 <li><a href="#intro">1. Introduction</a></li>
-<li><a href="#complex_magnitude_surface">2. Complex Magnitude Surface Plot</a></li>
-<li><a href="#implicit_curve_2d">3. Implicit Curve</a></li>
-<li><a href="#implicit_surface">4. Implicit Surface</a></li>
-<li><a href="#vector_field_3d">5. 3D Vector Field</a></li>
-<li><a href="#surface_with_normals">6. Surface Plot With Normals</a></li>
-<li><a href="#surface_plot_edge">7. Surface Plot With An Edge</a></li>
-<li><a href="#surface_branch_glue">8. Surface Branches &amp; Glue</a></li>
-<li><a href="#curve_plot">9. Curve Plot</a></li>
-<li><a href="#parametric_surface_with_defects">10. Parametric Surface With Defects</a></li>
-<li><a href="#performance_with_large_surface">11. High Resolution Parametric Surface</a></li>
-<li><a href="#trefoil">12. Trefoil Parametric Surface</a></li>
-<li><a href="#parametric_curve_3d">13. Twisted Cubic As A Surface Intersection</a></li>
+<li><a href="#core_examples">2. Core Examples</a>
+<ul>
+<li><a href="#complex_magnitude_surface">2.1. Complex Magnitude Surface Plot</a></li>
+<li><a href="#implicit_curve_2d">2.2. Implicit Curve</a></li>
+<li><a href="#implicit_surface">2.3. Implicit Surface</a></li>
+<li><a href="#vector_field_3d">2.4. 3D Vector Field</a></li>
+<li><a href="#surface_with_normals">2.5. Surface Plot With Normals</a></li>
+<li><a href="#surface_plot_edge">2.6. Surface Plot With An Edge</a></li>
+<li><a href="#surface_branch_glue">2.7. Surface Branches &amp; Glue</a></li>
+<li><a href="#curve_plot">2.8. Curve Plot</a></li>
+<li><a href="#parametric_surface_with_defects">2.9. Parametric Surface With Defects</a></li>
+<li><a href="#performance_with_large_surface">2.10. High Resolution Parametric Surface</a></li>
+</ul>
+</li>
+<li><a href="#extra_examples">3. Extra Examples</a>
+<ul>
+<li><a href="#trefoil">3.1. Trefoil Parametric Surface</a></li>
+<li><a href="#parametric_curve_3d">3.2. Twisted Cubic As A Surface Intersection</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -342,9 +350,17 @@ In some cases we preform post processing or use other tools: VisIT, meshlab, POV
 </div>
 </div>
 
-<div id="outline-container-complex_magnitude_surface" class="outline-2">
-<h2 id="complex_magnitude_surface"><span class="section-number-2">2.</span> Complex Magnitude Surface Plot</h2>
-<div class="outline-text-2" id="text-complex_magnitude_surface">
+<div id="outline-container-core_examples" class="outline-2">
+<h2 id="core_examples"><span class="section-number-2">2.</span> Core Examples</h2>
+<div class="outline-text-2" id="text-core_examples">
+<p>
+This group of core examples is intended to illistrate various features of MRPTree.
+</p>
+</div>
+
+<div id="outline-container-complex_magnitude_surface" class="outline-3">
+<h3 id="complex_magnitude_surface"><span class="section-number-3">2.1.</span> Complex Magnitude Surface Plot</h3>
+<div class="outline-text-3" id="text-complex_magnitude_surface">
 <p>
 One popular way to plot complex functions is to use a surface plot of \(\vert f(z)\vert\) and color the surface with \(\arg(f(z))\).  This way we can
 simultaneously represent the magnitude and phase over the complex plane.  There are several ways to color the plots, and we will be following the method
@@ -525,9 +541,10 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/comp
 </div>
 </div>
 
-<div id="outline-container-implicit_curve_2d" class="outline-2">
-<h2 id="implicit_curve_2d"><span class="section-number-2">3.</span> Implicit Curve</h2>
-<div class="outline-text-2" id="text-implicit_curve_2d">
+
+<div id="outline-container-implicit_curve_2d" class="outline-3">
+<h3 id="implicit_curve_2d"><span class="section-number-3">2.2.</span> Implicit Curve</h3>
+<div class="outline-text-3" id="text-implicit_curve_2d">
 <p>
 For many of us our first exposure to an implicit curve was the unit circle in high school algebra, \(x^2+y^2=1\), where we were ask to graph \(y\) with
 respect to \(x\) only to discover that \(y\) didn't appear to be a function of \(x\) because \(y\) had TWO values for some values of \(x\)!  But
@@ -627,9 +644,9 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/impl
 </div>
 </div>
 
-<div id="outline-container-implicit_surface" class="outline-2">
-<h2 id="implicit_surface"><span class="section-number-2">4.</span> Implicit Surface</h2>
-<div class="outline-text-2" id="text-implicit_surface">
+<div id="outline-container-implicit_surface" class="outline-3">
+<h3 id="implicit_surface"><span class="section-number-3">2.3.</span> Implicit Surface</h3>
+<div class="outline-text-3" id="text-implicit_surface">
 <p>
 This example is very similar to implicit_curve_2d.cpp; however, instead of extracting a curve from a triangulation of a surface, this time we extract a
 surface from a quad tessellation of a hexahedron.  In addition to what we demonstrate with implicit_curve_2d.cpp, this example also demonstrates:
@@ -706,9 +723,9 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/impl
 </div>
 </div>
 
-<div id="outline-container-vector_field_3d" class="outline-2">
-<h2 id="vector_field_3d"><span class="section-number-2">5.</span> 3D Vector Field</h2>
-<div class="outline-text-2" id="text-vector_field_3d">
+<div id="outline-container-vector_field_3d" class="outline-3">
+<h3 id="vector_field_3d"><span class="section-number-3">2.4.</span> 3D Vector Field</h3>
+<div class="outline-text-3" id="text-vector_field_3d">
 <p>
 This example illustrates how to uniformly sample a vector field.  Just for fun we have also produced a solution to the Lorenz system, and directly
 stored it with a MR_cell_cplx.
@@ -807,9 +824,9 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/vect
 </div>
 </div>
 
-<div id="outline-container-surface_with_normals" class="outline-2">
-<h2 id="surface_with_normals"><span class="section-number-2">6.</span> Surface Plot With Normals</h2>
-<div class="outline-text-2" id="text-surface_with_normals">
+<div id="outline-container-surface_with_normals" class="outline-3">
+<h3 id="surface_with_normals"><span class="section-number-3">2.5.</span> Surface Plot With Normals</h3>
+<div class="outline-text-3" id="text-surface_with_normals">
 <p>
 Surface normals may be used by many visualization tools to render smoother results.  In this example we demonstrate:
 </p>
@@ -938,9 +955,9 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
 </div>
 </div>
 
-<div id="outline-container-surface_plot_edge" class="outline-2">
-<h2 id="surface_plot_edge"><span class="section-number-2">7.</span> Surface Plot With An Edge</h2>
-<div class="outline-text-2" id="text-surface_plot_edge">
+<div id="outline-container-surface_plot_edge" class="outline-3">
+<h3 id="surface_plot_edge"><span class="section-number-3">2.6.</span> Surface Plot With An Edge</h3>
+<div class="outline-text-3" id="text-surface_plot_edge">
 <p>
 Surface plots are frequently complicated by regions upon which the function singular or undefined.  These functions often behave quite poorly on the
 boundaries of such regions.  For this example we consider \(f(x, y)=\sqrt{1-x^2-y^2}\) &#x2013; the upper half of the unit sphere.  Outside the unit circle this
@@ -1040,10 +1057,9 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
 </div>
 </div>
 
-
-<div id="outline-container-surface_branch_glue" class="outline-2">
-<h2 id="surface_branch_glue"><span class="section-number-2">8.</span> Surface Branches &amp; Glue</h2>
-<div class="outline-text-2" id="text-surface_branch_glue">
+<div id="outline-container-surface_branch_glue" class="outline-3">
+<h3 id="surface_branch_glue"><span class="section-number-3">2.7.</span> Surface Branches &amp; Glue</h3>
+<div class="outline-text-3" id="text-surface_branch_glue">
 <p>
 In surface_plot_edge.cpp we encountered the unit sphere defined by the zeros of \(1^2=x^2+y^2+z^2\), and the related function 
 \(f(x,y)=\sqrt{1-x^2-y^2}\) obtained by "solving" for \(z\).  Note that if \(z=f(x, y)\), then both \(z\) and \(-z\) satisfy the original equation.
@@ -1058,7 +1074,7 @@ any holes.  This is really the only change from surface_plot_edge.cpp.
 
 <div class="org-center">
 
-<div id="org714c237" class="figure">
+<div id="org83586e6" class="figure">
 <p><a href="media/surface_branch_glue_100.png"><img src="media/surface_branch_glue_10.png" alt="surface_branch_glue_10.png" /></a>
 </p>
 </div>
@@ -1124,10 +1140,9 @@ any holes.  This is really the only change from surface_plot_edge.cpp.
 </div>
 </div>
 
-
-<div id="outline-container-curve_plot" class="outline-2">
-<h2 id="curve_plot"><span class="section-number-2">9.</span> Curve Plot</h2>
-<div class="outline-text-2" id="text-curve_plot">
+<div id="outline-container-curve_plot" class="outline-3">
+<h3 id="curve_plot"><span class="section-number-3">2.8.</span> Curve Plot</h3>
+<div class="outline-text-3" id="text-curve_plot">
 <p>
 Univariate function plots are the bread-and-butter of the plotting world.  Normally a simple, uniformly spaced, sequence is enough to get the job 
 done quite nicely.  Still, a few things can come up:
@@ -1147,7 +1162,7 @@ Note that most of the items above are listed TBD.  A few features need to be add
 
 <div class="org-center">
 
-<div id="org9ebc5c9" class="figure">
+<div id="org45a72a5" class="figure">
 <p><a href="media/sq_curve_plot_heal_100.png"><img src="media/sq_curve_plot_heal_10.png" alt="sq_curve_plot_heal_10.png" /></a>
 </p>
 </div>
@@ -1236,9 +1251,9 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/curv
 </div>
 </div>
 
-<div id="outline-container-parametric_surface_with_defects" class="outline-2">
-<h2 id="parametric_surface_with_defects"><span class="section-number-2">10.</span> Parametric Surface With Defects</h2>
-<div class="outline-text-2" id="text-parametric_surface_with_defects">
+<div id="outline-container-parametric_surface_with_defects" class="outline-3">
+<h3 id="parametric_surface_with_defects"><span class="section-number-3">2.9.</span> Parametric Surface With Defects</h3>
+<div class="outline-text-3" id="text-parametric_surface_with_defects">
 <p>
 This example illustrates some of the things that can go wrong when generating parametric surfaces.  We dump two version of the tessellation &#x2013; one with
 quads and one with triangles.  This allows us to better illustrate how some defects show up.
@@ -1323,9 +1338,9 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/para
 </div>
 
 
-<div id="outline-container-performance_with_large_surface" class="outline-2">
-<h2 id="performance_with_large_surface"><span class="section-number-2">11.</span> High Resolution Parametric Surface</h2>
-<div class="outline-text-2" id="text-performance_with_large_surface">
+<div id="outline-container-performance_with_large_surface" class="outline-3">
+<h3 id="performance_with_large_surface"><span class="section-number-3">2.10.</span> High Resolution Parametric Surface</h3>
+<div class="outline-text-3" id="text-performance_with_large_surface">
 <p>
 Just a nice parametric surface without any weirdness.  Some things demonstrated:
 </p>
@@ -1428,19 +1443,29 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/perf
 </div>
 </div>
 </div>
+</div>
 
 
 
-<div id="outline-container-trefoil" class="outline-2">
-<h2 id="trefoil"><span class="section-number-2">12.</span> Trefoil Parametric Surface</h2>
-<div class="outline-text-2" id="text-trefoil">
+<div id="outline-container-extra_examples" class="outline-2">
+<h2 id="extra_examples"><span class="section-number-2">3.</span> Extra Examples</h2>
+<div class="outline-text-2" id="text-extra_examples">
+<p>
+The examples that follow are mostly just interesting mathematical objects.  No new MRPTree functionality is demonstrated beyond what is demonstrated in the
+fore examples.
+</p>
+</div>
+
+<div id="outline-container-trefoil" class="outline-3">
+<h3 id="trefoil"><span class="section-number-3">3.1.</span> Trefoil Parametric Surface</h3>
+<div class="outline-text-3" id="text-trefoil">
 <p>
 This example doesn't really demonstrate anything not found in the other examples.  It's just a neat surface. ;)
 </p>
 
 <div class="org-center">
 
-<div id="orgc3f342d" class="figure">
+<div id="org6c1ffbe" class="figure">
 <p><a href="media/trefoil_rot_50_crf30.html"><img src="media/trefoil_rot_10.gif" alt="trefoil_rot_10.gif" /></a>
 </p>
 </div>
@@ -1516,12 +1541,47 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/tref
 
 
 
-<div id="outline-container-parametric_curve_3d" class="outline-2">
-<h2 id="parametric_curve_3d"><span class="section-number-2">13.</span> Twisted Cubic As A Surface Intersection</h2>
-<div class="outline-text-2" id="text-parametric_curve_3d">
+<div id="outline-container-parametric_curve_3d" class="outline-3">
+<h3 id="parametric_curve_3d"><span class="section-number-3">3.2.</span> Twisted Cubic As A Surface Intersection</h3>
+<div class="outline-text-3" id="text-parametric_curve_3d">
+<p>
+This program produces an interesting visualization of an object known as the twisted cubic.  In parametric form, the curve may be expressed as
+</p>
+
+<p>
+\[ f(t)=[t, t^2, t^3] \]
+</p>
+
+<p>
+Alternately the curve is also the intersection of two surfaces in \(\mathbb{R}^3\):
+</p>
+
+<p>
+\[ y=f_2(x, z)=y^2 \]
+\[ z=f_3(x, y)=x^3 \]
+</p>
+
+<p>
+The "typical" way to graph a surface like \(f_2\) is to transform it into pseudo-parametric form.  In Maple that might look like this
+</p>
+
+<pre class="example" id="org3b11913">
+plot3d([u, u^2, v], u=-1..1, v=-1..1):
+</pre>
+
+<p>
+We could do that with MRPTree, but it is easier to simply map the variables when we use construct_geometry_fans().
+</p>
+
+<p>
+Another interesting use of MRPTree in this example is the way we have transformed each surface function into an SDF to drive up sample resolution near the
+surface intersection.  This would allow us to use a tool like Paraview to compute an approximation to the the intersection.  Just in case the reader is
+not using a tool that can extract a nice surface intersection, I have also dumped the curve out in a 3rd .VTU file.
+</p>
+
 <div class="org-center">
 
-<div id="org3f3d64a" class="figure">
+<div id="org85efc9f" class="figure">
 <p><a href="media/parametric_curve_3d_rot_100_crf30.html"><img src="media/parametric_curve_3d_rot_10.gif" alt="parametric_curve_3d_rot_10.gif" /></a>
 </p>
 </div>
@@ -1601,6 +1661,7 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/tref
   srf2_ccplx.write_xml_vtk(<span style="color: #fa8072;">"parametric_curve_3d-srf2.vtu"</span>, <span style="color: #fa8072;">"parametric_curve_3d-srf2"</span>);
 }
 </pre>
+</div>
 </div>
 </div>
 </div>

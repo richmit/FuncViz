@@ -70,13 +70,20 @@ In this document we break the process of mathematical function visualization int
 
 In some cases we preform post processing or use other tools: VisIT, meshlab, POV-Ray, Blender, ffmpeg, ImageMagick, etc...
 
-* Complex Magnitude Surface Plot
+* Core Examples
+:PROPERTIES:
+:CUSTOM_ID: core_examples
+:END:
+
+This group of core examples is intended to illistrate various features of MRPTree.
+
+** Complex Magnitude Surface Plot
 :PROPERTIES:
 :CUSTOM_ID: complex_magnitude_surface
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/complex_magnitude_surface.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!]\)/\\)\1/g;'
+grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/complex_magnitude_surface.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
 #+end_src
 
 #+RESULTS:
@@ -249,13 +256,14 @@ int main() {
 }
 #+end_src
 
-* Implicit Curve
+
+** Implicit Curve
 :PROPERTIES:
 :CUSTOM_ID: implicit_curve_2d
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/implicit_curve_2d.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!]\)/\\)\1/g;'
+grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/implicit_curve_2d.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
 #+end_src
 
 #+RESULTS:
@@ -345,13 +353,13 @@ int main() {
 }
 #+end_src
 
-* Implicit Surface
+** Implicit Surface
 :PROPERTIES:
 :CUSTOM_ID: implicit_surface
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/implicit_surface.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!]\)/\\)\1/g;'
+grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/implicit_surface.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
 #+end_src
 
 #+RESULTS:
@@ -426,13 +434,13 @@ int main() {
 }
 #+end_src
 
-* 3D Vector Field 
+** 3D Vector Field 
 :PROPERTIES:
 :CUSTOM_ID: vector_field_3d
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/vector_field_3d.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!]\)/\\)\1/g;'
+grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/vector_field_3d.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
 #+end_src
 
 #+RESULTS:
@@ -531,13 +539,13 @@ int main() {
 }
 #+end_src
 
-* Surface Plot With Normals
+** Surface Plot With Normals
 :PROPERTIES:
 :CUSTOM_ID: surface_with_normals
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_with_normals.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!]\)/\\)\1/g;'
+grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_with_normals.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
 #+end_src
 
 #+RESULTS:
@@ -664,13 +672,13 @@ int main() {
 }
 #+end_src
 
-* Surface Plot With An Edge
+** Surface Plot With An Edge
 :PROPERTIES:
 :CUSTOM_ID: surface_plot_edge
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_plot_edge.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!]\)/\\)\1/g;'
+grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_plot_edge.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
 #+end_src
 
 #+RESULTS:
@@ -766,14 +774,13 @@ int main() {
 }
 #+end_src
 
-
-* Surface Branches & Glue
+** Surface Branches & Glue
 :PROPERTIES:
 :CUSTOM_ID: surface_branch_glue
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_branch_glue.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!]\)/\\)\1/g;'
+grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_branch_glue.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
 #+end_src
 
 #+RESULTS:
@@ -852,14 +859,13 @@ int main() {
 }
 #+end_src
 
-
-* Curve Plot
+** Curve Plot
 :PROPERTIES:
 :CUSTOM_ID: curve_plot
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/curve_plot.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!]\)/\\)\1/g;'
+grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/curve_plot.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
 #+end_src
 
 #+RESULTS:
@@ -962,13 +968,13 @@ int main() {
 }
 #+end_src
 
-* Parametric Surface With Defects
+** Parametric Surface With Defects
 :PROPERTIES:
 :CUSTOM_ID: parametric_surface_with_defects
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/parametric_surface_with_defects.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!]\)/\\)\1/g;'
+grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/parametric_surface_with_defects.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
 #+end_src
 
 #+RESULTS:
@@ -1051,13 +1057,13 @@ int main() {
 #+end_src
 
 
-* High Resolution Parametric Surface
+** High Resolution Parametric Surface
 :PROPERTIES:
 :CUSTOM_ID: performance_with_large_surface
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/performance_with_large_surface.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!]\)/\\)\1/g;'
+grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/performance_with_large_surface.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
 #+end_src
 
 #+RESULTS:
@@ -1159,13 +1165,21 @@ int main() {
 
 
 
-* Trefoil Parametric Surface
+* Extra Examples
+:PROPERTIES:
+:CUSTOM_ID: extra_examples
+:END:
+
+The examples that follow are mostly just interesting mathematical objects.  No new MRPTree functionality is demonstrated beyond what is demonstrated in the
+fore examples.
+
+** Trefoil Parametric Surface
 :PROPERTIES:
 :CUSTOM_ID: trefoil
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/trefoil.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!]\)/\\)\1/g;'
+grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/trefoil.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
 #+end_src
 
 #+RESULTS:
@@ -1244,16 +1258,37 @@ int main() {
 }
 #+end_src
 
-
-
-* Twisted Cubic As A Surface Intersection
+** Twisted Cubic As A Surface Intersection
 :PROPERTIES:
 :CUSTOM_ID: parametric_curve_3d
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/parametric_curve_3d.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!]\)/\\)\1/g;'
+grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/parametric_curve_3d.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
 #+end_src
+
+#+RESULTS:
+
+  This program produces an interesting visualization of an object known as the twisted cubic.  In parametric form, the curve may be expressed as
+
+  \[ f(t)=[t, t^2, t^3] \]
+
+  Alternately the curve is also the intersection of two surfaces in \(\mathbb{R}^3\):
+
+  \[ y=f_2(x, z)=y^2 \]
+  \[ z=f_3(x, y)=x^3 \]
+
+  The "typical" way to graph a surface like \(f_2\) is to transform it into pseudo-parametric form.  In Maple that might look like this
+
+#+BEGIN_EXAMPLE                                                                                                              
+  plot3d([u, u^2, v], u=-1..1, v=-1..1):
+#+END_EXAMPLE
+
+  We could do that with MRPTree, but it is easier to simply map the variables when we use construct_geometry_fans().
+
+  Another interesting use of MRPTree in this example is the way we have transformed each surface function into an SDF to drive up sample resolution near the
+  surface intersection.  This would allow us to use a tool like Paraview to compute an approximation to the the intersection.  Just in case the reader is
+  not using a tool that can extract a nice surface intersection, I have also dumped the curve out in a 3rd .VTU file.
 
 #+BEGIN_CENTER
 [[file:media/parametric_curve_3d_rot_100_crf30.html][file:media/parametric_curve_3d_rot_10.gif]]
@@ -1342,7 +1377,8 @@ int main() {
 
 
 
-* Image Processing: Resize PNGs                                    :noexport:
+* Meta Stuff :noexport:
+** Image Processing: Resize PNGs                             
 
 #+begin_src sh  :results output verbatum :exports both
 for d in ../../paraview/ ../../misc/; do
@@ -1373,7 +1409,7 @@ make media/surface_branch_glue_25.png
 make media/surface_branch_glue_10.png
 #+end_example
 
-* Image Processing: GIFs                                           :noexport:
+** Image Processing: GIFs
 
 #+begin_src sh  :results output verbatum :exports both
 for f in ../../paraview/*.gif; do
@@ -1413,13 +1449,13 @@ make media/trefoil_rot_25.gif
 make media/trefoil_rot_50.gif
 #+end_example
 
-* PROGRAM_EXAMPLE                                                  :noexport:
+** PROGRAM_EXAMPLE
 :PROPERTIES:
 :CUSTOM_ID: PROGRAM_EXAMPLE
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/PROGRAM_EXAMPLE.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!]\)/\\)\1/g;'
+grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/PROGRAM_EXAMPLE.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
 #+end_src
 
 #+BEGIN_CENTER
@@ -1430,7 +1466,7 @@ grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/PROGRAM_EXAM
 grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/PROGRAM_EXAMPLE.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
 #+end_src
 
-* Out Of Date Code                                         :noexport:
+** Out Of Date Code
 
 #+begin_src sh :results output verbatum
 for f in ../../examples/*.cpp; do
@@ -1453,10 +1489,9 @@ NEWER: ../../examples/surface_plot_edge.cpp
 NEWER: ../../examples/surface_with_normals.cpp
 NEWER: ../../examples/vector_field_3d.cpp
 #+end_example
+** Image Processing: WEBMs
 
-* Image Processing: WEBMs                                          :noexport:
-
-** Put media in place
+*** Put media in place
 
 #+begin_src sh  :results output verbatum :exports both
 for f in ../../paraview/*_crf30.webm; do
@@ -1491,7 +1526,7 @@ skip media/trefoil_rot_25_crf30.webm
 skip media/trefoil_rot_50_crf30.webm
 #+end_example
 
-** Create HTML Wrappers
+*** Create HTML Wrappers
 
 #+begin_src sh :results output verbatum
 for e in complex_magnitude_surface implicit_surface lorenz trefoil parametric_curve_3d; do
