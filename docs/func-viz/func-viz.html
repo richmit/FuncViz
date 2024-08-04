@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-08-04 Sun 14:46 -->
+<!-- 2024-08-04 Sun 14:48 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Function Visualization</title>
@@ -272,12 +272,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-08-04 14:46:42</i></td>
+<td class="org-left"><i>2024-08-04 14:48:13</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-08-04 14:46:43</i></td>
+<td class="org-left"><i>2024-08-04 14:48:14</i></td>
 </tr>
 </tbody>
 </table>
@@ -1074,7 +1074,7 @@ any holes.  This is really the only change from surface_plot_edge.cpp.
 
 <div class="org-center">
 
-<div id="org83586e6" class="figure">
+<div id="orgedaed9d" class="figure">
 <p><a href="media/surface_branch_glue_100.png"><img src="media/surface_branch_glue_10.png" alt="surface_branch_glue_10.png" /></a>
 </p>
 </div>
@@ -1162,7 +1162,7 @@ Note that most of the items above are listed TBD.  A few features need to be add
 
 <div class="org-center">
 
-<div id="org45a72a5" class="figure">
+<div id="org7c01cb9" class="figure">
 <p><a href="media/sq_curve_plot_heal_100.png"><img src="media/sq_curve_plot_heal_10.png" alt="sq_curve_plot_heal_10.png" /></a>
 </p>
 </div>
@@ -1465,7 +1465,7 @@ This example doesn't really demonstrate anything not found in the other examples
 
 <div class="org-center">
 
-<div id="org6c1ffbe" class="figure">
+<div id="org0fd6d81" class="figure">
 <p><a href="media/trefoil_rot_50_crf30.html"><img src="media/trefoil_rot_10.gif" alt="trefoil_rot_10.gif" /></a>
 </p>
 </div>
@@ -1539,8 +1539,6 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/tref
 </div>
 </div>
 
-
-
 <div id="outline-container-parametric_curve_3d" class="outline-3">
 <h3 id="parametric_curve_3d"><span class="section-number-3">3.2.</span> Twisted Cubic As A Surface Intersection</h3>
 <div class="outline-text-3" id="text-parametric_curve_3d">
@@ -1565,7 +1563,7 @@ Alternately the curve is also the intersection of two surfaces in \(\mathbb{R}^3
 The "typical" way to graph a surface like \(f_2\) is to transform it into pseudo-parametric form.  In Maple that might look like this
 </p>
 
-<pre class="example" id="org3b11913">
+<pre class="example" id="orge17a613">
 plot3d([u, u^2, v], u=-1..1, v=-1..1):
 </pre>
 
@@ -1581,7 +1579,7 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
 
 <div class="org-center">
 
-<div id="org85efc9f" class="figure">
+<div id="orgbe6bc52" class="figure">
 <p><a href="media/parametric_curve_3d_rot_100_crf30.html"><img src="media/parametric_curve_3d_rot_10.gif" alt="parametric_curve_3d_rot_10.gif" /></a>
 </p>
 </div>
@@ -1597,7 +1595,7 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
 <span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                    <span style="color: #63b8ff;">cc1_t</span>;
 <span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt1_t</span>, <span style="color: #63b8ff;">cc1_t</span>&gt; <span style="color: #63b8ff;">tc1_t</span>;
 
-<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b2d3rT</span>              <span style="color: #63b8ff;">tt2_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b2d1rT</span>              <span style="color: #63b8ff;">tt2_t</span>;
 <span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                    <span style="color: #63b8ff;">cc2_t</span>;
 <span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt2_t</span>, <span style="color: #63b8ff;">cc2_t</span>&gt; <span style="color: #63b8ff;">tc2_t</span>;
 
@@ -1605,17 +1603,25 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
   <span style="color: #00ffff;">return</span> { t, t*t, t*t*t };
 }                          
 
-<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">twisted_cubic_srf1</span>(<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">uvvec</span>) {
-  <span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">u</span> = uvvec[0];
-  <span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">v</span> = uvvec[1];
-  <span style="color: #00ffff;">return</span> { u, u*u, v };
+<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">twisted_cubic_srf1</span>(<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xzvec</span>) {
+  <span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">x</span> = xzvec[0];
+  <span style="color: #00ffff;">return</span> x*x;
 }                          
 
-<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">twisted_cubic_srf2</span>(<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">uvvec</span>) {
-  <span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">u</span> = uvvec[0];
-  <span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">v</span> = uvvec[1];
-  <span style="color: #00ffff;">return</span> { u, v, u*u*u };
+<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #00fa9a; font-weight: bold;">twisted_cubic_srf1_sdf</span>(<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xzvec</span>) {
+  <span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">z</span> = xzvec[1];
+  <span style="color: #00ffff;">return</span> (twisted_cubic_srf1(xzvec)-z);
+}
+
+<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">twisted_cubic_srf2</span>(<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xyvec</span>) {
+  <span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">x</span> = xyvec[0];
+  <span style="color: #00ffff;">return</span> x*x*x;
 }                          
+
+<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #00fa9a; font-weight: bold;">twisted_cubic_srf2_sdf</span>(<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xyvec</span>) {
+  <span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">y</span> = xyvec[1];
+  <span style="color: #00ffff;">return</span> (twisted_cubic_srf2(xyvec)-y);
+}
 
 <span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
   <span style="color: #63b8ff;">tt1_t</span> <span style="color: #7fffd4;">crv_tree</span>;
@@ -1636,12 +1642,14 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
   <span style="color: #63b8ff;">cc2_t</span> <span style="color: #7fffd4;">srf1_ccplx</span>;
   <span style="color: #63b8ff;">tc2_t</span> <span style="color: #7fffd4;">srf1_tree_conv</span>;
   srf1_tree.refine_grid(5, twisted_cubic_srf1);
+  srf1_tree.refine_leaves_recursive_cell_pred(6, twisted_cubic_srf1, [&amp;<span style="color: #7fffd4;">srf1_tree</span>](<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> srf1_tree.cell_cross_sdf(i, twisted_cubic_srf2_sdf); });
+  srf1_tree.balance_tree(1, twisted_cubic_srf1);
   srf1_tree_conv.construct_geometry_fans(srf1_ccplx,
                                          srf1_tree,
                                          2,
-                                         {{<span style="color: #8470ff; font-weight: bold;">tc2_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 0},
-                                          {<span style="color: #8470ff; font-weight: bold;">tc2_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 1},
-                                          {<span style="color: #8470ff; font-weight: bold;">tc2_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE, 2}});
+                                         {{<span style="color: #8470ff; font-weight: bold;">tc2_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0},
+                                          {<span style="color: #8470ff; font-weight: bold;">tc2_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
+                                          {<span style="color: #8470ff; font-weight: bold;">tc2_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1}});
   srf1_ccplx.create_named_datasets({<span style="color: #fa8072;">"u"</span>, <span style="color: #fa8072;">"v"</span>, <span style="color: #fa8072;">"x(u,v)"</span>, <span style="color: #fa8072;">"y(u,v)"</span>, <span style="color: #fa8072;">"z(u,v)"</span>});
   srf1_ccplx.dump_cplx(5);
   srf1_ccplx.write_xml_vtk(<span style="color: #fa8072;">"parametric_curve_3d-srf1.vtu"</span>, <span style="color: #fa8072;">"parametric_curve_3d-srf1"</span>);
@@ -1650,6 +1658,8 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
   <span style="color: #63b8ff;">cc2_t</span> <span style="color: #7fffd4;">srf2_ccplx</span>;
   <span style="color: #63b8ff;">tc2_t</span> <span style="color: #7fffd4;">srf2_tree_conv</span>;
   srf2_tree.refine_grid(5, twisted_cubic_srf2);
+  srf2_tree.refine_leaves_recursive_cell_pred(6, twisted_cubic_srf2, [&amp;<span style="color: #7fffd4;">srf2_tree</span>](<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> srf2_tree.cell_cross_sdf(i, twisted_cubic_srf1_sdf); });
+  srf2_tree.balance_tree(1, twisted_cubic_srf2);
   srf2_tree_conv.construct_geometry_fans(srf2_ccplx,
                                          srf2_tree,
                                          2,

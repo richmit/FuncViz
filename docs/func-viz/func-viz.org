@@ -1309,7 +1309,7 @@ typedef mjr::tree15b1d3rT              tt1_t;
 typedef mjr::MRccT5                    cc1_t;
 typedef mjr::MR_rt_to_cc<tt1_t, cc1_t> tc1_t;
 
-typedef mjr::tree15b2d3rT              tt2_t;
+typedef mjr::tree15b2d1rT              tt2_t;
 typedef mjr::MRccT5                    cc2_t;
 typedef mjr::MR_rt_to_cc<tt2_t, cc2_t> tc2_t;
 
@@ -1317,17 +1317,25 @@ tt1_t::rrpt_t twisted_cubic_crv(tt1_t::drpt_t t) {
   return { t, t*t, t*t*t };
 }                          
 
-tt2_t::rrpt_t twisted_cubic_srf1(tt2_t::drpt_t uvvec) {
-  tt2_t::src_t u = uvvec[0];
-  tt2_t::src_t v = uvvec[1];
-  return { u, u*u, v };
+tt2_t::rrpt_t twisted_cubic_srf1(tt2_t::drpt_t xzvec) {
+  tt2_t::src_t x = xzvec[0];
+  return x*x;
 }                          
 
-tt2_t::rrpt_t twisted_cubic_srf2(tt2_t::drpt_t uvvec) {
-  tt2_t::src_t u = uvvec[0];
-  tt2_t::src_t v = uvvec[1];
-  return { u, v, u*u*u };
+tt2_t::src_t twisted_cubic_srf1_sdf(tt2_t::drpt_t xzvec) {
+  tt2_t::src_t z = xzvec[1];
+  return (twisted_cubic_srf1(xzvec)-z);
+}
+
+tt2_t::rrpt_t twisted_cubic_srf2(tt2_t::drpt_t xyvec) {
+  tt2_t::src_t x = xyvec[0];
+  return x*x*x;
 }                          
+
+tt2_t::src_t twisted_cubic_srf2_sdf(tt2_t::drpt_t xyvec) {
+  tt2_t::src_t y = xyvec[1];
+  return (twisted_cubic_srf2(xyvec)-y);
+}
 
 int main() {
   tt1_t crv_tree;
@@ -1348,12 +1356,14 @@ int main() {
   cc2_t srf1_ccplx;
   tc2_t srf1_tree_conv;
   srf1_tree.refine_grid(5, twisted_cubic_srf1);
+  srf1_tree.refine_leaves_recursive_cell_pred(6, twisted_cubic_srf1, [&srf1_tree](tt2_t::diti_t i) { return srf1_tree.cell_cross_sdf(i, twisted_cubic_srf2_sdf); });
+  srf1_tree.balance_tree(1, twisted_cubic_srf1);
   srf1_tree_conv.construct_geometry_fans(srf1_ccplx,
                                          srf1_tree,
                                          2,
-                                         {{tc2_t::tree_val_src_t::RANGE, 0},
-                                          {tc2_t::tree_val_src_t::RANGE, 1},
-                                          {tc2_t::tree_val_src_t::RANGE, 2}});
+                                         {{tc2_t::tree_val_src_t::DOMAIN, 0},
+                                          {tc2_t::tree_val_src_t::RANGE,  0},
+                                          {tc2_t::tree_val_src_t::DOMAIN, 1}});
   srf1_ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)"});
   srf1_ccplx.dump_cplx(5);
   srf1_ccplx.write_xml_vtk("parametric_curve_3d-srf1.vtu", "parametric_curve_3d-srf1");
@@ -1362,6 +1372,8 @@ int main() {
   cc2_t srf2_ccplx;
   tc2_t srf2_tree_conv;
   srf2_tree.refine_grid(5, twisted_cubic_srf2);
+  srf2_tree.refine_leaves_recursive_cell_pred(6, twisted_cubic_srf2, [&srf2_tree](tt2_t::diti_t i) { return srf2_tree.cell_cross_sdf(i, twisted_cubic_srf1_sdf); });
+  srf2_tree.balance_tree(1, twisted_cubic_srf2);
   srf2_tree_conv.construct_geometry_fans(srf2_ccplx,
                                          srf2_tree,
                                          2,
