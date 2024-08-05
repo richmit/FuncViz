@@ -156,9 +156,9 @@ namespace mjr {
           |------------+---------+---------+--------------------|
           | FANS       |       2 |       1 | Triangle Edges     |
           | FANS       |       2 |       2 | Triangles          |
-          | FANS       |       3 |       1 | Pyramid Edges      | TODO: Not currently implemented
-          | FANS       |       3 |       2 | Pyramid Faces      | TODO: Not currently implemented
-          | FANS       |       3 |       3 | Solid Pyramids     | TODO: Not currently implemented
+          | FANS       |       3 |       1 | Pyramid Edges      |
+          | FANS       |       3 |       2 | Pyramid Faces      |
+          | FANS       |       3 |       3 | Solid Pyramids     |
           @endverbatim
 
           @param ccplx             The MR_cell_cplx to populate with geometry
@@ -261,7 +261,7 @@ namespace mjr {
                   }
                 }
               }
-            } else { // We don't a func, so we can can't "heal" broken edges.  This is much faster. ;)
+            } else { // We don't have a func, so we can can't "heal" broken edges.  This is much faster. ;)
               typename cc_t::pnt_idx_t ctr_pnti = add_point_and_data_from_tree(ccplx, rtree, cell);
               if (ctr_pnti >= 0) { // Center point was good, let's try and make some triangles...
                 for(int i=0; i<2; i++) {
@@ -288,13 +288,35 @@ namespace mjr {
                 }
               }
             }
-
           }
         } else if (rtree.domain_dimension == 3) {
-          std::cout << "ERROR: construct_geometry_fans: domain_dimension==3 not supported!" << std::endl;
-          return 1;
-          //  MJR TODO NOTE <2024-08-02T09:43:13-0500> construct_geometry_fans: Implement
-        } else { //if (rtree.domain_dimension > 3) {
+          //  MJR TODO NOTE <2024-08-05T12:35:37-0500> construct_geometry_fans: Fix pyramid base vertex order!
+          for(auto& cell: cells) {
+            typename cc_t::pnt_idx_list_t new_cell(5);
+            new_cell[4] = add_point_and_data_from_tree(ccplx, rtree, cell);
+            std::array<int, 5> p {0, 1, 3, 2, 4};
+            if (new_cell[4] >= 0) { // Center point was good, let's try and make some pyramids...
+              for(int dim=0; dim<3; dim++) {
+                for(int dir=-1; dir<2; dir+=2) {
+                  typename rt_t::diti_list_t nbrs = rtree.get_existing_neighbor(cell, dim, dir);
+                  if (nbrs.size() > 1) {
+                    for(auto n: nbrs) {
+                      typename rt_t::diti_list_t corners = rtree.ccc_get_corners(n, dim, -dir);
+                      for(int k=0; k<4; ++k)
+                        new_cell[p[k]] = add_point_and_data_from_tree(ccplx, rtree, corners[k]);
+                      ccplx.add_cell(cc_t::cell_type_t::PYRAMID, new_cell, output_dimension);
+                    }
+                  } else {
+                    typename rt_t::diti_list_t corners = rtree.ccc_get_corners(cell, dim, dir);
+                    for(int k=0; k<4; ++k)
+                      new_cell[p[k]] = add_point_and_data_from_tree(ccplx, rtree, corners[k]);
+                    ccplx.add_cell(cc_t::cell_type_t::PYRAMID, new_cell, output_dimension);
+                  }
+                }
+              }
+            }
+          }            
+        } else { // if (rtree.domain_dimension > 3) {
           std::cout << "ERROR: construct_geometry_fans: output_dimension>3 not supported for output_dimension>0!" << std::endl;
           return 1;
         }
