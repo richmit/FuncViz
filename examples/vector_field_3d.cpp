@@ -64,24 +64,25 @@ int main() {
   tt_t vftree({-30.0, -30.0,  -0.0},
               { 30.0,  30.0,  60.0});
   cc_t vfccplx;
-  tc_t vftreeConverter;
+  tc_t vfbridge;
 
   /* Uniform sampling */
   vftree.refine_grid(5, vf);
 
   /* Dump the vector field */
-  vftreeConverter.construct_geometry_rects(vfccplx,
-                                           vftree,
-                                           0,
-                                           {{tc_t::tree_val_src_t::DOMAIN,  0},
-                                            {tc_t::tree_val_src_t::DOMAIN,  1},
-                                            {tc_t::tree_val_src_t::DOMAIN,  2}});
+  vfbridge.construct_geometry_rects(vfccplx,
+                                    vftree,
+                                    0,
+                                    {{tc_t::tree_val_src_t::DOMAIN,  0},
+                                     {tc_t::tree_val_src_t::DOMAIN,  1},
+                                     {tc_t::tree_val_src_t::DOMAIN,  2}});
 
   vfccplx.create_named_datasets({"x", "y", "z"},
                                 {{"d", {0, 1, 2}}});
   vfccplx.dump_cplx(5);
   vfccplx.write_xml_vtk("vector_field_3d-f.vtu", "vector_field_3d-f");
 
+  /* Now we solve the Lorenz system and directly create a cc_t object */
   cc_t cvccplx;
 
   int max_steps = 100000;
@@ -106,12 +107,9 @@ int main() {
     y_old=y_new;
     z_old=z_new;
     p_old=p_new;
-
   }
 
   cvccplx.dump_cplx(5);
   cvccplx.write_xml_vtk("vector_field_3d-c.vtu", "vector_field_3d-c");
-
-
 }
 /** @endcond */

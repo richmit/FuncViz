@@ -57,18 +57,18 @@ int main() {
   tt_t tree({-2.1, -2.1}, 
             { 2.1,  2.1});
   cc_t ccplx;
-  tc_t treeConverter;
+  tc_t bridge;
 
   tree.refine_grid(7, dampCosWave2);   // Sample on a uniform grid
   tree.dump_tree(5);                   // Dump some of the tree
 
   // Convert the tree to poly data
-  treeConverter.construct_geometry_fans(ccplx,
-                                        tree,
-                                        2,
-                                        {{tc_t::tree_val_src_t::DOMAIN, 0}, 
-                                         {tc_t::tree_val_src_t::DOMAIN, 1},
-                                         {tc_t::tree_val_src_t::RANGE,  0}});
+  bridge.construct_geometry_fans(ccplx,
+                                 tree,
+                                 2,
+                                 {{tc_t::tree_val_src_t::DOMAIN, 0}, 
+                                  {tc_t::tree_val_src_t::DOMAIN, 1},
+                                  {tc_t::tree_val_src_t::RANGE,  0}});
 
   ccplx.write_xml_vtk("hello_world.vtu", "hello_world");
 }

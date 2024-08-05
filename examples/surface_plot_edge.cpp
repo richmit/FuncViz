@@ -65,7 +65,7 @@ int main() {
   tt_t tree({-1.2, -1.2}, 
             { 1.2,  1.2});
   cc_t ccplx;
-  tc_t treeConverter;
+  tc_t bridge;
 
   // Sample a uniform grid across the domain
   tree.refine_grid(5, halfSphere2);
@@ -88,17 +88,17 @@ int main() {
   tree.dump_tree(10);
 
   /* By passing halfSphere2() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired. */
-  treeConverter.construct_geometry_fans(ccplx,
-                                        tree,
-                                        2,
-                                        {{tc_t::tree_val_src_t::DOMAIN, 0}, 
-                                         {tc_t::tree_val_src_t::DOMAIN, 1},
-                                         {tc_t::tree_val_src_t::RANGE,  0}},
-                                        halfSphere2
-                                       );
+  bridge.construct_geometry_fans(ccplx,
+                                 tree,
+                                 2,
+                                 {{tc_t::tree_val_src_t::DOMAIN, 0}, 
+                                  {tc_t::tree_val_src_t::DOMAIN, 1},
+                                  {tc_t::tree_val_src_t::RANGE,  0}},
+                                 halfSphere2
+                                );
 
   ccplx.create_named_datasets({"x", "y", "f(x,y)"},
-                             {{"NORMALS", {0, 1, 2}}});
+                              {{"NORMALS", {0, 1, 2}}});
 
   ccplx.dump_cplx(10);
 

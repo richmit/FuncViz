@@ -68,7 +68,7 @@ tt_t::rrpt_t f(tt_t::drpt_t x) {
 int main() {
   tt_t tree(-3, 3);
   cc_t ccplx;
-  tc_t treeConverter;
+  tc_t bridge;
 
   // Sample a uniform grid across the domain
   tree.refine_grid(5, f);
@@ -102,14 +102,14 @@ int main() {
 
   tree.dump_tree(10);
 
-  treeConverter.construct_geometry_fans(ccplx,
-                                        tree,
-                                        1,
-                                        {{tc_t::tree_val_src_t::DOMAIN,   0  }, 
-                                         {tc_t::tree_val_src_t::RANGE,    0  },
-                                         {tc_t::tree_val_src_t::CONSTANT, 0.0}},
-                                        f
-                                       );
+  bridge.construct_geometry_fans(ccplx,
+                                 tree,
+                                 1,
+                                 {{tc_t::tree_val_src_t::DOMAIN,   0  }, 
+                                  {tc_t::tree_val_src_t::RANGE,    0  },
+                                  {tc_t::tree_val_src_t::CONSTANT, 0.0}},
+                                 f
+                                );
 
   // Note the first argument need not name *every* data element, just the first ones.
   ccplx.create_named_datasets({"x", "f(x)"});

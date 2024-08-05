@@ -61,7 +61,7 @@ int main() {
   tt_t tree({-2.3, -2.3, -2.3}, 
             { 2.3,  2.3,  2.3});
   cc_t ccplx;
-  tc_t treeConverter;
+  tc_t bridge;
 
   /* Initial uniform sample */
   tree.refine_grid(4, isf);
@@ -72,13 +72,13 @@ int main() {
   tree.dump_tree(5);
 
   /* Convert our tree to a cell complex.  Note that we use an SDF to export only cells that contain our surface */
-  treeConverter.construct_geometry_rects(ccplx,
-                                         tree,
-                                         tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, isf)); }),
-                                         3,
-                                         {{tc_t::tree_val_src_t::DOMAIN, 0}, 
-                                          {tc_t::tree_val_src_t::DOMAIN, 1},
-                                          {tc_t::tree_val_src_t::DOMAIN, 2}});
+  bridge.construct_geometry_rects(ccplx,
+                                  tree,
+                                  tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, isf)); }),
+                                  3,
+                                  {{tc_t::tree_val_src_t::DOMAIN, 0}, 
+                                   {tc_t::tree_val_src_t::DOMAIN, 1},
+                                   {tc_t::tree_val_src_t::DOMAIN, 2}});
 
   /* Name the data points */
   ccplx.create_named_datasets({"x", "y", "z", "f(x,y,z)"});

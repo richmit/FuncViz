@@ -68,31 +68,31 @@ tt_t::rrpt_t parSphere2(tt_t::drpt_t xvec) {
 int main() {
   tt_t tree;
   cc_t ccplx;
-  tc_t treeConverter;
+  tc_t bridge;
 
   /* Uniform sampling */
   tree.refine_grid(6, parSphere2);
 
 
   /* First we dump a tessellation made of triangles */
-  treeConverter.construct_geometry_fans(ccplx,
-                                        tree,
-                                        2,
-                                        {{tc_t::tree_val_src_t::RANGE, 0},
-                                         {tc_t::tree_val_src_t::RANGE, 1},
-                                         {tc_t::tree_val_src_t::RANGE, 2}});
+  bridge.construct_geometry_fans(ccplx,
+                                 tree,
+                                 2,
+                                 {{tc_t::tree_val_src_t::RANGE, 0},
+                                  {tc_t::tree_val_src_t::RANGE, 1},
+                                  {tc_t::tree_val_src_t::RANGE, 2}});
   ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)"});
   ccplx.dump_cplx(5);
   ccplx.write_xml_vtk("parametric_surface_with_defects-tri.vtu", "parametric_surface_with_defects-tri");
 
   /* Next we dump a tessellation made of rectangles */
   ccplx.clear(); // We need to clear out the old contents first!
-  treeConverter.construct_geometry_rects(ccplx,
-                                         tree,
-                                         2,
-                                         {{tc_t::tree_val_src_t::RANGE, 0},
-                                          {tc_t::tree_val_src_t::RANGE, 1},
-                                          {tc_t::tree_val_src_t::RANGE, 2}});
+  bridge.construct_geometry_rects(ccplx,
+                                  tree,
+                                  2,
+                                  {{tc_t::tree_val_src_t::RANGE, 0},
+                                   {tc_t::tree_val_src_t::RANGE, 1},
+                                   {tc_t::tree_val_src_t::RANGE, 2}});
   ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)"});
   ccplx.dump_cplx(5);
   ccplx.write_xml_vtk("parametric_surface_with_defects-rect.vtu", "parametric_surface_with_defects-rect");

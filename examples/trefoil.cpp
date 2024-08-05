@@ -76,23 +76,22 @@ int main() {
   tt_t tree;
 
   cc_t ccplx;
-  tc_t treeConverter;
+  tc_t bridge;
 
   tree.refine_grid(7, trefoil);
 
   tree.dump_tree(20);
 
-  treeConverter.construct_geometry_fans(ccplx,
-                                        tree,
-                                        2,
-                                        {{tc_t::tree_val_src_t::RANGE,  0},
-                                         {tc_t::tree_val_src_t::RANGE,  1},
-                                         {tc_t::tree_val_src_t::RANGE,  2}});
+  bridge.construct_geometry_fans(ccplx,
+                                 tree,
+                                 2,
+                                 {{tc_t::tree_val_src_t::RANGE,  0},
+                                  {tc_t::tree_val_src_t::RANGE,  1},
+                                  {tc_t::tree_val_src_t::RANGE,  2}});
 
   ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)", "nx", "ny", "nz"},
                               {{"NORMALS", {5, 6, 7}}});
 
   ccplx.write_xml_vtk("trefoil.vtu", "trefoil");
-
 }
 /** @endcond */

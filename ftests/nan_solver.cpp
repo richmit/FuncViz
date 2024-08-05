@@ -54,20 +54,19 @@ tt_t::rrpt_t f(tt_t::drpt_t xvec) {
 int main() {
   tt_t tree;
   cc_t ccplx;
-  tc_t treeConverter;
+  tc_t bridge;
 
   tree.refine_grid(1, f);
 
   tree.dump_tree(10);
 
-  treeConverter.construct_geometry_fans(ccplx,
-                                        tree,
-                                        2,
-                                        {{tc_t::tree_val_src_t::DOMAIN, 0}, 
-                                         {tc_t::tree_val_src_t::DOMAIN, 1},
-                                         {tc_t::tree_val_src_t::RANGE,  0}},
-                                        f
-                                       );
+  bridge.construct_geometry_fans(ccplx,
+                                 tree,
+                                 2,
+                                 {{tc_t::tree_val_src_t::DOMAIN, 0}, 
+                                  {tc_t::tree_val_src_t::DOMAIN, 1},
+                                  {tc_t::tree_val_src_t::RANGE,  0}},
+                                 f);
 
   ccplx.create_named_datasets({"x", "y", "f(x,y)"});
 

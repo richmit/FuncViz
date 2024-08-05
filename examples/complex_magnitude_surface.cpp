@@ -111,7 +111,7 @@ int main() {
   tt_t tree({-2.2, -1.2}, 
             { 2.2,  1.2});
   cc_t ccplx;
-  tc_t treeConverter;
+  tc_t bridge;
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
   // Initial sample
@@ -177,14 +177,14 @@ int main() {
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
   tree.dump_tree(5);
 
-  auto tcret = treeConverter.construct_geometry_fans(ccplx,
-                                                     tree,
-                                                     tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), 
-                                                                              [&tree](tt_t::diti_t i) { return !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
-                                                     2,
-                                                     {{tc_t::tree_val_src_t::DOMAIN, 0}, 
-                                                      {tc_t::tree_val_src_t::DOMAIN, 1},
-                                                      {tc_t::tree_val_src_t::RANGE,  4}});
+  auto tcret = bridge.construct_geometry_fans(ccplx,
+                                              tree,
+                                              tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), 
+                                                                       [&tree](tt_t::diti_t i) { return !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
+                                              2,
+                                              {{tc_t::tree_val_src_t::DOMAIN, 0}, 
+                                               {tc_t::tree_val_src_t::DOMAIN, 1},
+                                               {tc_t::tree_val_src_t::RANGE,  4}});
 
   // Note the first argument need not name *every* data element, just the first ones.
   ccplx.create_named_datasets({"Re(z)", "Im(z)", "abs(z)", "arg(z)", "Re(f(z))", "Im(f(z))", "abs(f(z))", "arg(f(z))"}, {{"COLORS", {8, 9, 10}}});
