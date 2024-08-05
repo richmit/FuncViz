@@ -1401,6 +1401,11 @@ namespace mjr {
         return rv;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** @overload */
+      diti_list_t get_leaf_cells() const {
+        return get_leaf_cells(ccc_get_top_cell());
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Extract a list of all leaf cells starting from the given cell that match the given predicate
           @warning The given cell need not match the predicate.
           @param cell Starting cell

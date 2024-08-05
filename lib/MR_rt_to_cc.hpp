@@ -47,11 +47,13 @@ namespace mjr {
   template <class rt_t, class cc_t>
   /** @brief Tessellates a MR_rect_tree object, and places the result into an MR_cell_cplx object.
 
-      One might think of this class as a fancy pseudo-constructor or proto-factory for MR_cell_cplx objects.  Structurally it's simply a templated collection
-      of types and static methods.
+      From a structural perspective this class simply a templated collection of types and static methods all designed to work with pairs of MR_rect_tree and
+      MR_cell_cplx objects.  From a functional, or pattern, perspective this class might classified as a MR_cell_cplx pseudo-constructor or proto-factory. I
+      think of it as a bridge between MR_rect_tree and MR_cell_cplx objects.  A collection of helper types that ease working with pairs of MR_rect_tree and
+      MR_cell_cplx objects containing data derived from the same sampled function.
 
-      @tparam rt_t The type of the attached MR_rect_tree object
-      @tparam cc_t The type of the attached MR_cell_cplx object */
+      @tparam rt_t The type of supported MR_rect_tree objects
+      @tparam cc_t The type of supported MR_cell_cplx objects */
   class MR_rt_to_cc {
 
     public:
@@ -96,9 +98,9 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Given rt coordinates, extract point/scalar/vector data, and add point/data to cc
-          @param ccplx                The MR_cell_cplx to populate with geometry
-          @param rtree                The MR_rect_tree with source data
-          @param diti                 The point coordinate in rtree */
+          @param ccplx  The MR_cell_cplx to populate with geometry
+          @param rtree  The MR_rect_tree with source data
+          @param diti   The point coordinate in rtree */
       static typename cc_t::pnt_idx_t add_point_and_data_from_tree(cc_t&        ccplx,
                                                                    const rt_t&  rtree,
                                                                    rt_t::diti_t diti) {
@@ -142,36 +144,36 @@ namespace mjr {
           constructs cells using the new piont(s).  If func is nullptr, then no edge healing is preformed.  This feature works for segments & triangles only.
 
           @verbatim
-             | Geom       | Dom Dim | Out Dim | Result             |
-             |------------+---------+---------+--------------------|
-             | POINTS     |     1-3 |       1 | All Cell Points    |
-             |------------+---------+---------+--------------------|
-             | RECTANGLES |     1-3 |       0 | Cell Corner Points |
-             | RECTANGLES |     2-3 |       1 | Cell Edges         |
-             | RECTANGLES |       2 |       2 | 2D Rectangles      |
-             | RECTANGLES |       3 |       2 | Cell Faces         |
-             | RECTANGLES |       3 |       3 | Solid Hexahedra    |
-             |------------+---------+---------+--------------------|
-             | FANS       |       2 |       1 | Triangle Edges     |
-             | FANS       |       2 |       2 | Triangles          |
-             | FANS       |       3 |       1 | Pyramid Edges      | TODO: Not currently implemented
-             | FANS       |       3 |       2 | Pyramid Faces      | TODO: Not currently implemented
-             | FANS       |       3 |       3 | Solid Pyramids     | TODO: Not currently implemented
+          | Geom       | Dom Dim | Out Dim | Result             |
+          |------------+---------+---------+--------------------|
+          | POINTS     |     1-3 |       1 | All Cell Points    |
+          |------------+---------+---------+--------------------|
+          | RECTANGLES |     1-3 |       0 | Cell Corner Points |
+          | RECTANGLES |     2-3 |       1 | Cell Edges         |
+          | RECTANGLES |       2 |       2 | 2D Rectangles      |
+          | RECTANGLES |       3 |       2 | Cell Faces         |
+          | RECTANGLES |       3 |       3 | Solid Hexahedra    |
+          |------------+---------+---------+--------------------|
+          | FANS       |       2 |       1 | Triangle Edges     |
+          | FANS       |       2 |       2 | Triangles          |
+          | FANS       |       3 |       1 | Pyramid Edges      | TODO: Not currently implemented
+          | FANS       |       3 |       2 | Pyramid Faces      | TODO: Not currently implemented
+          | FANS       |       3 |       3 | Solid Pyramids     | TODO: Not currently implemented
           @endverbatim
 
-          @param ccplx                The MR_cell_cplx to populate with geometry
-          @param rtree                The MR_rect_tree with source data
-          @param cells                List of cells to output from rtree
-          @param output_dimension     Parts of cells to output
-          @param point_src            Point sources
-          @param func                 The function was used to sample the tree */
-      static int construct_geometry_fans(cc_t&                         ccplx,
-                                         const rt_t&                   rtree,
-                                         typename rt_t::diti_list_t    cells,
-                                         int                           output_dimension,
-                                         tree_scl_val_desc_lst_t       point_src,
-                                         typename rt_t::rsfunc_t       func = nullptr
-                                   ) {
+          @param ccplx             The MR_cell_cplx to populate with geometry
+          @param rtree             The MR_rect_tree with source data
+          @param cells             List of cells to output from rtree
+          @param output_dimension  Parts of cells to output
+          @param point_src         Point sources
+          @param func              The function was used to sample the tree */
+      static int construct_geometry_fans(cc_t&                      ccplx,
+                                         const rt_t&                rtree,
+                                         typename rt_t::diti_list_t cells,
+                                         int                        output_dimension,
+                                         tree_scl_val_desc_lst_t    point_src,
+                                         typename rt_t::rsfunc_t    func = nullptr
+                                        ) {
         create_dataset_to_point_mapping(rtree, ccplx, point_src);
         if (rtree.domain_dimension == 1) {
           for(auto& cell: cells) {
@@ -300,18 +302,13 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** @overload */
-      static int construct_geometry_fans(cc_t&                         ccplx,
-                                         const rt_t&                   rtree,
-                                         int                           output_dimension,
-                                         tree_scl_val_desc_lst_t       point_src,
-                                         typename rt_t::rsfunc_t                func = nullptr
-                                   ) {
-        return construct_geometry_fans(ccplx,
-                                       rtree,
-                                       rtree.get_leaf_cells(rtree.ccc_get_top_cell()),
-                                       output_dimension,
-                                       point_src,
-                                       func);
+      static int construct_geometry_fans(cc_t&                   ccplx,
+                                         const rt_t&             rtree,
+                                         int                     output_dimension,
+                                         tree_scl_val_desc_lst_t point_src,
+                                         typename rt_t::rsfunc_t func = nullptr
+                                        ) {
+        return construct_geometry_fans(ccplx, rtree, rtree.get_leaf_cells(), output_dimension, point_src, func);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Populate attached MR_cell_cplx object from data in attached MR_rect_tree object.
@@ -319,18 +316,18 @@ namespace mjr {
           Only 0D vertex cells are produced.  While vertex cells may be obtained by setting the output_dimension to zero and calling construct_geometry_fan or
           construct_geometry_rects, this method is much faster.  This method also provides the option of only outputting centers -- no corners.
 
-          @param ccplx                The MR_cell_cplx to populate with geometry
-          @param rtree                The MR_rect_tree with source data
-          @param cells                List of cells to output from rtree
-          @param point_src            Point sources
-          @param output_centers       Create vertexes for cell  centers
-          @param output_corners       Create vertexes for cell corners*/
-      static int construct_geometry_points(cc_t&                         ccplx,
-                                           const rt_t&                   rtree,
-                                           typename rt_t::diti_list_t    cells,
-                                           tree_scl_val_desc_lst_t       point_src,
-                                           bool                          output_centers,
-                                           bool                          output_corners
+          @param ccplx           The MR_cell_cplx to populate with geometry
+          @param rtree           The MR_rect_tree with source data
+          @param cells           List of tree cells from which to construct geometry
+          @param point_src       Point sources
+          @param output_centers  Create vertexes for cell  centers
+          @param output_corners  Create vertexes for cell corners*/
+      static int construct_geometry_points(cc_t&                      ccplx,
+                                           const rt_t&                rtree,
+                                           typename rt_t::diti_list_t cells,
+                                           tree_scl_val_desc_lst_t    point_src,
+                                           bool                       output_centers,
+                                           bool                       output_corners
                                           ) {
         create_dataset_to_point_mapping(rtree, ccplx, point_src);
         if (output_centers && output_corners) {
@@ -351,11 +348,30 @@ namespace mjr {
         return 0;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      static int construct_geometry_rects(cc_t&                         ccplx,
-                                          const rt_t&                   rtree,
-                                          typename rt_t::diti_list_t    cells,
-                                          int                           output_dimension,
-                                          tree_scl_val_desc_lst_t       point_src
+      /** @overload */
+      static int construct_geometry_points(cc_t&                   ccplx,
+                                           const rt_t&             rtree,
+                                           tree_scl_val_desc_lst_t point_src,
+                                           bool                    output_centers,
+                                           bool                    output_corners
+                                          ) {
+        return construct_geometry_points(ccplx, rtree, rtree.get_leaf_cells(), point_src, output_centers, output_corners);
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Populate a MR_cell_cplx object from data in a MR_rect_tree object.
+
+          The resulting geometric structure in the MR_cell_cplx object will consist of 'rectangular' cell types (points, segments, rectangles, & hexahedra).
+
+          @param ccplx                The MR_cell_cplx to populate with geometry
+          @param rtree                The MR_rect_tree with source data
+          @param cells                List of tree cells from which to construct geometry
+          @param output_dimension     Parts of cells to output
+          @param point_src            Point sources */
+      static int construct_geometry_rects(cc_t&                      ccplx,
+                                          const rt_t&                rtree,
+                                          typename rt_t::diti_list_t cells,
+                                          int                        output_dimension,
+                                          tree_scl_val_desc_lst_t    point_src
                                          ) {
         create_dataset_to_point_mapping(rtree, ccplx, point_src);
         for(auto& cell: cells) {
@@ -380,16 +396,12 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** @overload */
-      static int construct_geometry_rects(cc_t&                    ccplx,
-                                          const rt_t&              rtree,
-                                          int                      output_dimension,
-                                          tree_scl_val_desc_lst_t  point_src
+      static int construct_geometry_rects(cc_t&                   ccplx,
+                                          const rt_t&             rtree,
+                                          int                     output_dimension,
+                                          tree_scl_val_desc_lst_t point_src
                                          ) {
-        return construct_geometry_rects(ccplx,
-                                  rtree,
-                                  rtree.get_leaf_cells(rtree.ccc_get_top_cell()),
-                                  output_dimension,
-                                  point_src);
+        return construct_geometry_rects(ccplx, rtree, rtree.get_leaf_cells(), output_dimension, point_src);
       }
       //@}
 
@@ -402,12 +414,13 @@ namespace mjr {
           Note we normally use this function when we detect a NaN in a geometric point (i.e. the things with a pnt_idx_t).  This solver solves until
           the return of func has no NaNs.  Those two criteria might not be the same thing, but it's OK.
 
-          @param ccplx                  The MR_cell_cplx to populate with geometry
-          @param rtree                  The MR_rect_tree with source data
-          @param good_point_ccplx_index Good point index in the ccplx object
-          @param good_point_rtree_index Good point index in the rtree object
-          @param sick_point_rtree_index Bad point index in the rtree object
-          @param func                   The function to use for the solver */
+          @param ccplx                   The MR_cell_cplx to populate with geometry
+          @param rtree                   The MR_rect_tree with source data
+          @param good_point_ccplx_index  Good point index in the ccplx object
+          @param good_point_rtree_index  Good point index in the rtree object
+          @param sick_point_rtree_index  Bad point index in the rtree object
+          @param func                    The function to use for the solver
+          @param solver_epsilon          Used as a distance threshold between sick point and solved endpoint in the tree domain space. */
       static typename cc_t::pnt_idx_t nan_edge_solver(cc_t&                    ccplx,
                                                       const rt_t&              rtree,
                                                       typename cc_t::pnt_idx_t good_point_ccplx_index,
@@ -452,7 +465,6 @@ namespace mjr {
         return ret;
       }
       //@}
-
   };
 }
 
