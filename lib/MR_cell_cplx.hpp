@@ -466,13 +466,13 @@ namespace mjr {
 
           @param max_num_print Maximum number of points to print.  Use 0 to print all points. */
       inline void print_all_points(int max_num_print) const {
-        int numPrinted = 0;
+        int num_printed = 0;
         if (num_points() > 0) {
           std::cout << "POINTS BEGIN (" << num_points() << ")" << std::endl;
           for(pnt_idx_t pnt_idx = 0; pnt_idx<num_points(); ++pnt_idx) {
             std::cout << "  " << pnt_idx << ": " << pnt_to_string(pnt_idx) << std::endl;
-            numPrinted++;
-            if ((max_num_print > 0) && (numPrinted >= max_num_print)) {
+            num_printed++;
+            if ((max_num_print > 0) && (num_printed >= max_num_print)) {
               std::cout << "  Maximum number of points reached.  Halting tree dump." << std::endl;
               break;
             }
@@ -1295,7 +1295,7 @@ namespace mjr {
       /** Print all cells to STDOUT. 
           @param max_num_print Maximum number of cells to print.  Use 0 to print all cells. */
       void print_all_cells(int max_num_print) const {
-        int numPrinted = 0;
+        int num_printed = 0;
         if (num_cells() > 0) {
           std::cout << "CELLS BEGIN (" << num_cells() << ")" << std::endl;
           for(int i=0; i<num_cells(); i++) {
@@ -1304,8 +1304,8 @@ namespace mjr {
               std::cout << vert << " ";
             }
             std::cout << "   " << cell_type_to_string(req_pt_cnt_to_cell_type(cell_lst[i].size())) << std::endl;
-            numPrinted++;
-            if ((max_num_print > 0) && (numPrinted >= max_num_print)) {
+            num_printed++;
+            if ((max_num_print > 0) && (num_printed >= max_num_print)) {
               std::cout << "  Maximum number of cells reached.  Halting tree dump." << std::endl;
               break;
             }
@@ -1360,18 +1360,18 @@ namespace mjr {
           return 2;
         }
         /* Looks like we have data.  Let's open our file */
-        std::ofstream outStream;
-        outStream.open(file_name, std::ios::out | std::ios::binary | std::ios::trunc);
-        if (outStream.is_open()) {
-          outStream.imbue(std::locale::classic());
+        std::ofstream out_stream;
+        out_stream.open(file_name, std::ios::out | std::ios::binary | std::ios::trunc);
+        if (out_stream.is_open()) {
+          out_stream.imbue(std::locale::classic());
         } else {
           std::cout << "ERROR(write_xml_vtk): Could not open file!" << std::endl;
           return 3;
         }
-        outStream << "<VTKFile type='UnstructuredGrid' version='0.1' byte_order='LittleEndian'>" << std::endl;
-        outStream << "<!-- " << description << " -->" << std::endl;
-        outStream << "  <UnstructuredGrid>" << std::endl;
-        outStream << "    <Piece NumberOfPoints='" << num_points() << "' NumberOfCells='" << num_cells() << "'>" << std::endl;
+        out_stream << "<VTKFile type='UnstructuredGrid' version='0.1' byte_order='LittleEndian'>" << std::endl;
+        out_stream << "<!-- " << description << " -->" << std::endl;
+        out_stream << "  <UnstructuredGrid>" << std::endl;
+        out_stream << "    <Piece NumberOfPoints='" << num_points() << "' NumberOfCells='" << num_cells() << "'>" << std::endl;
         if ( !(data_name_to_data_idx_lst.empty())) {
           std::string scalars_attr_value, vectors_attr_value, normals_attr_value;
           for (auto& kv : data_name_to_data_idx_lst) 
@@ -1382,65 +1382,65 @@ namespace mjr {
                 normals_attr_value = "NORMALS";
               else
                 vectors_attr_value += (vectors_attr_value.empty() ? "" : " ") + kv.first;
-          outStream << "      <PointData";
+          out_stream << "      <PointData";
           if ( !(scalars_attr_value.empty()))
-            outStream << " Scalars='" << scalars_attr_value << "'";
+            out_stream << " Scalars='" << scalars_attr_value << "'";
           if ( !(normals_attr_value.empty()))
-            outStream << " Normals='" << normals_attr_value << "'";
+            out_stream << " Normals='" << normals_attr_value << "'";
           if ( !(vectors_attr_value.empty()))
-            outStream << " Vectors='" << vectors_attr_value << "'";
-          outStream << ">" << std::endl;
+            out_stream << " Vectors='" << vectors_attr_value << "'";
+          out_stream << ">" << std::endl;
           for (auto& kv : data_name_to_data_idx_lst) {
-            outStream << "        <DataArray Name='" << kv.first << "' type='Float64' format='ascii' NumberOfComponents='" << kv.second.size() << "'>" << std::endl;
-            outStream << "          ";
+            out_stream << "        <DataArray Name='" << kv.first << "' type='Float64' format='ascii' NumberOfComponents='" << kv.second.size() << "'>" << std::endl;
+            out_stream << "          ";
             for (const auto& dv : pnt_idx_to_pnt_data) {
               for (auto& idx : kv.second)
-                outStream << std::setprecision(10) << get_data_scalar(idx, dv) << " ";
+                out_stream << std::setprecision(10) << get_data_scalar(idx, dv) << " ";
             }
-            outStream << std::endl << "        </DataArray>" << std::endl;
+            out_stream << std::endl << "        </DataArray>" << std::endl;
           }
-          outStream << "      </PointData>" << std::endl;
+          out_stream << "      </PointData>" << std::endl;
         }
-        outStream << "      <Points>" << std::endl;
-        outStream << "        <DataArray Name='Points' type='Float64' format='ascii' NumberOfComponents='3'>" << std::endl;
+        out_stream << "      <Points>" << std::endl;
+        out_stream << "        <DataArray Name='Points' type='Float64' format='ascii' NumberOfComponents='3'>" << std::endl;
         for(pnt_idx_t pnt_idx=0; pnt_idx<static_cast<pnt_idx_t>(pnt_idx_to_pnt_data.size()); pnt_idx++) {
           pnt_t pnt = get_pnt(pnt_idx);
-          outStream << "          " << std::setprecision(10) << pnt[0] << " " << pnt[1] << " " << pnt[2] << std::endl;
+          out_stream << "          " << std::setprecision(10) << pnt[0] << " " << pnt[1] << " " << pnt[2] << std::endl;
         }
-        outStream << "        </DataArray>" << std::endl;
-        outStream << "      </Points>" << std::endl;
-        outStream << "      <Cells>" << std::endl;
-        outStream << "        <DataArray type='Int32' Name='connectivity' format='ascii'>" << std::endl;
+        out_stream << "        </DataArray>" << std::endl;
+        out_stream << "      </Points>" << std::endl;
+        out_stream << "      <Cells>" << std::endl;
+        out_stream << "        <DataArray type='Int32' Name='connectivity' format='ascii'>" << std::endl;
         for(auto& poly: cell_lst) {
-          outStream << "          " ;
+          out_stream << "          " ;
           for(auto& vert: poly)
-            outStream << vert << " ";
-          outStream << std::endl;
+            out_stream << vert << " ";
+          out_stream << std::endl;
         }
-        outStream << "        </DataArray>" << std::endl;
-        outStream << "        <DataArray type='Int32' Name='offsets' format='ascii'>" << std::endl;
-        outStream << "          ";
+        out_stream << "        </DataArray>" << std::endl;
+        out_stream << "        <DataArray type='Int32' Name='offsets' format='ascii'>" << std::endl;
+        out_stream << "          ";
         std::vector<int>::size_type j = 0;
         for(auto& poly: cell_lst) {
           j += poly.size();
-          outStream << j << " ";
+          out_stream << j << " ";
         }
-        outStream << std::endl;
-        outStream << "        </DataArray>" << std::endl;
-        outStream << "        <DataArray type='Int8' Name='types' format='ascii'>" << std::endl;
-        outStream << "          ";
+        out_stream << std::endl;
+        out_stream << "        </DataArray>" << std::endl;
+        out_stream << "        <DataArray type='Int8' Name='types' format='ascii'>" << std::endl;
+        out_stream << "          ";
         for(auto& poly: cell_lst)
-          outStream << cell_type_to_vtk_type(req_pt_cnt_to_cell_type(poly.size())) << " ";
-        outStream << std::endl;
-        outStream << "        </DataArray>" << std::endl;
-        outStream << "      </Cells>" << std::endl;
-        outStream << "    </Piece>" << std::endl;
-        outStream << "  </UnstructuredGrid>" << std::endl;
-        outStream << "</VTKFile>" << std::endl;
+          out_stream << cell_type_to_vtk_type(req_pt_cnt_to_cell_type(poly.size())) << " ";
+        out_stream << std::endl;
+        out_stream << "        </DataArray>" << std::endl;
+        out_stream << "      </Cells>" << std::endl;
+        out_stream << "    </Piece>" << std::endl;
+        out_stream << "  </UnstructuredGrid>" << std::endl;
+        out_stream << "</VTKFile>" << std::endl;
         
         /* Final newline */
-        outStream << std::endl;
-        outStream.close();
+        out_stream << std::endl;
+        out_stream.close();
         return 0;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1463,52 +1463,52 @@ namespace mjr {
           return 2;
         }
         /* Looks like we have data.  Let's open our file */
-        std::ofstream outStream;
-        outStream.open(file_name, std::ios::out | std::ios::binary | std::ios::trunc);
-        if (outStream.is_open()) {
-          outStream.imbue(std::locale::classic());
+        std::ofstream out_stream;
+        out_stream.open(file_name, std::ios::out | std::ios::binary | std::ios::trunc);
+        if (out_stream.is_open()) {
+          out_stream.imbue(std::locale::classic());
         } else {
           std::cout << "ERROR(write_legacy_vtk): Could not open file!" << std::endl;
           return 3;
         }
         /* Dump the header */
-        outStream << "# vtk DataFile Version 3.0" << std::endl;
-        outStream << description << std::endl;
-        outStream << "ASCII" << std::endl;
-        outStream << "DATASET UNSTRUCTURED_GRID" << std::endl;
+        out_stream << "# vtk DataFile Version 3.0" << std::endl;
+        out_stream << description << std::endl;
+        out_stream << "ASCII" << std::endl;
+        out_stream << "DATASET UNSTRUCTURED_GRID" << std::endl;
         /* Dump the points */
-        outStream << "POINTS " << num_points() << " double" << std::endl;
+        out_stream << "POINTS " << num_points() << " double" << std::endl;
         //for (const auto& pnt : pnt_idx_to_pnt) 
         for(pnt_idx_t pnt_idx=0; pnt_idx<static_cast<pnt_idx_t>(pnt_idx_to_pnt_data.size()); pnt_idx++) {
           pnt_t pnt = get_pnt(pnt_idx);
-          outStream << std::setprecision(10) << pnt[0] << " " << pnt[1] << " " << pnt[2] << std::endl;
+          out_stream << std::setprecision(10) << pnt[0] << " " << pnt[1] << " " << pnt[2] << std::endl;
         }
         /* Dump the cell data */
         std::vector<int>::size_type total_cells_ints = 0;
         for(auto& cell: cell_lst) 
           total_cells_ints += (1+cell.size());
-        outStream << "CELLS " << num_cells() << " " << total_cells_ints << std::endl;
+        out_stream << "CELLS " << num_cells() << " " << total_cells_ints << std::endl;
         for(auto& poly: cell_lst) {
-          outStream << poly.size() << " ";
+          out_stream << poly.size() << " ";
           for(auto& vert: poly) {
-            outStream << vert << " ";
+            out_stream << vert << " ";
           }
-          outStream << std::endl;
+          out_stream << std::endl;
         }
-        outStream << "CELL_TYPES " << num_cells() << std::endl;
+        out_stream << "CELL_TYPES " << num_cells() << std::endl;
         for(auto& poly: cell_lst)
-          outStream << cell_type_to_vtk_type(req_pt_cnt_to_cell_type(poly.size())) << std::endl;
+          out_stream << cell_type_to_vtk_type(req_pt_cnt_to_cell_type(poly.size())) << std::endl;
         /* Dump point scalar data */
         if (data_name_to_data_idx_lst.size() > 0) {
-          outStream << "POINT_DATA " << num_points() << std::endl;
+          out_stream << "POINT_DATA " << num_points() << std::endl;
           if (named_scalar_datasets_count() > 0) {
             for (auto& kv : data_name_to_data_idx_lst) {
               if (kv.second.size() == 1) {
-                outStream << "SCALARS " << kv.first << " double 1" << std::endl;
-                outStream << "LOOKUP_TABLE default" << std::endl;
+                out_stream << "SCALARS " << kv.first << " double 1" << std::endl;
+                out_stream << "LOOKUP_TABLE default" << std::endl;
                 for (const auto& dv : pnt_idx_to_pnt_data) {
                   uft_t v = get_data_scalar(kv.second[0], dv);
-                  outStream << std::setprecision(10) << v << std::endl;
+                  out_stream << std::setprecision(10) << v << std::endl;
                 }
               }
             }
@@ -1517,23 +1517,23 @@ namespace mjr {
             for (auto& kv : data_name_to_data_idx_lst) {
               if (kv.second.size() == 3) {
                 if ("NORMALS" == kv.first) {
-                  outStream << "NORMALS " << kv.first << " double" << std::endl;
+                  out_stream << "NORMALS " << kv.first << " double" << std::endl;
                 } else if ("COLORS" == kv.first) {
-                  outStream << "COLOR_SCALARS " << kv.first << " 3" << std::endl;
+                  out_stream << "COLOR_SCALARS " << kv.first << " 3" << std::endl;
                 } else {
-                  outStream << "VECTORS " << kv.first << " double" << std::endl;
+                  out_stream << "VECTORS " << kv.first << " double" << std::endl;
                 }
                 for (const auto& dv : pnt_idx_to_pnt_data) {
                   vdat_t v = get_dataset_vector(kv.second, dv);
-                  outStream << std::setprecision(10) << v[0] << " " << v[1] << " " << v[2] << std::endl;
+                  out_stream << std::setprecision(10) << v[0] << " " << v[1] << " " << v[2] << std::endl;
                 }
               }
             }
           }
         }
         /* Final newline */
-        outStream << std::endl;
-        outStream.close();
+        out_stream << std::endl;
+        out_stream.close();
         return 0;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1578,63 +1578,63 @@ namespace mjr {
           }
         }
         /* Looks like we have data.  Let's open our file */
-        std::ofstream outStream;
-        outStream.open(file_name, std::ios::out | std::ios::binary | std::ios::trunc);
-        if (outStream.is_open()) {
-          outStream.imbue(std::locale::classic());
+        std::ofstream out_stream;
+        out_stream.open(file_name, std::ios::out | std::ios::binary | std::ios::trunc);
+        if (out_stream.is_open()) {
+          out_stream.imbue(std::locale::classic());
         } else {
           std::cout << "ERROR(write_ply): Could not open file!" << std::endl;
           return 3;
         }
         bool have_colors_data = data_name_to_data_idx_lst.contains("COLORS");
         bool have_normal_data = data_name_to_data_idx_lst.contains("NORMALS");
-        outStream << "ply" << std::endl;
-        outStream << "format ascii 1.0" << std::endl;
-        outStream << "comment software: Mitch Richling's MR_rect_tree package" << std::endl;
-        outStream << "comment note: " << description << std::endl;
-        outStream << "element vertex " << num_points() << std::endl;
-        outStream << "property float x" << std::endl;
-        outStream << "property float y" << std::endl;
-        outStream << "property float z" << std::endl;
+        out_stream << "ply" << std::endl;
+        out_stream << "format ascii 1.0" << std::endl;
+        out_stream << "comment software: Mitch Richling's MR_rect_tree package" << std::endl;
+        out_stream << "comment note: " << description << std::endl;
+        out_stream << "element vertex " << num_points() << std::endl;
+        out_stream << "property float x" << std::endl;
+        out_stream << "property float y" << std::endl;
+        out_stream << "property float z" << std::endl;
         if (have_colors_data) {
-          outStream << "property uchar red" << std::endl;
-          outStream << "property uchar green" << std::endl;
-          outStream << "property uchar blue" << std::endl;
+          out_stream << "property uchar red" << std::endl;
+          out_stream << "property uchar green" << std::endl;
+          out_stream << "property uchar blue" << std::endl;
         }
         if (have_normal_data) {
-          outStream << "property float nx" << std::endl;
-          outStream << "property float ny" << std::endl;
-          outStream << "property float nz" << std::endl;
+          out_stream << "property float nx" << std::endl;
+          out_stream << "property float ny" << std::endl;
+          out_stream << "property float nz" << std::endl;
         }
-        outStream << "element face " << num_cells() << std::endl; // May need to be adjusted if cells are not triangles..
-        outStream << "property list uchar int vertex_index" << std::endl;
-        outStream << "end_header" << std::endl;
+        out_stream << "element face " << num_cells() << std::endl; // May need to be adjusted if cells are not triangles..
+        out_stream << "property list uchar int vertex_index" << std::endl;
+        out_stream << "end_header" << std::endl;
         // Dump Vertex Data
         for (int i=0; i<num_points(); i++) {
           pnt_t pnt = get_pnt(i);
-          outStream << std::setprecision(10) << pnt[0] << " " << pnt[1] << " " << pnt[2];
+          out_stream << std::setprecision(10) << pnt[0] << " " << pnt[1] << " " << pnt[2];
           if (have_colors_data) {
             vdat_t clr = get_dataset_vector(data_name_to_data_idx_lst["COLORS"], pnt_idx_to_pnt_data[i]);
-            outStream << " " << static_cast<int>(255*clr[0]) << " " << static_cast<int>(255*clr[1]) << " " << static_cast<int>(255*clr[2]);
+            out_stream << " " << static_cast<int>(255*clr[0]) << " " << static_cast<int>(255*clr[1]) << " " << static_cast<int>(255*clr[2]);
           }
           if (have_normal_data) {
             vdat_t nml = get_dataset_vector(data_name_to_data_idx_lst["NORMALS"], pnt_idx_to_pnt_data[i]);
             vec3_unitize(nml);
-            outStream << " " << std::setprecision(10) << nml[0] << " " << nml[1] << " " << nml[2];
+            out_stream << " " << std::setprecision(10) << nml[0] << " " << nml[1] << " " << nml[2];
           }
-          outStream << std::endl;
+          out_stream << std::endl;
         }
         // Dump Cells
         for(auto& poly: cell_lst) {
-          outStream << poly.size() << " ";
+          out_stream << poly.size() << " ";
           for(auto& vert: poly) {
-            outStream << vert << " ";
+            out_stream << vert << " ";
           }
-          outStream << std::endl;
+          out_stream << std::endl;
         }
         /* Final newline */
-        outStream << std::endl;
-        outStream.close();
+        out_stream << std::endl;
+        out_stream.close();
         return 0;
       }
       //@}

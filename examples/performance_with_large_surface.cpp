@@ -57,7 +57,7 @@ typedef mjr::MRccT5                  cc_t;   // Replace with mjr::MRccF5, and co
 typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-tt_t::rrpt_t shellStripes2(tt_t::drpt_t xvec) {
+tt_t::rrpt_t stripy_shell(tt_t::drpt_t xvec) {
   double u    = std::numbers::pi   * xvec[0] + std::numbers::pi + 0.1; // U transformed from unit interval
   double v    = std::numbers::pi/2 * xvec[1] + std::numbers::pi/2;     // V transformed from unit interval
   double x    = u*std::sin(u)*std::cos(v);                             // X
@@ -78,17 +78,17 @@ tt_t::rrpt_t shellStripes2(tt_t::drpt_t xvec) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int main() {
-  std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
+  std::chrono::time_point<std::chrono::system_clock> start_time = std::chrono::system_clock::now();
   tt_t tree;
   cc_t ccplx;
   tc_t bridge;
-  std::chrono::time_point<std::chrono::system_clock> constructTime = std::chrono::system_clock::now();
+  std::chrono::time_point<std::chrono::system_clock> construct_time = std::chrono::system_clock::now();
 
-  tree.refine_grid(7, shellStripes2);
-  std::chrono::time_point<std::chrono::system_clock> sampleTime = std::chrono::system_clock::now();
+  tree.refine_grid(7, stripy_shell);
+  std::chrono::time_point<std::chrono::system_clock> sample_time = std::chrono::system_clock::now();
 
   tree.dump_tree(20);
-  std::chrono::time_point<std::chrono::system_clock> dumpTime = std::chrono::system_clock::now();
+  std::chrono::time_point<std::chrono::system_clock> dump_time = std::chrono::system_clock::now();
 
   bridge.construct_geometry_fans(ccplx,
                                  tree,
@@ -96,21 +96,25 @@ int main() {
                                  {{tc_t::tree_val_src_t::RANGE,  0},
                                   {tc_t::tree_val_src_t::RANGE,  1},
                                   {tc_t::tree_val_src_t::RANGE,  2}});
-  std::chrono::time_point<std::chrono::system_clock> vtkFanTime = std::chrono::system_clock::now();
+  std::chrono::time_point<std::chrono::system_clock> fan_time = std::chrono::system_clock::now();
 
-  ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)", "c(u,v)", "dx(u,v)/du", "dx(u,v)/dv", "dy(u,v)/du", "dy(u,v)/dv", "dz(u,v)/du", "dz(u,v)/dv", "nx", "ny", "nz"}, 
+  ccplx.create_named_datasets({"u", "v", 
+                               "x(u,v)", "y(u,v)", "z(u,v)",
+                               "c(u,v)", 
+                               "dx(u,v)/du", "dx(u,v)/dv", "dy(u,v)/du", "dy(u,v)/dv", "dz(u,v)/du", "dz(u,v)/dv",
+                               "nx", "ny", "nz"}, 
                               {{"NORMALS", {12, 13, 14}}});
-  std::chrono::time_point<std::chrono::system_clock> datAnnoTime = std::chrono::system_clock::now();
+  std::chrono::time_point<std::chrono::system_clock> dat_anno_time = std::chrono::system_clock::now();
 
   ccplx.write_xml_vtk("performance_with_large_surface.vtu", "performance_with_large_surface");
-  std::chrono::time_point<std::chrono::system_clock> vtkWriteTime = std::chrono::system_clock::now();
+  std::chrono::time_point<std::chrono::system_clock> write_time = std::chrono::system_clock::now();
 
-  std::cout << "constructTime time ... " << static_cast<std::chrono::duration<double>>(constructTime-startTime)     << " sec" << std::endl;
-  std::cout << "sampleTime time ...... " << static_cast<std::chrono::duration<double>>(sampleTime-constructTime)    << " sec" << std::endl;
-  std::cout << "dumpTime time ........ " << static_cast<std::chrono::duration<double>>(dumpTime-sampleTime)         << " sec" << std::endl;
-  std::cout << "bridge time ... " << static_cast<std::chrono::duration<double>>(vtkFanTime-dumpTime)         << " sec" << std::endl;
-  std::cout << "dataset anno time .... " << static_cast<std::chrono::duration<double>>(datAnnoTime-vtkFanTime)      << " sec" << std::endl;
-  std::cout << "write_vtk time ....... " << static_cast<std::chrono::duration<double>>(vtkWriteTime-datAnnoTime)    << " sec" << std::endl;
-  std::cout << "Total Run Time ....... " << static_cast<std::chrono::duration<double>>(vtkWriteTime-startTime)      << " sec" << std::endl;
+  std::cout << "construct_time time .. " << static_cast<std::chrono::duration<double>>(construct_time-start_time)   << " sec" << std::endl;
+  std::cout << "sample_time time ..... " << static_cast<std::chrono::duration<double>>(sample_time-construct_time)  << " sec" << std::endl;
+  std::cout << "dump_time time ....... " << static_cast<std::chrono::duration<double>>(dump_time-sample_time)       << " sec" << std::endl;
+  std::cout << "bridge time .......... " << static_cast<std::chrono::duration<double>>(fan_time-dump_time)          << " sec" << std::endl;
+  std::cout << "dataset anno time .... " << static_cast<std::chrono::duration<double>>(dat_anno_time-fan_time)      << " sec" << std::endl;
+  std::cout << "write_vtk time ....... " << static_cast<std::chrono::duration<double>>(write_time-dat_anno_time)    << " sec" << std::endl;
+  std::cout << "Total Run _time ...... " << static_cast<std::chrono::duration<double>>(write_time-start_time)       << " sec" << std::endl;
 }
 /** @endcond */

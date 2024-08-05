@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-08-02 Fri 10:26 -->
+<!-- 2024-08-05 Mon 14:22 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Development Roadmap</title>
@@ -231,12 +231,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-08-02 10:26:15</i></td>
+<td class="org-left"><i>2024-08-05 14:22:25</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-08-02 10:26:17</i></td>
+<td class="org-left"><i>2024-08-05 14:22:26</i></td>
 </tr>
 </tbody>
 </table>
@@ -248,14 +248,14 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org8b31230">1. High Level Future Development Plans (TODO)</a></li>
-<li><a href="#org2ae47ce">2. Raw TODO Comments From Source Code</a></li>
+<li><a href="#orgd4ac6fe">1. High Level Future Development Plans (TODO)</a></li>
+<li><a href="#org5504111">2. Raw TODO Comments From Source Code</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org8b31230" class="outline-2">
-<h2 id="org8b31230"><span class="section-number-2">1.</span> High Level Future Development Plans (TODO)</h2>
+<div id="outline-container-orgd4ac6fe" class="outline-2">
+<h2 id="orgd4ac6fe"><span class="section-number-2">1.</span> High Level Future Development Plans (TODO)</h2>
 <div class="outline-text-2" id="text-1">
 <ul class="org-ul">
 <li>Tree Related
@@ -264,7 +264,7 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <ul class="org-ul">
 <li>cell angle</li>
 <li>cell aspect ratio</li>
-<li>cell width)</li>
+<li>cell width</li>
 </ul></li>
 </ul></li>
 <li>Tree To Complex Related
@@ -275,10 +275,8 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <ul class="org-ul">
 <li>Edge Solvers
 <ul class="org-ul">
-<li>Good -&gt; NaN (<b>DONE</b>)</li>
-<li>SDF on domain</li>
-<li>Level on range</li>
-<li>Level in domain (this can be direct)</li>
+<li>SDF</li>
+<li>Level</li>
 <li>Predicate</li>
 </ul></li>
 <li>Cell Manipulation
@@ -287,43 +285,55 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <li>Fat Cut Cell</li>
 <li>Fold Cell</li>
 </ul></li>
-<li>Add cell filter to file write functions</li>
-<li>Add cell cull (i.e. delete cells matching a predicate)</li>
+<li>Cell Complex Operations
+<ul class="org-ul">
+<li>Cull cells based on predicate</li>
+<li>Add cells from another cell complex</li>
+<li>Extract level complex and store in another cell complex</li>
 </ul></li>
-<li>Examples:
+<li>Add cell filter to file write functions?</li>
+</ul></li>
+<li>Examples
 <ul class="org-ul">
 <li>Demonstrate edge solver &amp; cell folding with SDF for surface with a corner</li>
 <li>Demonstrate "cropping" z-axis plot range with crop plane &amp; edge solver</li>
-<li>implicit curve
-<ul class="org-ul">
 <li>Demonstrate edge solver &amp; SDF to extract level curve with a large grid step size</li>
-<li>Demonstrate how to limit output to cells covering curve with cell filtering</li>
+<li>Demonstrate 3D parametric curve &lt;x(t), y(t), z(t)&gt; with bitree (twisted cubic) &#x2013; <b>WIP</b></li>
+<li>Demonstrate surface as level set using solid of pyramids (ear surface) &#x2013; <b>WIP</b></li>
+<li>Demonstrate how to insert multiple trees into one cell complex</li>
 </ul></li>
-<li>bitree examples
+<li>External Interfaces (listed in no particular order)
 <ul class="org-ul">
-<li>3D parametric curve &lt;x(t), y(t), z(t)&gt;</li>
-</ul></li>
+<li>Julia</li>
+<li>Ruby</li>
+<li>Fortran (Might just do MR_rect_tree)</li>
+<li>Maple</li>
+<li>Octave/Matlab</li>
+<li>Python</li>
 </ul></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org2ae47ce" class="outline-2">
-<h2 id="org2ae47ce"><span class="section-number-2">2.</span> Raw TODO Comments From Source Code</h2>
+<div id="outline-container-org5504111" class="outline-2">
+<h2 id="org5504111"><span class="section-number-2">2.</span> Raw TODO Comments From Source Code</h2>
 <div class="outline-text-2" id="text-2">
-<pre class="example" id="org75d08c3">
-lib/MR_cell_cplx.hpp  553   &lt;2024-07-22T15:48:31-0500&gt; vec3_det3: UNTESTED! UNTESTED! UNTESTED! UNTESTED! 
-lib/MR_cell_cplx.hpp  600   &lt;2024-08-02T09:41:48-0500&gt; geomi_seg_isect_type: Repeated point look-up slows things down
-lib/MR_cell_cplx.hpp  601   &lt;2024-08-02T09:41:48-0500&gt; geomi_seg_isect_type: Add unit tests for each code branch
-lib/MR_cell_cplx.hpp  718   &lt;2024-08-02T09:42:19-0500&gt; geomr_pnt_line_distance: check logic -- dp1&gt;segd || dp2&gt;segd?
-lib/MR_cell_cplx.hpp  751   &lt;2024-07-22T15:48:31-0500&gt; geomr_pnt_tri_distance: UNTESTED! UNTESTED! UNTESTED! UNTESTED! UNTESTED! 
-lib/MR_cell_cplx.hpp  821   &lt;2024-07-11T16:08:16-0500&gt; geomr_seg_tri_intersection: implement
-lib/MR_cell_cplx.hpp  822   &lt;2024-07-11T16:08:27-0500&gt; geomr_seg_tri_intersection: Should this be a bool or an enum?
-lib/MR_cell_cplx.hpp  932   &lt;2024-07-11T16:06:42-0500&gt; cell_type_to_structure: make sure polygons are all oriented correctly
-lib/MR_cell_cplx.hpp  1187  &lt;2024-08-02T09:42:38-0500&gt; check_cell_face_intersections: Implement
-lib/MR_rect_tree.hpp  640   &lt;2024-07-11T11:50:36-0500&gt; cuc_two_cross: If diti is close to an corner, some result points may be out of range.
-lib/MR_rect_tree.hpp  1354  &lt;2024-07-11T16:04:10-0500&gt; cell_is_unbalanced: Optimize run time (nix the use of get_smallest_neighbor_level)
-lib/MR_rt_to_cc.hpp   294   &lt;2024-08-02T09:43:13-0500&gt; construct_geometry_fans: Implement
+<pre class="example" id="orgd8198d5">
+Mon Aug  5 14:22:24 CDT 2024
+lib/MR_cell_cplx.hpp              555   &lt;2024-07-22T15:48:31-0500&gt; vec3_det3: UNTESTED! UNTESTED! UNTESTED! UNTESTED! 
+lib/MR_cell_cplx.hpp              601   &lt;2024-08-02T09:41:48-0500&gt; geomi_seg_isect_type: Repeated point look-up slows things down
+lib/MR_cell_cplx.hpp              602   &lt;2024-08-02T09:41:48-0500&gt; geomi_seg_isect_type: Add unit tests for each code branch
+lib/MR_cell_cplx.hpp              719   &lt;2024-08-02T09:42:19-0500&gt; geomr_pnt_line_distance: check logic -- dp1&gt;segd || dp2&gt;segd?
+lib/MR_cell_cplx.hpp              749   &lt;2024-07-22T15:48:31-0500&gt; geomr_pnt_tri_distance: UNTESTED! UNTESTED! UNTESTED! UNTESTED! UNTESTED! 
+lib/MR_cell_cplx.hpp              819   &lt;2024-07-11T16:08:16-0500&gt; geomr_seg_tri_intersection: implement
+lib/MR_cell_cplx.hpp              820   &lt;2024-07-11T16:08:27-0500&gt; geomr_seg_tri_intersection: Should this be a bool or an enum?
+lib/MR_cell_cplx.hpp              930   &lt;2024-07-11T16:06:42-0500&gt; cell_type_to_structure: make sure polygons are all oriented correctly
+lib/MR_cell_cplx.hpp              1185  &lt;2024-08-02T09:42:38-0500&gt; check_cell_face_intersections: Implement
+lib/MR_rect_tree.hpp              640   &lt;2024-07-11T11:50:36-0500&gt; cuc_two_cross: If diti is close to an corner, some result points may be out of range.
+lib/MR_rect_tree.hpp              1354  &lt;2024-07-11T16:04:10-0500&gt; cell_is_unbalanced: Optimize run time (nix the use of get_smallest_neighbor_level)
+lib/MR_rt_to_cc.hpp               293   &lt;2024-08-05T12:35:37-0500&gt; construct_geometry_fans: Fix pyramid base vertex order!
+examples/ear_surface.cpp          100   &lt;2024-08-05T14:19:05-0500&gt; main: Publish when we fix vertex ordering produced by construct_geometry_fans()
+examples/surface_plot_corner.cpp  99    &lt;2024-08-05T14:01:04-0500&gt; main: Requires new functionality in both MR_rt_to_cc and MR_cell_cplx.
 </pre>
 </div>
 </div>

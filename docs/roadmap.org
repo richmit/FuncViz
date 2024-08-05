@@ -50,7 +50,7 @@ Copyright \copy {{{time(%Y)}}} Mitch Richling. All rights reserved.
        - Adaptive function sample rules (for bitree & quadtree)
          - cell angle
          - cell aspect ratio
-         - cell width)
+         - cell width
      - Tree To Complex Related
        - Adapters & interfaces for cell complex edge solvers
      - Cell Complex
@@ -71,7 +71,8 @@ Copyright \copy {{{time(%Y)}}} Mitch Richling. All rights reserved.
        - Demonstrate edge solver & cell folding with SDF for surface with a corner
        - Demonstrate "cropping" z-axis plot range with crop plane & edge solver
        - Demonstrate edge solver & SDF to extract level curve with a large grid step size
-       - Demonstrate 3D parametric curve <x(t), y(t), z(t)> with bitree (twisted cubic?)
+       - Demonstrate 3D parametric curve <x(t), y(t), z(t)> with bitree (twisted cubic) -- *WIP*
+       - Demonstrate surface as level set using solid of pyramids (ear surface) -- *WIP*
        - Demonstrate how to insert multiple trees into one cell complex
      - External Interfaces (listed in no particular order)
        - Julia
@@ -84,23 +85,24 @@ Copyright \copy {{{time(%Y)}}} Mitch Richling. All rights reserved.
 * Raw TODO Comments From Source Code
 
 #+begin_src sh :results output verbatum :exports results 
-date; grep -n 'MJR TODO NOTE' ../lib/*.hpp | sed -E 's/^...//; s/pp:([0-9]+): +\/\/ +MJR TODO NOTE +/pp%\1%/;' | column -s% -t
+date; grep -n 'MJR TODO NOTE' ../lib/*.hpp ../examples/*.cpp ../utests/*.cpp ../ftests/*.cpp | sed -E 's/^...//; s/pp:([0-9]+): +\/\/ +MJR TODO NOTE +/pp%\1%/;' | column -s% -t
 #+end_src
 
 #+RESULTS:
 #+begin_example
-Fri Aug  2 12:58:41 CDT 2024
-lib/MR_cell_cplx.hpp  559   <2024-07-22T15:48:31-0500> vec3_det3: UNTESTED! UNTESTED! UNTESTED! UNTESTED! 
-lib/MR_cell_cplx.hpp  606   <2024-08-02T09:41:48-0500> geomi_seg_isect_type: Repeated point look-up slows things down
-lib/MR_cell_cplx.hpp  607   <2024-08-02T09:41:48-0500> geomi_seg_isect_type: Add unit tests for each code branch
-lib/MR_cell_cplx.hpp  724   <2024-08-02T09:42:19-0500> geomr_pnt_line_distance: check logic -- dp1>segd || dp2>segd?
-lib/MR_cell_cplx.hpp  757   <2024-07-22T15:48:31-0500> geomr_pnt_tri_distance: UNTESTED! UNTESTED! UNTESTED! UNTESTED! UNTESTED! 
-lib/MR_cell_cplx.hpp  827   <2024-07-11T16:08:16-0500> geomr_seg_tri_intersection: implement
-lib/MR_cell_cplx.hpp  828   <2024-07-11T16:08:27-0500> geomr_seg_tri_intersection: Should this be a bool or an enum?
-lib/MR_cell_cplx.hpp  938   <2024-07-11T16:06:42-0500> cell_type_to_structure: make sure polygons are all oriented correctly
-lib/MR_cell_cplx.hpp  1193  <2024-08-02T09:42:38-0500> check_cell_face_intersections: Implement
-lib/MR_cell_cplx.hpp  1737  <2024-08-02T12:36:46-0500> edge_solver: A "relivant_indexs" argument to speed up midpoint computation?
-lib/MR_rect_tree.hpp  640   <2024-07-11T11:50:36-0500> cuc_two_cross: If diti is close to an corner, some result points may be out of range.
-lib/MR_rect_tree.hpp  1354  <2024-07-11T16:04:10-0500> cell_is_unbalanced: Optimize run time (nix the use of get_smallest_neighbor_level)
-lib/MR_rt_to_cc.hpp   294   <2024-08-02T09:43:13-0500> construct_geometry_fans: Implement
+Mon Aug  5 14:22:24 CDT 2024
+lib/MR_cell_cplx.hpp              555   <2024-07-22T15:48:31-0500> vec3_det3: UNTESTED! UNTESTED! UNTESTED! UNTESTED! 
+lib/MR_cell_cplx.hpp              601   <2024-08-02T09:41:48-0500> geomi_seg_isect_type: Repeated point look-up slows things down
+lib/MR_cell_cplx.hpp              602   <2024-08-02T09:41:48-0500> geomi_seg_isect_type: Add unit tests for each code branch
+lib/MR_cell_cplx.hpp              719   <2024-08-02T09:42:19-0500> geomr_pnt_line_distance: check logic -- dp1>segd || dp2>segd?
+lib/MR_cell_cplx.hpp              749   <2024-07-22T15:48:31-0500> geomr_pnt_tri_distance: UNTESTED! UNTESTED! UNTESTED! UNTESTED! UNTESTED! 
+lib/MR_cell_cplx.hpp              819   <2024-07-11T16:08:16-0500> geomr_seg_tri_intersection: implement
+lib/MR_cell_cplx.hpp              820   <2024-07-11T16:08:27-0500> geomr_seg_tri_intersection: Should this be a bool or an enum?
+lib/MR_cell_cplx.hpp              930   <2024-07-11T16:06:42-0500> cell_type_to_structure: make sure polygons are all oriented correctly
+lib/MR_cell_cplx.hpp              1185  <2024-08-02T09:42:38-0500> check_cell_face_intersections: Implement
+lib/MR_rect_tree.hpp              640   <2024-07-11T11:50:36-0500> cuc_two_cross: If diti is close to an corner, some result points may be out of range.
+lib/MR_rect_tree.hpp              1354  <2024-07-11T16:04:10-0500> cell_is_unbalanced: Optimize run time (nix the use of get_smallest_neighbor_level)
+lib/MR_rt_to_cc.hpp               293   <2024-08-05T12:35:37-0500> construct_geometry_fans: Fix pyramid base vertex order!
+examples/ear_surface.cpp          100   <2024-08-05T14:19:05-0500> main: Publish when we fix vertex ordering produced by construct_geometry_fans()
+examples/surface_plot_corner.cpp  99    <2024-08-05T14:01:04-0500> main: Requires new functionality in both MR_rt_to_cc and MR_cell_cplx.
 #+end_example

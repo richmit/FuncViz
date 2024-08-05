@@ -34,7 +34,7 @@ endif()
 
 
 set(TARGETS_EXAMPLE "hello_world" 
-                    "surface_with_normals" "surface_plot_edge" "surface_branch_glue"
+                    "surface_with_normals" "surface_plot_edge" "surface_branch_glue" "surface_plot_corner"
                     "parametric_surface_with_defects" "performance_with_large_surface" "trefoil" 
                     "parametric_curve_3d"
                     "implicit_surface" 
@@ -42,6 +42,7 @@ set(TARGETS_EXAMPLE "hello_world"
                     "vector_field_3d"
                     "curve_plot"
                     "complex_magnitude_surface"
+                    "ear_surface"
                   )
 set(TARGETS_UTEST "check_cell_hexahedron" "check_cell_pyramid" "check_cell_quad" "check_cell_triangle" "check_cell_segment"
                  "geomi_pnt_line_distance"

@@ -51,7 +51,7 @@ typedef mjr::MRccT5                  cc_t;
 typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-tt_t::rrpt_t halfSphere2(tt_t::drpt_t xvec) {
+tt_t::rrpt_t half_sphere(tt_t::drpt_t xvec) {
   double m = xvec[0] * xvec[0] + xvec[1] * xvec[1];
   if (m > 1) {
     return std::numeric_limits<double>::quiet_NaN();
@@ -62,39 +62,36 @@ tt_t::rrpt_t halfSphere2(tt_t::drpt_t xvec) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int main() {
-  tt_t tree({-1.2, -1.2}, 
-            { 1.2,  1.2});
+  tt_t tree({-1.1, -1.1}, 
+            { 1.1,  1.1});
   cc_t ccplx;
   tc_t bridge;
 
   // Sample a uniform grid across the domain
-  tree.refine_grid(5, halfSphere2);
+  tree.refine_grid(5, half_sphere);
 
-  /* halfSphere2 produces NaNs outside the unit circle.  
+  /* half_sphere produces NaNs outside the unit circle.  
      We can refine cells that cross the unit circle using refine_recursive_if_cell_vertex_is_nan */
-  tree.refine_recursive_if_cell_vertex_is_nan(7, halfSphere2);
+  tree.refine_recursive_if_cell_vertex_is_nan(7, half_sphere);
 
-  /* halfSphere2 produces NaNs outside the unit circle.  
-     We can refine cells that cross the unit circle using refine_leaves_recursive_cell_pred & cell_vertex_is_nan.
-     The result is the same as the call to refine_recursive_if_cell_vertex_is_nan above. */
-  // tree.refine_leaves_recursive_cell_pred(6, halfSphere2, [&tree](int i) { return (tree.cell_vertex_is_nan(i)); });
+  /* We can acheive the same result via refine_leaves_recursive_cell_pred & cell_vertex_is_nan. */
+  // tree.refine_leaves_recursive_cell_pred(6, half_sphere, [&tree](int i) { return (tree.cell_vertex_is_nan(i)); });
 
-  /* Note: Instead of looking for NaNs, we could have used a SDF to simply tell the tree to sample anything that crosses
-     the unit circle.  This is the technique used in MR_rect_tree_test_surf_corner.cpp. */
+  /* We can acheive similar results by refining on the unit curcle via an SDF -- See surface_plot_corner.cpp */
 
   /* Balance the three to the traditional level of 1 (no cell borders a cell more than half it's size) */
-  tree.balance_tree(1, halfSphere2);
+  tree.balance_tree(1, half_sphere);
 
   tree.dump_tree(10);
 
-  /* By passing halfSphere2() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired. */
+  /* By passing half_sphere() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired. */
   bridge.construct_geometry_fans(ccplx,
                                  tree,
                                  2,
                                  {{tc_t::tree_val_src_t::DOMAIN, 0}, 
                                   {tc_t::tree_val_src_t::DOMAIN, 1},
                                   {tc_t::tree_val_src_t::RANGE,  0}},
-                                 halfSphere2
+                                 half_sphere
                                 );
 
   ccplx.create_named_datasets({"x", "y", "f(x,y)"},

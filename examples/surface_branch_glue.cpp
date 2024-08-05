@@ -51,7 +51,7 @@ typedef mjr::MRccT5                  cc_t;
 typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-tt_t::rrpt_t halfSphere2(tt_t::drpt_t xvec) {
+tt_t::rrpt_t half_sphere(tt_t::drpt_t xvec) {
   double m = xvec[0] * xvec[0] + xvec[1] * xvec[1];
   if (m > 1) {
     return std::numeric_limits<double>::quiet_NaN();
@@ -68,21 +68,21 @@ int main() {
   tc_t bridge;
 
   // Sample a uniform grid across the domain
-  tree.refine_grid(5, halfSphere2);
+  tree.refine_grid(5, half_sphere);
 
   /* Refine near the edge */
-  tree.refine_recursive_if_cell_vertex_is_nan(6, halfSphere2);
+  tree.refine_recursive_if_cell_vertex_is_nan(6, half_sphere);
 
   tree.dump_tree(10);
 
-  /* By passing halfSphere2() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired. */
+  /* By passing half_sphere() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired. */
   bridge.construct_geometry_fans(ccplx,
                                  tree,
                                  2,
                                  {{tc_t::tree_val_src_t::DOMAIN, 0}, 
                                   {tc_t::tree_val_src_t::DOMAIN, 1},
                                   {tc_t::tree_val_src_t::RANGE,  0}},
-                                 halfSphere2
+                                 half_sphere
                                 );
 
   ccplx.create_named_datasets({"x", "y", "f(x,y)"},

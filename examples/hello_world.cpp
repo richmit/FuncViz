@@ -44,7 +44,7 @@ typedef mjr::MRccT5                cc_t;
 typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-tt_t::rrpt_t dampCosWave2(tt_t::drpt_t xvec) {
+tt_t::rrpt_t damp_cos_wave(tt_t::drpt_t xvec) {
   double x = xvec[0];
   double y = xvec[1];
   double d = x*x+y*y;
@@ -59,7 +59,7 @@ int main() {
   cc_t ccplx;
   tc_t bridge;
 
-  tree.refine_grid(7, dampCosWave2);   // Sample on a uniform grid
+  tree.refine_grid(7, damp_cos_wave);   // Sample on a uniform grid
   tree.dump_tree(5);                   // Dump some of the tree
 
   // Convert the tree to poly data

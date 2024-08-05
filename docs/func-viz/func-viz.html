@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-08-05 Mon 12:37 -->
+<!-- 2024-08-05 Mon 15:35 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Function Visualization</title>
@@ -272,12 +272,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-08-05 12:37:37</i></td>
+<td class="org-left"><i>2024-08-05 15:33:53</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-08-05 12:37:38</i></td>
+<td class="org-left"><i>2024-08-05 15:34:59</i></td>
 </tr>
 </tbody>
 </table>
@@ -870,7 +870,7 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
 <span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;
 <span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
 
-<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">dampCosWave2</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">damp_cos_wave</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
   <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x</span> = xvec[0];
   <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y</span> = xvec[1];
   <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">d</span> = x*x+y*y;
@@ -893,7 +893,7 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
   <span style="color: #00ffff;">return</span> {z, -dx/nm, -dy/nm, 1/nm, dd};
 }
 
-<span style="color: #63b8ff;">double</span> <span style="color: #00fa9a; font-weight: bold;">circleSDF2</span>(<span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">r</span>, <span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+<span style="color: #63b8ff;">double</span> <span style="color: #00fa9a; font-weight: bold;">circle_sdf</span>(<span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">r</span>, <span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
   <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x</span> = xvec[0];
   <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y</span> = xvec[1];
   <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">m</span> = x*x+y*y;
@@ -907,23 +907,23 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
   <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">bridge</span>;
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Make a few samples on a uniform grid</span>
-  tree.refine_grid(2, dampCosWave2);
+  tree.refine_grid(2, damp_cos_wave);
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">The humps need extra samples.  We know where they are, and we could sample on them with an SDF like this:</span>
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">for(double i: {0, 1, 2, 3}) {</span>
   <span style="color: #ffa500;">//   </span><span style="color: #ff7f24;">double r = i*std::numbers::pi/4;</span>
-  <span style="color: #ffa500;">//   </span><span style="color: #ff7f24;">tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&amp;tree, r](int i) { return (tree.cell_cross_sdf(i, std::bind_front(circleSDF2, r))); });</span>
+  <span style="color: #ffa500;">//   </span><span style="color: #ff7f24;">tree.refine_leaves_recursive_cell_pred(6, damp_cos_wave, [&amp;tree, r](int i) { return (tree.cell_cross_sdf(i, std::bind_front(circle_sdf, r))); });</span>
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">}</span>
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Alternately, we can test the derivative values to identify the humps</span>
-  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&amp;tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 1, 0.0); });</span>
-  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&amp;tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 2, 0.0); });</span>
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">tree.refine_leaves_recursive_cell_pred(6, damp_cos_wave, [&amp;tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 1, 0.0); });</span>
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">tree.refine_leaves_recursive_cell_pred(6, damp_cos_wave, [&amp;tree](tt_t::diti_t i) { return tree.cell_cross_range_level(i, 2, 0.0); });</span>
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Lastly we can use the directional derivative radiating from the origin</span>
-  tree.refine_leaves_recursive_cell_pred(6, dampCosWave2, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> tree.cell_cross_range_level(i, 4, 0.0); });
+  tree.refine_leaves_recursive_cell_pred(6, damp_cos_wave, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> tree.cell_cross_range_level(i, 4, 0.0); });
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Balance the three to the traditional level of 1 (no  cell borders a cell more than half it's size)</span>
-  tree.balance_tree(1, dampCosWave2);
+  tree.balance_tree(1, damp_cos_wave);
 
   tree.dump_tree(5);
 
@@ -999,7 +999,7 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
 <span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;
 <span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
 
-<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">halfSphere2</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">half_sphere</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
   <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">m</span> = xvec[0] * xvec[0] + xvec[1] * xvec[1];
   <span style="color: #00ffff;">if</span> (m &gt; 1) {
     <span style="color: #00ffff;">return</span> <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numeric_limits</span>&lt;<span style="color: #63b8ff;">double</span>&gt;::quiet_NaN();
@@ -1009,39 +1009,36 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
 }
 
 <span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
-  <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">tree</span>({-1.2, -1.2}, 
-            { 1.2,  1.2});
+  <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">tree</span>({-1.1, -1.1}, 
+            { 1.1,  1.1});
   <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">ccplx</span>;
   <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">bridge</span>;
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Sample a uniform grid across the domain</span>
-  tree.refine_grid(5, halfSphere2);
+  tree.refine_grid(5, half_sphere);
 
-  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">halfSphere2 produces NaNs outside the unit circle.  </span>
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">half_sphere produces NaNs outside the unit circle.  </span>
 <span style="color: #ff7f24;">     We can refine cells that cross the unit circle using refine_recursive_if_cell_vertex_is_nan</span><span style="color: #ffa500;"> */</span>
-  tree.refine_recursive_if_cell_vertex_is_nan(7, halfSphere2);
+  tree.refine_recursive_if_cell_vertex_is_nan(7, half_sphere);
 
-  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">halfSphere2 produces NaNs outside the unit circle.  </span>
-<span style="color: #ff7f24;">     We can refine cells that cross the unit circle using refine_leaves_recursive_cell_pred &amp; cell_vertex_is_nan.</span>
-<span style="color: #ff7f24;">     The result is the same as the call to refine_recursive_if_cell_vertex_is_nan above.</span><span style="color: #ffa500;"> */</span>
-  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">tree.refine_leaves_recursive_cell_pred(6, halfSphere2, [&amp;tree](int i) { return (tree.cell_vertex_is_nan(i)); });</span>
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">We can acheive the same result via refine_leaves_recursive_cell_pred &amp; cell_vertex_is_nan.</span><span style="color: #ffa500;"> */</span>
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">tree.refine_leaves_recursive_cell_pred(6, half_sphere, [&amp;tree](int i) { return (tree.cell_vertex_is_nan(i)); });</span>
 
-  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Note: Instead of looking for NaNs, we could have used a SDF to simply tell the tree to sample anything that crosses</span>
-<span style="color: #ff7f24;">     the unit circle.  This is the technique used in MR_rect_tree_test_surf_corner.cpp.</span><span style="color: #ffa500;"> */</span>
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">We can acheive similar results by refining on the unit curcle via an SDF -- See surface_plot_corner.cpp</span><span style="color: #ffa500;"> */</span>
 
   <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Balance the three to the traditional level of 1 (no cell borders a cell more than half it's size)</span><span style="color: #ffa500;"> */</span>
-  tree.balance_tree(1, halfSphere2);
+  tree.balance_tree(1, half_sphere);
 
   tree.dump_tree(10);
 
-  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">By passing halfSphere2() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired.</span><span style="color: #ffa500;"> */</span>
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">By passing half_sphere() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired.</span><span style="color: #ffa500;"> */</span>
   bridge.construct_geometry_fans(ccplx,
                                  tree,
                                  2,
                                  {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0}, 
                                   {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
                                   {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0}},
-                                 halfSphere2
+                                 half_sphere
                                 );
 
   ccplx.create_named_datasets({<span style="color: #fa8072;">"x"</span>, <span style="color: #fa8072;">"y"</span>, <span style="color: #fa8072;">"f(x,y)"</span>},
@@ -1073,7 +1070,7 @@ any holes.  This is really the only change from surface_plot_edge.cpp.
 
 <div class="org-center">
 
-<div id="org31a916c" class="figure">
+<div id="org5d5aa3c" class="figure">
 <p><a href="media/surface_branch_glue_100.png"><img src="media/surface_branch_glue_10.png" alt="surface_branch_glue_10.png" /></a>
 </p>
 </div>
@@ -1089,7 +1086,7 @@ any holes.  This is really the only change from surface_plot_edge.cpp.
 <span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;
 <span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
 
-<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">halfSphere2</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">half_sphere</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
   <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">m</span> = xvec[0] * xvec[0] + xvec[1] * xvec[1];
   <span style="color: #00ffff;">if</span> (m &gt; 1) {
     <span style="color: #00ffff;">return</span> <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numeric_limits</span>&lt;<span style="color: #63b8ff;">double</span>&gt;::quiet_NaN();
@@ -1105,21 +1102,21 @@ any holes.  This is really the only change from surface_plot_edge.cpp.
   <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">bridge</span>;
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Sample a uniform grid across the domain</span>
-  tree.refine_grid(5, halfSphere2);
+  tree.refine_grid(5, half_sphere);
 
   <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Refine near the edge</span><span style="color: #ffa500;"> */</span>
-  tree.refine_recursive_if_cell_vertex_is_nan(6, halfSphere2);
+  tree.refine_recursive_if_cell_vertex_is_nan(6, half_sphere);
 
   tree.dump_tree(10);
 
-  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">By passing halfSphere2() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired.</span><span style="color: #ffa500;"> */</span>
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">By passing half_sphere() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired.</span><span style="color: #ffa500;"> */</span>
   bridge.construct_geometry_fans(ccplx,
                                  tree,
                                  2,
                                  {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0}, 
                                   {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
                                   {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0}},
-                                 halfSphere2
+                                 half_sphere
                                 );
 
   ccplx.create_named_datasets({<span style="color: #fa8072;">"x"</span>, <span style="color: #fa8072;">"y"</span>, <span style="color: #fa8072;">"f(x,y)"</span>},
@@ -1161,7 +1158,7 @@ Note that most of the items above are listed TBD.  A few features need to be add
 
 <div class="org-center">
 
-<div id="org0c3f89f" class="figure">
+<div id="orgbe67461" class="figure">
 <p><a href="media/sq_curve_plot_heal_100.png"><img src="media/sq_curve_plot_heal_10.png" alt="sq_curve_plot_heal_10.png" /></a>
 </p>
 </div>
@@ -1290,7 +1287,7 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/para
 <span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;
 <span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
 
-<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">parSphere2</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">par_sphere</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
   <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">u</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi/4 * xvec[0] + <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi/4;
   <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">v</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi   * xvec[1] + <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi;
   <span style="color: #00ffff;">return</span> { <span style="color: #8470ff; font-weight: bold;">std</span>::sin(u)*<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v),
@@ -1305,7 +1302,7 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/para
   <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">bridge</span>;
 
   <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Uniform sampling</span><span style="color: #ffa500;"> */</span>
-  tree.refine_grid(6, parSphere2);
+  tree.refine_grid(6, par_sphere);
 
 
   <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">First we dump a tessellation made of triangles</span><span style="color: #ffa500;"> */</span>
@@ -1380,10 +1377,10 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/perf
 <span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
 
 <span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b2d15rT</span>           <span style="color: #63b8ff;">tt_t</span>;
-<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Replace with mjr::MRccF5, and compare treeConverter performance.</span>
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Replace with mjr::MRccF5, and compare bridge performance.</span>
 <span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
 
-<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">shellStripes2</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">stripy_shell</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
   <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">u</span>    = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi   * xvec[0] + <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi + 0.1; <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">U transformed from unit interval</span>
   <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">v</span>    = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi/2 * xvec[1] + <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi/2;     <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">V transformed from unit interval</span>
   <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x</span>    = u*<span style="color: #8470ff; font-weight: bold;">std</span>::sin(u)*<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v);                             <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">X</span>
@@ -1403,40 +1400,44 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/perf
 }                          
 
 <span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
-  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">startTime</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
+  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">start_time</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
   <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">tree</span>;
   <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">ccplx</span>;
-  <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">treeConverter</span>;
-  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">constructTime</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
+  <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">bridge</span>;
+  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">construct_time</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
 
-  tree.refine_grid(7, shellStripes2);
-  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">sampleTime</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
+  tree.refine_grid(7, stripy_shell);
+  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">sample_time</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
 
   tree.dump_tree(20);
-  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">dumpTime</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
+  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">dump_time</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
 
-  treeConverter.construct_geometry_fans(ccplx,
-                                        tree,
-                                        2,
-                                        {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
-                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1},
-                                         {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2}});
-  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">vtkFanTime</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
+  bridge.construct_geometry_fans(ccplx,
+                                 tree,
+                                 2,
+                                 {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  0},
+                                  {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  1},
+                                  {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  2}});
+  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">fan_time</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
 
-  ccplx.create_named_datasets({<span style="color: #fa8072;">"u"</span>, <span style="color: #fa8072;">"v"</span>, <span style="color: #fa8072;">"x(u,v)"</span>, <span style="color: #fa8072;">"y(u,v)"</span>, <span style="color: #fa8072;">"z(u,v)"</span>, <span style="color: #fa8072;">"c(u,v)"</span>, <span style="color: #fa8072;">"dx(u,v)/du"</span>, <span style="color: #fa8072;">"dx(u,v)/dv"</span>, <span style="color: #fa8072;">"dy(u,v)/du"</span>, <span style="color: #fa8072;">"dy(u,v)/dv"</span>, <span style="color: #fa8072;">"dz(u,v)/du"</span>, <span style="color: #fa8072;">"dz(u,v)/dv"</span>, <span style="color: #fa8072;">"nx"</span>, <span style="color: #fa8072;">"ny"</span>, <span style="color: #fa8072;">"nz"</span>}, 
+  ccplx.create_named_datasets({<span style="color: #fa8072;">"u"</span>, <span style="color: #fa8072;">"v"</span>, 
+                               <span style="color: #fa8072;">"x(u,v)"</span>, <span style="color: #fa8072;">"y(u,v)"</span>, <span style="color: #fa8072;">"z(u,v)"</span>,
+                               <span style="color: #fa8072;">"c(u,v)"</span>, 
+                               <span style="color: #fa8072;">"dx(u,v)/du"</span>, <span style="color: #fa8072;">"dx(u,v)/dv"</span>, <span style="color: #fa8072;">"dy(u,v)/du"</span>, <span style="color: #fa8072;">"dy(u,v)/dv"</span>, <span style="color: #fa8072;">"dz(u,v)/du"</span>, <span style="color: #fa8072;">"dz(u,v)/dv"</span>,
+                               <span style="color: #fa8072;">"nx"</span>, <span style="color: #fa8072;">"ny"</span>, <span style="color: #fa8072;">"nz"</span>}, 
                               {{<span style="color: #fa8072;">"NORMALS"</span>, {12, 13, 14}}});
-  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">datAnnoTime</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
+  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">dat_anno_time</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
 
   ccplx.write_xml_vtk(<span style="color: #fa8072;">"performance_with_large_surface.vtu"</span>, <span style="color: #fa8072;">"performance_with_large_surface"</span>);
-  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">vtkWriteTime</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
+  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">write_time</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
 
-  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"constructTime time ... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(constructTime-startTime)     &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
-  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"sampleTime time ...... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(sampleTime-constructTime)    &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
-  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"dumpTime time ........ "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(dumpTime-sampleTime)         &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
-  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"treeConverter time ... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(vtkFanTime-dumpTime)         &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
-  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"dataset anno time .... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(datAnnoTime-vtkFanTime)      &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
-  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"write_vtk time ....... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(vtkWriteTime-datAnnoTime)    &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
-  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"Total Run Time ....... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(vtkWriteTime-startTime)      &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"construct_time time .. "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(construct_time-start_time)   &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"sample_time time ..... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(sample_time-construct_time)  &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"dump_time time ....... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(dump_time-sample_time)       &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"bridge time .......... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(fan_time-dump_time)          &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"dataset anno time .... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(dat_anno_time-fan_time)      &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"write_vtk time ....... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(write_time-dat_anno_time)    &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"Total Run _time ...... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(write_time-start_time)       &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
 }
 </pre>
 </div>
@@ -1464,7 +1465,7 @@ This example doesn't really demonstrate anything not found in the other examples
 
 <div class="org-center">
 
-<div id="org7ef3e09" class="figure">
+<div id="org6b99092" class="figure">
 <p><a href="media/trefoil_rot_50_crf30.html"><img src="media/trefoil_rot_10.gif" alt="trefoil_rot_10.gif" /></a>
 </p>
 </div>
@@ -1561,7 +1562,7 @@ Alternately the curve is also the intersection of two surfaces in \(\mathbb{R}^3
 The "typical" way to graph a surface like \(f_2\) is to transform it into pseudo-parametric form.  In Maple that might look like this
 </p>
 
-<pre class="example" id="orgafb156a">
+<pre class="example" id="org7fce809">
 plot3d([u, u^2, v], u=-1..1, v=-1..1):
 </pre>
 
@@ -1577,7 +1578,7 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
 
 <div class="org-center">
 
-<div id="org33f3ba0" class="figure">
+<div id="orgda29a12" class="figure">
 <p><a href="media/parametric_curve_3d_rot_100_crf30.html"><img src="media/parametric_curve_3d_rot_10.gif" alt="parametric_curve_3d_rot_10.gif" /></a>
 </p>
 </div>

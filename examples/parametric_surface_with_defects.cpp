@@ -55,7 +55,7 @@ typedef mjr::MRccT5                  cc_t;
 typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-tt_t::rrpt_t parSphere2(tt_t::drpt_t xvec) {
+tt_t::rrpt_t par_sphere(tt_t::drpt_t xvec) {
   double u = std::numbers::pi/4 * xvec[0] + std::numbers::pi/4;
   double v = std::numbers::pi   * xvec[1] + std::numbers::pi;
   return { std::sin(u)*std::cos(v),
@@ -71,7 +71,7 @@ int main() {
   tc_t bridge;
 
   /* Uniform sampling */
-  tree.refine_grid(6, parSphere2);
+  tree.refine_grid(6, par_sphere);
 
 
   /* First we dump a tessellation made of triangles */
