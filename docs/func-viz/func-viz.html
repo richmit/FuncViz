@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-08-06 Tue 19:35 -->
+<!-- 2024-08-07 Wed 13:37 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Function Visualization</title>
@@ -272,12 +272,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-08-06 19:35:21</i></td>
+<td class="org-left"><i>2024-08-07 13:37:10</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-08-06 19:35:23</i></td>
+<td class="org-left"><i>2024-08-07 13:37:14</i></td>
 </tr>
 </tbody>
 </table>
@@ -311,7 +311,7 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <li><a href="#parametric_curve_3d">3.2. Twisted Cubic As A Surface Intersection</a></li>
 </ul>
 </li>
-<li><a href="#orgce984d1">4. xx</a>
+<li><a href="#org04bfb90">4. xx</a>
 <ul>
 <li><a href="#PROGRAM_EXAMPLE">4.1. PROGRAM_EXAMPLE</a></li>
 </ul>
@@ -520,21 +520,28 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/comp
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Balance the three to the traditional level of 1 (no  cell borders a cell more than half it's size)</span>
   tree.balance_tree(1, cpf);
 
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">At this point the tree is adequately sampled, so we print a bit out to the screen.</span>
   tree.dump_tree(5);
 
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Create the cell complex from cells that have at least one point below our clipping plane.</span>
   <span style="color: #00ffff;">auto</span> <span style="color: #7fffd4;">tcret</span> = bridge.construct_geometry_fans(ccplx,
                                               tree,
                                               tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), 
                                                                        [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
                                               2,
-                                              {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 0}, 
-                                               {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::DOMAIN, 1},
-                                               {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">tree_val_src_t</span>::RANGE,  4}});
+                                              {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::DOMAIN, 0}, 
+                                               {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::DOMAIN, 1},
+                                               {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::RANGE,  4}});
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"TC Return: "</span> &lt;&lt; tcret &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Note the first argument need not name *every* data element, just the first ones.</span>
   ccplx.create_named_datasets({<span style="color: #fa8072;">"Re(z)"</span>, <span style="color: #fa8072;">"Im(z)"</span>, <span style="color: #fa8072;">"abs(z)"</span>, <span style="color: #fa8072;">"arg(z)"</span>, <span style="color: #fa8072;">"Re(f(z))"</span>, <span style="color: #fa8072;">"Im(f(z))"</span>, <span style="color: #fa8072;">"abs(f(z))"</span>, <span style="color: #fa8072;">"arg(f(z))"</span>}, {{<span style="color: #fa8072;">"COLORS"</span>, {8, 9, 10}}});
 
-  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"TC Return: "</span> &lt;&lt; tcret &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Fold the triangles on our clipping plane</span>
+  ccplx.triangle_folder([&amp;<span style="color: #7fffd4;">bridge</span>](<span style="color: #8470ff; font-weight: bold;">cc_t</span>::<span style="color: #63b8ff;">pnt_data_t</span> <span style="color: #7fffd4;">x</span>){<span style="color: #00ffff;">return</span> bridge.tsampf_to_cdatf(        cpf, x); }, 
+                        [&amp;<span style="color: #7fffd4;">bridge</span>](<span style="color: #8470ff; font-weight: bold;">cc_t</span>::<span style="color: #63b8ff;">pnt_data_t</span> <span style="color: #7fffd4;">x</span>){<span style="color: #00ffff;">return</span> bridge.tsampf_to_clcdf(4, 3.5, cpf, x); });
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Remove all triangles above our clipping plane</span>
 
   ccplx.dump_cplx(5);
 
@@ -1085,8 +1092,10 @@ the triangulation that are on, or very near, the unit circle.  We can do that by
 
 <div class="org-center">
 <p>
-Mathematica 12<br />
-<a href="media/mathematica_hat_100.png"><img src="media/mathematica_hat_10.png" alt="mathematica_hat_10.png" /></a> <br />
+Matlab 2023b &amp; Mathematica 12 &amp; Maple 2024.1<br />
+<a href="media/matlab_hat_100.png"><img src="media/matlab_hat_10.png" alt="matlab_hat_10.png" /></a> 
+<a href="media/mathematica_hat_100.png"><img src="media/mathematica_hat_10.png" alt="mathematica_hat_10.png" /></a> 
+<a href="media/maple_hat_100.png"><img src="media/maple_hat_10.png" alt="maple_hat_10.png" /></a> <br />
 MRPtree Version <br />
 <a href="media/surface_plot_corner_rot_100_crf30.html"><img src="media/surface_plot_corner_rot_10.gif" alt="surface_plot_corner_rot_10.gif" /></a>
 </p>
@@ -1096,6 +1105,70 @@ MRPtree Version <br />
 Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surface_plot_corner.cpp">https://github.com/richmit/MRPTree/blob/main/examples/surface_plot_corner.cpp</a>
 </p>
 
+<div class="org-src-container">
+<pre class="src src-c++">
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
+
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b2d1rT</span>            <span style="color: #63b8ff;">tt_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
+
+
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">half_sphere_hat</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">m</span> = xvec[0] * xvec[0] + xvec[1] * xvec[1];
+  <span style="color: #00ffff;">return</span> (<span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(<span style="color: #8470ff; font-weight: bold;">std</span>::abs(1-m)));
+}
+
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #00fa9a; font-weight: bold;">unit_circle_sdf</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">m</span> = xvec[0] * xvec[0] + xvec[1] * xvec[1];
+  <span style="color: #00ffff;">return</span> (1-m);
+}
+
+<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
+  <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">tree</span>({-1.1, -1.1}, 
+            { 1.1,  1.1});
+  <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">ccplx</span>;
+  <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">bridge</span>;
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Here is another way to get fine samples on the circle, but with a SDF this time.</span><span style="color: #ffa500;"> */</span>
+  tree.refine_grid(5, half_sphere_hat);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Increase sample resolution on the unit circle.  Here we do that with an SDF.</span><span style="color: #ffa500;"> */</span>
+  tree.refine_leaves_recursive_cell_pred(7, half_sphere_hat, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #63b8ff;">int</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_cross_sdf(i, unit_circle_sdf)); });
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Balance the three to the traditional level of 1 (no cell borders a cell more than half it's size)</span><span style="color: #ffa500;"> */</span>
+  tree.balance_tree(1, half_sphere_hat);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Take a peek at the raw tree data</span><span style="color: #ffa500;"> */</span>
+  tree.dump_tree(10);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Generate a cell complex from the tree samples</span><span style="color: #ffa500;"> */</span>
+  bridge.construct_geometry_fans(ccplx,
+                                 tree,
+                                 2,
+                                 {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::DOMAIN, 0}, 
+                                  {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::DOMAIN, 1},
+                                  {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::RANGE,  0}});
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">The single argument form of create_named_datasets() allows us to easily name data points.</span><span style="color: #ffa500;"> */</span>
+  ccplx.create_named_datasets({<span style="color: #fa8072;">"x"</span>, <span style="color: #fa8072;">"y"</span>, <span style="color: #fa8072;">"f(x,y)"</span>});
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Take a look at the generated cell complex</span><span style="color: #ffa500;"> */</span>
+  ccplx.dump_cplx(10);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Fold all triangles that cross the unit circle!</span><span style="color: #ffa500;"> */</span>
+  ccplx.triangle_folder([&amp;<span style="color: #7fffd4;">bridge</span>](<span style="color: #8470ff; font-weight: bold;">cc_t</span>::<span style="color: #63b8ff;">pnt_data_t</span> <span style="color: #7fffd4;">x</span>){<span style="color: #00ffff;">return</span> bridge.tsampf_to_cdatf(half_sphere_hat, x); }, 
+                        [&amp;<span style="color: #7fffd4;">bridge</span>](<span style="color: #8470ff; font-weight: bold;">cc_t</span>::<span style="color: #63b8ff;">pnt_data_t</span> <span style="color: #7fffd4;">x</span>){<span style="color: #00ffff;">return</span> bridge.tsdf_to_csdf(unit_circle_sdf,    x); });
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Notice how it changed after the fold</span><span style="color: #ffa500;"> */</span>
+  ccplx.dump_cplx(10);
+
+  ccplx.write_xml_vtk(<span style="color: #fa8072;">"surface_plot_corner.vtu"</span>, <span style="color: #fa8072;">"surface_plot_corner"</span>);
+}
+</pre>
+</div>
 <div class="org-src-container">
 <pre class="src src-c++">
 <span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
@@ -1180,7 +1253,7 @@ any holes.  This is really the only change from surface_plot_edge.cpp.
 
 <div class="org-center">
 
-<div id="orgfd0c6c2" class="figure">
+<div id="orga0aefba" class="figure">
 <p><a href="media/surface_branch_glue_100.png"><img src="media/surface_branch_glue_10.png" alt="surface_branch_glue_10.png" /></a>
 </p>
 </div>
@@ -1268,7 +1341,7 @@ Note that most of the items above are listed TBD.  A few features need to be add
 
 <div class="org-center">
 
-<div id="org028b228" class="figure">
+<div id="org2380a4d" class="figure">
 <p><a href="media/sq_curve_plot_heal_100.png"><img src="media/sq_curve_plot_heal_10.png" alt="sq_curve_plot_heal_10.png" /></a>
 </p>
 </div>
@@ -1575,7 +1648,7 @@ This example doesn't really demonstrate anything not found in the other examples
 
 <div class="org-center">
 
-<div id="orgc41a17e" class="figure">
+<div id="org7ba04a5" class="figure">
 <p><a href="media/trefoil_rot_50_crf30.html"><img src="media/trefoil_rot_10.gif" alt="trefoil_rot_10.gif" /></a>
 </p>
 </div>
@@ -1672,7 +1745,7 @@ Alternately the curve is also the intersection of two surfaces in \(\mathbb{R}^3
 The "typical" way to graph a surface like \(f_2\) is to transform it into pseudo-parametric form.  In Maple that might look like this
 </p>
 
-<pre class="example" id="org2cb6f72">
+<pre class="example" id="orgdf37af9">
 plot3d([u, u^2, v], u=-1..1, v=-1..1):
 </pre>
 
@@ -1688,7 +1761,7 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
 
 <div class="org-center">
 
-<div id="org20658e3" class="figure">
+<div id="org92c1f8f" class="figure">
 <p><a href="media/parametric_curve_3d_rot_100_crf30.html"><img src="media/parametric_curve_3d_rot_10.gif" alt="parametric_curve_3d_rot_10.gif" /></a>
 </p>
 </div>
@@ -1788,8 +1861,8 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
 
 
 
-<div id="outline-container-orgce984d1" class="outline-2">
-<h2 id="orgce984d1"><span class="section-number-2">4.</span> xx</h2>
+<div id="outline-container-org04bfb90" class="outline-2">
+<h2 id="org04bfb90"><span class="section-number-2">4.</span> xx</h2>
 <div class="outline-text-2" id="text-4">
 </div>
 <div id="outline-container-PROGRAM_EXAMPLE" class="outline-3">
@@ -1797,7 +1870,7 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
 <div class="outline-text-3" id="text-PROGRAM_EXAMPLE">
 <div class="org-center">
 
-<div id="orgc647d8d" class="figure">
+<div id="orgd9b30f8" class="figure">
 <p><a href="media/PROGRAM_EXAMPLE_100.png"><img src="media/PROGRAM_EXAMPLE_10.png" alt="PROGRAM_EXAMPLE_10.png" /></a>
 </p>
 </div>

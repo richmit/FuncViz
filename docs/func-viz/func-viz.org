@@ -232,21 +232,28 @@ int main() {
   // Balance the three to the traditional level of 1 (no  cell borders a cell more than half it's size)
   tree.balance_tree(1, cpf);
 
+  // At this point the tree is adequately sampled, so we print a bit out to the screen.
   tree.dump_tree(5);
 
+  // Create the cell complex from cells that have at least one point below our clipping plane.
   auto tcret = bridge.construct_geometry_fans(ccplx,
                                               tree,
                                               tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), 
                                                                        [&tree](tt_t::diti_t i) { return !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
                                               2,
-                                              {{tc_t::tree_val_src_t::DOMAIN, 0}, 
-                                               {tc_t::tree_val_src_t::DOMAIN, 1},
-                                               {tc_t::tree_val_src_t::RANGE,  4}});
+                                              {{tc_t::val_src_spc_t::DOMAIN, 0}, 
+                                               {tc_t::val_src_spc_t::DOMAIN, 1},
+                                               {tc_t::val_src_spc_t::RANGE,  4}});
+  std::cout << "TC Return: " << tcret << std::endl;
 
   // Note the first argument need not name *every* data element, just the first ones.
   ccplx.create_named_datasets({"Re(z)", "Im(z)", "abs(z)", "arg(z)", "Re(f(z))", "Im(f(z))", "abs(f(z))", "arg(f(z))"}, {{"COLORS", {8, 9, 10}}});
 
-  std::cout << "TC Return: " << tcret << std::endl;
+  // Fold the triangles on our clipping plane
+  ccplx.triangle_folder([&bridge](cc_t::pnt_data_t x){return bridge.tsampf_to_cdatf(        cpf, x); }, 
+                        [&bridge](cc_t::pnt_data_t x){return bridge.tsampf_to_clcdf(4, 3.5, cpf, x); });
+
+  // Remove all triangles above our clipping plane
 
   ccplx.dump_cplx(5);
 
@@ -797,8 +804,10 @@ grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_plot
     - How to use tsampf_to_cdatf() & tsdf_to_csdf() to adapt functions designed for a MR_rect_tree for use with a MR_cell_cplx.
 
 #+BEGIN_CENTER
-Mathematica 12\\
-[[file:media/mathematica_hat_100.png][file:media/mathematica_hat_10.png]] \\
+Matlab 2023b & Mathematica 12 & Maple 2024.1\\
+[[file:media/matlab_hat_100.png][file:media/matlab_hat_10.png]] 
+[[file:media/mathematica_hat_100.png][file:media/mathematica_hat_10.png]] 
+[[file:media/maple_hat_100.png][file:media/maple_hat_10.png]] \\
 MRPtree Version \\
 [[file:media/surface_plot_corner_rot_100_crf30.html][file:media/surface_plot_corner_rot_10.gif]]
 #+END_CENTER
@@ -810,6 +819,69 @@ grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_plot
 #+end_src
 
 #+RESULTS:
+#+begin_src c++ :eval never :tangle no
+
+#include "MR_rect_tree.hpp"
+#include "MR_cell_cplx.hpp"
+#include "MR_rt_to_cc.hpp"
+
+typedef mjr::tree15b2d1rT            tt_t;
+typedef mjr::MRccT5                  cc_t;
+typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
+
+
+tt_t::rrpt_t half_sphere_hat(tt_t::drpt_t xvec) {
+  double m = xvec[0] * xvec[0] + xvec[1] * xvec[1];
+  return (std::sqrt(std::abs(1-m)));
+}
+
+tt_t::src_t unit_circle_sdf(tt_t::drpt_t xvec) {
+  double m = xvec[0] * xvec[0] + xvec[1] * xvec[1];
+  return (1-m);
+}
+
+int main() {
+  tt_t tree({-1.1, -1.1}, 
+            { 1.1,  1.1});
+  cc_t ccplx;
+  tc_t bridge;
+
+  /* Here is another way to get fine samples on the circle, but with a SDF this time. */
+  tree.refine_grid(5, half_sphere_hat);
+
+  /* Increase sample resolution on the unit circle.  Here we do that with an SDF. */
+  tree.refine_leaves_recursive_cell_pred(7, half_sphere_hat, [&tree](int i) { return (tree.cell_cross_sdf(i, unit_circle_sdf)); });
+
+  /* Balance the three to the traditional level of 1 (no cell borders a cell more than half it's size) */
+  tree.balance_tree(1, half_sphere_hat);
+
+  /* Take a peek at the raw tree data */
+  tree.dump_tree(10);
+
+  /* Generate a cell complex from the tree samples */
+  bridge.construct_geometry_fans(ccplx,
+                                 tree,
+                                 2,
+                                 {{tc_t::val_src_spc_t::DOMAIN, 0}, 
+                                  {tc_t::val_src_spc_t::DOMAIN, 1},
+                                  {tc_t::val_src_spc_t::RANGE,  0}});
+
+  /* The single argument form of create_named_datasets() allows us to easily name data points. */
+  ccplx.create_named_datasets({"x", "y", "f(x,y)"});
+
+  /* Take a look at the generated cell complex */
+  ccplx.dump_cplx(10);
+
+  /* Fold all triangles that cross the unit circle! */
+  ccplx.triangle_folder([&bridge](cc_t::pnt_data_t x){return bridge.tsampf_to_cdatf(half_sphere_hat, x); }, 
+                        [&bridge](cc_t::pnt_data_t x){return bridge.tsdf_to_csdf(unit_circle_sdf,    x); });
+
+  /* Notice how it changed after the fold */
+  ccplx.dump_cplx(10);
+
+  ccplx.write_xml_vtk("surface_plot_corner.vtu", "surface_plot_corner");
+}
+#+end_src
 #+begin_src c++ :eval never :tangle no
 
 #include "MR_rect_tree.hpp"
@@ -1517,22 +1589,10 @@ done
 
 #+RESULTS:
 #+begin_example
-make media/parametric_surface_with_defects-rect_100.png
-make media/parametric_surface_with_defects-rect_50.png
-make media/parametric_surface_with_defects-rect_25.png
-make media/parametric_surface_with_defects-rect_10.png
-make media/parametric_surface_with_defects-tri_100.png
-make media/parametric_surface_with_defects-tri_50.png
-make media/parametric_surface_with_defects-tri_25.png
-make media/parametric_surface_with_defects-tri_10.png
-make media/mathematica_hat_100.png
-make media/mathematica_hat_50.png
-make media/mathematica_hat_25.png
-make media/mathematica_hat_10.png
-make media/mathematica_sphere_100.png
-make media/mathematica_sphere_50.png
-make media/mathematica_sphere_25.png
-make media/mathematica_sphere_10.png
+make media/matlab_hat_100.png
+make media/matlab_hat_50.png
+make media/matlab_hat_25.png
+make media/matlab_hat_10.png
 #+end_example
 
 *** Image Processing: GIFs
