@@ -1861,7 +1861,7 @@ Processing Example ear_surface
   make media/ear_surface_rot_50_crf30.html
 #+end_example
 
-* xx
+* xx :noexport:
 
 ** PROGRAM_EXAMPLE
 :PROPERTIES:
