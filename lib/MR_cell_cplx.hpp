@@ -1665,6 +1665,12 @@ namespace mjr {
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /** @name Cell Predicates */
       //@{
+      bool cell_above_level(const cell_t cell, int level_index, uft_t level, uft_t level_epsilon=epsilon) {
+        return std::all_of(cell.cbegin(), cell.cend(), [this, level_index, level, level_epsilon](int v) { return (pnt_idx_to_pnt_data[v][level_index] > level+level_epsilon); });
+      }
+      bool cell_below_level(const cell_t cell, int level_index, uft_t level, uft_t level_epsilon=epsilon) {
+        return std::all_of(cell.cbegin(), cell.cend(), [this, level_index, level, level_epsilon](int v) { return (pnt_idx_to_pnt_data[v][level_index] < level+level_epsilon); });
+      }
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1672,8 +1678,27 @@ namespace mjr {
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Function that takes and returns a pnt_data_t */
-      typedef std::function<pnt_data_t(const pnt_data_t&)> data_func_t;
-      typedef std::function<uft_t(const pnt_data_t&)> sdf_func_t;
+      typedef std::function<pnt_data_t(const pnt_data_t&)> p2data_func_t; 
+      typedef std::function<uft_t(const pnt_data_t&)>      p2sd_func_t;
+      typedef std::function<bool(const pnt_data_t&)>       p2bool_func_t;
+      typedef std::function<bool(const cell_t&)>           c2bool_func_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Delete cells matching a predicate function
+
+          @param func       Predicate function -- if true we get rid of the cell */
+      int cull_cells(c2bool_func_t func) {
+        int idx_last_good = -1;
+        int start_size = num_cells();
+        for(int i=0; i<start_size; i++) 
+          if ( !(func(cell_lst[i]))) {
+            idx_last_good++;
+            if (idx_last_good != i)
+              cell_lst[idx_last_good] = cell_lst[i];
+          }
+        idx_last_good++;
+        cell_lst.resize(idx_last_good);
+        return (start_size-num_cells());
+      }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Add new cells with points from existing cells with the given coordinates negated. 
 
@@ -1735,7 +1760,7 @@ namespace mjr {
           @param sdf_func       Data function (if nullptr, then clear solver cache and return immediately)
           @param solve_epsilon  Used to detect SDF value near zero
           @param dat_func       Produce the point data vector for the newly solved point. */
-      pnt_idx_t edge_solver_sdf(data_func_t dat_func, pnt_idx_t pnt_idx1, pnt_idx_t pnt_idx2, sdf_func_t sdf_func, uft_t solve_epsilon=epsilon/10) {
+      pnt_idx_t edge_solver_sdf(p2data_func_t dat_func, pnt_idx_t pnt_idx1, pnt_idx_t pnt_idx2, p2sd_func_t sdf_func, uft_t solve_epsilon=epsilon/10) {
         // Solver cache.
         static std::unordered_map<pnt_idx_t, std::unordered_map<pnt_idx_t, pnt_idx_t>> edge_solver_cache;
         if (sdf_func == nullptr) {
@@ -1797,7 +1822,7 @@ namespace mjr {
           @param data_func           Data function
           @param sdf_index      Index of SDF value in sdf_func return
           @param solve_epsilon  Used to detect SDF value near zero */
-      void triangle_folder(data_func_t dat_func, sdf_func_t sdf_func, uft_t solve_epsilon=epsilon/10) {
+      void triangle_folder(p2data_func_t dat_func, p2sd_func_t sdf_func, uft_t solve_epsilon=epsilon/10) {
         //  MJR TODO NOTE <2024-08-06T12:38:33-0500> triangle_folder: Implement!
         clear_cache_edge_solver_sdf();
         const std::array<int, 3> p00 {0, 1, 2};

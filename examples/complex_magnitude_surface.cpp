@@ -41,11 +41,7 @@
    - Sample near domain axis
    - Directly attach colors to geometric points
    - Do rough clipping with high sampling and cell filtering.  
-
-  Eventually we will also demonstrate:
-
-   - Clip with a clipping plain (TBD) -- requires new functionality in MR_rt_to_cc.
-   - Extract level curves (TBD) -- requires new functionality in MR_rt_to_cc.
+   - Precision clipping by folding & culling.
 
   References:
     Richardson (1991); Visualizing quantum scattering on the CM-2 supercomputer; Computer Physics Communications 63; pp 84-94"
@@ -189,20 +185,21 @@ int main() {
                                                {tc_t::val_src_spc_t::DOMAIN, 1},
                                                {tc_t::val_src_spc_t::RANGE,  4}});
   std::cout << "TC Return: " << tcret << std::endl;
-
-  //--------------------------------------------------------------------------------------------------------------------------------------------------------------
-  // Note the first argument need not name *every* data element, just the first ones.
   ccplx.create_named_datasets({"Re(z)", "Im(z)", "abs(z)", "arg(z)", "Re(f(z))", "Im(f(z))", "abs(f(z))", "arg(f(z))"}, {{"COLORS", {8, 9, 10}}});
+  std::cout << "POST CONST" << std::endl;
+  ccplx.dump_cplx(5);
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
   // Fold the triangles on our clipping plane
-  // ccplx.triangle_folder([&bridge](cc_t::pnt_data_t x){return bridge.tsampf_to_cdatf(        cpf, x); }, 
-  //                       [&bridge](cc_t::pnt_data_t x){return bridge.tsampf_to_clcdf(4, 3.5, cpf, x); });
+  ccplx.triangle_folder([&bridge](cc_t::pnt_data_t x){return bridge.tsampf_to_cdatf(        cpf, x); }, 
+                        [&bridge](cc_t::pnt_data_t x){return bridge.tsampf_to_clcdf(4, 3.5, cpf, x); });
+  std::cout << "POST FOLD" << std::endl;
+  ccplx.dump_cplx(5);
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
   // Remove all triangles above our clipping plane
-
-  //--------------------------------------------------------------------------------------------------------------------------------------------------------------
+  ccplx.cull_cells([&ccplx](cc_t::cell_t c){ return !(ccplx.cell_below_level(c, 6, 3.5)); });
+  std::cout << "POST CULL" << std::endl;
   ccplx.dump_cplx(5);
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
