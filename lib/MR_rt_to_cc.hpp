@@ -62,17 +62,17 @@ namespace mjr {
       /** @name Types imported from MR_rect_tree and MR_cell_cplx. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      typedef typename cc_t::data_idx_lst_t cc_data_idx_lst_t;
-      typedef typename cc_t::pnt_data_t     cc_pnt_data_t;
-      typedef typename cc_t::pnt_idx_list_t cc_pnt_idx_list_t;
-      typedef typename cc_t::pnt_idx_t      cc_pnt_idx_t;
-      typedef typename cc_t::uft_t          cc_uft_t;
-      typedef typename rt_t::diti_list_t    rt_diti_list_t;
-      typedef typename rt_t::diti_t         rt_diti_t;
-      typedef typename rt_t::drpt_t         rt_drpt_t;
-      typedef typename rt_t::rrfunc_t       rt_rrfunc_t;
-      typedef typename rt_t::rrpt_t         rt_rrpt_t;
-      typedef typename rt_t::rsfunc_t       rt_rsfunc_t;
+      typedef typename cc_t::data_idx_lst_t    cc_data_idx_lst_t;
+      typedef typename cc_t::pnt_data_t        cc_pnt_data_t;
+      typedef typename cc_t::pnt_idx_list_t    cc_pnt_idx_list_t;
+      typedef typename cc_t::pnt_idx_t         cc_pnt_idx_t;
+      typedef typename cc_t::uft_t             cc_uft_t;
+      typedef typename rt_t::diti_list_t       rt_diti_list_t;
+      typedef typename rt_t::diti_t            rt_diti_t;
+      typedef typename rt_t::drpt_t            rt_drpt_t;
+      typedef typename rt_t::drpt2real_func_t  rt_drpt2real_func_t;
+      typedef typename rt_t::rrpt_t            rt_rrpt_t;
+      typedef typename rt_t::drpt2rrpt_func_t  rt_drpt2rrpt_func_t;
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,12 +179,12 @@ namespace mjr {
           @param output_dimension  Parts of cells to output
           @param point_src         Point sources
           @param func              The function was used to sample the tree */
-      static int construct_geometry_fans(cc_t&          ccplx,
-                                         const rt_t&    rtree,
-                                         rt_diti_list_t cells,
-                                         int            output_dimension,
-                                         val_src_lst_t  point_src,
-                                         rt_rsfunc_t    func = nullptr
+      static int construct_geometry_fans(cc_t&               ccplx,
+                                         const rt_t&         rtree,
+                                         rt_diti_list_t      cells,
+                                         int                 output_dimension,
+                                         val_src_lst_t       point_src,
+                                         rt_drpt2rrpt_func_t func = nullptr
                                         ) {
         create_dataset_to_point_mapping(rtree, ccplx, point_src);
         if (rtree.domain_dimension == 1) {
@@ -336,11 +336,11 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** @overload */
-      static int construct_geometry_fans(cc_t&         ccplx,
-                                         const rt_t&   rtree,
-                                         int           output_dimension,
-                                         val_src_lst_t point_src,
-                                         rt_rsfunc_t   func = nullptr
+      static int construct_geometry_fans(cc_t&               ccplx,
+                                         const rt_t&         rtree,
+                                         int                 output_dimension,
+                                         val_src_lst_t       point_src,
+                                         rt_drpt2rrpt_func_t func = nullptr
                                         ) {
         return construct_geometry_fans(ccplx, rtree, rtree.get_leaf_cells(), output_dimension, point_src, func);
       }
@@ -475,13 +475,13 @@ namespace mjr {
           @param sick_point_rtree_index  Bad point index in the rtree object
           @param func                    The function to use for the solver
           @param solver_epsilon          Used as a distance threshold between sick point and solved endpoint in the tree domain space. */
-      static cc_pnt_idx_t nan_edge_solver(cc_t&        ccplx,
-                                          const rt_t&  rtree,
-                                          cc_pnt_idx_t good_point_ccplx_index,
-                                          rt_diti_t    good_point_rtree_index,
-                                          rt_diti_t    sick_point_rtree_index,
-                                          rt_rsfunc_t  func,
-                                          cc_uft_t     solver_epsilon=cc_t::epsilon/100
+      static cc_pnt_idx_t nan_edge_solver(cc_t&               ccplx,
+                                          const rt_t&         rtree,
+                                          cc_pnt_idx_t        good_point_ccplx_index,
+                                          rt_diti_t           good_point_rtree_index,
+                                          rt_diti_t           sick_point_rtree_index,
+                                          rt_drpt2rrpt_func_t func,
+                                          cc_uft_t            solver_epsilon=cc_t::epsilon/100
                                          ) {
         // Solver cache.  Clear it if we have a different rtree object from last time.
         static std::unordered_map<rt_diti_t, std::unordered_map<rt_diti_t, cc_pnt_idx_t>> nan_solver_cache;
@@ -523,8 +523,8 @@ namespace mjr {
 
           @param func        The function to adapt
           @param pd          Point data to be passed to func. */
-      cc_pnt_data_t tsampf_to_cdatf(rt_rsfunc_t   func,
-                                    cc_pnt_data_t pd) {
+      cc_pnt_data_t tsampf_to_cdatf(rt_drpt2rrpt_func_t func,
+                                    cc_pnt_data_t       pd) {
         rt_drpt_t xpt = pnt_data_to_drpt(pd);
         return tree_point_data_to_cplx_point_data(xpt, func(xpt));
       }
@@ -533,13 +533,13 @@ namespace mjr {
 
           @param func        The function to adapt
           @param pd          Point data to be passed to func. */
-      cc_uft_t tsdf_to_csdf(rt_rrfunc_t   func,
-                            cc_pnt_data_t pd) {
+      cc_uft_t tsdf_to_csdf(rt_drpt2real_func_t func,
+                            cc_pnt_data_t       pd) {
         return static_cast<cc_uft_t>(func(pnt_data_to_drpt(pd)));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Transform a pnt_data_t value from a MR_cell_cplx into drpt_t from a MR_rect_tree */
-      rt_drpt_t pnt_data_to_drpt(cc_pnt_data_t pd) {
+      rt_drpt_t pnt_data_to_drpt(const cc_pnt_data_t& pd) {
         rt_drpt_t ret;
         if constexpr (rt_t::domain_dimension == 1) {
           ret = pd[0];
@@ -556,10 +556,10 @@ namespace mjr {
           @param range_index Index into range of origional sample function
           @param func        The function to adapt
           @param pd          Point data to be passed to func. */
-      cc_uft_t tsampf_to_clcdf(int           range_index,
-                               cc_uft_t      level,
-                               rt_rsfunc_t   func,
-                               cc_pnt_data_t pd) {
+      cc_uft_t tsampf_to_clcdf(int                 range_index,
+                               cc_uft_t            level,
+                               rt_drpt2rrpt_func_t func,
+                               cc_pnt_data_t       pd) {
         if constexpr (rt_t::domain_dimension == 1) {
           return static_cast<cc_uft_t>(func(pnt_data_to_drpt(pd))) - level;
         } else {

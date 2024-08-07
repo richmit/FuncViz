@@ -257,16 +257,16 @@ namespace mjr {
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Real input sample function */
-      typedef std::function<rrpt_t(drpt_t)> rsfunc_t;
+      typedef std::function<rrpt_t(drpt_t)> drpt2rrpt_func_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Integer input predicate function */
-      typedef std::function<bool(diti_t)>   ipfunc_t;
+      typedef std::function<bool(diti_t)>   diti2bool_func_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Real input predicate function */
-      typedef std::function<bool(drpt_t)>   rpfunc_t;
+      typedef std::function<bool(drpt_t)>   drpt2bool_func_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Real input, single real variable output function */
-      typedef std::function<src_t(drpt_t)>  rrfunc_t;  
+      typedef std::function<src_t(drpt_t)>  drpt2real_func_t;
       //@}
 
     private:
@@ -820,7 +820,7 @@ namespace mjr {
       /** Sample a cell 
           @param cell Cell to sample
           @param func Function to use for samples */
-      void sample_cell(diti_t cell, rsfunc_t func) {
+      void sample_cell(diti_t cell, drpt2rrpt_func_t func) {
         if (sample_point_maybe(cell, func)) {
           for(auto const e: ccc_get_corners(cell)) {
             sample_point_maybe(e, func);
@@ -829,7 +829,7 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** @overload */
-      void sample_cell(rsfunc_t func) {
+      void sample_cell(drpt2rrpt_func_t func) {
         sample_cell(ccc_get_top_cell(), func);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -837,7 +837,7 @@ namespace mjr {
           @param diti Point at which to sample
           @param func Function to sample
           @return true if we sampled the point, and false otherwise. */
-      inline bool sample_point_maybe(diti_t diti, rsfunc_t func) {
+      inline bool sample_point_maybe(diti_t diti, drpt2rrpt_func_t func) {
         if ( !(vertex_exists(diti))) {
           drpt_t xvec = diti_to_drpt(diti);
           rrpt_t val = func(xvec);
@@ -851,7 +851,7 @@ namespace mjr {
       /** Sample a point 
           @param diti Point at which to sample
           @param func Function to sample */
-      inline void sample_point(diti_t diti, rsfunc_t func) {
+      inline void sample_point(diti_t diti, drpt2rrpt_func_t func) {
         drpt_t xvec = diti_to_drpt(diti);
         rrpt_t val = func(xvec);
         samples[diti] = val;
@@ -938,7 +938,7 @@ namespace mjr {
           @param cell Cell to refine -- no error checking!!
           @param func Function to use for samples 
           @return 1 if cell was refined, and 0 otherwise -- i.e. the number of cells refined. */
-      bool refine_once(diti_t cell, rsfunc_t func) {
+      bool refine_once(diti_t cell, drpt2rrpt_func_t func) {
         auto children = ccc_get_children(cell);
         if (children.empty()) {
           return 0;
@@ -959,7 +959,7 @@ namespace mjr {
                                level_delta=0 is equivalent to calling sample_cell(cell, func).
                                level_delta=1 is equivalent to calling sample_cell(cell, func) followed by refine_once(cell, func).
           @param func        Function to use for samples */
-      void refine_grid(diti_t cell, int level_delta, rsfunc_t func) {
+      void refine_grid(diti_t cell, int level_delta, drpt2rrpt_func_t func) {
         diti_t tmp = ccc_cell_get_corner_min(cell);
         if constexpr (dom_dim == 1) {
           dic_t  del = ccc_cell_half_width(cell) >> level_delta;
@@ -1017,7 +1017,7 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** @overload */
-      void refine_grid(int level_delta, rsfunc_t func) {
+      void refine_grid(int level_delta, drpt2rrpt_func_t func) {
         refine_grid(ccc_get_top_cell(), level_delta, func);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1029,7 +1029,7 @@ namespace mjr {
           @param cell Cell to refine
           @param level Maximum level of refined cells.  -1 means refine to the limit.
           @param func Function to use for samples */
-      void refine_recursive(diti_t cell, int level, rsfunc_t func) {
+      void refine_recursive(diti_t cell, int level, drpt2rrpt_func_t func) {
         sample_cell(cell, func);
         if ((level < 0) || (ccc_cell_level(cell) < level)) {
           for(auto const c : ccc_get_children(cell)) {
@@ -1040,7 +1040,7 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** @overload */
-      void refine_recursive(int level, rsfunc_t func) {
+      void refine_recursive(int level, drpt2rrpt_func_t func) {
         refine_recursive(ccc_get_top_cell(), level, func);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1056,7 +1056,7 @@ namespace mjr {
           @param level Maximum level of refinded cells.  -1 means refine to the limit.
           @param func Function to use for samples 
           @param pred Predicate function. */
-      void refine_recursive_cell_pred(diti_t cell, int level, rsfunc_t func, ipfunc_t pred) {
+      void refine_recursive_cell_pred(diti_t cell, int level, drpt2rrpt_func_t func, diti2bool_func_t pred) {
         if ((level < 0) || (ccc_cell_level(cell) < level)) {
           if (pred(cell)) {
             refine_once(cell, func);
@@ -1073,13 +1073,13 @@ namespace mjr {
           @param level Maximum level of refinded cells.  -1 means refine to the limit.
           @param func Function to use for samples 
           @param pred Predicate function. */
-      void refine_leaves_recursive_cell_pred(diti_t cell, int level, rsfunc_t func, ipfunc_t pred) {
+      void refine_leaves_recursive_cell_pred(diti_t cell, int level, drpt2rrpt_func_t func, diti2bool_func_t pred) {
         for(auto c: get_leaf_cells(cell))
           refine_recursive_cell_pred(c, level, func, pred);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** @overload */
-      void refine_leaves_recursive_cell_pred(int level, rsfunc_t func, ipfunc_t pred) {
+      void refine_leaves_recursive_cell_pred(int level, drpt2rrpt_func_t func, diti2bool_func_t pred) {
         refine_leaves_recursive_cell_pred(ccc_get_top_cell(), level, func, pred);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1093,7 +1093,7 @@ namespace mjr {
           @param level Maximum level of refinded cells.  -1 means refine to the limit.
           @param func  Function to sample 
           @param pred  Predicate function. */
-      int  refine_leaves_once_if_cell_pred(diti_t cell, int level, rsfunc_t func, ipfunc_t pred) {
+      int  refine_leaves_once_if_cell_pred(diti_t cell, int level, drpt2rrpt_func_t func, diti2bool_func_t pred) {
         diti_list_t cells_to_check  = get_leaf_cells(cell);
         diti_list_t cells_to_refine;
         for(auto c: cells_to_check)
@@ -1107,7 +1107,7 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** @overload */
-      int  refine_leaves_once_if_cell_pred(int level, rsfunc_t func, ipfunc_t pred) {
+      int  refine_leaves_once_if_cell_pred(int level, drpt2rrpt_func_t func, diti2bool_func_t pred) {
         return refine_leaves_once_if_cell_pred(ccc_get_top_cell(), level, func, pred);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1119,7 +1119,7 @@ namespace mjr {
           @param level Maximum level of refinded cells.  -1 means refine to the limit.
           @param func  Function to sample
           @param pred  Predicate function. */
-      int refine_leaves_atomically_if_cell_pred(diti_t cell, int level, rsfunc_t func, ipfunc_t pred) {
+      int refine_leaves_atomically_if_cell_pred(diti_t cell, int level, drpt2rrpt_func_t func, diti2bool_func_t pred) {
         int refined_count = 0;
         while (0 < (refined_count = refine_leaves_once_if_cell_pred(cell, level, func, pred)))
           ;
@@ -1127,7 +1127,7 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** @overload */
-      int refine_leaves_atomically_if_cell_pred(int level, rsfunc_t func, ipfunc_t pred) {
+      int refine_leaves_atomically_if_cell_pred(int level, drpt2rrpt_func_t func, diti2bool_func_t pred) {
         return refine_leaves_atomically_if_cell_pred(ccc_get_top_cell(), level, func, pred);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1137,7 +1137,7 @@ namespace mjr {
 
           @param level Maximum level of refinded cells.  -1 means refine to the limit.
           @param func Function to use for samples */
-      void refine_recursive_if_cell_vertex_is_nan(int level, rsfunc_t func) { 
+      void refine_recursive_if_cell_vertex_is_nan(int level, drpt2rrpt_func_t func) { 
         refine_leaves_recursive_cell_pred(level, func, std::bind_front(&MR_rect_tree::cell_vertex_is_nan, this)); 
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1149,7 +1149,7 @@ namespace mjr {
 
           @param level_delta The Level.
           @param func        Function to sample */
-      int refine_leaves_once_if_unbalanced(int level_delta, rsfunc_t func) {
+      int refine_leaves_once_if_unbalanced(int level_delta, drpt2rrpt_func_t func) {
         return refine_leaves_once_if_cell_pred(ccc_get_top_cell(), -1, func, std::bind_front(&cell_is_unbalanced, this, level_delta));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1159,7 +1159,7 @@ namespace mjr {
 
           @param level_delta  The Level.
           @param func         Function to sample */
-      void balance_tree(int level_delta, rsfunc_t func) {
+      void balance_tree(int level_delta, drpt2rrpt_func_t func) {
         refine_leaves_atomically_if_cell_pred(ccc_get_top_cell(), -1, func, std::bind_front(&cell_is_unbalanced, this, level_delta));
       }
       //@}
@@ -1254,7 +1254,7 @@ namespace mjr {
           @param cell Input Cell
           @param sdf Signed distance function
           @return true if the cell crosses the signed distance function. */
-      inline bool cell_cross_sdf(diti_t cell, rrfunc_t sdf) {
+      inline bool cell_cross_sdf(diti_t cell, drpt2real_func_t sdf) {
         bool first_sign = std::signbit(sdf(diti_to_drpt(cell)));
         for(diti_t& v: ccc_get_corners(cell)) 
           if (first_sign != std::signbit(sdf(diti_to_drpt(v)))) 
@@ -1410,7 +1410,7 @@ namespace mjr {
           @warning The given cell need not match the predicate.
           @param cell Starting cell
           @param pred Predicate function. */
-      diti_list_t get_leaf_cells_pred(diti_t cell, ipfunc_t pred) const {
+      diti_list_t get_leaf_cells_pred(diti_t cell, diti2bool_func_t pred) const {
         diti_list_t cells_to_return;
         for(auto c: get_leaf_cells(cell))
           if (pred(c)) 
