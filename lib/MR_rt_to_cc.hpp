@@ -514,10 +514,8 @@ namespace mjr {
           @param pd          Point data to be passed to func. */
       cc_t::pnt_data_t tsampf_to_cdatf(typename rt_t::rsfunc_t   func,
                                        typename cc_t::pnt_data_t pd) {
-        typename rt_t::drpt_t xvec;
-        for(int i=0; i<rt_t::domain_dimension; ++i)
-          xvec[i] = pd[i];
-        return tree_point_data_to_cplx_point_data(xvec, func(xvec));
+        typename rt_t::drpt_t xvec = pnt_data_to_drpt(pd);
+        return tree_point_data_to_cplx_point_data(xvec, func(pnt_data_to_drpt(pd)));
         }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Adapt a MR_rect_tree sdf function to a MR_cell_cplx point data function.
@@ -526,11 +524,20 @@ namespace mjr {
           @param pd          Point data to be passed to func. */
       cc_t::uft_t tsdf_to_csdf(typename rt_t::rrfunc_t   func,
                                typename cc_t::pnt_data_t pd) {
-        typename rt_t::drpt_t xvec;
-        for(int i=0; i<rt_t::domain_dimension; ++i)
-          xvec[i] = pd[i];
-        return func(xvec);
+        return func(pnt_data_to_drpt(pd));
         }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Transform a pnt_data_t value from a MR_cell_cplx into drpt_t from a MR_rect_tree */
+      typename rt_t::drpt_t pnt_data_to_drpt(typename cc_t::pnt_data_t pd) {
+        typename rt_t::drpt_t ret;
+        if constexpr (rt_t::domain_dimension == 1) {
+          ret = pd[0];
+        } else {
+          for(int i=0; i<rt_t::domain_dimension; ++i)
+            ret[i] = pd[i];
+        }
+        return ret;
+      }
       //@}
 
 
