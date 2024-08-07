@@ -105,9 +105,9 @@ int main() {
   bridge.construct_geometry_fans(ccplx,
                                  tree,
                                  1,
-                                 {{tc_t::tree_val_src_t::DOMAIN,   0  }, 
-                                  {tc_t::tree_val_src_t::RANGE,    0  },
-                                  {tc_t::tree_val_src_t::CONSTANT, 0.0}},
+                                 {{tc_t::val_src_spc_t::DOMAIN,   0  }, 
+                                  {tc_t::val_src_spc_t::RANGE,    0  },
+                                  {tc_t::val_src_spc_t::CONSTANT, 0.0}},
                                  f
                                 );
 

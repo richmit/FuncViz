@@ -106,9 +106,9 @@ int main() {
   crv_tree_conv.construct_geometry_fans(crv_ccplx,
                                         crv_tree,
                                         1,
-                                        {{tc1_t::tree_val_src_t::RANGE, 0},
-                                         {tc1_t::tree_val_src_t::RANGE, 1},
-                                         {tc1_t::tree_val_src_t::RANGE, 2}});
+                                        {{tc1_t::val_src_spc_t::RANGE, 0},
+                                         {tc1_t::val_src_spc_t::RANGE, 1},
+                                         {tc1_t::val_src_spc_t::RANGE, 2}});
   crv_ccplx.create_named_datasets({"t", "x(t)", "y(t)", "z(t)"});
   crv_ccplx.dump_cplx(5);
   crv_ccplx.write_xml_vtk("parametric_curve_3d-crv.vtu", "parametric_curve_3d-crv");
@@ -122,9 +122,9 @@ int main() {
   srf1_tree_conv.construct_geometry_fans(srf1_ccplx,
                                          srf1_tree,
                                          2,
-                                         {{tc2_t::tree_val_src_t::DOMAIN, 0},
-                                          {tc2_t::tree_val_src_t::RANGE,  0},
-                                          {tc2_t::tree_val_src_t::DOMAIN, 1}});
+                                         {{tc2_t::val_src_spc_t::DOMAIN, 0},
+                                          {tc2_t::val_src_spc_t::RANGE,  0},
+                                          {tc2_t::val_src_spc_t::DOMAIN, 1}});
   srf1_ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)"});
   srf1_ccplx.dump_cplx(5);
   srf1_ccplx.write_xml_vtk("parametric_curve_3d-srf1.vtu", "parametric_curve_3d-srf1");
@@ -138,9 +138,9 @@ int main() {
   srf2_tree_conv.construct_geometry_fans(srf2_ccplx,
                                          srf2_tree,
                                          2,
-                                         {{tc2_t::tree_val_src_t::RANGE, 0},
-                                          {tc2_t::tree_val_src_t::RANGE, 1},
-                                          {tc2_t::tree_val_src_t::RANGE, 2}});
+                                         {{tc2_t::val_src_spc_t::RANGE, 0},
+                                          {tc2_t::val_src_spc_t::RANGE, 1},
+                                          {tc2_t::val_src_spc_t::RANGE, 2}});
   srf2_ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)"});
   srf2_ccplx.dump_cplx(5);
   srf2_ccplx.write_xml_vtk("parametric_curve_3d-srf2.vtu", "parametric_curve_3d-srf2");

@@ -66,9 +66,9 @@ int main() {
   bridge.construct_geometry_fans(ccplx,
                                  tree,
                                  2,
-                                 {{tc_t::tree_val_src_t::DOMAIN, 0}, 
-                                  {tc_t::tree_val_src_t::DOMAIN, 1},
-                                  {tc_t::tree_val_src_t::RANGE,  0}});
+                                 {{tc_t::val_src_spc_t::DOMAIN, 0}, 
+                                  {tc_t::val_src_spc_t::DOMAIN, 1},
+                                  {tc_t::val_src_spc_t::RANGE,  0}});
 
   ccplx.write_xml_vtk("hello_world.vtu", "hello_world");
 }

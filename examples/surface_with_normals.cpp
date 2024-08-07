@@ -116,9 +116,9 @@ int main() {
   bridge.construct_geometry_fans(ccplx,
                                  tree,
                                  2,
-                                 {{tc_t::tree_val_src_t::DOMAIN, 0}, 
-                                  {tc_t::tree_val_src_t::DOMAIN, 1},
-                                  {tc_t::tree_val_src_t::RANGE,  0}});
+                                 {{tc_t::val_src_spc_t::DOMAIN, 0}, 
+                                  {tc_t::val_src_spc_t::DOMAIN, 1},
+                                  {tc_t::val_src_spc_t::RANGE,  0}});
 
   // Note we use the single argument version of create_named_datasets() because we don't want to name elements 3, 4, & 5 (the components of the normal
   // Note if we had placed the ddiv component right after z, then we could have used the two argument version...

@@ -80,19 +80,19 @@ namespace mjr {
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Specify a source space for a data index. */
-      enum class tree_val_src_t { DOMAIN,    //!< The domain space.
-                                  RANGE,     //!< The range space.
-                                  CONSTANT   //!< A pseudo-source that returns a constant.
-                                };
+      enum class val_src_spc_t { DOMAIN,    //!< The domain space.
+                                 RANGE,     //!< The range space.
+                                 CONSTANT   //!< A pseudo-source that returns a constant.
+                               };
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Type to hold an integer or double */
       typedef std::variant<int, cc_uft_t> iorf_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Type used to hold a description of how to extract a scalar value from a tree object */
-      typedef std::tuple<tree_val_src_t, iorf_t> tree_scl_val_desc_t;
+      typedef std::tuple<val_src_spc_t, iorf_t> val_src_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** A list of tree_scl_val_desc_t objects.  */
-      typedef std::vector<tree_scl_val_desc_t> tree_scl_val_desc_lst_t;
+      /** A list of val_src_t objects.  */
+      typedef std::vector<val_src_t> val_src_lst_t;
       //@}
 
     private:
@@ -100,15 +100,15 @@ namespace mjr {
       /** @name Utility Functions. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** A list of tree_scl_val_desc_t objects.  */
-      static void create_dataset_to_point_mapping(const rt_t& rtree, cc_t& ccplx, const tree_scl_val_desc_lst_t& rt_dil) {
+      /** A list of val_src_t objects.  */
+      static void create_dataset_to_point_mapping(const rt_t& rtree, cc_t& ccplx, const val_src_lst_t& rt_dil) {
         cc_data_idx_lst_t cc_data_idx_lst(3);
         for(int i=0; i<3; ++i)
-          if(get<0>(rt_dil[i]) == tree_val_src_t::DOMAIN)
+          if(get<0>(rt_dil[i]) == val_src_spc_t::DOMAIN)
             cc_data_idx_lst[i] = get<int>(get<1>(rt_dil[i]));
-          else if(get<0>(rt_dil[i]) == tree_val_src_t::RANGE)
+          else if(get<0>(rt_dil[i]) == val_src_spc_t::RANGE)
             cc_data_idx_lst[i] = get<int>(get<1>(rt_dil[i])) + rtree.domain_dimension;
-          else if(get<0>(rt_dil[i]) == tree_val_src_t::CONSTANT)
+          else if(get<0>(rt_dil[i]) == val_src_spc_t::CONSTANT)
             cc_data_idx_lst[i] = get<cc_uft_t>(get<1>(rt_dil[i]));
         ccplx.create_dataset_to_point_mapping(cc_data_idx_lst);
       }
@@ -166,14 +166,6 @@ namespace mjr {
           @verbatim
           | Geom       | Dom Dim | Out Dim | Result             |
           |------------+---------+---------+--------------------|
-          | POINTS     |     1-3 |       1 | All Cell Points    |
-          |------------+---------+---------+--------------------|
-          | RECTANGLES |     1-3 |       0 | Cell Corner Points |
-          | RECTANGLES |     2-3 |       1 | Cell Edges         |
-          | RECTANGLES |       2 |       2 | 2D Rectangles      |
-          | RECTANGLES |       3 |       2 | Cell Faces         |
-          | RECTANGLES |       3 |       3 | Solid Hexahedra    |
-          |------------+---------+---------+--------------------|
           | FANS       |       2 |       1 | Triangle Edges     |
           | FANS       |       2 |       2 | Triangles          |
           | FANS       |       3 |       1 | Pyramid Edges      |
@@ -187,12 +179,12 @@ namespace mjr {
           @param output_dimension  Parts of cells to output
           @param point_src         Point sources
           @param func              The function was used to sample the tree */
-      static int construct_geometry_fans(cc_t&                   ccplx,
-                                         const rt_t&             rtree,
-                                         rt_diti_list_t          cells,
-                                         int                     output_dimension,
-                                         tree_scl_val_desc_lst_t point_src,
-                                         rt_rsfunc_t             func = nullptr
+      static int construct_geometry_fans(cc_t&          ccplx,
+                                         const rt_t&    rtree,
+                                         rt_diti_list_t cells,
+                                         int            output_dimension,
+                                         val_src_lst_t  point_src,
+                                         rt_rsfunc_t    func = nullptr
                                         ) {
         create_dataset_to_point_mapping(rtree, ccplx, point_src);
         if (rtree.domain_dimension == 1) {
@@ -344,19 +336,29 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** @overload */
-      static int construct_geometry_fans(cc_t&                   ccplx,
-                                         const rt_t&             rtree,
-                                         int                     output_dimension,
-                                         tree_scl_val_desc_lst_t point_src,
-                                         rt_rsfunc_t             func = nullptr
+      static int construct_geometry_fans(cc_t&         ccplx,
+                                         const rt_t&   rtree,
+                                         int           output_dimension,
+                                         val_src_lst_t point_src,
+                                         rt_rsfunc_t   func = nullptr
                                         ) {
         return construct_geometry_fans(ccplx, rtree, rtree.get_leaf_cells(), output_dimension, point_src, func);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Populate attached MR_cell_cplx object from data in attached MR_rect_tree object.
 
-          Only 0D vertex cells are produced.  While vertex cells may be obtained by setting the output_dimension to zero and calling construct_geometry_fan or
-          construct_geometry_rects, this method is much faster.  This method also provides the option of only outputting centers -- no corners.
+          Only 0D vertex cells are produced.  While similar results may be obtained by setting the output_dimension to zero and calling
+          construct_geometry_fan() or construct_geometry_rects(), this method is much faster.  This method also provides the option of only outputting centers without
+          corners.
+
+          @verbatim
+          | Geom   | output_centers | output_corners | Result        | output_dimension=0 equivalent |
+          |--------+----------------+----------------+---------------+-------------------------------|
+          | POINTS | true           | true           | cell vertexes | construct_geometry_fans       |
+          | POINTS | true           | false          | cell centers  |                               |
+          | POINTS | false          | true           | cell corners  | construct_geometry_rects      |
+          | POINTS | false          | false          | No Points     |                               |
+          @endverbatim
 
           @param ccplx           The MR_cell_cplx to populate with geometry
           @param rtree           The MR_rect_tree with source data
@@ -364,12 +366,12 @@ namespace mjr {
           @param point_src       Point sources
           @param output_centers  Create vertexes for cell  centers
           @param output_corners  Create vertexes for cell corners*/
-      static int construct_geometry_points(cc_t&                   ccplx,
-                                           const rt_t&             rtree,
-                                           rt_diti_list_t          cells,
-                                           tree_scl_val_desc_lst_t point_src,
-                                           bool                    output_centers,
-                                           bool                    output_corners
+      static int construct_geometry_points(cc_t&          ccplx,
+                                           const rt_t&    rtree,
+                                           rt_diti_list_t cells,
+                                           val_src_lst_t  point_src,
+                                           bool           output_centers,
+                                           bool           output_corners
                                           ) {
         create_dataset_to_point_mapping(rtree, ccplx, point_src);
         if (output_centers && output_corners) {
@@ -391,11 +393,11 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** @overload */
-      static int construct_geometry_points(cc_t&                   ccplx,
-                                           const rt_t&             rtree,
-                                           tree_scl_val_desc_lst_t point_src,
-                                           bool                    output_centers,
-                                           bool                    output_corners
+      static int construct_geometry_points(cc_t&         ccplx,
+                                           const rt_t&   rtree,
+                                           val_src_lst_t point_src,
+                                           bool          output_centers,
+                                           bool          output_corners
                                           ) {
         return construct_geometry_points(ccplx, rtree, rtree.get_leaf_cells(), point_src, output_centers, output_corners);
       }
@@ -404,16 +406,26 @@ namespace mjr {
 
           The resulting geometric structure in the MR_cell_cplx object will consist of 'rectangular' cell types (points, segments, rectangles, & hexahedra).
 
+          @verbatim
+          | Geom       | Dom Dim | Out Dim | Result             |
+          |------------+---------+---------+--------------------|
+          | RECTANGLES |     1-3 |       0 | Cell Corner Points |
+          | RECTANGLES |     2-3 |       1 | Cell Edges         |
+          | RECTANGLES |       2 |       2 | 2D Rectangles      |
+          | RECTANGLES |       3 |       2 | Cell Faces         |
+          | RECTANGLES |       3 |       3 | Solid Hexahedra    |
+          @endverbatim
+
           @param ccplx                The MR_cell_cplx to populate with geometry
           @param rtree                The MR_rect_tree with source data
           @param cells                List of tree cells from which to construct geometry
           @param output_dimension     Parts of cells to output
           @param point_src            Point sources */
-      static int construct_geometry_rects(cc_t&                   ccplx,
-                                          const rt_t&             rtree,
-                                          rt_diti_list_t          cells,
-                                          int                     output_dimension,
-                                          tree_scl_val_desc_lst_t point_src
+      static int construct_geometry_rects(cc_t&          ccplx,
+                                          const rt_t&    rtree,
+                                          rt_diti_list_t cells,
+                                          int            output_dimension,
+                                          val_src_lst_t  point_src
                                          ) {
         create_dataset_to_point_mapping(rtree, ccplx, point_src);
         for(auto& cell: cells) {
@@ -438,10 +450,10 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** @overload */
-      static int construct_geometry_rects(cc_t&                   ccplx,
-                                          const rt_t&             rtree,
-                                          int                     output_dimension,
-                                          tree_scl_val_desc_lst_t point_src
+      static int construct_geometry_rects(cc_t&         ccplx,
+                                          const rt_t&   rtree,
+                                          int           output_dimension,
+                                          val_src_lst_t point_src
                                          ) {
         return construct_geometry_rects(ccplx, rtree, rtree.get_leaf_cells(), output_dimension, point_src);
       }
@@ -513,8 +525,8 @@ namespace mjr {
           @param pd          Point data to be passed to func. */
       cc_pnt_data_t tsampf_to_cdatf(rt_rsfunc_t   func,
                                     cc_pnt_data_t pd) {
-        rt_drpt_t xvec = pnt_data_to_drpt(pd);
-        return tree_point_data_to_cplx_point_data(xvec, func(pnt_data_to_drpt(pd)));
+        rt_drpt_t xpt = pnt_data_to_drpt(pd);
+        return tree_point_data_to_cplx_point_data(xpt, func(xpt));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Adapt a MR_rect_tree sdf function to a MR_cell_cplx point data function.
@@ -523,7 +535,7 @@ namespace mjr {
           @param pd          Point data to be passed to func. */
       cc_uft_t tsdf_to_csdf(rt_rrfunc_t   func,
                             cc_pnt_data_t pd) {
-        return func(pnt_data_to_drpt(pd));
+        return static_cast<cc_uft_t>(func(pnt_data_to_drpt(pd)));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Transform a pnt_data_t value from a MR_cell_cplx into drpt_t from a MR_rect_tree */
@@ -537,9 +549,24 @@ namespace mjr {
         }
         return ret;
       }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Convert a MR_rect_tree sample function into a level test SDF'ish function.
+
+          @param cc_uft_t    Level to check aginst
+          @param range_index Index into range of origional sample function
+          @param func        The function to adapt
+          @param pd          Point data to be passed to func. */
+      cc_uft_t tsampf_to_clcdf(int           range_index,
+                               cc_uft_t      level,
+                               rt_rsfunc_t   func,
+                               cc_pnt_data_t pd) {
+        if constexpr (rt_t::domain_dimension == 1) {
+          return static_cast<cc_uft_t>(func(pnt_data_to_drpt(pd))) - level;
+        } else {
+          return static_cast<cc_uft_t>(func(pnt_data_to_drpt(pd))[range_index]) - level;
+        }
+      }
       //@}
-
-
   };
 }
 

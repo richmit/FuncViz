@@ -76,9 +76,9 @@ int main() {
                                   tree,
                                   tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, isf)); }),
                                   3,
-                                  {{tc_t::tree_val_src_t::DOMAIN, 0}, 
-                                   {tc_t::tree_val_src_t::DOMAIN, 1},
-                                   {tc_t::tree_val_src_t::DOMAIN, 2}});
+                                  {{tc_t::val_src_spc_t::DOMAIN, 0}, 
+                                   {tc_t::val_src_spc_t::DOMAIN, 1},
+                                   {tc_t::val_src_spc_t::DOMAIN, 2}});
 
   /* Name the data points */
   ccplx.create_named_datasets({"x", "y", "z", "f(x,y,z)"});

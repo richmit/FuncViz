@@ -175,24 +175,37 @@ int main() {
   tree.balance_tree(1, cpf);
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // At this point the tree is adequately sampled, so we print a bit out to the screen.
   tree.dump_tree(5);
 
+  //--------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // Create the cell complex from cells that have at least one point below our clipping plane.
   auto tcret = bridge.construct_geometry_fans(ccplx,
                                               tree,
                                               tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), 
                                                                        [&tree](tt_t::diti_t i) { return !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
                                               2,
-                                              {{tc_t::tree_val_src_t::DOMAIN, 0}, 
-                                               {tc_t::tree_val_src_t::DOMAIN, 1},
-                                               {tc_t::tree_val_src_t::RANGE,  4}});
+                                              {{tc_t::val_src_spc_t::DOMAIN, 0}, 
+                                               {tc_t::val_src_spc_t::DOMAIN, 1},
+                                               {tc_t::val_src_spc_t::RANGE,  4}});
+  std::cout << "TC Return: " << tcret << std::endl;
 
+  //--------------------------------------------------------------------------------------------------------------------------------------------------------------
   // Note the first argument need not name *every* data element, just the first ones.
   ccplx.create_named_datasets({"Re(z)", "Im(z)", "abs(z)", "arg(z)", "Re(f(z))", "Im(f(z))", "abs(f(z))", "arg(f(z))"}, {{"COLORS", {8, 9, 10}}});
 
-  std::cout << "TC Return: " << tcret << std::endl;
+  //--------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // Fold the triangles on our clipping plane
+  // ccplx.triangle_folder([&bridge](cc_t::pnt_data_t x){return bridge.tsampf_to_cdatf(        cpf, x); }, 
+  //                       [&bridge](cc_t::pnt_data_t x){return bridge.tsampf_to_clcdf(4, 3.5, cpf, x); });
 
+  //--------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // Remove all triangles above our clipping plane
+
+  //--------------------------------------------------------------------------------------------------------------------------------------------------------------
   ccplx.dump_cplx(5);
 
+  //--------------------------------------------------------------------------------------------------------------------------------------------------------------
   ccplx.write_legacy_vtk("complex_magnitude_surface.vtk", "complex_magnitude_surface");
   ccplx.write_xml_vtk(   "complex_magnitude_surface.vtu", "complex_magnitude_surface");
   ccplx.write_ply(       "complex_magnitude_surface.ply", "complex_magnitude_surface");

@@ -93,9 +93,9 @@ int main() {
   bridge.construct_geometry_fans(ccplx,
                                  tree,
                                  2,
-                                 {{tc_t::tree_val_src_t::RANGE,  0},
-                                  {tc_t::tree_val_src_t::RANGE,  1},
-                                  {tc_t::tree_val_src_t::RANGE,  2}});
+                                 {{tc_t::val_src_spc_t::RANGE,  0},
+                                  {tc_t::val_src_spc_t::RANGE,  1},
+                                  {tc_t::val_src_spc_t::RANGE,  2}});
   std::chrono::time_point<std::chrono::system_clock> fan_time = std::chrono::system_clock::now();
 
   ccplx.create_named_datasets({"u", "v", 

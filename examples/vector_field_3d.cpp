@@ -73,9 +73,9 @@ int main() {
   vfbridge.construct_geometry_rects(vfccplx,
                                     vftree,
                                     0,
-                                    {{tc_t::tree_val_src_t::DOMAIN,  0},
-                                     {tc_t::tree_val_src_t::DOMAIN,  1},
-                                     {tc_t::tree_val_src_t::DOMAIN,  2}});
+                                    {{tc_t::val_src_spc_t::DOMAIN,  0},
+                                     {tc_t::val_src_spc_t::DOMAIN,  1},
+                                     {tc_t::val_src_spc_t::DOMAIN,  2}});
 
   vfccplx.create_named_datasets({"x", "y", "z"},
                                 {{"d", {0, 1, 2}}});
