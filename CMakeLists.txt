@@ -55,7 +55,7 @@ set(TARGETS_UTEST "check_cell_hexahedron" "check_cell_pyramid" "check_cell_quad"
                )
 set(TARGETS_FTEST "MR_cell_cplx_test_mpl" "MR_cell_cplx_test_wedge" "MR_cell_cplx_test_surf_wave_hole" 
                   #"MR_rect_tree_test_surf_corner" 
-                  "MR_rect_tree_test_flat1"
+                  "flat_test_tree_01"
                   "nan_solver"
                )
 
