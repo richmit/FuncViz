@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-08-07 Wed 15:09 -->
+<!-- 2024-08-07 Wed 15:46 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Function Visualization</title>
@@ -272,12 +272,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-08-07 15:09:36</i></td>
+<td class="org-left"><i>2024-08-07 15:46:05</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-08-07 15:09:38</i></td>
+<td class="org-left"><i>2024-08-07 15:46:07</i></td>
 </tr>
 </tbody>
 </table>
@@ -309,9 +309,10 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <ul>
 <li><a href="#trefoil">3.1. Trefoil Parametric Surface</a></li>
 <li><a href="#parametric_curve_3d">3.2. Twisted Cubic As A Surface Intersection</a></li>
+<li><a href="#ear_surface">3.3. Ear Surface</a></li>
 </ul>
 </li>
-<li><a href="#org9effc82">4. xx</a>
+<li><a href="#orgae98217">4. xx</a>
 <ul>
 <li><a href="#PROGRAM_EXAMPLE">4.1. PROGRAM_EXAMPLE</a></li>
 </ul>
@@ -1255,7 +1256,7 @@ any holes.  This is really the only change from surface_plot_edge.cpp.
 
 <div class="org-center">
 
-<div id="org8f84982" class="figure">
+<div id="orgbd72d58" class="figure">
 <p><a href="media/surface_branch_glue_100.png"><img src="media/surface_branch_glue_10.png" alt="surface_branch_glue_10.png" /></a>
 </p>
 </div>
@@ -1343,7 +1344,7 @@ Note that most of the items above are listed TBD.  A few features need to be add
 
 <div class="org-center">
 
-<div id="org942baea" class="figure">
+<div id="orge793f0e" class="figure">
 <p><a href="media/sq_curve_plot_heal_100.png"><img src="media/sq_curve_plot_heal_10.png" alt="sq_curve_plot_heal_10.png" /></a>
 </p>
 </div>
@@ -1650,7 +1651,7 @@ This example doesn't really demonstrate anything not found in the other examples
 
 <div class="org-center">
 
-<div id="org784c752" class="figure">
+<div id="org05f32fd" class="figure">
 <p><a href="media/trefoil_rot_50_crf30.html"><img src="media/trefoil_rot_10.gif" alt="trefoil_rot_10.gif" /></a>
 </p>
 </div>
@@ -1747,7 +1748,7 @@ Alternately the curve is also the intersection of two surfaces in \(\mathbb{R}^3
 The "typical" way to graph a surface like \(f_2\) is to transform it into pseudo-parametric form.  In Maple that might look like this
 </p>
 
-<pre class="example" id="orgd73d9c4">
+<pre class="example" id="org85ecd06">
 plot3d([u, u^2, v], u=-1..1, v=-1..1):
 </pre>
 
@@ -1763,7 +1764,7 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
 
 <div class="org-center">
 
-<div id="orgc62243d" class="figure">
+<div id="org3f43fef" class="figure">
 <p><a href="media/parametric_curve_3d_rot_100_crf30.html"><img src="media/parametric_curve_3d_rot_10.gif" alt="parametric_curve_3d_rot_10.gif" /></a>
 </p>
 </div>
@@ -1858,13 +1859,113 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
 </div>
 </div>
 </div>
+
+
+
+<div id="outline-container-ear_surface" class="outline-3">
+<h3 id="ear_surface"><span class="section-number-3">3.3.</span> Ear Surface</h3>
+<div class="outline-text-3" id="text-ear_surface">
+<p>
+This example is very similar to implicit_surface.cpp; however, instead of extracting a surface from a quad tessellation of a hexahedrona we extract the
+surface from a tessellation of a pyramids.  Why use pyramids instead of hexahedrona?  In the example implicit_surface.cpp all of the underlying cells are
+the same size, and thus no gaps occur in the extracted level set (the surface).  In this example we have cells that vary a great deal in size.
+</p>
+
+<p>
+This example demonstrates scratch made cell predicates, and uses them to increse sample resolution on parts of the surface that are particularly difficlut
+to extract.
+</p>
+
+<p>
+This surface is defined by the zeros of the following polynomial
+</p>
+
+<p>
+\[ x^2-y^2*z^2+z^3 \]
+</p>
+
+
+<div class="org-center">
+
+<div id="org350a804" class="figure">
+<p><a href="media/ear_surface_rot_100_crf30.html"><img src="media/ear_surface_rot_10.gif" alt="ear_surface_rot_10.gif" /></a>
+</p>
+</div>
 </div>
 
+<div class="org-src-container">
+<pre class="src src-c++">
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
 
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b3d1rT</span>            <span style="color: #63b8ff;">tt_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT9</span>                  <span style="color: #63b8ff;">cc_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
 
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">isf</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x</span> = xvec[0];
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y</span> = xvec[1];
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z</span> = xvec[2];
 
-<div id="outline-container-org9effc82" class="outline-2">
-<h2 id="org9effc82"><span class="section-number-2">4.</span> xx</h2>
+  <span style="color: #00ffff;">return</span> x*x-y*y*z*z+z*z*z;
+}
+
+<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
+  <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">tree</span>({-2.2, -2.2, -2.2}, 
+            { 2.2,  2.2,  2.2});
+  <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">ccplx</span>;
+  <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">bridge</span>; 
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Initial uniform sample</span><span style="color: #ffa500;"> */</span>
+  tree.refine_grid(3, isf);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Refine near surface</span><span style="color: #ffa500;"> */</span>
+  tree.refine_leaves_recursive_cell_pred(6, isf, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_cross_sdf(i, isf)); });
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Refine on the x-y plane</span><span style="color: #ffa500;"> */</span>
+  tree.refine_leaves_recursive_cell_pred(7, isf, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_cross_domain_level(i, 2, 0.0, 1.0e-6)); });
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Refine between the ears</span><span style="color: #ffa500;"> */</span>
+  tree.refine_leaves_recursive_cell_pred(7,  isf, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">auto</span> <span style="color: #7fffd4;">x</span> = tree.diti_to_drpt(i); <span style="color: #00ffff;">return</span> ((<span style="color: #8470ff; font-weight: bold;">std</span>::abs(x[0]) &lt; 0.07)&amp;&amp;(<span style="color: #8470ff; font-weight: bold;">std</span>::abs(x[1]) &lt; 0.6)); });
+  tree.refine_leaves_recursive_cell_pred(8,  isf, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">auto</span> <span style="color: #7fffd4;">x</span> = tree.diti_to_drpt(i); <span style="color: #00ffff;">return</span> ((<span style="color: #8470ff; font-weight: bold;">std</span>::abs(x[0]) &lt; 0.04)&amp;&amp;(<span style="color: #8470ff; font-weight: bold;">std</span>::abs(x[1]) &lt; 0.3)); });
+  tree.refine_leaves_recursive_cell_pred(9,  isf, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">auto</span> <span style="color: #7fffd4;">x</span> = tree.diti_to_drpt(i); <span style="color: #00ffff;">return</span> ((<span style="color: #8470ff; font-weight: bold;">std</span>::abs(x[0]) &lt; 0.02)&amp;&amp;(<span style="color: #8470ff; font-weight: bold;">std</span>::abs(x[1]) &lt; 0.2)); });
+  tree.refine_leaves_recursive_cell_pred(10, isf, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">auto</span> <span style="color: #7fffd4;">x</span> = tree.diti_to_drpt(i); <span style="color: #00ffff;">return</span> ((<span style="color: #8470ff; font-weight: bold;">std</span>::abs(x[0]) &lt; 0.01)&amp;&amp;(<span style="color: #8470ff; font-weight: bold;">std</span>::abs(x[1]) &lt; 0.15)); });
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Refine lower edge of ears</span><span style="color: #ffa500;"> */</span>
+  tree.refine_leaves_recursive_cell_pred(7, isf, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">auto</span> <span style="color: #7fffd4;">x</span> = tree.diti_to_drpt(i); <span style="color: #00ffff;">return</span> ((<span style="color: #8470ff; font-weight: bold;">std</span>::abs(x[0]) &lt; 0.3)&amp;&amp;(<span style="color: #8470ff; font-weight: bold;">std</span>::abs(x[1]) &gt; 0.2)&amp;&amp;(<span style="color: #8470ff; font-weight: bold;">std</span>::abs(x[1]) &lt; 1.0)); });
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Balance the tree</span><span style="color: #ffa500;"> */</span>
+  tree.balance_tree(1, isf);
+
+  tree.dump_tree(5);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Convert our tree to a cell complex.  Note that we use an SDF to export only cells that contain our surface</span><span style="color: #ffa500;"> */</span>
+  bridge.construct_geometry_fans(ccplx,
+                                 tree,
+                                 tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_cross_sdf(i, isf)); }),
+                                 3,
+                                 {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::DOMAIN, 0}, 
+                                  {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::DOMAIN, 1},
+                                  {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::DOMAIN, 2}});
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Name the data points</span><span style="color: #ffa500;"> */</span>
+  ccplx.create_named_datasets({<span style="color: #fa8072;">"x"</span>, <span style="color: #fa8072;">"y"</span>, <span style="color: #fa8072;">"z"</span>, <span style="color: #fa8072;">"f(x,y,z)"</span>});
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Display some data about the cell complex</span><span style="color: #ffa500;"> */</span>
+  ccplx.dump_cplx(5);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Write out our cell complex</span><span style="color: #ffa500;"> */</span>
+  ccplx.write_xml_vtk(<span style="color: #fa8072;">"ear_surface.vtu"</span>, <span style="color: #fa8072;">"ear_surface"</span>);
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgae98217" class="outline-2">
+<h2 id="orgae98217"><span class="section-number-2">4.</span> xx</h2>
 <div class="outline-text-2" id="text-4">
 </div>
 <div id="outline-container-PROGRAM_EXAMPLE" class="outline-3">
@@ -1872,7 +1973,7 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
 <div class="outline-text-3" id="text-PROGRAM_EXAMPLE">
 <div class="org-center">
 
-<div id="orgc66d1cd" class="figure">
+<div id="orgd1cbff3" class="figure">
 <p><a href="media/PROGRAM_EXAMPLE_100.png"><img src="media/PROGRAM_EXAMPLE_10.png" alt="PROGRAM_EXAMPLE_10.png" /></a>
 </p>
 </div>
