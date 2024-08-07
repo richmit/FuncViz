@@ -1,0 +1,8 @@
+Maple
+Version: 2024.1
+ Build: 1835466
+
+
+plot3d(sqrt(1-x^2-y^2), x=-1.1..1.1, y=-1.1..1.1,adaptmesh=true,scaling=constrained);
+plot3d(sqrt(1-x^2-y^2), x=-1.1..1.1, y=-1.1..1.1,adaptmesh=false,scaling=constrained);
+

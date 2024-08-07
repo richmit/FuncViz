@@ -1,0 +1,10 @@
+Matlab 
+Version: 2023b
+Update: 23.2.0.25999560
+Date: Apr 29, 2024
+
+
+
+[X, Y] = meshgrid(-1.1:0.1:1.1, -1.1:0.1:1.1);
+Z = sqrt(abs(1-X.*X-Y.*Y));
+surf(X, Y, Z);
