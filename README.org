@@ -29,11 +29,12 @@ You can read more about the way the data structure works here: [[https://richmit
 * Repository Contents (Current & Planned)
 
  - [[https://richmit.github.io/MRPTree/tree_theory/trees.html][Documentation about how data structure works]]
- - [[https://richmit.github.io/MRPTree/func-viz/func-viz.html][Some notes one the examples and mathematical function visualization]]
- - The =MRPTree= itself (See the single header file: =lib/MR_cell_cplx.hpp=)
+ - [[https://richmit.github.io/MRPTree/func-viz/func-viz.html][Example code for mathematical function visualization]]
+ - [[https://richmit.github.io/MRPTree/roadmap.html][Future development plans]]
+ - The =MRPTree= itself (See: =lib/MR_cell_cplx.hpp=)
  - Several examples of mathematical function visualization illustrating MRPTree in 1, 2, & 3 dimensions
- - An unstructured cell-complex (similar to a [[https://en.wikipedia.org/wiki/Simplicial_complex][simplicial complex]]) library (See the single header file: =lib/MR_cell_cplx.hpp=)
- - A library to tessellate an =MR_rect_tree= object into an =MR_cell_cplx= object (See the single header file: =lib/MR_rt_to_cc.hpp=)
+ - An unstructured cell-complex/mesh library (See: =lib/MR_cell_cplx.hpp=)
+ - A library to tessellate an =MR_rect_tree= object into an =MR_cell_cplx= object (See: =lib/MR_rt_to_cc.hpp=)
 
 Have fun!!
 
