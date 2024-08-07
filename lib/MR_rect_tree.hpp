@@ -491,7 +491,7 @@ namespace mjr {
       /** Return a list of potential neighbor cells of the specified cell
           @warning No error checking -- cell must be a valid center coordinate. See: cell_good_cords()
           @param cell Input cell */
-      diti_list_t ccc_ccc_get_neighbors(diti_t cell) const { return cuc_axis_cross(cell, ccc_cell_full_width(cell)); }
+      diti_list_t ccc_get_neighbors(diti_t cell) const { return cuc_axis_cross(cell, ccc_cell_full_width(cell)); }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Return the potential neighbor cell along the given axis in the specified direction.
           @warning No error checking -- cell must be a valid center coordinate. See: cell_good_cords()
