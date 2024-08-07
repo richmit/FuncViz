@@ -260,13 +260,13 @@ namespace mjr {
       typedef std::function<rrpt_t(drpt_t)> rsfunc_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Integer input predicate function */
-      typedef std::function<bool(diti_t)> ipfunc_t;
+      typedef std::function<bool(diti_t)>   ipfunc_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Real input predicate function */
-      typedef std::function<bool(drpt_t)> rpfunc_t;
+      typedef std::function<bool(drpt_t)>   rpfunc_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Real input, real output function */
-      typedef std::function<src_t(drpt_t)> rrfunc_t;  
+      /** Real input, single real variable output function */
+      typedef std::function<src_t(drpt_t)>  rrfunc_t;  
       //@}
 
     private:
@@ -1267,7 +1267,7 @@ namespace mjr {
           @param epsilon      How close the point must be
           @param cell Input Cell
           @return true if a cell contains, or is close to, a domain_point. */
-      inline bool cell_close_to_domain_point(drpt_t domain_point, spc_real_t epsilon, diti_t cell) {        
+      inline bool cell_close_to_domain_point(drpt_t domain_point, src_t epsilon, diti_t cell) {        
         drpt_t min_drpt = diti_to_drpt(ccc_cell_get_corner_min(cell));
         for(int i=0; i<dom_dim; i++)
           if (dom_at(min_drpt, i)-epsilon > dom_at(domain_point, i))
@@ -1514,7 +1514,7 @@ namespace mjr {
           drta_t tmp3 = diti_to_drta(diti);
           convert << "[ ";
           for (const auto tmp4 : tmp3)
-            convert << std::setprecision(5) << static_cast<double>(tmp4) << " ";
+            convert << std::setprecision(5) << static_cast<src_t>(tmp4) << " ";
           convert << "] ";
         }
           return(convert.str());
@@ -1532,7 +1532,7 @@ namespace mjr {
         } else {
           convert << "[ ";
           for(auto c: x)
-            convert << std::setprecision(5) << static_cast<double>(c) << " ";
+            convert << std::setprecision(5) << static_cast<src_t>(c) << " ";
           convert << "]";
         }
         return(convert.str());
@@ -1546,7 +1546,7 @@ namespace mjr {
         } else {
           convert << "[ ";
           for(auto c: x)
-            convert << std::setprecision(5) << static_cast<double>(c) << " ";
+            convert << std::setprecision(5) << static_cast<src_t>(c) << " ";
           convert << "]";
         }
           return(convert.str());

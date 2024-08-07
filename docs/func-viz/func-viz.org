@@ -770,6 +770,110 @@ int main() {
 }
 #+end_src
 
+
+** Surface Plot With An Corner
+:PROPERTIES:
+:CUSTOM_ID: surface_plot_corner
+:END:
+
+#+begin_src sh :results output raw :exports results 
+grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_plot_corner.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
+#+end_src
+
+#+RESULTS:
+
+  The function illustrated here is continuous on the entire plane, but has no derivative on the unit circle.  While no derivative exists on the unit circle,
+  directional derivatives pointing from the origin approach infinity as we get close to the unit circle.  The derivative at the origin is zero.  Thus the
+  surface is not only zero on the unit circle, but it drops to zero very quickly from it's local extrema at the origin.
+
+  If we sample on a uniform grid, some of the resulting polygons will have vertexes both inside and outside the unit circle.  These polygons will never touch
+  the x-y plane, and thus the surface will not appear to have a uniform zero set on the unit circle.  At low resolution the results are so bad they are
+  difficult to interpret.  At higher resolutions we see what appears to be a jagged edge over the unit circle.  Meaning the results are visually quite wrong,
+  but an astute viewer might well guess the true behavior of the function from the resulting image.  In order to correct this graph we need sample points in
+  the triangulation that are on, or very near, the unit circle.  We can do that by folding and resampling the cell complex on the unit circle.
+
+    - How to drive up the sample rate near a particular SDF -- so that we get higher resolution where the surface meets the plane.
+    - How to "fold" the resulting triangles to achieve higher accuracy on the non-differentiable edge.
+    - How to use tsampf_to_cdatf() & tsdf_to_csdf() to adapt functions designed for a MR_rect_tree for use with a MR_cell_cplx.
+
+#+BEGIN_CENTER
+Mathematica 12\\
+[[file:media/mathematica_hat_100.png][file:media/mathematica_hat_10.png]] \\
+MRPtree Version \\
+[[file:media/surface_plot_corner_rot_100_crf30.html][file:media/surface_plot_corner_rot_10.gif]]
+#+END_CENTER
+
+Source code: https://github.com/richmit/MRPTree/blob/main/examples/surface_plot_corner.cpp
+
+#+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
+grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_plot_corner.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+#+end_src
+
+#+RESULTS:
+#+begin_src c++ :eval never :tangle no
+
+#include "MR_rect_tree.hpp"
+#include "MR_cell_cplx.hpp"
+#include "MR_rt_to_cc.hpp"
+
+typedef mjr::tree15b2d1rT            tt_t;
+typedef mjr::MRccT5                  cc_t;
+typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
+
+
+tt_t::rrpt_t half_sphere_hat(tt_t::drpt_t xvec) {
+  double m = xvec[0] * xvec[0] + xvec[1] * xvec[1];
+  return (std::sqrt(std::abs(1-m)));
+}
+
+tt_t::src_t unit_circle_sdf(tt_t::drpt_t xvec) {
+  double m = xvec[0] * xvec[0] + xvec[1] * xvec[1];
+  return (1-m);
+}
+
+int main() {
+  tt_t tree({-1.1, -1.1}, 
+            { 1.1,  1.1});
+  cc_t ccplx;
+  tc_t bridge;
+
+  /* Here is another way to get fine samples on the circle, but with a SDF this time. */
+  tree.refine_grid(5, half_sphere_hat);
+
+  /* Increase sample resolution on the unit circle.  Here we do that with an SDF. */
+  tree.refine_leaves_recursive_cell_pred(7, half_sphere_hat, [&tree](int i) { return (tree.cell_cross_sdf(i, unit_circle_sdf)); });
+
+  /* Balance the three to the traditional level of 1 (no cell borders a cell more than half it's size) */
+  tree.balance_tree(1, half_sphere_hat);
+
+  /* Take a peek at the raw tree data */
+  tree.dump_tree(10);
+
+  /* Generate a cell complex from the tree samples */
+  bridge.construct_geometry_fans(ccplx,
+                                 tree,
+                                 2,
+                                 {{tc_t::tree_val_src_t::DOMAIN, 0}, 
+                                  {tc_t::tree_val_src_t::DOMAIN, 1},
+                                  {tc_t::tree_val_src_t::RANGE,  0}});
+
+  /* The single argument form of create_named_datasets() allows us to easily name data points. */
+  ccplx.create_named_datasets({"x", "y", "f(x,y)"});
+
+  /* Take a look at the generated cell complex */
+  ccplx.dump_cplx(10);
+
+  /* Fold all triangles that cross the unit circle! */
+  ccplx.triangle_folder([&bridge](cc_t::pnt_data_t x){return bridge.tsampf_to_cdatf(half_sphere_hat, x); }, 
+                        [&bridge](cc_t::pnt_data_t x){return bridge.tsdf_to_csdf(unit_circle_sdf,    x); });
+
+  /* Notice how it changed after the fold */
+  ccplx.dump_cplx(10);
+
+  ccplx.write_xml_vtk("surface_plot_corner.vtu", "surface_plot_corner");
+}
+#+end_src
+
 ** Surface Branches & Glue
 :PROPERTIES:
 :CUSTOM_ID: surface_branch_glue
@@ -1389,7 +1493,10 @@ int main() {
 
 
 * Meta Stuff :noexport:
-** Image Processing: Resize PNGs                             
+
+** Media
+
+*** Image Processing: Resize PNGs                             
 
 #+begin_src sh  :results output verbatum :exports both
 for d in ../../paraview/ ../../misc/; do
@@ -1410,17 +1517,25 @@ done
 
 #+RESULTS:
 #+begin_example
-make media/curve_plot_heal_smo_100.png
-make media/curve_plot_heal_smo_50.png
-make media/curve_plot_heal_smo_25.png
-make media/curve_plot_heal_smo_10.png
-make media/surface_branch_glue_100.png
-make media/surface_branch_glue_50.png
-make media/surface_branch_glue_25.png
-make media/surface_branch_glue_10.png
+make media/parametric_surface_with_defects-rect_100.png
+make media/parametric_surface_with_defects-rect_50.png
+make media/parametric_surface_with_defects-rect_25.png
+make media/parametric_surface_with_defects-rect_10.png
+make media/parametric_surface_with_defects-tri_100.png
+make media/parametric_surface_with_defects-tri_50.png
+make media/parametric_surface_with_defects-tri_25.png
+make media/parametric_surface_with_defects-tri_10.png
+make media/mathematica_hat_100.png
+make media/mathematica_hat_50.png
+make media/mathematica_hat_25.png
+make media/mathematica_hat_10.png
+make media/mathematica_sphere_100.png
+make media/mathematica_sphere_50.png
+make media/mathematica_sphere_25.png
+make media/mathematica_sphere_10.png
 #+end_example
 
-** Image Processing: GIFs
+*** Image Processing: GIFs
 
 #+begin_src sh  :results output verbatum :exports both
 for f in ../../paraview/*.gif; do
@@ -1455,27 +1570,13 @@ skip media/parametric_curve_3d_rot_50.gif
 skip media/sq_complex_magnitude_surface_rot_10.gif
 skip media/sq_implicit_surface_rot_10.gif
 skip media/sq_lorenz_rot_10.gif
-make media/trefoil_rot_10.gif
-make media/trefoil_rot_25.gif
-make media/trefoil_rot_50.gif
+skip media/surface_plot_corner_rot_10.gif
+skip media/surface_plot_corner_rot_25.gif
+skip media/surface_plot_corner_rot_50.gif
+skip media/trefoil_rot_10.gif
+skip media/trefoil_rot_25.gif
+skip media/trefoil_rot_50.gif
 #+end_example
-
-** PROGRAM_EXAMPLE
-:PROPERTIES:
-:CUSTOM_ID: PROGRAM_EXAMPLE
-:END:
-
-#+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/PROGRAM_EXAMPLE.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
-#+end_src
-
-#+BEGIN_CENTER
-[[file:media/PROGRAM_EXAMPLE_100.png][file:media/PROGRAM_EXAMPLE_10.png]]
-#+END_CENTER
-
-#+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/PROGRAM_EXAMPLE.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
-#+end_src
 
 ** Out Of Date Code
 
@@ -1526,12 +1627,15 @@ skip media/complex_magnitude_surface_rot_50_crf30.webm
 skip media/implicit_surface_rot_100_crf30.webm
 skip media/implicit_surface_rot_25_crf30.webm
 skip media/implicit_surface_rot_50_crf30.webm
-skip media/lorenz_rot_100_crf30.webm
+make media/lorenz_rot_100_crf30.webm
 skip media/lorenz_rot_25_crf30.webm
 skip media/lorenz_rot_50_crf30.webm
 skip media/parametric_curve_3d_rot_100_crf30.webm
 skip media/parametric_curve_3d_rot_25_crf30.webm
 skip media/parametric_curve_3d_rot_50_crf30.webm
+make media/surface_plot_corner_rot_100_crf30.webm
+make media/surface_plot_corner_rot_25_crf30.webm
+make media/surface_plot_corner_rot_50_crf30.webm
 skip media/trefoil_rot_100_crf30.webm
 skip media/trefoil_rot_25_crf30.webm
 skip media/trefoil_rot_50_crf30.webm
@@ -1540,7 +1644,7 @@ skip media/trefoil_rot_50_crf30.webm
 *** Create HTML Wrappers
 
 #+begin_src sh :results output verbatum
-for e in complex_magnitude_surface implicit_surface lorenz trefoil parametric_curve_3d; do
+for e in complex_magnitude_surface implicit_surface lorenz trefoil parametric_curve_3d surface_plot_corner; do
   echo Processing Example $e
   he=$(echo $e | sed 's/_/ /g; s/\b\(.\)/\u\1/g')
   for f in media/$e*_crf30.webm; do
@@ -1577,5 +1681,28 @@ Processing Example parametric_curve_3d
   skip media/parametric_curve_3d_rot_100_crf30.html
   skip media/parametric_curve_3d_rot_25_crf30.html
   skip media/parametric_curve_3d_rot_50_crf30.html
+Processing Example surface_plot_corner
+  make media/surface_plot_corner_rot_100_crf30.html
+  make media/surface_plot_corner_rot_25_crf30.html
+  make media/surface_plot_corner_rot_50_crf30.html
 #+end_example
+
+* xx
+
+** PROGRAM_EXAMPLE
+:PROPERTIES:
+:CUSTOM_ID: PROGRAM_EXAMPLE
+:END:
+
+#+begin_src sh :results output raw :exports results 
+grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/PROGRAM_EXAMPLE.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
+#+end_src
+
+#+BEGIN_CENTER
+[[file:media/PROGRAM_EXAMPLE_100.png][file:media/PROGRAM_EXAMPLE_10.png]]
+#+END_CENTER
+
+#+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
+grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/PROGRAM_EXAMPLE.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+#+end_src
 

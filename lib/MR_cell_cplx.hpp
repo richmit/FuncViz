@@ -52,15 +52,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Put everything in the mjr namespace
 namespace mjr {
-  /** @brief Template Class used hold tessellations of MR_rect_tree geometric data as well as MR_rect_tree point data sets.
-
-      This class's primary use case is to hold tessellations of MR_rect_tree geometric data as well as MR_rect_tree point data sets.  A secondary goal
-      is to preform tessellation manipulations that take advantage of auxiliary knowledge of the function being approximated -- in particular we do *not*
-      attempt to preform tessellation manipulations commonly found in the many available  mesh packages.  Most of the time the final goal of this class
-      is to produce a geometry file to be imported into some other software.
+  /** @brief Template class used to store and transform cell complexes (mesh/triangluation/etc...) and data sets generated from  MR_rect_tree sample data.
 
       This code is a quick-n-dirty hack job.  I simply wanted to quickly get to a point where I could visually test MR_rect_tree objects.  Logically this
       class should be split into several classes (unique point list, unique cell list, 3D vectors, 3D analytic geometry, etc...).  It's a bit of a mess.
+
+      The primary use case is to store and manipulate geometric (i.e. mesh) data derived from MR_rect_tree samples.  On the mesh manipulation front the focus
+      is on computations that require knowledge related to the function being approximated.  
 
       Significant limitations:
         - VTK files generated from MR_rect_tree objects don't require all of the capability of VTK files
@@ -1674,7 +1672,8 @@ namespace mjr {
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Function that takes and returns a pnt_data_t */
-      typedef std::function<pnt_data_t(const pnt_data_t&)> pdfunc_t;
+      typedef std::function<pnt_data_t(const pnt_data_t&)> data_func_t;
+      typedef std::function<uft_t(const pnt_data_t&)> sdf_func_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Add new cells with points from existing cells with the given coordinates negated. 
 
@@ -1713,6 +1712,177 @@ namespace mjr {
           if (reverse_vertex_order)
             std::reverse(new_cell.begin(), new_cell.end());
           add_cell(req_pt_cnt_to_cell_type(new_cell.size()), new_cell);
+        }
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Clear the solution cache stored in edge_solver_sdf(). */
+      void clear_cache_edge_solver_sdf() {
+        edge_solver_sdf(nullptr, 0, 0, nullptr, 0.0);
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Solve an SDF function for zero on a line between two point data sets, and add the solution to the master point list.
+
+          The SDF must have different signs on the given points.  If this is not the case, then the endpoint with SDF closest to zero will be returned.
+
+          Uses bisection.  Halting conditions:
+            - The SDF value at the most recent guess is within solve_epsilon of zero
+            - The absolute difference in SDF values at the end points is less than solve_epsilon
+
+          This function stores a cache of previous solution results.  This cache may be cleared by clear_cache_edge_solver_sdf().
+
+          @param pnt_idx1       First edge vertex
+          @param pnt_idx2       Second edge vertex
+          @param sdf_func       Data function (if nullptr, then clear solver cache and return immediately)
+          @param solve_epsilon  Used to detect SDF value near zero
+          @param dat_func       Produce the point data vector for the newly solved point. */
+      pnt_idx_t edge_solver_sdf(data_func_t dat_func, pnt_idx_t pnt_idx1, pnt_idx_t pnt_idx2, sdf_func_t sdf_func, uft_t solve_epsilon=epsilon/10) {
+        // Solver cache.
+        static std::unordered_map<pnt_idx_t, std::unordered_map<pnt_idx_t, pnt_idx_t>> edge_solver_cache;
+        if (sdf_func == nullptr) {
+          edge_solver_cache.clear();
+          return pnt_idx1;
+        }
+        pnt_idx_t cache_key1 = std::min(pnt_idx1, pnt_idx2);
+        pnt_idx_t cache_key2 = std::max(pnt_idx1, pnt_idx2);
+        // Check to see if we solved this one before
+        if (edge_solver_cache.contains(cache_key1))
+          if (edge_solver_cache[cache_key1].contains(cache_key2))
+            return edge_solver_cache[cache_key1][cache_key2];
+        // Gotta do the work and solve...
+        // Init neg&pos with the points that have eng&pos sdf values
+        pnt_data_t neg_pnt_data;
+        uft_t      neg_pnt_sdfv;
+        pnt_data_t pos_pnt_data = pnt_idx_to_pnt_data[pnt_idx1];
+        uft_t      pos_pnt_sdfv = sdf_func(pos_pnt_data);
+        if (pos_pnt_sdfv > 0) {
+          neg_pnt_data = pnt_idx_to_pnt_data[pnt_idx2];
+          neg_pnt_sdfv = sdf_func(neg_pnt_data);
+        } else {
+          neg_pnt_data = pos_pnt_data;
+          neg_pnt_sdfv = pos_pnt_sdfv;
+          pos_pnt_data = pnt_idx_to_pnt_data[pnt_idx2];
+          pos_pnt_sdfv = sdf_func(pos_pnt_data);
+        }
+        // Init sol_pnt_data to end point with sdf value nearest zero
+        pnt_data_t sol_pnt_data;
+        uft_t      sol_pnt_sdfv;
+        if (std::abs(pos_pnt_sdfv) < std::abs(neg_pnt_sdfv)) {
+          sol_pnt_data = pos_pnt_data;
+          sol_pnt_sdfv = pos_pnt_sdfv;
+        } else {
+          sol_pnt_data = neg_pnt_data;
+          sol_pnt_sdfv = neg_pnt_sdfv;
+        }
+        if (neg_pnt_sdfv < 0) {  // Just to make sure pos&neg are pos&neg...
+          while ((std::abs(sol_pnt_sdfv) > solve_epsilon) && (pos_pnt_sdfv-neg_pnt_sdfv) > solve_epsilon) {
+            for(decltype(pos_pnt_data.size()) i=0; i<pos_pnt_data.size(); i++)
+              sol_pnt_data[i] = (pos_pnt_data[i] + neg_pnt_data[i])/static_cast<uft_t>(2.0);
+            sol_pnt_sdfv = sdf_func(sol_pnt_data);
+            if (sol_pnt_sdfv > 0) {
+              pos_pnt_data = sol_pnt_data;
+              pos_pnt_sdfv = sol_pnt_sdfv;
+            } else {
+              neg_pnt_data = sol_pnt_data;
+              neg_pnt_sdfv = sol_pnt_sdfv;
+            }
+          }
+        }
+        // Add out point, update solver cache, and return index
+        pnt_idx_t sol_pnt_idx = add_point(dat_func(sol_pnt_data));
+        edge_solver_cache[cache_key1][cache_key2] = sol_pnt_idx;
+        return sol_pnt_idx;
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Fold triangles that cross over an SDF function.
+          @param data_func           Data function
+          @param sdf_index      Index of SDF value in sdf_func return
+          @param solve_epsilon  Used to detect SDF value near zero */
+      void triangle_folder(data_func_t dat_func, sdf_func_t sdf_func, uft_t solve_epsilon=epsilon/10) {
+        //  MJR TODO NOTE <2024-08-06T12:38:33-0500> triangle_folder: Implement!
+        clear_cache_edge_solver_sdf();
+        const std::array<int, 3> p00 {0, 1, 2};
+        const std::array<int, 3> p10 {1, 2, 0};
+        const std::array<int, 3> p20 {2, 0, 1};
+        int num_start_cells = num_cells();
+        for(int cell_idx=0; cell_idx<num_start_cells; ++cell_idx) {
+          if (static_cast<int>(cell_lst[cell_idx].size()) == cell_type_to_req_pt_cnt(cell_type_t::TRIANGLE)) {
+            auto& cur_cell = cell_lst[cell_idx];
+            // Find and count zeros, positive, and negative vertexes
+            std::vector<int> zeros(3);
+            std::vector<int> pluss(3);
+            int zero_cnt=0, plus_cnt=0;
+            int zero_loc=-1, plus_loc=-1, negv_loc=-1;
+            for(int i=0; i<3; i++) {
+              uft_t sdf_val = sdf_func(pnt_idx_to_pnt_data[cur_cell[i]]);
+              if (std::abs(sdf_val) <= solve_epsilon) {
+                zeros[i] = true;
+                zero_cnt++;
+                zero_loc = i;
+              } else {
+                zeros[i] = false;
+                if (sdf_val < static_cast<uft_t>(0.0)) {
+                  pluss[i] = true;
+                  plus_cnt++;
+                  plus_loc = i;
+                } else {
+                  pluss[i] = false;
+                  negv_loc = i;
+                }
+              }
+            }
+            std::array<int, 3> p = p00;
+            if (zero_cnt == 0) { // three triangles or NOP
+              if ( (plus_cnt == 1) || (plus_cnt == 2) ) { // three triangles
+                // Figure out permutation
+                if (plus_cnt == 1) {
+                  if (plus_loc == 1)
+                    p = p10;
+                  else if (plus_loc == 2)  // Rotate 2=>0
+                    p = p20;
+                  else 
+                    p = p00;
+                } else {
+                  if (negv_loc == 1)
+                    p = p10;
+                  else if (negv_loc == 2)  // Rotate 2=>0
+                    p = p20;
+                  else 
+                    p = p00;
+                }
+                // Construct new triangles
+                auto orgv0 = cur_cell[p[0]];
+                auto orgv1 = cur_cell[p[1]];
+                auto orgv2 = cur_cell[p[2]];
+                auto newv1 = edge_solver_sdf(dat_func, orgv0, orgv1, sdf_func, solve_epsilon);
+                auto newv2 = edge_solver_sdf(dat_func, orgv0, orgv2, sdf_func, solve_epsilon);
+                if ((newv1 != orgv0) && (newv1 != orgv1) && (newv2 != orgv0) && (newv2 != orgv2)) { // We got TWO new points
+                  cur_cell[p[1]] = newv1; // Modify current triangle in place
+                  cur_cell[p[2]] = newv2; // Modify current triangle in place
+                  add_cell(cell_type_t::TRIANGLE, {newv1, orgv1, newv2});  // Add new triangle
+                  add_cell(cell_type_t::TRIANGLE, {orgv1, orgv2, newv2});  // Add new triangle
+                }
+              }
+            } else if (zero_cnt == 1) { // two triangles or NOP
+              // Figure out permutation
+              if (plus_cnt == 1) { // two triangles
+                if (zero_loc == 1)
+                  p = p10;
+                else if (zero_loc == 2)  // Rotate 2=>0
+                  p = p20;
+                else 
+                  p = p00;
+              }
+              // Construct new triangles
+              auto orgv0 = cur_cell[p[0]];
+              auto orgv1 = cur_cell[p[1]];
+              auto orgv2 = cur_cell[p[2]];
+              auto newv0 = edge_solver_sdf(dat_func, orgv1, orgv2, sdf_func, solve_epsilon);
+              if ((newv0 != orgv1) && (newv0 != orgv2)) { // We got new point
+                cur_cell[2] = newv0; // Modify current triangle in place
+                add_cell(cell_type_t::TRIANGLE, {orgv0, newv0, orgv2});  // Add new triangle
+              }
+            }
+          }
         }
       }
       //@}

@@ -104,7 +104,7 @@ namespace mjr {
       static typename cc_t::pnt_idx_t add_point_and_data_from_tree(cc_t&        ccplx,
                                                                    const rt_t&  rtree,
                                                                    rt_t::diti_t diti) {
-        return add_point_and_data_from_data(ccplx, rtree, rtree.diti_to_drpt(diti), rtree.get_sample(diti));
+        return add_point_and_data_from_data(ccplx, rtree.diti_to_drpt(diti), rtree.get_sample(diti));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Given rt coordinates, extract point/scalar/vector data, and add point/data to cc
@@ -112,22 +112,43 @@ namespace mjr {
           @param rtree    The MR_rect_tree with source data
           @param dom_pnt  Domain point
           @param rng_pnt  Range point */
-      static typename cc_t::pnt_idx_t add_point_and_data_from_data(cc_t&                 ccplx,
-                                                                   const rt_t&           rtree,
-                                                                   typename rt_t::drpt_t dom_pnt,
-                                                                   typename rt_t::rrpt_t rng_pnt) {
+      inline static typename cc_t::pnt_idx_t add_point_and_data_from_data(cc_t&          ccplx,
+                                                                          typename rt_t::drpt_t dom_pnt,
+                                                                          typename rt_t::rrpt_t rng_pnt) {
+        // typename cc_t::pnt_data_t pd;
+        // if constexpr (rtree.domain_dimension == 1)
+        //   pd.push_back(dom_pnt);
+        // else
+        //   for(auto v: dom_pnt)
+        //     pd.push_back(v);
+        // if constexpr (rtree.range_dimension == 1)
+        //   pd.push_back(rng_pnt);
+        // else
+        //   for(auto v: rng_pnt)
+        //     pd.push_back(v);
+        // return ccplx.add_point(pd);
+        return ccplx.add_point(tree_point_data_to_cplx_point_data(dom_pnt, rng_pnt));
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Given rt coordinates, extract point/scalar/vector data, and return cc_t style point data vector.
+          @param ccplx    The MR_cell_cplx to populate with geometry
+          @param rtree    The MR_rect_tree with source data
+          @param dom_pnt  Domain point
+          @param rng_pnt  Range point */
+      inline static typename cc_t::pnt_data_t tree_point_data_to_cplx_point_data(typename rt_t::drpt_t dom_pnt,
+                                                                                 typename rt_t::rrpt_t rng_pnt)  {
         typename cc_t::pnt_data_t pd;
-        if constexpr (rtree.domain_dimension == 1)
+        if constexpr (rt_t::domain_dimension == 1)
           pd.push_back(dom_pnt);
         else
           for(auto v: dom_pnt)
             pd.push_back(v);
-        if constexpr (rtree.range_dimension == 1)
+        if constexpr (rt_t::range_dimension == 1)
           pd.push_back(rng_pnt);
         else
           for(auto v: rng_pnt)
             pd.push_back(v);
-        return ccplx.add_point(pd);
+        return pd;
       }
       //@}
 
@@ -482,11 +503,37 @@ namespace mjr {
         if (rtree.drpt_distance_inf(good_point_drpt, init_point_drpt) < (ccplx.epsilon)) // Use ccplx here!!!
           ret = good_point_ccplx_index;
         else
-          ret = add_point_and_data_from_data(ccplx, rtree, good_point_drpt, good_point_rrpt);
+          ret = add_point_and_data_from_data(ccplx, good_point_drpt, good_point_rrpt);
         nan_solver_cache[sick_point_rtree_index][good_point_rtree_index] = ret;
         return ret;
       }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Adapt a MR_rect_tree sample function to a MR_cell_cplx point data function.
+
+          @param func        The function to adapt
+          @param pd          Point data to be passed to func. */
+      cc_t::pnt_data_t tsampf_to_cdatf(typename rt_t::rsfunc_t   func,
+                                       typename cc_t::pnt_data_t pd) {
+        typename rt_t::drpt_t xvec;
+        for(int i=0; i<rt_t::domain_dimension; ++i)
+          xvec[i] = pd[i];
+        return tree_point_data_to_cplx_point_data(xvec, func(xvec));
+        }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Adapt a MR_rect_tree sdf function to a MR_cell_cplx point data function.
+
+          @param func        The function to adapt
+          @param pd          Point data to be passed to func. */
+      cc_t::uft_t tsdf_to_csdf(typename rt_t::rrfunc_t   func,
+                               typename cc_t::pnt_data_t pd) {
+        typename rt_t::drpt_t xvec;
+        for(int i=0; i<rt_t::domain_dimension; ++i)
+          xvec[i] = pd[i];
+        return func(xvec);
+        }
       //@}
+
+
   };
 }
 
