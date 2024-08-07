@@ -51,7 +51,7 @@ set(TARGETS_UTEST "check_cell_hexahedron" "check_cell_pyramid" "check_cell_quad"
                  "tree_basics_7b1" "tree_basics_7b2" "tree_basics_7b3" "tree_basics_7b4" "tree_basics_7b5"
                  "tree_basics_15b1" "tree_basics_15b3"
                  "tree_corners"
-                 "zzz_tbd_MRPTree"
+                 "zzz_tbd_tree_children" "zzz_tbd_tree_neighbors"
                )
 set(TARGETS_FTEST "MR_cell_cplx_test_mpl" "MR_cell_cplx_test_wedge" "MR_cell_cplx_test_surf_wave_hole" 
                   #"MR_rect_tree_test_surf_corner" 

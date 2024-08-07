@@ -38,14 +38,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 typedef mjr::tree15b2d1rT            tt_t;
-typedef mjr::MRccT5                cc_t;
+typedef mjr::MRccT5                  cc_t;
 typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-double zero2(std::array<double, 2> xvec) {
-  double x = xvec[0];
-  double y = xvec[1];
-  return 0*(x+y);
+tt_t::rrpt_t zero(tt_t::drpt_t xvec) {
+  return 0*xvec[0];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,17 +52,17 @@ int main() {
   cc_t ccplx;
   tc_t bridge;
 
-  tree.refine_grid(1, zero2);
+  tree.refine_grid(1, zero);
 
   auto c1 = tree.ccc_get_children(tree.ccc_get_top_cell(), 0, -1);
-  tree.refine_once(c1[0], zero2);
+  tree.refine_once(c1[0], zero);
 
   auto c2 = tree.ccc_get_children(c1[0], 0, -1);
-  tree.refine_recursive(c2[0], 4, zero2);
+  tree.refine_recursive(c2[0], 4, zero);
 
   tree.dump_tree(5);
 
-  tree.balance_tree(1, zero2);
+  tree.balance_tree(1, zero);
 
   tree.dump_tree(5);
 
