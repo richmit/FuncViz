@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-08-07 Wed 14:26 -->
+<!-- 2024-08-07 Wed 15:09 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Function Visualization</title>
@@ -272,12 +272,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-08-07 14:26:20</i></td>
+<td class="org-left"><i>2024-08-07 15:09:36</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-08-07 14:26:21</i></td>
+<td class="org-left"><i>2024-08-07 15:09:38</i></td>
 </tr>
 </tbody>
 </table>
@@ -311,7 +311,7 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <li><a href="#parametric_curve_3d">3.2. Twisted Cubic As A Surface Intersection</a></li>
 </ul>
 </li>
-<li><a href="#org15f6a40">4. xx</a>
+<li><a href="#org9effc82">4. xx</a>
 <ul>
 <li><a href="#PROGRAM_EXAMPLE">4.1. PROGRAM_EXAMPLE</a></li>
 </ul>
@@ -537,7 +537,13 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/comp
   ccplx.dump_cplx(5);
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Remove all triangles above our clipping plane</span>
-  ccplx.cull_cells([&amp;<span style="color: #7fffd4;">ccplx</span>](<span style="color: #8470ff; font-weight: bold;">cc_t</span>::<span style="color: #63b8ff;">cell_t</span> <span style="color: #7fffd4;">c</span>){ <span style="color: #00ffff;">return</span> !(ccplx.cell_below_level(c, 6, 3.5)); });
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">We can do this directly with ccplx using index 6 into the point data (point data is domain data appended with range data)</span>
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">ccplx.cull_cells([&amp;ccplx](cc_t::cell_t c){ return !(ccplx.cell_below_level(c, 6, 3.5)); });</span>
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Or we can use the index in the original sample function along with the converter rt_ran_idx_to_pd_idx().</span>
+  ccplx.cull_cells([&amp;<span style="color: #7fffd4;">bridge</span>, &amp;<span style="color: #7fffd4;">ccplx</span>](<span style="color: #8470ff; font-weight: bold;">cc_t</span>::<span style="color: #63b8ff;">cell_t</span> <span style="color: #7fffd4;">c</span>){ <span style="color: #00ffff;">return</span> !(ccplx.cell_below_level(c, bridge.rt_ran_idx_to_pd_idx(4), 3.5)); });
+
   <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"POST CULL"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
   ccplx.dump_cplx(5);
 
@@ -1249,7 +1255,7 @@ any holes.  This is really the only change from surface_plot_edge.cpp.
 
 <div class="org-center">
 
-<div id="orgfe4a59d" class="figure">
+<div id="org8f84982" class="figure">
 <p><a href="media/surface_branch_glue_100.png"><img src="media/surface_branch_glue_10.png" alt="surface_branch_glue_10.png" /></a>
 </p>
 </div>
@@ -1337,7 +1343,7 @@ Note that most of the items above are listed TBD.  A few features need to be add
 
 <div class="org-center">
 
-<div id="org7dddd8b" class="figure">
+<div id="org942baea" class="figure">
 <p><a href="media/sq_curve_plot_heal_100.png"><img src="media/sq_curve_plot_heal_10.png" alt="sq_curve_plot_heal_10.png" /></a>
 </p>
 </div>
@@ -1644,7 +1650,7 @@ This example doesn't really demonstrate anything not found in the other examples
 
 <div class="org-center">
 
-<div id="orgcd129af" class="figure">
+<div id="org784c752" class="figure">
 <p><a href="media/trefoil_rot_50_crf30.html"><img src="media/trefoil_rot_10.gif" alt="trefoil_rot_10.gif" /></a>
 </p>
 </div>
@@ -1741,7 +1747,7 @@ Alternately the curve is also the intersection of two surfaces in \(\mathbb{R}^3
 The "typical" way to graph a surface like \(f_2\) is to transform it into pseudo-parametric form.  In Maple that might look like this
 </p>
 
-<pre class="example" id="orgda34201">
+<pre class="example" id="orgd73d9c4">
 plot3d([u, u^2, v], u=-1..1, v=-1..1):
 </pre>
 
@@ -1757,7 +1763,7 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
 
 <div class="org-center">
 
-<div id="orgee10f80" class="figure">
+<div id="orgc62243d" class="figure">
 <p><a href="media/parametric_curve_3d_rot_100_crf30.html"><img src="media/parametric_curve_3d_rot_10.gif" alt="parametric_curve_3d_rot_10.gif" /></a>
 </p>
 </div>
@@ -1857,8 +1863,8 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
 
 
 
-<div id="outline-container-org15f6a40" class="outline-2">
-<h2 id="org15f6a40"><span class="section-number-2">4.</span> xx</h2>
+<div id="outline-container-org9effc82" class="outline-2">
+<h2 id="org9effc82"><span class="section-number-2">4.</span> xx</h2>
 <div class="outline-text-2" id="text-4">
 </div>
 <div id="outline-container-PROGRAM_EXAMPLE" class="outline-3">
@@ -1866,7 +1872,7 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
 <div class="outline-text-3" id="text-PROGRAM_EXAMPLE">
 <div class="org-center">
 
-<div id="org5a69edc" class="figure">
+<div id="orgc66d1cd" class="figure">
 <p><a href="media/PROGRAM_EXAMPLE_100.png"><img src="media/PROGRAM_EXAMPLE_10.png" alt="PROGRAM_EXAMPLE_10.png" /></a>
 </p>
 </div>

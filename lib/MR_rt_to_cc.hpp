@@ -566,6 +566,13 @@ namespace mjr {
           return static_cast<cc_uft_t>(func(pnt_data_to_drpt(pd))[range_index]) - level;
         }
       }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Convert a MR_rect_tree range index into an index for a point data array
+
+          @param tree_range_index value to convert */
+      int rt_ran_idx_to_pd_idx(int tree_range_index) {
+        return (tree_range_index + rt_t::domain_dimension);
+      }
       //@}
   };
 }
