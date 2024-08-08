@@ -489,6 +489,7 @@ namespace mjr {
       diti_list_t ccc_get_corners(diti_t cell, int index, int direction) const { return cuc_two_cross(cell, ccc_cell_half_width(cell), index, direction); }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Return a list of potential neighbor cells of the specified cell
+          Note the cells are not in canonical order!
           @warning No error checking -- cell must be a valid center coordinate. See: cell_good_cords()
           @param cell Input cell */
       diti_list_t ccc_get_neighbors(diti_t cell) const { return cuc_axis_cross(cell, ccc_cell_full_width(cell)); }
