@@ -1891,7 +1891,6 @@ namespace mjr {
         int num_start_cells = num_cells();
         for(int cell_idx=0; cell_idx<num_start_cells; ++cell_idx) {
           if (static_cast<int>(cell_lst[cell_idx].size()) == cell_type_to_req_pt_cnt(cell_type_t::SEGMENT)) {
-std::cout << "HI" << std::endl;
             auto& cur_cell = cell_lst[cell_idx];
             int plus_cnt=0,  negv_cnt=0;
             for(int i=0; i<2; i++) {
