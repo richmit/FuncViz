@@ -148,6 +148,9 @@ namespace mjr {
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Externally exposed typedef for spc_real_t */
+      typedef MR_rect_tree<max_level, spc_real_t, dom_dim, rng_dim> this_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Externally exposed typedef for spc_real_t */
       typedef spc_real_t src_t;
       //@}
 
@@ -590,7 +593,7 @@ namespace mjr {
           diti_t tmp = value;
           for(int i=0; i<dom_dim; i++) {
             rv -= tmp;
-            tmp = tmp << dic_bits;
+            tmp = static_cast<diti_t>(tmp << dic_bits);
           }
           return rv;
         }
@@ -608,7 +611,7 @@ namespace mjr {
           diti_t tmp = value;
           for(int i=0; i<dom_dim; i++) {
             rv += tmp;
-            tmp = tmp << dic_bits;
+            tmp = static_cast<diti_t>(tmp << dic_bits);
           }
           return rv;
         }
@@ -869,7 +872,7 @@ namespace mjr {
         if constexpr (rng_dim == 1) {
           return std::isnan(val);
         } else {
-          return (std::any_of(val.cbegin(), val.cend(), [this](src_t v) { return (std::isnan(v)); }));
+          return (std::any_of(val.cbegin(), val.cend(), [](src_t v) { return (std::isnan(v)); }));
         }
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1161,7 +1164,7 @@ namespace mjr {
           @param level_delta  The Level.
           @param func         Function to sample */
       void balance_tree(int level_delta, drpt2rrpt_func_t func) {
-        refine_leaves_atomically_if_cell_pred(ccc_get_top_cell(), -1, func, std::bind_front(&cell_is_unbalanced, this, level_delta));
+        refine_leaves_atomically_if_cell_pred(ccc_get_top_cell(), -1, func, std::bind_front(&this_t::cell_is_unbalanced, this, level_delta));
       }
       //@}
 
