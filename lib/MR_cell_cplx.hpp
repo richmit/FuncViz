@@ -1881,6 +1881,38 @@ namespace mjr {
           }
         }
       }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Fold segments that cross over an SDF function.
+          @param data_func      Data function
+          @param sdf_func       SDF function
+          @param solve_epsilon  Used to detect SDF value near zero */
+      void segment_folder(p2data_func_t dat_func, p2real_func_t sdf_func, uft_t solve_epsilon=epsilon/10) {
+        clear_cache_edge_solver_sdf();
+        int num_start_cells = num_cells();
+        for(int cell_idx=0; cell_idx<num_start_cells; ++cell_idx) {
+          if (static_cast<int>(cell_lst[cell_idx].size()) == cell_type_to_req_pt_cnt(cell_type_t::SEGMENT)) {
+std::cout << "HI" << std::endl;
+            auto& cur_cell = cell_lst[cell_idx];
+            int plus_cnt=0,  negv_cnt=0;
+            for(int i=0; i<2; i++) {
+              uft_t sdf_val = sdf_func(pnt_idx_to_pnt_data[cur_cell[i]]);
+              if (sdf_val < static_cast<uft_t>(0.0))
+                plus_cnt++;
+              else if (sdf_val > static_cast<uft_t>(0.0)) 
+                negv_cnt++;
+            }
+            if ((plus_cnt == 1) && (negv_cnt == 1)) {
+              auto orgv0 = cur_cell[0];
+              auto orgv1 = cur_cell[1];
+              auto newv  = edge_solver_sdf(dat_func, orgv0, orgv1, sdf_func, solve_epsilon);
+              if ((newv != orgv0) && (newv != orgv1)) {
+                cur_cell[1] = newv; // Modify current segment in place
+                add_cell(cell_type_t::SEGMENT, {newv, orgv1});  // Add new segment
+              }
+            }
+          }
+        }
+      }
       //@}
 
   };

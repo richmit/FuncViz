@@ -57,6 +57,8 @@ set(TARGETS_FTEST "MR_cell_cplx_test_mpl" "MR_cell_cplx_test_wedge" "MR_cell_cpl
                   #"MR_rect_tree_test_surf_corner" 
                   "flat_test_tree_01"
                   "nan_solver"
+                  "segment_folder"
+                  "triangle_folder"
                )
 
 # Construct list of targets we can build
