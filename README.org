@@ -36,6 +36,18 @@ You can read more about the way the data structure works here: [[https://richmit
  - An unstructured cell-complex/mesh library (See: =lib/MR_cell_cplx.hpp=)
  - A library to tessellate an =MR_rect_tree= object into an =MR_cell_cplx= object (See: =lib/MR_rt_to_cc.hpp=)
 
+* Build & Test Notes
+
+ - MSYS2 on Windows 11:
+   - g++: (Rev3, Built by MSYS2 project) 14.1.0
+   - clang: 18.1.6
+   - cmake: 3.29.5
+   - boost: 1.85.0-2 (For unit tests)
+ - Debian 12.6
+   - g++: (Debian 14-20240330-1) 14.0.1 20240330 (experimental) [master r14-9728-g6fc84f680d0]
+   - cmake: 3.25.1
+   - boost: 1.83
+
 Have fun!!
 
 -mitch

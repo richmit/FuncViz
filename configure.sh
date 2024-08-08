@@ -35,21 +35,22 @@ if [[ "${@}" == *'-h'* ]]; then
 
   Run this script from the 'build' directory.
 
-  If you don't have a 'build' directory yet, then
-  create one!
+  If you don't have a 'build' directory yet, then create one!
 
   Use: configure.sh [cmake arguments]
 
     Common Arguments:
-     * Target -- leave it off and get 'MSYS Makefiles'
-       - -G 'MSYS Makefiles' 
+     * Target -- leave it off to get the default
+       - -G 'MSYS Makefiles'           <-- Default on MSYS2
        - -G 'Visual Studio 17 2022'
-       - -G 'Unix Makefiles'
+       - -G 'Unix Makefiles'           <-- Default on Linux ('Linux' means 'Not MSYS2')
        - -G Ninja
      * Compiler -- leave it off to get the default
        - -DCMAKE_CXX_COMPILER=clang++
-       - -DCMAKE_CXX_COMPILER=g++
-     * Optional features -- leave them off to enable everythign
+       - -DCMAKE_CXX_COMPILER=g++      <-- Default on MSYS2
+       - -DCMAKE_CXX_COMPILER=g++-14   <-- Default on Linux if /usr/bin/g++-14 exists
+       - -DCMAKE_CXX_COMPILER=g++      <-- Default on Linux if g++-14 wasn't found
+     * Optional features -- leave them off to enable everything
        - -DO_DOXYGEN=[YES|NO]  -- For documentation
        - -DO_O_BTEST=[YES|NO]  -- Used for BOOT unit tests
 EOF
@@ -61,14 +62,28 @@ if [ -e ../CMakeLists.txt ]; then
   if [ "$(basename $(pwd))" == "build" ]; then
     CMAKE_G=''
     if [[ "$CMD_LINE_ARGS" != *'-G'* ]]; then
-      CMAKE_G='MSYS Makefiles'
+      if [ -n "$MSYSTEM" ]; then
+        CMAKE_G='MSYS Makefiles'
+      else
+        CMAKE_G='Unix Makefiles'
+      fi
     fi
-    if [ -n "${@}" ]; then
+    if [ -n "$1" ]; then
       echo cmake -G "$CMAKE_G" "$@" ../
       cmake -G "$CMAKE_G" "$@" ../
     else
-      echo cmake -G "$CMAKE_G" -DCMAKE_CXX_COMPILER=g++.exe ..
-      cmake -G "$CMAKE_G" -DCMAKE_CXX_COMPILER=g++.exe ..
+      CMAKE_C=''
+      if [ -n "$MSYSTEM" ]; then
+        CMAKE_C='-DCMAKE_CXX_COMPILER=g++.exe'
+      else
+        if [ -x '/usr/bin/g++-14' ]; then
+          CMAKE_C='-DCMAKE_CXX_COMPILER=g++-14'
+        else
+          CMAKE_C='-DCMAKE_CXX_COMPILER=g++'
+        fi
+      fi
+      echo cmake -G "$CMAKE_G" "$CMAKE_C" ..
+      cmake -G "$CMAKE_G" "$CMAKE_C" ..
     fi
   else
     echo "ERROR: Must run from build directory"
