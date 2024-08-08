@@ -59,9 +59,7 @@
 #include <unordered_map>                                                 /* STL hash map            C++11    */
 #include <map>                                                           /* STL map                 C++11    */
 #include <utility>                                                       /* STL Misc Utilities      C++11    */
-#include <vector>                                                        /* STL vector              C++11    */
-
-
+#include <vector>                                                        /* STL vector              C++11    */ 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Put everything in the mjr namespace

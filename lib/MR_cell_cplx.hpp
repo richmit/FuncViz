@@ -45,11 +45,11 @@
 #include <iostream>                                                      /* C++ iostream            C++11    */
 #include <map>                                                           /* STL map                 C++11    */
 #include <set>                                                           /* STL set                 C++98    */
+#include <sstream>                                                       /* C++ string stream       C++      */
 #include <string>                                                        /* C++ strings             C++11    */
 #include <unordered_map>                                                 /* STL hash map            C++11    */
-#include <vector>                                                        /* STL vector              C++11    */
-#include <variant>
-#include <sstream>
+#include <variant>                                                       /* C++ variant type        C++17    */
+#include <vector>                                                        /* STL vector              C++11    */ 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Put everything in the mjr namespace
