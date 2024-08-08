@@ -24,10 +24,10 @@ You can read more about the way the data structure works here: [[https://richmit
  - [[https://richmit.github.io/MRPTree/tree_theory/trees.html][Documentation about how data structure works]]
  - [[https://richmit.github.io/MRPTree/func-viz/func-viz.html][Example code for mathematical function visualization]]
  - [[https://richmit.github.io/MRPTree/roadmap.html][Development roadmap]]
- - The =MRPTree= itself (See: =[[https://github.com/richmit/MRPTree/blob/main/lib/MR_rect_tree.hpp][lib/MR_rect_tree.hpp]]=)
+ - The =MRPTree= itself (See: [[https://github.com/richmit/MRPTree/blob/main/lib/MR_rect_tree.hpp][lib/MR_rect_tree.hpp]])
  - Several examples of mathematical function visualization illustrating MRPTree in 1, 2, & 3 dimensions
- - An unstructured cell-complex/mesh library (See: [[https://github.com/richmit/MRPTree/blob/main/lib/MR_cell_cplx.hpp][=lib/MR_cell_cplx.hpp=]])
- - A library to tessellate an =MR_rect_tree= object into an =MR_cell_cplx= object (See: [[https://github.com/richmit/MRPTree/blob/main/lib/MR_rt_to_cc.hpp][=lib/MR_rt_to_cc.hpp=]])
+ - An unstructured cell-complex/mesh library (See: [[https://github.com/richmit/MRPTree/blob/main/lib/MR_cell_cplx.hpp][lib/MR_cell_cplx.hpp]])
+ - A library to tessellate an =MR_rect_tree= object into an =MR_cell_cplx= object (See: [[https://github.com/richmit/MRPTree/blob/main/lib/MR_rt_to_cc.hpp][lib/MR_rt_to_cc.hpp]])
 
 * Build & Test Notes
 
