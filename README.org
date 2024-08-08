@@ -12,9 +12,7 @@ About half of planned functionality is implemented. Unit test coverage is less t
 
 * =MRPTree= (MR 2^P Tree)
 
-=MRPTree= is C++ library implementing a data structure that is a generalization of the
-[[https://en.wikipedia.org/wiki/Quadtree][quadtree]]/[[https://en.wikipedia.org/wiki/Octree][octree]]
-concept to any dimension.
+=MRPTree= is C++ library implementing a data structure that is a generalization of the quadtree/octree concept to any dimension.
   - This single data structure is capable of representing quadtree-like structures in any dimension -- with no code modifications.
   - The resulting code is both less complex and easier to use than traditional tree based data structures.
   - Many tree operations are transformed into simple integer manipulation, and thus are much faster than tree operations.
@@ -25,11 +23,11 @@ You can read more about the way the data structure works here: [[https://richmit
 
  - [[https://richmit.github.io/MRPTree/tree_theory/trees.html][Documentation about how data structure works]]
  - [[https://richmit.github.io/MRPTree/func-viz/func-viz.html][Example code for mathematical function visualization]]
- - [[https://richmit.github.io/MRPTree/roadmap.html][Future development plans]]
- - The =MRPTree= itself (See: =lib/MR_cell_cplx.hpp=)
+ - [[https://richmit.github.io/MRPTree/roadmap.html][Development roadmap]]
+ - The =MRPTree= itself (See: [[https://github.com/richmit/MRPTree/blob/main/lib/MR_rect_tree.hpp][=lib/MR_rect_tree.hpp=]])
  - Several examples of mathematical function visualization illustrating MRPTree in 1, 2, & 3 dimensions
- - An unstructured cell-complex/mesh library (See: =lib/MR_cell_cplx.hpp=)
- - A library to tessellate an =MR_rect_tree= object into an =MR_cell_cplx= object (See: =lib/MR_rt_to_cc.hpp=)
+ - An unstructured cell-complex/mesh library (See: [[https://github.com/richmit/MRPTree/blob/main/lib/MR_cell_cplx.hpp][=lib/MR_cell_cplx.hpp=]])
+ - A library to tessellate an =MR_rect_tree= object into an =MR_cell_cplx= object (See: [[https://github.com/richmit/MRPTree/blob/main/lib/MR_rt_to_cc.hpp][=lib/MR_rt_to_cc.hpp=]])
 
 * Build & Test Notes
 
