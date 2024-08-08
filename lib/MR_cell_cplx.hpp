@@ -1822,90 +1822,58 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Fold triangles that cross over an SDF function.
-          @param data_func           Data function
-          @param sdf_index      Index of SDF value in sdf_func return
+          @param data_func      Data function
+          @param sdf_func       SDF function
           @param solve_epsilon  Used to detect SDF value near zero */
       void triangle_folder(p2data_func_t dat_func, p2real_func_t sdf_func, uft_t solve_epsilon=epsilon/10) {
-        //  MJR TODO NOTE <2024-08-06T12:38:33-0500> triangle_folder: Implement!
         clear_cache_edge_solver_sdf();
-        const std::array<int, 3> p00 {0, 1, 2};
-        const std::array<int, 3> p10 {1, 2, 0};
-        const std::array<int, 3> p20 {2, 0, 1};
         int num_start_cells = num_cells();
         for(int cell_idx=0; cell_idx<num_start_cells; ++cell_idx) {
           if (static_cast<int>(cell_lst[cell_idx].size()) == cell_type_to_req_pt_cnt(cell_type_t::TRIANGLE)) {
             auto& cur_cell = cell_lst[cell_idx];
             // Find and count zeros, positive, and negative vertexes
-            std::vector<int> zeros(3);
-            std::vector<int> pluss(3);
-            int zero_cnt=0, plus_cnt=0;
+            int zero_cnt= 0, plus_cnt= 0, negv_cnt= 0;
             int zero_loc=-1, plus_loc=-1, negv_loc=-1;
             for(int i=0; i<3; i++) {
               uft_t sdf_val = sdf_func(pnt_idx_to_pnt_data[cur_cell[i]]);
               if (std::abs(sdf_val) <= solve_epsilon) {
-                zeros[i] = true;
                 zero_cnt++;
                 zero_loc = i;
               } else {
-                zeros[i] = false;
                 if (sdf_val < static_cast<uft_t>(0.0)) {
-                  pluss[i] = true;
                   plus_cnt++;
                   plus_loc = i;
                 } else {
-                  pluss[i] = false;
+                  negv_cnt++;
                   negv_loc = i;
                 }
               }
             }
-            std::array<int, 3> p = p00;
-            if (zero_cnt == 0) { // three triangles or NOP
-              if ( (plus_cnt == 1) || (plus_cnt == 2) ) { // three triangles
-                // Figure out permutation
-                if (plus_cnt == 1) {
-                  if (plus_loc == 1)
-                    p = p10;
-                  else if (plus_loc == 2)  // Rotate 2=>0
-                    p = p20;
-                  else 
-                    p = p00;
-                } else {
-                  if (negv_loc == 1)
-                    p = p10;
-                  else if (negv_loc == 2)  // Rotate 2=>0
-                    p = p20;
-                  else 
-                    p = p00;
-                }
-                // Construct new triangles
-                auto orgv0 = cur_cell[p[0]];
-                auto orgv1 = cur_cell[p[1]];
-                auto orgv2 = cur_cell[p[2]];
-                auto newv1 = edge_solver_sdf(dat_func, orgv0, orgv1, sdf_func, solve_epsilon);
-                auto newv2 = edge_solver_sdf(dat_func, orgv0, orgv2, sdf_func, solve_epsilon);
-                if ((newv1 != orgv0) && (newv1 != orgv1) && (newv2 != orgv0) && (newv2 != orgv2)) { // We got TWO new points
-                  cur_cell[p[1]] = newv1; // Modify current triangle in place
-                  cur_cell[p[2]] = newv2; // Modify current triangle in place
-                  add_cell(cell_type_t::TRIANGLE, {newv1, orgv1, newv2});  // Add new triangle
-                  add_cell(cell_type_t::TRIANGLE, {orgv1, orgv2, newv2});  // Add new triangle
-                }
+            const std::vector<std::array<int, 3>> pmat { {0, 1, 2}, {1, 2, 0}, {2, 0, 1}};
+            std::array<int, 3> p;
+            if ((zero_cnt == 0) && (plus_cnt > 0) && (negv_cnt >0)) { // three triangles
+              if (plus_cnt == 1) 
+                p = pmat[plus_loc];
+              else 
+                p = pmat[negv_loc];              
+              auto orgv0 = cur_cell[p[0]];
+              auto orgv1 = cur_cell[p[1]];
+              auto orgv2 = cur_cell[p[2]];
+              auto newv1 = edge_solver_sdf(dat_func, orgv0, orgv1, sdf_func, solve_epsilon);
+              auto newv2 = edge_solver_sdf(dat_func, orgv0, orgv2, sdf_func, solve_epsilon);
+              if ((newv1 != orgv0) && (newv1 != orgv1) && (newv2 != orgv0) && (newv2 != orgv2)) {
+                cur_cell[p[1]] = newv1; // Modify current triangle in place
+                cur_cell[p[2]] = newv2; // Modify current triangle in place
+                add_cell(cell_type_t::TRIANGLE, {newv1, orgv1, newv2});  // Add new triangle
+                add_cell(cell_type_t::TRIANGLE, {orgv1, orgv2, newv2});  // Add new triangle
               }
-            } else if (zero_cnt == 1) { // two triangles or NOP
-              // Figure out permutation
-              if (plus_cnt == 1) { // two triangles
-                if (zero_loc == 1)
-                  p = p10;
-                else if (zero_loc == 2)  // Rotate 2=>0
-                  p = p20;
-                else 
-                  p = p00;
-              }
-              // Construct new triangles
+            } else if ((zero_cnt == 1) && (plus_cnt == 1) && (negv_cnt == 1)) { // two triangles
+              p = pmat[zero_loc];
               auto orgv0 = cur_cell[p[0]];
               auto orgv1 = cur_cell[p[1]];
               auto orgv2 = cur_cell[p[2]];
               auto newv0 = edge_solver_sdf(dat_func, orgv1, orgv2, sdf_func, solve_epsilon);
-              if ((newv0 != orgv1) && (newv0 != orgv2)) { // We got new point
+              if ((newv0 != orgv1) && (newv0 != orgv2)) {
                 cur_cell[2] = newv0; // Modify current triangle in place
                 add_cell(cell_type_t::TRIANGLE, {orgv0, newv0, orgv2});  // Add new triangle
               }
