@@ -82,7 +82,6 @@ Copyright \copy {{{time(%Y)}}} Mitch Richling. All rights reserved.
        - /Consider/ color schemes
        - /Consider/ image generation 
        - /Consider/ image output
-     - Add MSVC Support 
 
 * Raw TODO Comments From Source Code
 

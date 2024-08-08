@@ -45,6 +45,9 @@
 /** @cond exj */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include <numbers>
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "MR_rect_tree.hpp"
 #include "MR_cell_cplx.hpp"
 #include "MR_rt_to_cc.hpp"
@@ -78,9 +81,9 @@ int main() {
   bridge.construct_geometry_fans(ccplx,
                                  tree,
                                  2,
-                                 {{tc_t::val_src_spc_t::RANGE, 0},
-                                  {tc_t::val_src_spc_t::RANGE, 1},
-                                  {tc_t::val_src_spc_t::RANGE, 2}});
+                                 {{tc_t::val_src_spc_t::FRANGE, 0},
+                                  {tc_t::val_src_spc_t::FRANGE, 1},
+                                  {tc_t::val_src_spc_t::FRANGE, 2}});
   ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)"});
   ccplx.dump_cplx(5);
   ccplx.write_xml_vtk("parametric_surface_with_defects-tri.vtu", "parametric_surface_with_defects-tri");
@@ -90,9 +93,9 @@ int main() {
   bridge.construct_geometry_rects(ccplx,
                                   tree,
                                   2,
-                                  {{tc_t::val_src_spc_t::RANGE, 0},
-                                   {tc_t::val_src_spc_t::RANGE, 1},
-                                   {tc_t::val_src_spc_t::RANGE, 2}});
+                                  {{tc_t::val_src_spc_t::FRANGE, 0},
+                                   {tc_t::val_src_spc_t::FRANGE, 1},
+                                   {tc_t::val_src_spc_t::FRANGE, 2}});
   ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)"});
   ccplx.dump_cplx(5);
   ccplx.write_xml_vtk("parametric_surface_with_defects-rect.vtu", "parametric_surface_with_defects-rect");

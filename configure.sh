@@ -52,7 +52,7 @@ if [[ "${@}" == *'-h'* ]]; then
        - -DCMAKE_CXX_COMPILER=g++      <-- Default on Linux if g++-14 wasn't found
      * Optional features -- leave them off to enable everything
        - -DO_DOXYGEN=[YES|NO]  -- For documentation
-       - -DO_O_BTEST=[YES|NO]  -- Used for BOOT unit tests
+       - -DO_BTEST=[YES|NO]    -- Used for BOOT unit tests
 EOF
 exit
 fi

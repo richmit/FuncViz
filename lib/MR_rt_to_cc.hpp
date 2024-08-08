@@ -80,8 +80,8 @@ namespace mjr {
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Specify a source space for a data index. */
-      enum class val_src_spc_t { DOMAIN,    //!< The domain space.
-                                 RANGE,     //!< The range space.
+      enum class val_src_spc_t { FDOMAIN,    //!< The domain space.
+                                 FRANGE,     //!< The range space.
                                  CONSTANT   //!< A pseudo-source that returns a constant.
                                };
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -104,9 +104,9 @@ namespace mjr {
       static void create_dataset_to_point_mapping(const rt_t& rtree, cc_t& ccplx, const val_src_lst_t& rt_dil) {
         cc_data_idx_lst_t cc_data_idx_lst(3);
         for(int i=0; i<3; ++i)
-          if(get<0>(rt_dil[i]) == val_src_spc_t::DOMAIN)
+          if(get<0>(rt_dil[i]) == val_src_spc_t::FDOMAIN)
             cc_data_idx_lst[i] = get<int>(get<1>(rt_dil[i]));
-          else if(get<0>(rt_dil[i]) == val_src_spc_t::RANGE)
+          else if(get<0>(rt_dil[i]) == val_src_spc_t::FRANGE)
             cc_data_idx_lst[i] = get<int>(get<1>(rt_dil[i])) + rtree.domain_dimension;
           else if(get<0>(rt_dil[i]) == val_src_spc_t::CONSTANT)
             cc_data_idx_lst[i] = get<cc_uft_t>(get<1>(rt_dil[i]));

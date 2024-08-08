@@ -48,6 +48,8 @@
 #include <string>                                                        /* C++ strings             C++11    */
 #include <unordered_map>                                                 /* STL hash map            C++11    */
 #include <vector>                                                        /* STL vector              C++11    */
+#include <variant>
+#include <sstream>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Put everything in the mjr namespace

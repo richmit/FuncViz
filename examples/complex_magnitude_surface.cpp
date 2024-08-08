@@ -181,9 +181,9 @@ int main() {
                                               tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), 
                                                                        [&tree](tt_t::diti_t i) { return !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
                                               2,
-                                              {{tc_t::val_src_spc_t::DOMAIN, 0}, 
-                                               {tc_t::val_src_spc_t::DOMAIN, 1},
-                                               {tc_t::val_src_spc_t::RANGE,  4}});
+                                              {{tc_t::val_src_spc_t::FDOMAIN, 0}, 
+                                               {tc_t::val_src_spc_t::FDOMAIN, 1},
+                                               {tc_t::val_src_spc_t::FRANGE,  4}});
   std::cout << "TC Return: " << tcret << std::endl;
   ccplx.create_named_datasets({"Re(z)", "Im(z)", "abs(z)", "arg(z)", "Re(f(z))", "Im(f(z))", "abs(f(z))", "arg(f(z))"}, {{"COLORS", {8, 9, 10}}});
   std::cout << "POST CONST" << std::endl;
