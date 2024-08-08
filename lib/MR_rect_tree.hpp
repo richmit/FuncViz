@@ -8,7 +8,7 @@
  @keywords  quadtree octree lod
  @std       C++23
  @see       MR_rt_to_cc.hpp, MR_cell_cplx.hpp
- @copyright 
+ @copyright
   @parblock
   Copyright (c) 2024, Mitchell Jay Richling <http://www.mitchr.me/> All rights reserved.
 
@@ -59,7 +59,7 @@
 #include <unordered_map>                                                 /* STL hash map            C++11    */
 #include <map>                                                           /* STL map                 C++11    */
 #include <utility>                                                       /* STL Misc Utilities      C++11    */
-#include <vector>                                                        /* STL vector              C++11    */ 
+#include <vector>                                                        /* STL vector              C++11    */
 
 
 
@@ -85,7 +85,7 @@ namespace mjr {
 
     The max_level parameter will seem odd for anyone who has used a traditional quadtree/octree library.  As a practical matter trees in traditional libraries
     are limited to a shallow depths (say 10 or 12 levels); however, the code bases themselves don't usually place an explicit limit on depth.  In this
-    library the maximum depth must be specified from the start.  
+    library the maximum depth must be specified from the start.
 
     As an example, suppose we have a function @f$f:\mathbb{R}^2\rightarrow\mathbb{R}^3@f$ we wish to sample.  For this application we might use the following values:
       - spc_real_t = double
@@ -105,7 +105,7 @@ namespace mjr {
     - Type Naming Conventions
       - Coordinates
         - dic_t (domain Integer Coordinate) -- A single integer
-        - src_t (domain/range space Real Coordinate) -- Floating point 
+        - src_t (domain/range space Real Coordinate) -- Floating point
       - Domain Integer Coordinate Tuples
         - diti_t (domain int tuple Integer) -- Encoded as a packed integer
         - dita_t (domain int tuple Array) -- As a dom_dim element std::array
@@ -127,7 +127,7 @@ namespace mjr {
   requires ((max_level>0)                                  &&
             (dom_dim>0)                                    &&
             (rng_dim>0)                                    &&
-            (dom_dim*max_level<=CHAR_BIT*sizeof(uint64_t)) &&           
+            (dom_dim*max_level<=CHAR_BIT*sizeof(uint64_t)) &&
             (std::is_floating_point<spc_real_t>::value))
   class MR_rect_tree {
     public:
@@ -147,7 +147,7 @@ namespace mjr {
       /** @name Template Parameter Types */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Externally exposed typedef for spc_real_t */ 
+      /** Externally exposed typedef for spc_real_t */
       typedef spc_real_t src_t;
       //@}
 
@@ -157,18 +157,18 @@ namespace mjr {
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** std::vector for values in the domain space. */
-      typedef std::vector<src_t> drtv_t; 
+      typedef std::vector<src_t> drtv_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** An std::array for points in the domain space. */
-      typedef std::array<src_t, dom_dim> drta_t; 
+      typedef std::array<src_t, dom_dim> drta_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** For values in the domain space.
             - When dom_dim==1, this will be src_t
             - When dom_dim!=1, this will be drta_t (an std::array) */
-      typedef typename std::conditional<std::cmp_equal(dom_dim, 1), src_t, drta_t>::type drpt_t; 
+      typedef typename std::conditional<std::cmp_equal(dom_dim, 1), src_t, drta_t>::type drpt_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** A nicely descriptive typedef for drpt_t. */
-      typedef drpt_t real_domain_t; 
+      typedef drpt_t real_domain_t;
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -176,18 +176,18 @@ namespace mjr {
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** std::vector for values in the range space. */
-      typedef std::vector<src_t> rrtv_t; 
+      typedef std::vector<src_t> rrtv_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** An std::array for points in the range space. */
-      typedef std::array<src_t, rng_dim> rrta_t; 
+      typedef std::array<src_t, rng_dim> rrta_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** For values in the range space.
             - When rng_dim==1, this will be src_t
             - When rng_dim!=1, this will be a rrta_t (an std::array) */
-      typedef typename std::conditional<std::cmp_equal(rng_dim, 1), src_t, rrta_t>::type rrpt_t; 
+      typedef typename std::conditional<std::cmp_equal(rng_dim, 1), src_t, rrta_t>::type rrpt_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** A nicely descriptive typedef for rrpt_t */
-      typedef rrpt_t real_range_t; 
+      typedef rrpt_t real_range_t;
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -196,7 +196,7 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** The number of bits used by a single component of an integer coordinate tuple.
           @warning dic_bits >= sizeof(dic_t), but it might not be equal. */
-      constexpr static int dic_bits = max_level+1;            
+      constexpr static int dic_bits = max_level+1;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** The number of bits used by an entire integer coordinate tuple.
           @warning diti_bits >= sizeof(diti_t), but it might not be equal. */
@@ -301,7 +301,7 @@ namespace mjr {
       /** Set real coordinate & aspect ratio to defaults.  see: set_bbox_default() & set_aspect_default(). */
       MR_rect_tree()                                                            { set_bbox_default();                set_aspect_default();   }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Set real coordinate as specified & aspect ratio to default.  see: set_aspect_default(). 
+      /** Set real coordinate as specified & aspect ratio to default.  see: set_aspect_default().
           @param new_bbox_min Value to use for bounding box minimum point
           @param new_bbox_max Value to use for bounding box maximum point */
       MR_rect_tree(drpt_t new_bbox_min, drpt_t new_bbox_max)                    { set_bbox(new_bbox_min, new_bbox_max); set_aspect_default();   }
@@ -334,7 +334,7 @@ namespace mjr {
         }
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Set the bounding box 
+      /** Set the bounding box
           @param new_bbox_min Value to use for bounding box minimum point
           @param new_bbox_max Value to use for bounding box maximum point */
       void set_bbox(drpt_t new_bbox_min, drpt_t new_bbox_max) {
@@ -363,7 +363,7 @@ namespace mjr {
           @param new_bbox_max Value to use for bounding box maximum point*/
       void set_bbox_max(drpt_t new_bbox_max) { set_bbox(bbox_min, new_bbox_max); };
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Set the aspect ratio 
+      /** Set the aspect ratio
           @warning No error checking -- Correct operation only if all elements are positive
           @param new_aspect Value to use for aspect */
       void set_aspect(drpt_t new_aspect)  { aspect = new_aspect; }
@@ -402,9 +402,9 @@ namespace mjr {
           @param vertex Input vertex */
       inline rrta_t get_sample_rrta(diti_t vertex) const {
         rrta_t ret;
-        if constexpr (rng_dim == 1) 
+        if constexpr (rng_dim == 1)
           ret[0] = get_sample(vertex);
-        else 
+        else
           ret = get_sample(vertex);
         return ret;
       }
@@ -419,13 +419,13 @@ namespace mjr {
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Cell Oriented Coordinate Computation 
+      /** @name Cell Oriented Coordinate Computation
           These functions compute theoretical values based on a given cell center coordinate, and have nothing to do with sample state.
 
           For example, the ccc_get_top_cell() function returns the coordinates that would be used to identify the tree's top cell; however, this function tells us
           nothing about if that cell exists (as been sampled) in the tree.
 
-          In general these routines are optimized for performance, and do not preform any error checking.  
+          In general these routines are optimized for performance, and do not preform any error checking.
 
             - Many functions require a valid cell coordinate (that is a coordinate that could be the center of a cell).  For example, if one of these
               functions is given 0, then erroneous results are likely because 0 represents the coordinate for the corner of a tree which can never the the
@@ -444,25 +444,25 @@ namespace mjr {
           @warning Only uses the last dic in the cell to compute value.  Thus inconsistant components will not be detected.
           @param cell Input cell
           @return The level of the given cell. */
-      inline dic_t ccc_cell_level(diti_t cell) const     { return static_cast<dic_t>(max_level-static_cast<diti_t>(1)-std::countr_zero(cell)); } 
+      inline dic_t ccc_cell_level(diti_t cell) const     { return static_cast<dic_t>(max_level-static_cast<diti_t>(1)-std::countr_zero(cell)); }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute cell quarter width
           @warning No error checking -- cell must be a valid center coordinate. See: cell_good_cords()
           @param cell Input cell
           @return Quarter width of the given cell. */
-      inline dic_t ccc_cell_quarter_width(diti_t cell) const { return static_cast<dic_t>(ccc_cell_half_width(cell) >> static_cast<dic_t>(1)); } 
+      inline dic_t ccc_cell_quarter_width(diti_t cell) const { return static_cast<dic_t>(ccc_cell_half_width(cell) >> static_cast<dic_t>(1)); }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute cell half width
           @warning No error checking -- cell must be a valid center coordinate. See: cell_good_cords()
           @param cell Input cell
           @return Half width of the given cell. */
-       inline dic_t ccc_cell_half_width(diti_t cell) const { return static_cast<dic_t>(cell & (~cell+static_cast<diti_t>(1))); }         
+       inline dic_t ccc_cell_half_width(diti_t cell) const { return static_cast<dic_t>(cell & (~cell+static_cast<diti_t>(1))); }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute cell full width
           @warning No error checking -- cell must be a valid center coordinate. See: cell_good_cords()
           @param cell Input cell
           @return Full width of the given cell. */
-      inline dic_t ccc_cell_full_width(diti_t cell) const { return static_cast<dic_t>(ccc_cell_half_width(cell) << static_cast<dic_t>(1)); } 
+      inline dic_t ccc_cell_full_width(diti_t cell) const { return static_cast<dic_t>(ccc_cell_half_width(cell) << static_cast<dic_t>(1)); }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Cell first corner
           @warning No error checking -- cell must be a valid center coordinate. See: cell_good_cords()
@@ -496,7 +496,7 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Return the potential neighbor cell along the given axis in the specified direction.
           @warning No error checking -- cell must be a valid center coordinate. See: cell_good_cords()
-          @param cell      Input cell 
+          @param cell      Input cell
           @param index     The index of the axis.  Must be in [0, dom_dim-1].  No error checking.
           @param direction The direction on the given index.  Must be 1 or -1.  No error checking.
           @return A neighbor cell coordinate or 0 if no neighbor exists.  Note 0 is a valid coordinate, but not the center of any cell. */
@@ -504,10 +504,10 @@ namespace mjr {
         dic_t tmp   = cuc_get_crd(cell, index);
         dic_t delta = ccc_cell_full_width(cell);
         if (direction == 1) {
-          if ((dic_max-tmp) >= delta) 
+          if ((dic_max-tmp) >= delta)
             return cuc_inc_crd(cell, index, delta);
         } else {
-          if (tmp >= delta) 
+          if (tmp >= delta)
             return cuc_dec_crd(cell, index, delta);
         }
         return 0;
@@ -527,9 +527,9 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Return a list of child cells of the specified cell
-          An empty vector is returned if no children are possible.  
+          An empty vector is returned if no children are possible.
           @warning This isn't a check for existing, sampled children -- it simply returns the coordinates of potential children.
-          @param cell Input cell 
+          @param cell Input cell
           @param index     The index of the axis.  Must be in [0, dom_dim-1].  No error checking.
           @param direction The direction on the given index.  Must be 1 or -1.  No error checking.
       */
@@ -546,7 +546,7 @@ namespace mjr {
       diti_list_t ccc_get_vertexes(diti_t cell) const {
         diti_list_t rv = ccc_get_corners(cell);
         rv.push_back(cell);
-        return rv; 
+        return rv;
       }
       //@}
 
@@ -582,7 +582,7 @@ namespace mjr {
           @param diti The input tuple
           @param value Amout by which to decrement each component
           @return New tuple with decrimented components */
-      inline diti_t cuc_dec_all_crd(diti_t diti, dic_t value) const { 
+      inline diti_t cuc_dec_all_crd(diti_t diti, dic_t value) const {
         if constexpr (dom_dim == 1) {
           return (diti - value);
         } else {
@@ -600,7 +600,7 @@ namespace mjr {
           @param diti The input tuple
           @param value Amout by which to increment each component
           @return New tuple with incrimented components */
-      inline diti_t cuc_inc_all_crd(diti_t diti, dic_t value) const { 
+      inline diti_t cuc_inc_all_crd(diti_t diti, dic_t value) const {
         if constexpr (dom_dim == 1) {
           return (diti + value);
         } else {
@@ -617,20 +617,20 @@ namespace mjr {
       /** Set all components in a a tuple to a constant
           @param value The value for each component
           @return New tuple */
-      inline diti_t cuc_set_all_crd(dic_t value) const { 
+      inline diti_t cuc_set_all_crd(dic_t value) const {
         if constexpr (dom_dim == 1) {
           return value;
         } else {
           diti_t tmp = value;
           diti_t rv = 0;
           for(int i=0; i<dom_dim; i++)
-            rv |= (tmp << (i * dic_bits));  
+            rv |= (tmp << (i * dic_bits));
           return rv;
         }
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute cross product points centered at diti and delta away
-          Examples: 
+          Examples:
             - dom_dom==1 => {diti-delta, diti+delta}
             - dom_dom==2 => {diti+[-delta, -delta], diti+[-delta, +delta], diti+[+delta, -delta], diti+[+delta, +delta]}
             - dom_dom==3 => {diti+[-delta, -delta, -delta], ..., diti+[+delta, +delta, +delta]} -- this list will have 8 points
@@ -641,7 +641,7 @@ namespace mjr {
         //  MJR TODO NOTE <2024-07-11T11:50:36-0500> cuc_two_cross: If diti is close to an corner, some result points may be out of range.
         diti_list_t rv;
         for(int i=0; i<(1 << dom_dim); i++) {
-          diti_t tmp = diti;    
+          diti_t tmp = diti;
           for(int j=0; j<dom_dim; j++) {
             if (i & (1 << j)) {
               tmp = cuc_inc_crd(tmp, j, delta);
@@ -651,12 +651,12 @@ namespace mjr {
           }
           rv.push_back(tmp);
         }
-        return rv; 
+        return rv;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute directional cross product points centered at diti and delta away
           @warning If diti is close to an corner, then some of the cross product points may be out of range!
-          Examples: 
+          Examples:
             - dom_dom==1, index==0, direction==-1 => {diti-delta}
             - dom_dom==1, index==0, direction== 1 => {diti+delta}
             - dom_dom==2, index==0, direction==-1 => {diti+[-delta, -delta], diti+[-delta, +delta]                                                  }
@@ -674,7 +674,7 @@ namespace mjr {
           direction = 0;
         for(int i=0; i<(1 << dom_dim); i++) {
           if (((i >> index) & 1) == direction) {
-            diti_t tmp = diti;    
+            diti_t tmp = diti;
             for(int j=0; j<dom_dim; j++) {
               if ((i >> j) & 1) {
                 tmp = cuc_inc_crd(tmp, j, delta);
@@ -685,15 +685,15 @@ namespace mjr {
             rv.push_back(tmp);
           }
         }
-        return rv; 
+        return rv;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute axis aligned cross points centered at diti and delta away
           Axis aligned cross points that fall outside of the domain will not be returned.  For example, if diti=0, then we get no points to the left.
-          Examples: 
+          Examples:
             - dom_dom==1 => {diti-delta, diti+delta}
             - dom_dom==2 => {diti+[0, -delta], diti+[0, +delta], diti+[-delta, 0], diti+[+delta, 0]}
-            - dom_dom==3 => {diti+[0, 0, -delta], diti+[0, 0, +delta], 
+            - dom_dom==3 => {diti+[0, 0, -delta], diti+[0, 0, +delta],
                             diti+[0, -delta, 0], diti+[0, +delta, 0],
                             diti+[-delta, 0, 0], diti+[+delta, 0, 0]}
           @param diti Center coordinates for the cross
@@ -705,15 +705,15 @@ namespace mjr {
           for(int up=0; up<2; up++) {
             dic_t tmp = cuc_get_crd(diti, idx);
             if (up) {
-              if ((dic_max-tmp) >= delta) 
+              if ((dic_max-tmp) >= delta)
                 rv.push_back(cuc_inc_crd(diti, idx, delta));
             } else {
-              if (tmp >= delta) 
+              if (tmp >= delta)
                 rv.push_back(cuc_dec_crd(diti, idx, delta));
             }
           }
         }
-        return rv; 
+        return rv;
       }
       //@}
 
@@ -753,7 +753,7 @@ namespace mjr {
         } else {
           diti_t rv = 0;
           for(int i=0; i<dom_dim; i++)
-            rv |= (dita[i] << (i * dic_bits));  
+            rv |= (dita[i] << (i * dic_bits));
           return rv;
         }
       }
@@ -818,7 +818,7 @@ namespace mjr {
 
        Note that refine_grid() is a hybrid in that it can be used for both refinement and for sampling. */
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Sample a cell 
+      /** Sample a cell
           @param cell Cell to sample
           @param func Function to use for samples */
       void sample_cell(diti_t cell, drpt2rrpt_func_t func) {
@@ -834,7 +834,7 @@ namespace mjr {
         sample_cell(ccc_get_top_cell(), func);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Sample a point if it has not already been sampled 
+      /** Sample a point if it has not already been sampled
           @param diti Point at which to sample
           @param func Function to sample
           @return true if we sampled the point, and false otherwise. */
@@ -849,7 +849,7 @@ namespace mjr {
         }
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Sample a point 
+      /** Sample a point
           @param diti Point at which to sample
           @param func Function to sample */
       inline void sample_point(diti_t diti, drpt2rrpt_func_t func) {
@@ -874,7 +874,7 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Distance between two points in the range space using the infinity norm (max absolute value)
-          @param val1 Value in range space 
+          @param val1 Value in range space
           @param val2 Value in range space */
       inline src_t rrpt_distance_inf(rrpt_t val1, rrpt_t val2) const {
         if constexpr (rng_dim == 1) {
@@ -893,7 +893,7 @@ namespace mjr {
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Distance between two points in the domain space using the infinity norm (max absolute value)
-          @param val1 Value in domain space 
+          @param val1 Value in domain space
           @param val2 Value in domain space */
       inline src_t drpt_distance_inf(drpt_t val1, drpt_t val2) const {
         if constexpr (dom_dim == 1) {
@@ -907,7 +907,7 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Return the midpoint between two points in the domain space
-          @param val1 Value in domain space 
+          @param val1 Value in domain space
           @param val2 Value in domain space */
       inline drpt_t drpt_midpoint(drpt_t val1, drpt_t val2) const {
         if constexpr (dom_dim == 1) {
@@ -937,7 +937,7 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Refine a cell if possible.
           @param cell Cell to refine -- no error checking!!
-          @param func Function to use for samples 
+          @param func Function to use for samples
           @return 1 if cell was refined, and 0 otherwise -- i.e. the number of cells refined. */
       bool refine_once(diti_t cell, drpt2rrpt_func_t func) {
         auto children = ccc_get_children(cell);
@@ -953,7 +953,7 @@ namespace mjr {
       /** Sample a function uniformly across given cell to the given level.
           The given cell need not exist in the tree yet.
 
-          @warning Will resample previously sampled points in the cell. 
+          @warning Will resample previously sampled points in the cell.
 
           @param cell        The cell to sample within
           @param level_delta The relative level at which to sample
@@ -1055,7 +1055,7 @@ namespace mjr {
 
           @param cell Cell to refine
           @param level Maximum level of refinded cells.  -1 means refine to the limit.
-          @param func Function to use for samples 
+          @param func Function to use for samples
           @param pred Predicate function. */
       void refine_recursive_cell_pred(diti_t cell, int level, drpt2rrpt_func_t func, diti2bool_func_t pred) {
         if ((level < 0) || (ccc_cell_level(cell) < level)) {
@@ -1072,7 +1072,7 @@ namespace mjr {
           @warning cell must exist (i.e. must be sampled)
           @param cell Cell to refine
           @param level Maximum level of refinded cells.  -1 means refine to the limit.
-          @param func Function to use for samples 
+          @param func Function to use for samples
           @param pred Predicate function. */
       void refine_leaves_recursive_cell_pred(diti_t cell, int level, drpt2rrpt_func_t func, diti2bool_func_t pred) {
         for(auto c: get_leaf_cells(cell))
@@ -1092,17 +1092,17 @@ namespace mjr {
 
           @param cell  Input cell. Must be a valid cell. -- no error checking.
           @param level Maximum level of refinded cells.  -1 means refine to the limit.
-          @param func  Function to sample 
+          @param func  Function to sample
           @param pred  Predicate function. */
       int  refine_leaves_once_if_cell_pred(diti_t cell, int level, drpt2rrpt_func_t func, diti2bool_func_t pred) {
         diti_list_t cells_to_check  = get_leaf_cells(cell);
         diti_list_t cells_to_refine;
         for(auto c: cells_to_check)
-          if (pred(c)) 
+          if (pred(c))
             if ((level < 0) || (ccc_cell_level(c) < level))
               cells_to_refine.push_back(c);
         int refined_count = 0;
-        for(auto c: cells_to_refine) 
+        for(auto c: cells_to_refine)
           refined_count += refine_once(c, func);
         return refined_count;
       }
@@ -1116,7 +1116,7 @@ namespace mjr {
 
           Apply refine_leaves_once_if_cell_pred() repeatedly untill no new cells are refined.
 
-          @param cell  Input cell. Must be a valid cell. -- no error checking.          
+          @param cell  Input cell. Must be a valid cell. -- no error checking.
           @param level Maximum level of refinded cells.  -1 means refine to the limit.
           @param func  Function to sample
           @param pred  Predicate function. */
@@ -1138,8 +1138,8 @@ namespace mjr {
 
           @param level Maximum level of refinded cells.  -1 means refine to the limit.
           @param func Function to use for samples */
-      void refine_recursive_if_cell_vertex_is_nan(int level, drpt2rrpt_func_t func) { 
-        refine_leaves_recursive_cell_pred(level, func, std::bind_front(&MR_rect_tree::cell_vertex_is_nan, this)); 
+      void refine_recursive_if_cell_vertex_is_nan(int level, drpt2rrpt_func_t func) {
+        refine_leaves_recursive_cell_pred(level, func, std::bind_front(&MR_rect_tree::cell_vertex_is_nan, this));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Refine leaf cells if they are unbalanced at the given level.
@@ -1173,7 +1173,7 @@ namespace mjr {
       /** Check if cell coordinates are in range to be a cell center
           @param cell Input cell
           @return True if cell is in bounds, false otherwise */
-      inline bool cell_good_cords(diti_t cell) const { 
+      inline bool cell_good_cords(diti_t cell) const {
         if constexpr (dom_dim == 1) {
           return ((0 < cell) && (dic_max > cell));
         } else {
@@ -1204,14 +1204,14 @@ namespace mjr {
         return (std::all_of(verts.cbegin(), verts.cend(), [this](diti_t i) { return (vertex_exists(i)); }));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Test if a cell has a vertex with a NaN value for a sample 
+      /** Test if a cell has a vertex with a NaN value for a sample
           @param cell Input cell */
       inline bool cell_vertex_is_nan(diti_t cell) {
         diti_list_t verts = ccc_get_vertexes(cell);
         return (std::any_of(verts.cbegin(), verts.cend(), [this](diti_t i) { return (vertex_is_nan(i)); }));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Test if a cell has an corner with a NaN value for a sample 
+      /** Test if a cell has an corner with a NaN value for a sample
           @param cell Input cell */
       inline bool cell_corner_is_nan(diti_t cell) {
         diti_list_t corners = ccc_get_corners(cell);
@@ -1219,14 +1219,14 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Test if a cell has children
-          @warning Assumes the tree is well formed, and only checks that the "lower left" child's center been sampled! 
+          @warning Assumes the tree is well formed, and only checks that the "lower left" child's center been sampled!
           @param cell Input cell */
       inline bool cell_has_child(diti_t cell) const {
         return (cell_can_have_children(cell) && cell_exists(cuc_dec_all_crd(cell, ccc_cell_quarter_width(cell))));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Test if a cell has no children
-          @warning Assumes the tree is well formed, and only checks that the "lower left" child's center been sampled! 
+          @warning Assumes the tree is well formed, and only checks that the "lower left" child's center been sampled!
           @param cell Input cell */
       inline bool cell_has_no_child(diti_t cell) const {
         return ( !(cell_has_child(cell)));
@@ -1257,8 +1257,8 @@ namespace mjr {
           @return true if the cell crosses the signed distance function. */
       inline bool cell_cross_sdf(diti_t cell, drpt2real_func_t sdf) {
         bool first_sign = std::signbit(sdf(diti_to_drpt(cell)));
-        for(diti_t& v: ccc_get_corners(cell)) 
-          if (first_sign != std::signbit(sdf(diti_to_drpt(v)))) 
+        for(diti_t& v: ccc_get_corners(cell))
+          if (first_sign != std::signbit(sdf(diti_to_drpt(v))))
             return true;
         return false;
       }
@@ -1268,15 +1268,15 @@ namespace mjr {
           @param epsilon      How close the point must be
           @param cell Input Cell
           @return true if a cell contains, or is close to, a domain_point. */
-      inline bool cell_close_to_domain_point(drpt_t domain_point, src_t epsilon, diti_t cell) {        
+      inline bool cell_close_to_domain_point(drpt_t domain_point, src_t epsilon, diti_t cell) {
         drpt_t min_drpt = diti_to_drpt(ccc_cell_get_corner_min(cell));
         for(int i=0; i<dom_dim; i++)
           if (dom_at(min_drpt, i)-epsilon > dom_at(domain_point, i))
-            return false;  
+            return false;
         drpt_t max_drpt = diti_to_drpt(ccc_cell_get_corner_max(cell));
         for(int i=0; i<dom_dim; i++)
           if (dom_at(max_drpt, i)+epsilon < dom_at(domain_point, i))
-            return false;  
+            return false;
         return true;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1347,7 +1347,7 @@ namespace mjr {
         return std::all_of(verts.cbegin(), verts.cend(), [this, range_index, range_level, epsilon](int i) { return (rng_at(samples[i], range_index) > range_level-epsilon); });
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Test if a cell is unbalanced at the given level 
+      /** Test if a cell is unbalanced at the given level
           @param cell        Input Cell
           @param level_delta Signed distance function
           @return true if the cell is unbalanced at the given level. */
@@ -1366,7 +1366,7 @@ namespace mjr {
       /** @name Vertex Predicates */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Test if a vertex is NaN or, when it is an std::array, if it contains a NaN element 
+      /** Test if a vertex is NaN or, when it is an std::array, if it contains a NaN element
           @param vertex Input vertex */
       inline bool vertex_is_nan(diti_t vertex) {
         if constexpr (rng_dim == 1) {
@@ -1392,7 +1392,7 @@ namespace mjr {
       diti_list_t get_leaf_cells(diti_t cell) const {
         diti_list_t rv;
         if (cell_has_child(cell)) {
-          for(auto const c : ccc_get_children(cell)) {        
+          for(auto const c : ccc_get_children(cell)) {
             auto mv = get_leaf_cells(c);
             std::move(mv.begin(), mv.end(), std::back_inserter(rv));
           }
@@ -1414,7 +1414,7 @@ namespace mjr {
       diti_list_t get_leaf_cells_pred(diti_t cell, diti2bool_func_t pred) const {
         diti_list_t cells_to_return;
         for(auto c: get_leaf_cells(cell))
-          if (pred(c)) 
+          if (pred(c))
             cells_to_return.push_back(c);
         return cells_to_return;
       }
@@ -1426,7 +1426,7 @@ namespace mjr {
       diti_list_t get_leaf_cells(diti_t cell, int index, int direction) const {
         diti_list_t rv;
         if (cell_has_child(cell)) {
-          for(auto const c : ccc_get_children(cell, index, direction)) {        
+          for(auto const c : ccc_get_children(cell, index, direction)) {
             auto mv = get_leaf_cells(c, index, direction);
             std::move(mv.begin(), mv.end(), std::back_inserter(rv));
           }
@@ -1441,7 +1441,7 @@ namespace mjr {
       int count_leaf_cells(diti_t cell) const {
         int rv=0;
         if (cell_has_child(cell)) {
-          for(auto const c : ccc_get_children(cell)) {        
+          for(auto const c : ccc_get_children(cell)) {
             int mv = count_leaf_cells(c);
             rv+=mv;
           }
@@ -1509,7 +1509,7 @@ namespace mjr {
         std::ostringstream convert;
         int pwid = (do_hex ? (max_level+1)/4+1 : (max_level+1)/2+1);
         dita_t tmp1 = diti_to_dita(diti);
-        for(int i=0; i<dom_dim; i++) 
+        for(int i=0; i<dom_dim; i++)
           convert << std::setw(pwid) << std::setfill('0') << (do_hex ? std::hex : std::dec ) << (uint32_t)tmp1[dom_dim-1-i] << std::dec << std::setw(0) << std::setfill('\0') << " ";
         if (include_domain) {
           drta_t tmp3 = diti_to_drta(diti);
@@ -1610,19 +1610,19 @@ namespace mjr {
     /* 15-bit per coordinate */
 
     typedef mjr::MR_rect_tree<15, double, 1, 1> tree15b1d1rT;  // Curve defined by [x, f(x)]
-    typedef mjr::MR_rect_tree<15, double, 2, 1> tree15b2d1rT;  // Surface defined by [x, y, f(x, y)] 
+    typedef mjr::MR_rect_tree<15, double, 2, 1> tree15b2d1rT;  // Surface defined by [x, y, f(x, y)]
                                                                // Monochrome image defined by [x, y] and colored by f(x, y)
                                                                // 2D scalar field
     typedef mjr::MR_rect_tree<15, double, 3, 1> tree15b3d1rT;  // 3D scalar field
     typedef mjr::MR_rect_tree<15, double, 4, 1> tree15b4d1rT;
 
-    typedef mjr::MR_rect_tree<15, double, 1, 2> tree15b1d2rT;  // Parametric Plane Curve defined by [x(t), y(t)] 
-    typedef mjr::MR_rect_tree<15, double, 2, 2> tree15b2d2rT;  // Complex function magnutude surface defined by [Re(z), Im(z), mag(z)]   
-    typedef mjr::MR_rect_tree<15, double, 3, 2> tree15b3d2rT;  
+    typedef mjr::MR_rect_tree<15, double, 1, 2> tree15b1d2rT;  // Parametric Plane Curve defined by [x(t), y(t)]
+    typedef mjr::MR_rect_tree<15, double, 2, 2> tree15b2d2rT;  // Complex function magnutude surface defined by [Re(z), Im(z), mag(z)]
+    typedef mjr::MR_rect_tree<15, double, 3, 2> tree15b3d2rT;
     typedef mjr::MR_rect_tree<15, double, 4, 2> tree15b4d2rT;
 
-    typedef mjr::MR_rect_tree<15, double, 1, 3> tree15b1d3rT;  // Parametric Space Curve defined by [x(t), y(t), z(t)] 
-    typedef mjr::MR_rect_tree<15, double, 2, 3> tree15b2d3rT;  // Parametric Surface defined by [x(u, v), y(u, v), z(u, v)] 
+    typedef mjr::MR_rect_tree<15, double, 1, 3> tree15b1d3rT;  // Parametric Space Curve defined by [x(t), y(t), z(t)]
+    typedef mjr::MR_rect_tree<15, double, 2, 3> tree15b2d3rT;  // Parametric Surface defined by [x(u, v), y(u, v), z(u, v)]
                                                                // RGB image defined by [x, y] and colored by [f_1(x, y), f_2(x, y), f_3(x, y)]
     typedef mjr::MR_rect_tree<15, double, 3, 3> tree15b3d3rT;
     typedef mjr::MR_rect_tree<15, double, 4, 3> tree15b4d3rT;
@@ -1717,4 +1717,3 @@ namespace mjr {
 
 #define MJR_INCLUDE_MR_rect_tree
 #endif
- 

@@ -8,7 +8,7 @@
  @keywords  VTK polydata PLY file MR_rect_tree polygon triangulation cell complex tessellation
  @std       C++23
  @see       MR_rect_tree.hpp, MR_rt_to_cc.hpp
- @copyright 
+ @copyright
   @parblock
   Copyright (c) 2024, Mitchell Jay Richling <http://www.mitchr.me/> All rights reserved.
 
@@ -47,7 +47,7 @@
 #include <set>                                                           /* STL set                 C++98    */
 #include <string>                                                        /* C++ strings             C++11    */
 #include <unordered_map>                                                 /* STL hash map            C++11    */
-#include <vector>                                                        /* STL vector              C++11    */ 
+#include <vector>                                                        /* STL vector              C++11    */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Put everything in the mjr namespace
@@ -58,7 +58,7 @@ namespace mjr {
       class should be split into several classes (unique point list, unique cell list, 3D vectors, 3D analytic geometry, etc...).  It's a bit of a mess.
 
       The primary use case is to store and manipulate geometric (i.e. mesh) data derived from MR_rect_tree samples.  On the mesh manipulation front the focus
-      is on computations that require knowledge related to the function being approximated.  
+      is on computations that require knowledge related to the function being approximated.
 
       Significant limitations:
         - VTK files generated from MR_rect_tree objects don't require all of the capability of VTK files
@@ -83,49 +83,49 @@ namespace mjr {
       Cells supported:
 
        - Point
-         - Zero-dimensional cell. 
+         - Zero-dimensional cell.
          - Defined by a single point.
-       
+
        - Segment
-         - One-dimensional cell. 
-         - Defined an ordered list of two points. 
+         - One-dimensional cell.
+         - Defined an ordered list of two points.
          - The direction along the line is from the first point to the second point.
-       
+
        - Triangle
-         - Two-dimensional cell. 
-         - Defined by an ordered list of three points. 
+         - Two-dimensional cell.
+         - Defined by an ordered list of three points.
          - The points are ordered counterclockwise, defining a surface normal using the right-hand rule.
-       
+
        - Quadrilateral
-         - Two-dimensional cell. 
+         - Two-dimensional cell.
          - Defined by an ordered list of four points.
          - The points are ordered counterclockwise, defining a surface normal using the right-hand rule.
          - The points must be coplainer
-         - The quadrilateral is convex and its edges must not intersect. 
-       
+         - The quadrilateral is convex and its edges must not intersect.
+
        - Hexahedron
-         - Three-dimensional cell consisting of six quadrilateral faces, twelve edges, and eight vertices. 
-         - The hexahedron is defined by an ordered list of eight points. 
+         - Three-dimensional cell consisting of six quadrilateral faces, twelve edges, and eight vertices.
+         - The hexahedron is defined by an ordered list of eight points.
          - The faces and edges must not intersect any other faces and edges, and the hexahedron must be convex.
-       
+
        - Pyramid
-         - Three-dimensional cell consisting of one quadrilateral face, four triangular faces, eight edges, and five vertices. 
-         - The pyramid is defined by an ordered list of five points. 
+         - Three-dimensional cell consisting of one quadrilateral face, four triangular faces, eight edges, and five vertices.
+         - The pyramid is defined by an ordered list of five points.
          - The four points defining the quadrilateral base plane must be convex
          - The fifth point, the apex, must not be co-planar with the base points.
 
-         \verbatim                                                                                                              
-                                                                                                                    4                 
-                                                                                                                   .^.                  
-                                                                              3---------2                       .  / \ .              
-                                                                             /|        /|                     .   /   \  .                  
-                                                                            / |       / |                  .     /     \   .          
-                                           2            3---------2        7---------6  |                 1...../.......\.....0  Back 
-                                          / \           |         |        |  |      |  |                 |    /         \    |       
-          0        0-------1             /   \          |         |        |  0------|--1 Back            |   /           \   |       
-                                        /     \         |         |        | /       | /                  |  /             \  |       
-                                       0-------1        |         |        |/        |/                   | /               \ |       
-                                                        0---------1        4---------5 Front              |/                 \|       
+         \verbatim
+                                                                                                                    4
+                                                                                                                   .^.
+                                                                              3---------2                       .  / \ .
+                                                                             /|        /|                     .   /   \  .
+                                                                            / |       / |                  .     /     \   .
+                                           2            3---------2        7---------6  |                 1...../.......\.....0  Back
+                                          / \           |         |        |  |      |  |                 |    /         \    |
+          0        0-------1             /   \          |         |        |  0------|--1 Back            |   /           \   |
+                                        /     \         |         |        | /       | /                  |  /             \  |
+                                       0-------1        |         |        |/        |/                   | /               \ |
+                                                        0---------1        4---------5 Front              |/                 \|
                                                                                                           2 ----------------- 3  Front
          \endverbatim
 
@@ -133,7 +133,7 @@ namespace mjr {
       by an order of magnitude, and almost double the RAM required for this class.  These checks are entirely optional.
 
         - uniq_points:
-          - Many 3D file formats store the master list of potential points, and then use an integer index into this list when defining geometric objects.  
+          - Many 3D file formats store the master list of potential points, and then use an integer index into this list when defining geometric objects.
           - Most visualization software is pretty tolerant of having duplicate points on this list when just doing rendering.
           - Duplicate points can break many software packages pretty badly when it comes to computation.
           - Depending on how points are added to this object, this check can avoid quite a bit of wasted RAM and produce *much* smaller output files.
@@ -159,7 +159,7 @@ namespace mjr {
 
       Levels Of Cell Goodness
 
-       \verbatim                                                                                                              
+       \verbatim
        +-------------+-------------------+--------------------+--------------------+-------------------------------+-------------------------------+
        |             | uniq_points       | uniq_points        | uniq_points        | uniq_points                   | uniq_points                   |
        |             | uniq_cells        | uniq_cells         | uniq_cells         | uniq_cells                    | uniq_cells                    |
@@ -186,8 +186,8 @@ namespace mjr {
         @tparam chk_cell_dimension Do cell dimension checks (See: cell_stat_t)
         @tparam chk_cell_edges     Do cell edge checks (See: cell_stat_t)
         @tparam eps                Epsilon used to detect zero */
-  template <bool uniq_points, 
-            bool uniq_cells, 
+  template <bool uniq_points,
+            bool uniq_cells,
             bool chk_cell_vertexes,
             bool chk_cell_dimension,
             bool chk_cell_edges,
@@ -222,7 +222,7 @@ namespace mjr {
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /** @name Master point list.
 
-          Cell complex objects have a master list of points.  Cells & data elements defined by referencing point indexes on this master list.  
+          Cell complex objects have a master list of points.  Cells & data elements defined by referencing point indexes on this master list.
 
           Points consist of three double values, think (x, y, z) in R^3.  Indexes in this list are used to identify points.  The first point added gets index
           0, and each successive point gets the next integer. */
@@ -273,21 +273,21 @@ namespace mjr {
       /** The index of the last point added via the add_point() method. */
       pnt_idx_t last_point_idx = -1;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** True if the last point given to the add_point() method was new -- i.e. not on the master point list. 
+      /** True if the last point given to the add_point() method was new -- i.e. not on the master point list.
           Only updated if uniq_points is true.  See: last_point_added_was_new() */
       bool last_point_new = true;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Less operator for pnt_lst_uniq_t.
-          @return If a & b are close in space, then return false.  Otherwise uses lexicographic ordering. 
+          @return If a & b are close in space, then return false.  Otherwise uses lexicographic ordering.
           @bug Assumes 3==3. */
       struct pnt_less {
           bool operator()(const pnt_t& a, const pnt_t& b) const { return (((std::abs(a[0]-b[0]) > eps) ||
                                                                            (std::abs(a[1]-b[1]) > eps) ||
                                                                            (std::abs(a[2]-b[2]) > eps)) &&
-                                                                          ((a[0] < b[0]) || 
-                                                                           ((a[0] == b[0]) && 
-                                                                            ((a[1] < b[1]) || 
-                                                                             ((a[1] == b[1]) && (a[2] < b[2])))))); } 
+                                                                          ((a[0] < b[0]) ||
+                                                                           ((a[0] == b[0]) &&
+                                                                            ((a[1] < b[1]) ||
+                                                                             ((a[1] == b[1]) && (a[2] < b[2])))))); }
       };
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** List of points */
@@ -353,14 +353,14 @@ namespace mjr {
       /** @overload */
       inline void create_named_datasets(std::vector<pdata_name_t> scalar_name_strings) {
         data_name_to_data_idx_lst.clear();
-        for(int i=0; i<static_cast<int>(scalar_name_strings.size()); ++i) 
+        for(int i=0; i<static_cast<int>(scalar_name_strings.size()); ++i)
           data_name_to_data_idx_lst[scalar_name_strings[i]] = {i};
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** @overload */
       inline void create_named_datasets(std::vector<pdata_name_t> scalar_name_strings, data_name_to_data_idx_lst_t names) {
         data_name_to_data_idx_lst.clear();
-        for(int i=0; i<static_cast<int>(scalar_name_strings.size()); ++i) 
+        for(int i=0; i<static_cast<int>(scalar_name_strings.size()); ++i)
           data_name_to_data_idx_lst[scalar_name_strings[i]] = {i};
         for(auto kv : names)
           data_name_to_data_idx_lst[kv.first] = kv.second;
@@ -372,10 +372,10 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       inline vdat_t get_dataset_vector(data_idx_lst_t data_idx_lst, pnt_data_t pnt_data) const {
         vdat_t v;
-        for(int i=0; i<3; ++i) 
-          if (data_idx_lst[i].index() == 0) 
+        for(int i=0; i<3; ++i)
+          if (data_idx_lst[i].index() == 0)
             v[i] = pnt_data[std::get<int>(data_idx_lst[i])];
-          else 
+          else
             v[i] = std::get<uft_t>(data_idx_lst[i]);
         return v;
       }
@@ -383,7 +383,7 @@ namespace mjr {
       inline uft_t get_data_scalar(data_idx_t data_idx, pnt_data_t pnt_data) const {
         if (data_idx.index() == 0)
           return (pnt_data[std::get<int>(data_idx)]);
-        else 
+        else
           return (std::get<int>(data_idx));
       }
       //@}
@@ -456,11 +456,11 @@ namespace mjr {
           convert << "]";
         } else {
           convert << "[ DNE ]";
-        }        
+        }
         return(convert.str());
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Print all points to STDOUT. 
+      /** Print all points to STDOUT.
 
           @param max_num_print Maximum number of points to print.  Use 0 to print all points. */
       inline void print_all_points(int max_num_print) const {
@@ -532,7 +532,7 @@ namespace mjr {
       inline bool vec3_unitize(pnt_t& pnt) const {
         uft_t length = vec3_two_norm(pnt);
         if (std::abs(length) > eps) {
-          for(int i=0; i<3; ++i) 
+          for(int i=0; i<3; ++i)
             pnt[i] = pnt[i]/length;
           return true;
         } else {
@@ -550,19 +550,19 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Determinant of 3x3 matrix with given vectors as columns/rows. */
       inline uft_t vec3_det3(const pnt_t& pnt1, const pnt_t& pnt2, const pnt_t& pnt3) const {
-        //  MJR TODO NOTE <2024-07-22T15:48:31-0500> vec3_det3: UNTESTED! UNTESTED! UNTESTED! UNTESTED! 
+        //  MJR TODO NOTE <2024-07-22T15:48:31-0500> vec3_det3: UNTESTED! UNTESTED! UNTESTED! UNTESTED!
         static_assert(false, "vec3_det3: Under active development.  Untested!");
-        return (pnt1[0] * pnt2[1] * pnt3[2] - 
-                pnt1[0] * pnt2[2] * pnt3[1] - 
-                pnt1[1] * pnt2[0] * pnt3[2] + 
-                pnt1[1] * pnt2[2] * pnt3[0] + 
-                pnt1[2] * pnt2[0] * pnt3[1] - 
+        return (pnt1[0] * pnt2[1] * pnt3[2] -
+                pnt1[0] * pnt2[2] * pnt3[1] -
+                pnt1[1] * pnt2[0] * pnt3[2] +
+                pnt1[1] * pnt2[2] * pnt3[0] +
+                pnt1[2] * pnt2[0] * pnt3[1] -
                 pnt1[2] * pnt2[1] * pnt3[0]);
       }
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name 3D Geometry Computations. 
+      /** @name 3D Geometry Computations.
 
        Methods with geomi_ prefix take point index types while methods with a geomr_ prefix take double tuples.  */
       //@{
@@ -583,13 +583,13 @@ namespace mjr {
       /** Convert an seg_isect_t to a string */
       inline std::string seg_isect_to_string(seg_isect_t seg_isect) const {
         switch(seg_isect) {
-          case seg_isect_t::C0_EMPTY:     return std::string("C0_EMPTY");    break; 
-          case seg_isect_t::C1_VERTEX1:   return std::string("C1_VERTEX1");  break; 
-          case seg_isect_t::C1_INTERIOR:  return std::string("C1_INTERIOR"); break; 
-          case seg_isect_t::CI_VERTEX2:   return std::string("CI_VERTEX2");  break; 
-          case seg_isect_t::CI_VERTEX1:   return std::string("CI_VERTEX1");  break; 
-          case seg_isect_t::CI_VERTEX0:   return std::string("CI_VERTEX0");  break; 
-          case seg_isect_t::BAD_SEGMENT:  return std::string("BAD_SEGMENT"); break; 
+          case seg_isect_t::C0_EMPTY:     return std::string("C0_EMPTY");    break;
+          case seg_isect_t::C1_VERTEX1:   return std::string("C1_VERTEX1");  break;
+          case seg_isect_t::C1_INTERIOR:  return std::string("C1_INTERIOR"); break;
+          case seg_isect_t::CI_VERTEX2:   return std::string("CI_VERTEX2");  break;
+          case seg_isect_t::CI_VERTEX1:   return std::string("CI_VERTEX1");  break;
+          case seg_isect_t::CI_VERTEX0:   return std::string("CI_VERTEX0");  break;
+          case seg_isect_t::BAD_SEGMENT:  return std::string("BAD_SEGMENT"); break;
         }
         return std::string(""); // Never get here, but some compilers can't figure that out. ;)
       }
@@ -611,9 +611,9 @@ namespace mjr {
         points_sorted.insert(ilin2pnt2);
         if (points_sorted.size() == 4) { // ...................................................... REMAINING CASES: C0_EMPTY, C1_INTERIOR, CI_VERTEX0
           if (geomi_pts_colinear(ilin1pnt1, ilin1pnt2, ilin2pnt1, ilin2pnt2)) { // ............... REMAINING CASES: C0_EMPTY,              CI_VERTEX0
-            if ( (geomi_pnt_line_distance(ilin1pnt1, ilin1pnt2, ilin2pnt1, true) < eps) ||  
+            if ( (geomi_pnt_line_distance(ilin1pnt1, ilin1pnt2, ilin2pnt1, true) < eps) ||
                  (geomi_pnt_line_distance(ilin1pnt1, ilin1pnt2, ilin2pnt2, true) < eps) ||
-                 (geomi_pnt_line_distance(ilin2pnt1, ilin2pnt2, ilin1pnt1, true) < eps) ||  
+                 (geomi_pnt_line_distance(ilin2pnt1, ilin2pnt2, ilin1pnt1, true) < eps) ||
                  (geomi_pnt_line_distance(ilin2pnt1, ilin2pnt2, ilin1pnt2, true) < eps) ) { // .. REMAINING CASES: CI_VERTEX0
               return seg_isect_t::CI_VERTEX0;
             } else { // ......................................................................... REMAINING CASES: C0_EMPTY
@@ -627,7 +627,7 @@ namespace mjr {
             }
           }
           return seg_isect_t::C0_EMPTY;
-        } else if (points_sorted.size() == 3) { // .............................................. REMAINING CASES: C1_VERTEX1, CI_VERTEX1          
+        } else if (points_sorted.size() == 3) { // .............................................. REMAINING CASES: C1_VERTEX1, CI_VERTEX1
           pnt_idx_t ipnt1, ipnt2, ipntc;
           if (ilin1pnt1 == ilin2pnt1) {
             ipntc = ilin1pnt1; ipnt1 = ilin1pnt2; ipnt2 = ilin2pnt2;
@@ -638,10 +638,10 @@ namespace mjr {
           } else if (ilin1pnt2 == ilin2pnt2) {
             ipntc = ilin1pnt2; ipnt1 = ilin1pnt1; ipnt2 = ilin2pnt1;
           } else { // Never get here.  Silences compiler warnings.
-            ipntc = 0;         ipnt1 = 0;         ipnt2 = 0; 
+            ipntc = 0;         ipnt1 = 0;         ipnt2 = 0;
           }
-          if (geomi_pts_colinear(ipnt1, ipnt2, ipntc)) { // ..................................... REMAINING CASES: C1_VERTEX1, CI_VERTEX1          
-            if ( (geomi_pnt_line_distance(ipnt1, ipntc, ipnt2, true) < eps) ||  
+          if (geomi_pts_colinear(ipnt1, ipnt2, ipntc)) { // ..................................... REMAINING CASES: C1_VERTEX1, CI_VERTEX1
+            if ( (geomi_pnt_line_distance(ipnt1, ipntc, ipnt2, true) < eps) ||
                  (geomi_pnt_line_distance(ipnt2, ipntc, ipnt1, true) < eps) ) { // .............. REMAINING CASES: CI_VERTEX1
               return seg_isect_t::CI_VERTEX1;
             } else { // ......................................................................... REMAINING CASES: CI_VERTEX1
@@ -665,18 +665,18 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if two line segments intersect in a single point */
       inline bool geomr_seg_isect1(const pnt_t& lin1pnt1, const pnt_t& lin1pnt2, const pnt_t& lin2pnt1, const pnt_t& lin2pnt2) const {
-        uft_t denom = 
-          lin1pnt1[0] * lin2pnt1[1] - lin1pnt1[0] * lin2pnt2[1] - lin1pnt1[1] * lin2pnt1[0] + lin1pnt1[1] * lin2pnt2[0] - 
+        uft_t denom =
+          lin1pnt1[0] * lin2pnt1[1] - lin1pnt1[0] * lin2pnt2[1] - lin1pnt1[1] * lin2pnt1[0] + lin1pnt1[1] * lin2pnt2[0] -
           lin1pnt2[0] * lin2pnt1[1] + lin1pnt2[0] * lin2pnt2[1] + lin1pnt2[1] * lin2pnt1[0] - lin1pnt2[1] * lin2pnt2[0];
         if (std::abs(denom) < eps) // Lines are parallel
           return false;
-        uft_t numera = 
-          lin1pnt1[0]*lin2pnt1[1] - lin1pnt1[0]*lin2pnt2[1] - 
-          lin1pnt1[1]*lin2pnt1[0] + lin1pnt1[1]*lin2pnt2[0] + 
+        uft_t numera =
+          lin1pnt1[0]*lin2pnt1[1] - lin1pnt1[0]*lin2pnt2[1] -
+          lin1pnt1[1]*lin2pnt1[0] + lin1pnt1[1]*lin2pnt2[0] +
           lin2pnt1[0]*lin2pnt2[1] - lin2pnt1[1]*lin2pnt2[0];
-        uft_t numerb = 
-          -(lin1pnt1[0]*lin1pnt2[1] - lin1pnt1[0]*lin2pnt1[1] - 
-            lin1pnt1[1]*lin1pnt2[0] + lin1pnt1[1]*lin2pnt1[0] + 
+        uft_t numerb =
+          -(lin1pnt1[0]*lin1pnt2[1] - lin1pnt1[0]*lin2pnt1[1] -
+            lin1pnt1[1]*lin1pnt2[0] + lin1pnt1[1]*lin2pnt1[0] +
             lin1pnt2[0]*lin2pnt1[1] - lin1pnt2[1]*lin2pnt1[0]);
         uft_t ua = numera/denom;
         uft_t ub = numerb/denom;
@@ -689,7 +689,7 @@ namespace mjr {
           return false;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Distance between a point and a line. 
+      /** Distance between a point and a line.
           See: geomr_pnt_line_distance(). */
       inline uft_t geomi_pnt_line_distance(pnt_idx_t ilinpnt1, pnt_idx_t ilinpnt2, pnt_idx_t ipnt, bool seg_distance) const {
         return geomr_pnt_line_distance(get_pnt(ilinpnt1), get_pnt(ilinpnt2), get_pnt(ipnt), seg_distance);
@@ -744,11 +744,11 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the distance between a point and a triangle */
       inline uft_t geomr_pnt_tri_distance(const pnt_t& tripnt1, const pnt_t& tripnt2, const pnt_t& tripnt3, const pnt_t& pnt) const {
-        //  MJR TODO NOTE <2024-07-22T15:48:31-0500> geomr_pnt_tri_distance: UNTESTED! UNTESTED! UNTESTED! UNTESTED! UNTESTED! 
+        //  MJR TODO NOTE <2024-07-22T15:48:31-0500> geomr_pnt_tri_distance: UNTESTED! UNTESTED! UNTESTED! UNTESTED! UNTESTED!
         pnt_t basisv1 = vec3_diff(tripnt1, tripnt2);  // basis vectors for pln containing triagnel
         pnt_t basisv2 = vec3_diff(tripnt3, tripnt2);  // basis vectors for pln containing triagnel
         pnt_t normal = vec3_cross_product(basisv1, basisv2); // normal vector for tri. ax+by+cz+d=0, a=normal[0], b=normal[1], c=normal[2]
-        vec3_unitize(normal); 
+        vec3_unitize(normal);
         uft_t d = -vec3_dot_product(normal, tripnt2);            // ax+by+cz+d=0
         uft_t lambda = vec3_dot_product(normal, pnt) + d;
         pnt_t q = vec3_diff(vec3_linear_combination(1.0, pnt, lambda, normal), tripnt2); // q is the point in the plane closest to pnt
@@ -899,12 +899,12 @@ namespace mjr {
       /** Unique cell list. */
       uniq_cell_lst_t uniq_cell_lst;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** True if the last cell given to the add_cell() method was new -- i.e. not on the master cell list. 
-          Only updated if uniq_cells is true.  Value is invalid if last_cell_stat is NOT cell_stat_t::GOOD. 
+      /** True if the last cell given to the add_cell() method was new -- i.e. not on the master cell list.
+          Only updated if uniq_cells is true.  Value is invalid if last_cell_stat is NOT cell_stat_t::GOOD.
           See: last_cell_added_was_new() */
       bool last_cell_new = true;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Status of the last cell added via add_cell() method. 
+      /** Status of the last cell added via add_cell() method.
           Only updated if (chk_cell_vertexes || chk_cell_dimension | chk_cell_edges) is true. See: status_of_last_cell_added() */
       cell_stat_t last_cell_stat = cell_stat_t::GOOD;
       //@}
@@ -950,19 +950,19 @@ namespace mjr {
                                                                    {4}},                             // Pyramid: Tip vertex
                                                                   {{0},{1},{2},{3},                  // Hexahedron: Back vertexes
                                                                    {4},{5},{6},{7}}},                // Hexahedron: Front vertexes
-                                                                 {{},                                // vertex      
-                                                                  {{0,1}},                           // segment     
-                                                                  {{0,1},{1,2},{2,0}},               // triangle    
-                                                                  {{0,1},{1,2},{2,3},{3,0}},         // Quad        
+                                                                 {{},                                // vertex
+                                                                  {{0,1}},                           // segment
+                                                                  {{0,1},{1,2},{2,0}},               // triangle
+                                                                  {{0,1},{1,2},{2,3},{3,0}},         // Quad
                                                                   {{0,1},{1,2},{2,3},{3,0},          // Pyramid: Base segments
                                                                    {0,4},{1,4},{2,4},{3,4}},         // Pyramid: Side sets
                                                                   {{0,1},{1,2},{2,3},{3,0},          // Hexahedron: Back segments
                                                                    {4,5},{5,6},{6,7},{7,4},          // Hexahedron: Front segments
                                                                    {0,4},{1,5},{2,6},{3,7}}},        // Hexahedron: Back to front segments
-                                                                 {{},                                // vertex      
-                                                                  {},                                // segment     
-                                                                  {{0,1,2}},                         // triangle    
-                                                                  {{0,1,2,3}},                       // Quad        
+                                                                 {{},                                // vertex
+                                                                  {},                                // segment
+                                                                  {{0,1,2}},                         // triangle
+                                                                  {{0,1,2,3}},                       // Quad
                                                                   {{0,1,2,3},                        // Pyramid: Base face
                                                                    {0,1,4},                          // Pyramid: Back face
                                                                    {1,2,4},                          // Pyramid: Left face
@@ -974,10 +974,10 @@ namespace mjr {
                                                                    {2,3,7,6},                        // Hexahedron: Top face
                                                                    {1,2,6,5},                        // Hexahedron: Right face
                                                                    {0,1,4,5}}},                      // Hexahedron: Bottom face
-                                                                 {{},                                // vertex      
-                                                                  {},                                // segment     
-                                                                  {},                                // triangle    
-                                                                  {},                                // Quad        
+                                                                 {{},                                // vertex
+                                                                  {},                                // segment
+                                                                  {},                                // triangle
+                                                                  {},                                // Quad
                                                                   {{0,1,2,3,4}},                     // Pyramid
                                                                   {{0,1,2,3,4,5,6,7}}}};             // Hexahedron
         return (cst[dimension][idx]);
@@ -1035,7 +1035,7 @@ namespace mjr {
           case cell_type_t::HEXAHEDRON:  return ("HEXAHEDRON"); break;
           case cell_type_t::PYRAMID:     return ("PYRAMID"   ); break;
         }
-        return ""; // Never get here.  
+        return ""; // Never get here.
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Convert number of points in a cell to cell_type_t. */
@@ -1102,15 +1102,15 @@ namespace mjr {
           std::set<pnt_idx_t> a_cell_pnt_sorted;
           for(pnt_idx_t pnt_idx: a_cell) {
             if (a_cell_pnt_sorted.contains(pnt_idx))
-              return cell_stat_t::DUP_PNT;          
+              return cell_stat_t::DUP_PNT;
             a_cell_pnt_sorted.insert(pnt_idx);
           }
         }
         // Return GOOD
-        return cell_stat_t::GOOD;          
+        return cell_stat_t::GOOD;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Perform cell dimension (2D cells must not be colinear & 3D cells must not be coplainer) 
+      /** Perform cell dimension (2D cells must not be colinear & 3D cells must not be coplainer)
 
           @warning This function assumes that check_cell_vertexes() would have returned GOOD for the cell being checked!
 
@@ -1132,20 +1132,20 @@ namespace mjr {
           if ( geomi_pts_coplanar(a_cell))
             return cell_stat_t::DIM_LOW;
         }
-        return cell_stat_t::GOOD;          
+        return cell_stat_t::GOOD;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Checks that cell edges have expected intersections.
 
           Checks that every pair of cell edges has the correct intersection type (i.e. intersect in a single vertex or an empty intersection).  If a bad
-          intersection is detected, then a cell_stat_t of cell_stat_t::BAD_EDGEI will be returned.  Otherwise cell_stat_t::GOOD will be returned.  
+          intersection is detected, then a cell_stat_t of cell_stat_t::BAD_EDGEI will be returned.  Otherwise cell_stat_t::GOOD will be returned.
 
           @warning This function assumes that check_cell_vertexes() would have returned GOOD for the cell being checked!
 
           Note that this function will detect some conditions caught by other checks.  For example, this function will return cell_stat_t::BAD_EDGEI for
           cell_type_t::SEG cells for which check_cell_dimension() returns cell_stat_t::DUP_PNT.  Note the cell_stat_t values are different depending upon which
           check function is called.
-          
+
           @param cell_type The type for a_cell.
           @param a_cell    The cell to test.  */
       inline cell_stat_t check_cell_edge_intersections(cell_type_t cell_type, cell_t a_cell) const {
@@ -1164,7 +1164,7 @@ namespace mjr {
                 if (it != seg_isect_t::C0_EMPTY)
                   return cell_stat_t::BAD_EDGEI;
               } else if(points_sorted.size() == 3) {
-                if (it != seg_isect_t::C1_VERTEX1) 
+                if (it != seg_isect_t::C1_VERTEX1)
                   return cell_stat_t::BAD_EDGEI;
               } else {
                 return cell_stat_t::BAD_EDGEI;
@@ -1172,11 +1172,11 @@ namespace mjr {
             }
           }
         }
-        return cell_stat_t::GOOD;          
+        return cell_stat_t::GOOD;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Checks that cell faces have expected intersections.
-          
+
           @param cell_type The type for a_cell.
           @param a_cell    The cell to test.  */
       inline cell_stat_t check_cell_face_intersections(cell_type_t cell_type, cell_t a_cell) const {
@@ -1188,7 +1188,7 @@ namespace mjr {
           if ( geomi_pts_coplanar(a_cell))
             return cell_stat_t::DIM_LOW;
         }
-        return cell_stat_t::GOOD;          
+        return cell_stat_t::GOOD;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if the vertexes of a cell are coplainer.
@@ -1206,16 +1206,16 @@ namespace mjr {
         const cell_structure_t& face_structures = cell_type_to_structure(cell_type, 2);
         for(auto face_structure: face_structures) {
           cell_t face;
-          for(auto idx: face_structure) 
+          for(auto idx: face_structure)
             face.push_back(a_cell[idx]);
           // std::cout << "[ ";
-          // for(auto v: face) 
+          // for(auto v: face)
           //   std::cout << v << " ";
           // std::cout << "]" << std::endl;
           if ( !(geomi_pts_coplanar(face)))
             return cell_stat_t::FACE_BENT;
         }
-        return cell_stat_t::GOOD;             
+        return cell_stat_t::GOOD;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Add parts of a cell of the specified dimension.
@@ -1227,7 +1227,7 @@ namespace mjr {
           Example 3: a valid cell_type_t::PYRAMID cell added wth dimension == 1 results in 8 cell_type_t::SEG cells added
 
           @param cell_type The type of cell to add.
-          @param new_cell  The cell to add. 
+          @param new_cell  The cell to add.
           @param dimension The dimension of the parts to add.
           @return Number of cells added */
       inline int add_cell(cell_type_t cell_type, cell_t new_cell, int dimension) {
@@ -1239,7 +1239,7 @@ namespace mjr {
           const cell_structure_t& cell_parts = cell_type_to_structure(cell_type, dimension);
           for(auto cell_part: cell_parts) {
             cell_t newer_cell;
-            for(auto idx: cell_part) 
+            for(auto idx: cell_part)
               newer_cell.push_back(new_cell[idx]);
             if (add_cell(req_pt_cnt_to_cell_type(newer_cell.size()), newer_cell))
               num_added++;
@@ -1250,7 +1250,7 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Add a cell
           @param cell_type The type of cell to add.
-          @param new_cell  The cell to add. 
+          @param new_cell  The cell to add.
           @return A boolean indicateing success
           @retval true  The cell was added or had been added previously
           @retval false The cell could not be added (because of a failed geometric check) */
@@ -1273,7 +1273,7 @@ namespace mjr {
           if (cell_stat_is_bad(last_cell_stat))
             return false;
         }
-        // Geom was good or we didn't need to check.  
+        // Geom was good or we didn't need to check.
         if constexpr (uniq_cells) {
           cell_t sorted_cell = new_cell;
           std::sort(sorted_cell.begin(), sorted_cell.end());
@@ -1290,7 +1290,7 @@ namespace mjr {
         return true;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Print all cells to STDOUT. 
+      /** Print all cells to STDOUT.
           @param max_num_print Maximum number of cells to print.  Use 0 to print all cells. */
       void print_all_cells(int max_num_print) const {
         int num_printed = 0;
@@ -1313,7 +1313,7 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Retruns the status of the last cell given to the add_cell() method.
-          If (chk_cell_vertexes || chk_cell_dimension | chk_cell_edges) is true, this value is updated each time add_cell() is called.  
+          If (chk_cell_vertexes || chk_cell_dimension | chk_cell_edges) is true, this value is updated each time add_cell() is called.
           Otherwise its value is always cell_stat_t::GOOD. */
       inline cell_stat_t status_of_last_cell_added() const {
         return last_cell_stat;
@@ -1347,7 +1347,7 @@ namespace mjr {
           @param file_name   The name of the output file
           @param description This is included as a file comment at the start of the file.
           @return 0 if everything worked, and non-zero otherwise */
-      io_result write_xml_vtk(std::string file_name, std::string description) { 
+      io_result write_xml_vtk(std::string file_name, std::string description) {
         /* Check that we have data */
         if (num_points() <= 0) {
           std::cout << "ERROR(write_xml_vtk): No points!" << std::endl;
@@ -1372,10 +1372,10 @@ namespace mjr {
         out_stream << "    <Piece NumberOfPoints='" << num_points() << "' NumberOfCells='" << num_cells() << "'>" << std::endl;
         if ( !(data_name_to_data_idx_lst.empty())) {
           std::string scalars_attr_value, vectors_attr_value, normals_attr_value;
-          for (auto& kv : data_name_to_data_idx_lst) 
-            if (kv.second.size()==1) 
+          for (auto& kv : data_name_to_data_idx_lst)
+            if (kv.second.size()==1)
               scalars_attr_value += (scalars_attr_value.empty() ? "" : " ") + kv.first;
-            else 
+            else
               if (kv.first == "NORMALS")
                 normals_attr_value = "NORMALS";
               else
@@ -1435,7 +1435,7 @@ namespace mjr {
         out_stream << "    </Piece>" << std::endl;
         out_stream << "  </UnstructuredGrid>" << std::endl;
         out_stream << "</VTKFile>" << std::endl;
-        
+
         /* Final newline */
         out_stream << std::endl;
         out_stream.close();
@@ -1450,7 +1450,7 @@ namespace mjr {
           @param file_name   The name of the output file
           @param description This is the file description.
           @return 0 if everything worked, and non-zero otherwise */
-      io_result write_legacy_vtk(std::string file_name, std::string description) { 
+      io_result write_legacy_vtk(std::string file_name, std::string description) {
         /* Check that we have data */
         if (num_points() <= 0) {
           std::cout << "ERROR(write_legacy_vtk): No points!" << std::endl;
@@ -1476,14 +1476,14 @@ namespace mjr {
         out_stream << "DATASET UNSTRUCTURED_GRID" << std::endl;
         /* Dump the points */
         out_stream << "POINTS " << num_points() << " double" << std::endl;
-        //for (const auto& pnt : pnt_idx_to_pnt) 
+        //for (const auto& pnt : pnt_idx_to_pnt)
         for(pnt_idx_t pnt_idx=0; pnt_idx<static_cast<pnt_idx_t>(pnt_idx_to_pnt_data.size()); pnt_idx++) {
           pnt_t pnt = get_pnt(pnt_idx);
           out_stream << std::setprecision(10) << pnt[0] << " " << pnt[1] << " " << pnt[2] << std::endl;
         }
         /* Dump the cell data */
         std::vector<int>::size_type total_cells_ints = 0;
-        for(auto& cell: cell_lst) 
+        for(auto& cell: cell_lst)
           total_cells_ints += (1+cell.size());
         out_stream << "CELLS " << num_cells() << " " << total_cells_ints << std::endl;
         for(auto& poly: cell_lst) {
@@ -1535,7 +1535,7 @@ namespace mjr {
         return 0;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Dump object to STDOUT. 
+      /** Dump object to STDOUT.
 
           @param max_num_print Maximum number of points/cells to print.  Use 0 to print all points/cells. */
       void dump_cplx(int max_num_print) const {
@@ -1558,7 +1558,7 @@ namespace mjr {
           @param file_name   The name of the output file
           @param description For legacy files, this is the file description.  For XML files this is included as a file comment at the start of the file.
           @return 0 if everything worked, and non-zero otherwise */
-      io_result write_ply(std::string file_name, std::string description) { 
+      io_result write_ply(std::string file_name, std::string description) {
         /* Check that we have data */
         if (num_points() <= 0) {
           std::cout << "ERROR(write_ply): No points!" << std::endl;
@@ -1647,17 +1647,17 @@ namespace mjr {
         return (std::isnan(test_pnt[0]) || std::isnan(test_pnt[1]) || std::isnan(test_pnt[2]));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Return 0 if point is close to the level, -1 if it is below the level, and 1 if it is above the level. 
-          @param test_pnt      The point to test 
+      /** Return 0 if point is close to the level, -1 if it is below the level, and 1 if it is above the level.
+          @param test_pnt      The point to test
           @param axis_index    Which axis to compare to the level
           @param level         Level to test aginst
           @param close_epsilon Epsilon used to check for "closeness". */
       inline int pnt_vs_level(const pnt_t& test_pnt, int axis_index, uft_t level, uft_t close_epsilon=epsilon) {
-        if (std::abs(test_pnt[axis_index]-level) < close_epsilon) 
+        if (std::abs(test_pnt[axis_index]-level) < close_epsilon)
           return 0;
         else if(test_pnt[axis_index] < level)
           return -1;
-        else 
+        else
           return 1;
       }
       //@}
@@ -1681,7 +1681,7 @@ namespace mjr {
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Function that takes and returns a pnt_data_t */
-      typedef std::function<pnt_data_t(const pnt_data_t&)> p2data_func_t; 
+      typedef std::function<pnt_data_t(const pnt_data_t&)> p2data_func_t;
       typedef std::function<uft_t(const pnt_data_t&)>      p2real_func_t;
       typedef std::function<bool(const pnt_data_t&)>       p2bool_func_t;
       typedef std::function<bool(const cell_t&)>           c2bool_func_t;
@@ -1692,7 +1692,7 @@ namespace mjr {
       int cull_cells(c2bool_func_t func) {
         int idx_last_good = -1;
         int start_size = num_cells();
-        for(int i=0; i<start_size; i++) 
+        for(int i=0; i<start_size; i++)
           if ( !(func(cell_lst[i]))) {
             idx_last_good++;
             if (idx_last_good != i)
@@ -1703,7 +1703,7 @@ namespace mjr {
         return (start_size-num_cells());
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Add new cells with points from existing cells with the given coordinates negated. 
+      /** Add new cells with points from existing cells with the given coordinates negated.
 
           When zero_epsilon is positive, some existing points may be adjusted such that components on the flipped axis near zero will become zero.  When
           uniq_points is true, both the original point coordinates and the new point coordinates will be mapped to the same point index -- that is to say if
@@ -1725,13 +1725,13 @@ namespace mjr {
             pnt_idx_to_pnt_data[pidx] = od;
             pnt_t new_old_pnt = get_dataset_vector(data_to_pnt, od);
             if constexpr (uniq_points) {
-              if (pnt_to_pnt_idx_map.contains(new_old_pnt)) 
-                if (pnt_to_pnt_idx_map[new_old_pnt] != pidx) 
+              if (pnt_to_pnt_idx_map.contains(new_old_pnt))
+                if (pnt_to_pnt_idx_map[new_old_pnt] != pidx)
                   std::cout << "ERROR(mirror): Collapse caused collision!" << std::endl;
               pnt_to_pnt_idx_map[new_old_pnt] = pidx;
             }
             pnt_data_t nd = od;
-            for(int flip_list_idx=0; flip_list_idx<static_cast<int>(flip_list.size()); ++flip_list_idx) 
+            for(int flip_list_idx=0; flip_list_idx<static_cast<int>(flip_list.size()); ++flip_list_idx)
               if (flip_list[flip_list_idx])
                 nd[flip_list_idx] = -nd[flip_list_idx];
             pnt_idx_t p = add_point(nd);
@@ -1852,10 +1852,10 @@ namespace mjr {
             const std::vector<std::array<int, 3>> pmat { {0, 1, 2}, {1, 2, 0}, {2, 0, 1}};
             std::array<int, 3> p;
             if ((zero_cnt == 0) && (plus_cnt > 0) && (negv_cnt >0)) { // three triangles
-              if (plus_cnt == 1) 
+              if (plus_cnt == 1)
                 p = pmat[plus_loc];
-              else 
-                p = pmat[negv_loc];              
+              else
+                p = pmat[negv_loc];
               auto orgv0 = cur_cell[p[0]];
               auto orgv1 = cur_cell[p[1]];
               auto orgv2 = cur_cell[p[2]];

@@ -194,7 +194,7 @@ namespace mjr {
             cc_pnt_idx_t cn0_pnti = add_point_and_data_from_tree(ccplx, rtree, corners[0]);
             cc_pnt_idx_t cn1_pnti = add_point_and_data_from_tree(ccplx, rtree, corners[1]);
             if (func) { // We have a func, so we can "heal" broken edges.
-              if (ctr_pnti < 0) { // Center: Broken. Left: 
+              if (ctr_pnti < 0) { // Center: Broken. Left:
                 if(cn0_pnti >= 0) { // Center: Broken.  Left: Good.
                   cc_pnt_idx_t np = nan_edge_solver(ccplx, rtree, cn0_pnti, corners[0], cell, func);
                   ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {cn0_pnti, np}, output_dimension);
@@ -327,7 +327,7 @@ namespace mjr {
                 }
               }
             }
-          }            
+          }
         } else { // if (rtree.domain_dimension > 3) {
           std::cout << "ERROR: construct_geometry_fans: output_dimension>3 not supported for output_dimension>0!" << std::endl;
           return 1;
