@@ -52,14 +52,12 @@ Copyright \copy {{{time(%Y)}}} Mitch Richling. All rights reserved.
          - cell aspect ratio
          - cell width
      - Tree To Complex Related
-       - Adapters & interfaces for cell complex edge solvers
+       - Adapters & interfaces for cell complex edge solvers (*WIP*)
      - Cell Complex
        - Edge Solvers
-         - SDF
-         - Level
-         - Predicate
+         - SDF (*WIP*)
+         - Level (*WIP*)
        - Cell Manipulation
-         - Fold segment cells
          - Fat Fold segment cells
          - Fat Fold triangle cells
          - Refine a triangle cell by adding a single interior point
@@ -68,23 +66,23 @@ Copyright \copy {{{time(%Y)}}} Mitch Richling. All rights reserved.
          - Add cells from another cell complex
          - Extract level complex and store in another cell complex
      - Function Examples
-       - Demonstrate "cropping" z-axis plot range with crop plane & edge solver
        - Demonstrate edge solver & SDF to extract level curve with a large grid step size
        - Demonstrate how to insert multiple trees into one cell complex (and glue them together?)
      - External Interfaces (listed in no particular order)
        - Julia
        - Ruby
        - Maple
-       - Consider Fortran (Might just do MR_rect_tree)
-       - Consider Octave/Matlab
-       - Consider Python
-     - File export
-       - Consider direct POV-Ray
-       - Consider direct VTK image/voxel (rectilinear grid)
-     - MRaster integration
-       - Color schemes
-       - Image generation 
-       - Image I/O
+       - /Consider/ Fortran (Might just do MR_rect_tree)
+       - /Consider/ Octave/Matlab
+       - /Consider/ Python
+     - /Consider/ Additional file export
+       - /Consider/ direct POV-Ray
+       - /Consider/ direct VTK image/voxel (rectilinear grid)
+     - /Consider/ MRaster integration
+       - /Consider/ color schemes
+       - /Consider/ image generation 
+       - /Consider/ image output
+     - Add MSVC Support 
 
 * Raw TODO Comments From Source Code
 
@@ -94,18 +92,16 @@ date; grep -n 'MJR TODO NOTE' ../lib/*.hpp ../examples/*.cpp ../utests/*.cpp ../
 
 #+RESULTS:
 #+begin_example
-Wed Aug  7 15:47:27 CDT 2024
-lib/MR_cell_cplx.hpp  553   <2024-07-22T15:48:31-0500> vec3_det3: UNTESTED! UNTESTED! UNTESTED! UNTESTED! 
+Thu Aug  8 15:31:01 CDT 2024
+lib/MR_cell_cplx.hpp  553   <2024-07-22T15:48:31-0500> vec3_det3: UNTESTED! UNTESTED! UNTESTED! UNTESTED!
 lib/MR_cell_cplx.hpp  599   <2024-08-02T09:41:48-0500> geomi_seg_isect_type: Repeated point look-up slows things down
 lib/MR_cell_cplx.hpp  600   <2024-08-02T09:41:48-0500> geomi_seg_isect_type: Add unit tests for each code branch
 lib/MR_cell_cplx.hpp  717   <2024-08-02T09:42:19-0500> geomr_pnt_line_distance: check logic -- dp1>segd || dp2>segd?
-lib/MR_cell_cplx.hpp  747   <2024-07-22T15:48:31-0500> geomr_pnt_tri_distance: UNTESTED! UNTESTED! UNTESTED! UNTESTED! UNTESTED! 
+lib/MR_cell_cplx.hpp  747   <2024-07-22T15:48:31-0500> geomr_pnt_tri_distance: UNTESTED! UNTESTED! UNTESTED! UNTESTED! UNTESTED!
 lib/MR_cell_cplx.hpp  817   <2024-07-11T16:08:16-0500> geomr_seg_tri_intersection: implement
 lib/MR_cell_cplx.hpp  818   <2024-07-11T16:08:27-0500> geomr_seg_tri_intersection: Should this be a bool or an enum?
 lib/MR_cell_cplx.hpp  928   <2024-07-11T16:06:42-0500> cell_type_to_structure: make sure polygons are all oriented correctly
 lib/MR_cell_cplx.hpp  1183  <2024-08-02T09:42:38-0500> check_cell_face_intersections: Implement
-lib/MR_cell_cplx.hpp  1829  <2024-08-06T12:38:33-0500> triangle_folder: Implement!
-lib/MR_rect_tree.hpp  640   <2024-07-11T11:50:36-0500> cuc_two_cross: If diti is close to an corner, some result points may be out of range.
-lib/MR_rect_tree.hpp  1354  <2024-07-11T16:04:10-0500> cell_is_unbalanced: Optimize run time (nix the use of get_smallest_neighbor_level)
-lib/MR_rt_to_cc.hpp   305   <2024-08-05T12:35:37-0500> construct_geometry_fans: Fix pyramid base vertex order!
+lib/MR_rect_tree.hpp  644   <2024-07-11T11:50:36-0500> cuc_two_cross: If diti is close to an corner, some result points may be out of range.
+lib/MR_rect_tree.hpp  1358  <2024-07-11T16:04:10-0500> cell_is_unbalanced: Optimize run time (nix the use of get_smallest_neighbor_level)
 #+end_example

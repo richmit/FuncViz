@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-08-07 Wed 15:47 -->
+<!-- 2024-08-08 Thu 15:42 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Development Roadmap</title>
@@ -231,12 +231,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-08-07 15:47:28</i></td>
+<td class="org-left"><i>2024-08-08 15:31:42</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-08-07 15:47:29</i></td>
+<td class="org-left"><i>2024-08-08 15:42:15</i></td>
 </tr>
 </tbody>
 </table>
@@ -248,14 +248,14 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org3549a06">1. High Level Future Development Plans (TODO)</a></li>
-<li><a href="#org4ca1058">2. Raw TODO Comments From Source Code</a></li>
+<li><a href="#org24f6aad">1. High Level Future Development Plans (TODO)</a></li>
+<li><a href="#orgd77cca8">2. Raw TODO Comments From Source Code</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org3549a06" class="outline-2">
-<h2 id="org3549a06"><span class="section-number-2">1.</span> High Level Future Development Plans (TODO)</h2>
+<div id="outline-container-org24f6aad" class="outline-2">
+<h2 id="org24f6aad"><span class="section-number-2">1.</span> High Level Future Development Plans (TODO)</h2>
 <div class="outline-text-2" id="text-1">
 <ul class="org-ul">
 <li>Tree Related
@@ -269,19 +269,17 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 </ul></li>
 <li>Tree To Complex Related
 <ul class="org-ul">
-<li>Adapters &amp; interfaces for cell complex edge solvers</li>
+<li>Adapters &amp; interfaces for cell complex edge solvers (<b>WIP</b>)</li>
 </ul></li>
 <li>Cell Complex
 <ul class="org-ul">
 <li>Edge Solvers
 <ul class="org-ul">
-<li>SDF</li>
-<li>Level</li>
-<li>Predicate</li>
+<li>SDF (<b>WIP</b>)</li>
+<li>Level (<b>WIP</b>)</li>
 </ul></li>
 <li>Cell Manipulation
 <ul class="org-ul">
-<li>Fold segment cells</li>
 <li>Fat Fold segment cells</li>
 <li>Fat Fold triangle cells</li>
 <li>Refine a triangle cell by adding a single interior point</li>
@@ -295,7 +293,6 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 </ul></li>
 <li>Function Examples
 <ul class="org-ul">
-<li>Demonstrate "cropping" z-axis plot range with crop plane &amp; edge solver</li>
 <li>Demonstrate edge solver &amp; SDF to extract level curve with a large grid step size</li>
 <li>Demonstrate how to insert multiple trees into one cell complex (and glue them together?)</li>
 </ul></li>
@@ -304,43 +301,42 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <li>Julia</li>
 <li>Ruby</li>
 <li>Maple</li>
-<li>Consider Fortran (Might just do MR_rect_tree)</li>
-<li>Consider Octave/Matlab</li>
-<li>Consider Python</li>
+<li><i>Consider</i> Fortran (Might just do MR_rect_tree)</li>
+<li><i>Consider</i> Octave/Matlab</li>
+<li><i>Consider</i> Python</li>
 </ul></li>
-<li>File export
+<li><i>Consider</i> Additional file export
 <ul class="org-ul">
-<li>Consider direct POV-Ray</li>
-<li>Consider direct VTK image/voxel (rectilinear grid)</li>
+<li><i>Consider</i> direct POV-Ray</li>
+<li><i>Consider</i> direct VTK image/voxel (rectilinear grid)</li>
 </ul></li>
-<li>MRaster integration
+<li><i>Consider</i> MRaster integration
 <ul class="org-ul">
-<li>Color schemes</li>
-<li>Image generation</li>
-<li>Image I/O</li>
+<li><i>Consider</i> color schemes</li>
+<li><i>Consider</i> image generation</li>
+<li><i>Consider</i> image output</li>
 </ul></li>
+<li>Add MSVC Support</li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org4ca1058" class="outline-2">
-<h2 id="org4ca1058"><span class="section-number-2">2.</span> Raw TODO Comments From Source Code</h2>
+<div id="outline-container-orgd77cca8" class="outline-2">
+<h2 id="orgd77cca8"><span class="section-number-2">2.</span> Raw TODO Comments From Source Code</h2>
 <div class="outline-text-2" id="text-2">
-<pre class="example" id="orgfd2b779">
-Wed Aug  7 15:47:27 CDT 2024
-lib/MR_cell_cplx.hpp  553   &lt;2024-07-22T15:48:31-0500&gt; vec3_det3: UNTESTED! UNTESTED! UNTESTED! UNTESTED! 
+<pre class="example" id="org1d23866">
+Thu Aug  8 15:31:01 CDT 2024
+lib/MR_cell_cplx.hpp  553   &lt;2024-07-22T15:48:31-0500&gt; vec3_det3: UNTESTED! UNTESTED! UNTESTED! UNTESTED!
 lib/MR_cell_cplx.hpp  599   &lt;2024-08-02T09:41:48-0500&gt; geomi_seg_isect_type: Repeated point look-up slows things down
 lib/MR_cell_cplx.hpp  600   &lt;2024-08-02T09:41:48-0500&gt; geomi_seg_isect_type: Add unit tests for each code branch
 lib/MR_cell_cplx.hpp  717   &lt;2024-08-02T09:42:19-0500&gt; geomr_pnt_line_distance: check logic -- dp1&gt;segd || dp2&gt;segd?
-lib/MR_cell_cplx.hpp  747   &lt;2024-07-22T15:48:31-0500&gt; geomr_pnt_tri_distance: UNTESTED! UNTESTED! UNTESTED! UNTESTED! UNTESTED! 
+lib/MR_cell_cplx.hpp  747   &lt;2024-07-22T15:48:31-0500&gt; geomr_pnt_tri_distance: UNTESTED! UNTESTED! UNTESTED! UNTESTED! UNTESTED!
 lib/MR_cell_cplx.hpp  817   &lt;2024-07-11T16:08:16-0500&gt; geomr_seg_tri_intersection: implement
 lib/MR_cell_cplx.hpp  818   &lt;2024-07-11T16:08:27-0500&gt; geomr_seg_tri_intersection: Should this be a bool or an enum?
 lib/MR_cell_cplx.hpp  928   &lt;2024-07-11T16:06:42-0500&gt; cell_type_to_structure: make sure polygons are all oriented correctly
 lib/MR_cell_cplx.hpp  1183  &lt;2024-08-02T09:42:38-0500&gt; check_cell_face_intersections: Implement
-lib/MR_cell_cplx.hpp  1829  &lt;2024-08-06T12:38:33-0500&gt; triangle_folder: Implement!
-lib/MR_rect_tree.hpp  640   &lt;2024-07-11T11:50:36-0500&gt; cuc_two_cross: If diti is close to an corner, some result points may be out of range.
-lib/MR_rect_tree.hpp  1354  &lt;2024-07-11T16:04:10-0500&gt; cell_is_unbalanced: Optimize run time (nix the use of get_smallest_neighbor_level)
-lib/MR_rt_to_cc.hpp   305   &lt;2024-08-05T12:35:37-0500&gt; construct_geometry_fans: Fix pyramid base vertex order!
+lib/MR_rect_tree.hpp  644   &lt;2024-07-11T11:50:36-0500&gt; cuc_two_cross: If diti is close to an corner, some result points may be out of range.
+lib/MR_rect_tree.hpp  1358  &lt;2024-07-11T16:04:10-0500&gt; cell_is_unbalanced: Optimize run time (nix the use of get_smallest_neighbor_level)
 </pre>
 </div>
 </div>

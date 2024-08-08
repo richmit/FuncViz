@@ -302,7 +302,6 @@ namespace mjr {
             }
           }
         } else if (rtree.domain_dimension == 3) {
-          //  MJR TODO NOTE <2024-08-05T12:35:37-0500> construct_geometry_fans: Fix pyramid base vertex order!
           for(auto& cell: cells) {
             cc_pnt_idx_list_t new_cell(5);
             new_cell[4] = add_point_and_data_from_tree(ccplx, rtree, cell);

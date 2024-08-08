@@ -7,13 +7,8 @@ About half of planned functionality is implemented. Unit test coverage is less t
 
 *The exposed API is in flux.*
 
-Items below for which I have not yet started working are marked (*TBD*).
-
-The source code files document numerous TODO items.
-
 *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING*
 *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING*
-
 
 * =MRPTree= (MR 2^P Tree)
 
