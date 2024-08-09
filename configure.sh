@@ -47,9 +47,10 @@ if [[ "${@}" == *'-h'* ]]; then
        - -G Ninja
      * Compiler -- leave it off to get the default
        - -DCMAKE_CXX_COMPILER=clang++
-       - -DCMAKE_CXX_COMPILER=g++      <-- Default on MSYS2
-       - -DCMAKE_CXX_COMPILER=g++-14   <-- Default on Linux if /usr/bin/g++-14 exists
-       - -DCMAKE_CXX_COMPILER=g++      <-- Default on Linux if g++-14 wasn't found
+       - -DCMAKE_CXX_COMPILER=g++      <-- Default for 'MSYS Makefiles'
+       - -DCMAKE_CXX_COMPILER=g++-14   <-- Default for 'Unix Makefiles' if /usr/bin/g++-14 exists
+       - -DCMAKE_CXX_COMPILER=g++      <-- Default for 'Unix Makefiles' if /usr/bin/g++-14 missing
+       -                               <-- Default for 'Visual Studio 17 2022'
      * Optional features -- leave them off to enable everything
        - -DO_DOXYGEN=[YES|NO]  -- For documentation
        - -DO_BTEST=[YES|NO]    -- Used for BOOT unit tests
