@@ -1,0 +1,6 @@
+Mathematica
+version: 12.0
+
+
+Plot3D[If[x^2 + y^2 < 1, 1, 0], {x, -1.5, 1.5}, {y, -1.5, 1.5}] 
+

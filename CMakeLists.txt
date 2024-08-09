@@ -34,7 +34,7 @@ endif()
 
 
 set(TARGETS_EXAMPLE "hello_world" 
-                    "surface_with_normals" "surface_plot_edge" "surface_branch_glue" "surface_plot_corner"
+                    "surface_with_normals" "surface_plot_edge" "surface_branch_glue" "surface_plot_corner" "surface_plot_step"
                     "parametric_surface_with_defects" "performance_with_large_surface" "trefoil" 
                     "parametric_curve_3d"
                     "implicit_surface" 

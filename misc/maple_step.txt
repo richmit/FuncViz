@@ -1,0 +1,6 @@
+Maple
+Version: 2024.1
+ Build: 1835466
+
+
+plot3d(ifelse(x^2+y^2<1,1,0), x=-1.5..1.5, y=-1.5..1.5,scaling=constrained);

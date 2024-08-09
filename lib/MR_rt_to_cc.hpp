@@ -67,6 +67,7 @@ namespace mjr {
       typedef typename cc_t::pnt_data_t        cc_pnt_data_t;
       typedef typename cc_t::pnt_idx_list_t    cc_pnt_idx_list_t;
       typedef typename cc_t::pnt_idx_t         cc_pnt_idx_t;
+      typedef typename cc_t::cell_t            cc_cell_t;
       typedef typename cc_t::uft_t             cc_uft_t;
       typedef typename rt_t::diti_list_t       rt_diti_list_t;
       typedef typename rt_t::diti_t            rt_diti_t;
@@ -570,6 +571,17 @@ namespace mjr {
       inline static int rt_ran_idx_to_pd_idx(int tree_range_index) {
         return (tree_range_index + rt_t::domain_dimension);
       }
+
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Drop cells from a MR_cell_cplx object using an MR_rect_tree domain SDF function.
+       */
+      inline static int cull_cc_cells_on_domain_sdf_boundry(cc_t&               ccplx,
+                                              //const rt_t&         rtree,
+                                              rt_drpt2real_func_t sdf_func) {
+        return ccplx.cull_cells([&ccplx, &sdf_func](cc_cell_t c) { return ccplx.cell_on_sdf_boundry(c, [&sdf_func](cc_pnt_data_t pd) { return (tsdf_to_csdf(sdf_func, pd)); }); });
+      }
+
+
       //@}
   };
 }

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-08-08 Thu 16:51 -->
+<!-- 2024-08-09 Fri 15:27 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Development Roadmap</title>
@@ -231,12 +231,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-08-08 16:45:21</i></td>
+<td class="org-left"><i>2024-08-09 15:27:16</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-08-08 16:51:21</i></td>
+<td class="org-left"><i>2024-08-09 15:27:19</i></td>
 </tr>
 </tbody>
 </table>
@@ -248,14 +248,14 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org3484113">1. High Level Future Development Plans (TODO)</a></li>
-<li><a href="#org3d0652c">2. Raw TODO Comments From Source Code</a></li>
+<li><a href="#orgabd28ca">1. High Level Future Development Plans (TODO)</a></li>
+<li><a href="#org406063e">2. Raw TODO Comments From Source Code</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org3484113" class="outline-2">
-<h2 id="org3484113"><span class="section-number-2">1.</span> High Level Future Development Plans (TODO)</h2>
+<div id="outline-container-orgabd28ca" class="outline-2">
+<h2 id="orgabd28ca"><span class="section-number-2">1.</span> High Level Future Development Plans (TODO)</h2>
 <div class="outline-text-2" id="text-1">
 <ul class="org-ul">
 <li>Tree Related
@@ -270,6 +270,7 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <li>Tree To Complex Related
 <ul class="org-ul">
 <li>Adapters &amp; interfaces for cell complex edge solvers (<b>WIP</b>)</li>
+<li>Cull cells containing domain point</li>
 </ul></li>
 <li>Cell Complex
 <ul class="org-ul">
@@ -280,8 +281,6 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 </ul></li>
 <li>Cell Manipulation
 <ul class="org-ul">
-<li>Fat Fold segment cells</li>
-<li>Fat Fold triangle cells</li>
 <li>Refine a triangle cell by adding a single interior point</li>
 <li>Refine a segment cell by adding a single interior point</li>
 </ul></li>
@@ -295,12 +294,14 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <ul class="org-ul">
 <li>Demonstrate edge solver &amp; SDF to extract level curve with a large grid step size</li>
 <li>Demonstrate how to insert multiple trees into one cell complex (and glue them together?)</li>
+<li>Demonstrate cutting on a domain point for bitree example &#x2013; step discontinuity.</li>
 </ul></li>
 <li>External Interfaces (listed in no particular order)
 <ul class="org-ul">
 <li>Julia</li>
-<li>Ruby</li>
 <li>Maple</li>
+<li><i>Consider</i> Ruby</li>
+<li><i>Consider</i> Paraview &#x2013; this could be cool, but also very complex.</li>
 <li><i>Consider</i> Fortran (Might just do MR_rect_tree)</li>
 <li><i>Consider</i> Octave/Matlab</li>
 <li><i>Consider</i> Python</li>
@@ -320,22 +321,22 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 </div>
 </div>
 
-<div id="outline-container-org3d0652c" class="outline-2">
-<h2 id="org3d0652c"><span class="section-number-2">2.</span> Raw TODO Comments From Source Code</h2>
+<div id="outline-container-org406063e" class="outline-2">
+<h2 id="org406063e"><span class="section-number-2">2.</span> Raw TODO Comments From Source Code</h2>
 <div class="outline-text-2" id="text-2">
-<pre class="example" id="org6fdb154">
-Thu Aug  8 15:31:01 CDT 2024
-lib/MR_cell_cplx.hpp  553   &lt;2024-07-22T15:48:31-0500&gt; vec3_det3: UNTESTED! UNTESTED! UNTESTED! UNTESTED!
-lib/MR_cell_cplx.hpp  599   &lt;2024-08-02T09:41:48-0500&gt; geomi_seg_isect_type: Repeated point look-up slows things down
-lib/MR_cell_cplx.hpp  600   &lt;2024-08-02T09:41:48-0500&gt; geomi_seg_isect_type: Add unit tests for each code branch
-lib/MR_cell_cplx.hpp  717   &lt;2024-08-02T09:42:19-0500&gt; geomr_pnt_line_distance: check logic -- dp1&gt;segd || dp2&gt;segd?
-lib/MR_cell_cplx.hpp  747   &lt;2024-07-22T15:48:31-0500&gt; geomr_pnt_tri_distance: UNTESTED! UNTESTED! UNTESTED! UNTESTED! UNTESTED!
-lib/MR_cell_cplx.hpp  817   &lt;2024-07-11T16:08:16-0500&gt; geomr_seg_tri_intersection: implement
-lib/MR_cell_cplx.hpp  818   &lt;2024-07-11T16:08:27-0500&gt; geomr_seg_tri_intersection: Should this be a bool or an enum?
-lib/MR_cell_cplx.hpp  928   &lt;2024-07-11T16:06:42-0500&gt; cell_type_to_structure: make sure polygons are all oriented correctly
-lib/MR_cell_cplx.hpp  1183  &lt;2024-08-02T09:42:38-0500&gt; check_cell_face_intersections: Implement
-lib/MR_rect_tree.hpp  644   &lt;2024-07-11T11:50:36-0500&gt; cuc_two_cross: If diti is close to an corner, some result points may be out of range.
-lib/MR_rect_tree.hpp  1358  &lt;2024-07-11T16:04:10-0500&gt; cell_is_unbalanced: Optimize run time (nix the use of get_smallest_neighbor_level)
+<pre class="example" id="org0150f10">
+Fri Aug  9 15:27:13 CDT 2024
+lib/MR_cell_cplx.hpp  565   &lt;2024-07-22T15:48:31-0500&gt; vec3_det3: UNTESTED! UNTESTED! UNTESTED! UNTESTED!
+lib/MR_cell_cplx.hpp  611   &lt;2024-08-02T09:41:48-0500&gt; geomi_seg_isect_type: Repeated point look-up slows things down
+lib/MR_cell_cplx.hpp  612   &lt;2024-08-02T09:41:48-0500&gt; geomi_seg_isect_type: Add unit tests for each code branch
+lib/MR_cell_cplx.hpp  729   &lt;2024-08-02T09:42:19-0500&gt; geomr_pnt_line_distance: check logic -- dp1&gt;segd || dp2&gt;segd?
+lib/MR_cell_cplx.hpp  759   &lt;2024-07-22T15:48:31-0500&gt; geomr_pnt_tri_distance: UNTESTED! UNTESTED! UNTESTED! UNTESTED! UNTESTED!
+lib/MR_cell_cplx.hpp  829   &lt;2024-07-11T16:08:16-0500&gt; geomr_seg_tri_intersection: implement
+lib/MR_cell_cplx.hpp  830   &lt;2024-07-11T16:08:27-0500&gt; geomr_seg_tri_intersection: Should this be a bool or an enum?
+lib/MR_cell_cplx.hpp  940   &lt;2024-07-11T16:06:42-0500&gt; cell_type_to_structure: make sure polygons are all oriented correctly
+lib/MR_cell_cplx.hpp  1195  &lt;2024-08-02T09:42:38-0500&gt; check_cell_face_intersections: Implement
+lib/MR_rect_tree.hpp  642   &lt;2024-07-11T11:50:36-0500&gt; cuc_two_cross: If diti is close to an corner, some result points may be out of range.
+lib/MR_rect_tree.hpp  1356  &lt;2024-07-11T16:04:10-0500&gt; cell_is_unbalanced: Optimize run time (nix the use of get_smallest_neighbor_level)
 </pre>
 </div>
 </div>
