@@ -56,31 +56,36 @@
 namespace mjr {
   /** @brief Template class used to store and transform cell complexes (mesh/triangluation/etc...) and data sets generated from  MR_rect_tree sample data.
 
+      The primary use case is to store and manipulate geometric (i.e. mesh) data derived from MR_rect_tree objects.  On the mesh manipulation front the focus
+      is on computations that require knowledge related to the function being approximated.
+
       This code is a quick-n-dirty hack job.  I simply wanted to quickly get to a point where I could visually test MR_rect_tree objects.  Logically this
       class should be split into several classes (unique point list, unique cell list, 3D vectors, 3D analytic geometry, etc...).  It's a bit of a mess.
 
-      The primary use case is to store and manipulate geometric (i.e. mesh) data derived from MR_rect_tree samples.  On the mesh manipulation front the focus
-      is on computations that require knowledge related to the function being approximated.
-
-      Significant limitations:
-        - VTK files generated from MR_rect_tree objects don't require all of the capability of VTK files
-          - Only Unstructured_Grid files are supported
+      Design Constraints:
+        - Geometry
           - Only four types of cells are supported: points, segments, triangles, quads, pyramids, & hexahedrons.
-            - No tetrahedrons!  This may seem bazaar; however, they are simply not a natural product of MR_rect_tree tessellation.
-          - Only point data is supported (i.e. no cell data), and only scalar & vector data types are supported
-          - Both legacy & XML files are supported, but they are ASCII only.
-          - XML files are serial and self contained
-          - NaN's in legacy files are not properly handled by many VTK applications
-        - Performance isn't a priority
-          - Especially true for 0-cells
-        - Various saftey checks are slow (may be turned off via template parameter)
-          - Geometry checks
-          - Point de-duplication
-          - Cell de-duplication
-          - In general expect a 5x speedup by turning off all checks
-        - Things we don't check
+          - No tetrahedrons!  This may seem bazaar; however, they are simply not a natural product of MR_rect_tree tessellation.
+          - Unlike MR_rect_tree, this class can't operate on data of dimension higher than 3!
+        - Data
+          - Only point data is supported (i.e. no cell data)
+          - Data elements are scalar and/or vector.  No tensors, fields, etc...
+          - uft_t types are used for atomic data components (scalars are uft_t, and components of vectors are uft_t).
+        - Computations/Manipulation
+          - Supported is focused on manipulation that benefits from knowledge of the approximated function
+          - The idea is that one can use one of the many mesh packages for standard types of mesh computations
+        - I/O
+          - Write only. 
+          - VTK files
+            - Only Unstructured_Grid files are supported
+            - Both legacy & XML files are supported, but they are ASCII only.
+            - XML files are serial and self contained
+            - Note that NaN's in ASCII legacy files are not properly handled by many VTK applications
+        - Error Checking
+          - It's pretty limited
           - Memory allocation -- you run out, the thing crashes
           - Cells that are a part of other cells may be added (i.e. a segment that is part of an existing triangle)
+          - Geometry checks are quite basic, and I don't even bother with things like convexity. ;)
 
       Cells supported:
 
@@ -187,13 +192,18 @@ namespace mjr {
         @tparam chk_cell_vertexes  Do cell vertex checks (See: cell_stat_t)
         @tparam chk_cell_dimension Do cell dimension checks (See: cell_stat_t)
         @tparam chk_cell_edges     Do cell edge checks (See: cell_stat_t)
+        @tparam flt_type           Type for floating point values (
         @tparam eps                Epsilon used to detect zero */
-  template <bool uniq_points,
-            bool uniq_cells,
-            bool chk_cell_vertexes,
-            bool chk_cell_dimension,
-            bool chk_cell_edges,
-            double eps>
+  template <bool     uniq_points,
+            bool     uniq_cells,
+            bool     chk_cell_vertexes,
+            bool     chk_cell_dimension,
+            bool     chk_cell_edges,
+            typename flt_type,
+            flt_type eps
+            // double eps
+            >
+  requires (std::is_floating_point<flt_type>::value)
   class MR_cell_cplx {
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -208,7 +218,7 @@ namespace mjr {
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Universal floating point type -- used for point components, scalar data values, vector components, all computation, etc.... */
-      typedef double uft_t;
+      typedef flt_type uft_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** epsilon */
       constexpr static uft_t epsilon = eps;
@@ -1827,7 +1837,7 @@ namespace mjr {
           @param data_func      Data function
           @param sdf_func       SDF function
           @param solve_epsilon  Used to detect SDF value near zero */
-      void triangle_folder(p2data_func_t dat_func, p2real_func_t sdf_func, uft_t solve_epsilon=epsilon/10) {
+      void triangle_folder(p2data_func_t data_func, p2real_func_t sdf_func, uft_t solve_epsilon=epsilon/10) {
         clear_cache_edge_solver_sdf();
         int num_start_cells = num_cells();
         for(int cell_idx=0; cell_idx<num_start_cells; ++cell_idx) {
@@ -1861,8 +1871,8 @@ namespace mjr {
               auto orgv0 = cur_cell[p[0]];
               auto orgv1 = cur_cell[p[1]];
               auto orgv2 = cur_cell[p[2]];
-              auto newv1 = edge_solver_sdf(dat_func, orgv0, orgv1, sdf_func, solve_epsilon);
-              auto newv2 = edge_solver_sdf(dat_func, orgv0, orgv2, sdf_func, solve_epsilon);
+              auto newv1 = edge_solver_sdf(data_func, orgv0, orgv1, sdf_func, solve_epsilon);
+              auto newv2 = edge_solver_sdf(data_func, orgv0, orgv2, sdf_func, solve_epsilon);
               if ((newv1 != orgv0) && (newv1 != orgv1) && (newv2 != orgv0) && (newv2 != orgv2)) {
                 cur_cell[p[1]] = newv1; // Modify current triangle in place
                 cur_cell[p[2]] = newv2; // Modify current triangle in place
@@ -1874,7 +1884,7 @@ namespace mjr {
               auto orgv0 = cur_cell[p[0]];
               auto orgv1 = cur_cell[p[1]];
               auto orgv2 = cur_cell[p[2]];
-              auto newv0 = edge_solver_sdf(dat_func, orgv1, orgv2, sdf_func, solve_epsilon);
+              auto newv0 = edge_solver_sdf(data_func, orgv1, orgv2, sdf_func, solve_epsilon);
               if ((newv0 != orgv1) && (newv0 != orgv2)) {
                 cur_cell[2] = newv0; // Modify current triangle in place
                 add_cell(cell_type_t::TRIANGLE, {orgv0, newv0, orgv2});  // Add new triangle
@@ -1888,7 +1898,7 @@ namespace mjr {
           @param data_func      Data function
           @param sdf_func       SDF function
           @param solve_epsilon  Used to detect SDF value near zero */
-      void segment_folder(p2data_func_t dat_func, p2real_func_t sdf_func, uft_t solve_epsilon=epsilon/10) {
+      void segment_folder(p2data_func_t data_func, p2real_func_t sdf_func, uft_t solve_epsilon=epsilon/10) {
         clear_cache_edge_solver_sdf();
         int num_start_cells = num_cells();
         for(int cell_idx=0; cell_idx<num_start_cells; ++cell_idx) {
@@ -1905,7 +1915,7 @@ namespace mjr {
             if ((plus_cnt == 1) && (negv_cnt == 1)) {
               auto orgv0 = cur_cell[0];
               auto orgv1 = cur_cell[1];
-              auto newv  = edge_solver_sdf(dat_func, orgv0, orgv1, sdf_func, solve_epsilon);
+              auto newv  = edge_solver_sdf(data_func, orgv0, orgv1, sdf_func, solve_epsilon);
               if ((newv != orgv0) && (newv != orgv1)) {
                 cur_cell[1] = newv; // Modify current segment in place
                 add_cell(cell_type_t::SEGMENT, {newv, orgv1});  // Add new segment
@@ -1918,14 +1928,14 @@ namespace mjr {
 
   };
 
-  typedef MR_cell_cplx<false, false, false, false, false, 1.0e-3> MRccF3;
-  typedef MR_cell_cplx<true,  true,  true,  true,  true,  1.0e-3> MRccT3;
+  typedef MR_cell_cplx<false, false, false, false, false, double, 1.0e-3> MRccF3;
+  typedef MR_cell_cplx<true,  true,  true,  true,  true,  double, 1.0e-3> MRccT3;
 
-  typedef MR_cell_cplx<false, false, false, false, false, 1.0e-5> MRccF5;
-  typedef MR_cell_cplx<true,  true,  true,  true,  true,  1.0e-5> MRccT5;
+  typedef MR_cell_cplx<false, false, false, false, false, double, 1.0e-5> MRccF5;
+  typedef MR_cell_cplx<true,  true,  true,  true,  true,  double, 1.0e-5> MRccT5;
 
-  typedef MR_cell_cplx<false, false, false, false, false, 1.0e-9> MRccF9;
-  typedef MR_cell_cplx<true,  true,  true,  true,  true,  1.0e-9> MRccT9;
+  typedef MR_cell_cplx<false, false, false, false, false, double, 1.0e-9> MRccF9;
+  typedef MR_cell_cplx<true,  true,  true,  true,  true,  double, 1.0e-9> MRccT9;
 }
 
 #define MJR_INCLUDE_MR_cell_cplx

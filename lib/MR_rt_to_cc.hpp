@@ -44,7 +44,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Put everything in the mjr namespace
 namespace mjr {
-  template <class rt_t, class cc_t>
   /** @brief Tessellates a MR_rect_tree object, and places the result into an MR_cell_cplx object.
 
       From a structural perspective this class simply a templated collection of types and static methods all designed to work with pairs of MR_rect_tree and
@@ -54,6 +53,8 @@ namespace mjr {
 
       @tparam rt_t The type of supported MR_rect_tree objects
       @tparam cc_t The type of supported MR_cell_cplx objects */
+  template <class rt_t, class cc_t>
+  requires (std::is_same<typename rt_t::src_t, typename cc_t::uft_t>::value)
   class MR_rt_to_cc {
 
     public:
@@ -101,7 +102,7 @@ namespace mjr {
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** A list of val_src_t objects.  */
-      static void create_dataset_to_point_mapping(const rt_t& rtree, cc_t& ccplx, const val_src_lst_t& rt_dil) {
+      inline static void create_dataset_to_point_mapping(const rt_t& rtree, cc_t& ccplx, const val_src_lst_t& rt_dil) {
         cc_data_idx_lst_t cc_data_idx_lst(3);
         for(int i=0; i<3; ++i)
           if(get<0>(rt_dil[i]) == val_src_spc_t::FDOMAIN)
@@ -117,13 +118,12 @@ namespace mjr {
           @param ccplx  The MR_cell_cplx to populate with geometry
           @param rtree  The MR_rect_tree with source data
           @param diti   The point coordinate in rtree */
-      static cc_pnt_idx_t add_point_and_data_from_tree(cc_t& ccplx, const rt_t& rtree, rt_diti_t diti) {
+      inline static cc_pnt_idx_t add_point_and_data_from_tree(cc_t& ccplx, const rt_t& rtree, rt_diti_t diti) {
         return add_point_and_data_from_data(ccplx, rtree.diti_to_drpt(diti), rtree.get_sample(diti));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Given rt coordinates, extract point/scalar/vector data, and add point/data to cc
           @param ccplx    The MR_cell_cplx to populate with geometry
-          @param rtree    The MR_rect_tree with source data
           @param dom_pnt  Domain point
           @param rng_pnt  Range point */
       inline static cc_pnt_idx_t add_point_and_data_from_data(cc_t& ccplx, rt_drpt_t dom_pnt, rt_rrpt_t rng_pnt) {
@@ -131,8 +131,6 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Given rt coordinates, extract point/scalar/vector data, and return cc_t style point data vector.
-          @param ccplx    The MR_cell_cplx to populate with geometry
-          @param rtree    The MR_rect_tree with source data
           @param dom_pnt  Domain point
           @param rng_pnt  Range point */
       inline static cc_pnt_data_t tree_point_data_to_cplx_point_data(rt_drpt_t dom_pnt, rt_rrpt_t rng_pnt)  {
@@ -522,8 +520,8 @@ namespace mjr {
 
           @param func        The function to adapt
           @param pd          Point data to be passed to func. */
-      cc_pnt_data_t tsampf_to_cdatf(rt_drpt2rrpt_func_t func,
-                                    cc_pnt_data_t       pd) {
+      inline static cc_pnt_data_t tsampf_to_cdatf(rt_drpt2rrpt_func_t func,
+                                                  cc_pnt_data_t       pd) {
         rt_drpt_t xpt = pnt_data_to_drpt(pd);
         return tree_point_data_to_cplx_point_data(xpt, func(xpt));
       }
@@ -532,13 +530,13 @@ namespace mjr {
 
           @param func        The function to adapt
           @param pd          Point data to be passed to func. */
-      cc_uft_t tsdf_to_csdf(rt_drpt2real_func_t func,
-                            cc_pnt_data_t       pd) {
+      inline static cc_uft_t tsdf_to_csdf(rt_drpt2real_func_t func,
+                                          cc_pnt_data_t       pd) {
         return static_cast<cc_uft_t>(func(pnt_data_to_drpt(pd)));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Transform a pnt_data_t value from a MR_cell_cplx into drpt_t from a MR_rect_tree */
-      rt_drpt_t pnt_data_to_drpt(const cc_pnt_data_t& pd) {
+      inline static rt_drpt_t pnt_data_to_drpt(const cc_pnt_data_t& pd) {
         rt_drpt_t ret;
         if constexpr (rt_t::domain_dimension == 1) {
           ret = pd[0];
@@ -551,14 +549,14 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Convert a MR_rect_tree sample function into a level test SDF'ish function.
 
-          @param cc_uft_t    Level to check aginst
           @param range_index Index into range of origional sample function
+          @param level       Level to check range element aginst
           @param func        The function to adapt
           @param pd          Point data to be passed to func. */
-      cc_uft_t tsampf_to_clcdf(int                 range_index,
-                               cc_uft_t            level,
-                               rt_drpt2rrpt_func_t func,
-                               cc_pnt_data_t       pd) {
+      inline static cc_uft_t tsampf_to_clcdf(int                 range_index,
+                                             cc_uft_t            level,
+                                             rt_drpt2rrpt_func_t func,
+                                             cc_pnt_data_t       pd) {
         if constexpr (rt_t::domain_dimension == 1) {
           return static_cast<cc_uft_t>(func(pnt_data_to_drpt(pd))) - level;
         } else {
@@ -569,7 +567,7 @@ namespace mjr {
       /** Convert a MR_rect_tree range index into an index for a point data array
 
           @param tree_range_index value to convert */
-      int rt_ran_idx_to_pd_idx(int tree_range_index) {
+      inline static int rt_ran_idx_to_pd_idx(int tree_range_index) {
         return (tree_range_index + rt_t::domain_dimension);
       }
       //@}
