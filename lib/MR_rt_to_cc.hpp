@@ -37,7 +37,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include <tuple>                                                         /* STL tuples              C++11    */
-#include <vector>                                                        /* STL vector              C++11    */ 
+#include <vector>                                                        /* STL vector              C++11    */
 #include <string>                                                        /* C++ strings             C++11    */
 #include <variant>                                                       /* C++ variant type        C++17    */
 

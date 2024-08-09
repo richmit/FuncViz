@@ -49,7 +49,7 @@
 #include <string>                                                        /* C++ strings             C++11    */
 #include <unordered_map>                                                 /* STL hash map            C++11    */
 #include <variant>                                                       /* C++ variant type        C++17    */
-#include <vector>                                                        /* STL vector              C++11    */ 
+#include <vector>                                                        /* STL vector              C++11    */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Put everything in the mjr namespace
@@ -75,7 +75,7 @@ namespace mjr {
           - Supported is focused on manipulation that benefits from knowledge of the approximated function
           - The idea is that one can use one of the many mesh packages for standard types of mesh computations
         - I/O
-          - Write only. 
+          - Write only.
           - VTK files
             - Only Unstructured_Grid files are supported
             - Both legacy & XML files are supported, but they are ASCII only.
@@ -1895,7 +1895,7 @@ namespace mjr {
               uft_t sdf_val = sdf_func(pnt_idx_to_pnt_data[cur_cell[i]]);
               if (sdf_val < static_cast<uft_t>(0.0))
                 plus_cnt++;
-              else if (sdf_val > static_cast<uft_t>(0.0)) 
+              else if (sdf_val > static_cast<uft_t>(0.0))
                 negv_cnt++;
             }
             if ((plus_cnt == 1) && (negv_cnt == 1)) {
@@ -1911,7 +1911,6 @@ namespace mjr {
         }
       }
       //@}
-
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /** @name Cell Predicates */
