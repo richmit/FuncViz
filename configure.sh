@@ -60,30 +60,67 @@ fi
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------
 if [ -e ../CMakeLists.txt ]; then
   if [ "$(basename $(pwd))" == "build" ]; then
-    CMAKE_G=''
-    if [[ "$CMD_LINE_ARGS" != *'-G'* ]]; then
+    #
+    # Figure out target
+    CMAKE_TARGET=''
+    CMAKE_TARGET_SRC='AUTO'
+    for arg in "$@"; do
+      if [ -z "$CMAKE_TARGET" -a "$CMAKE_TARGET_SRC" == 'COMMAND_LINE' ]; then
+        CMAKE_TARGET="$arg"
+      fi
+      if [ "$arg" == "-G" ]; then
+        CMAKE_TARGET_SRC='COMMAND_LINE'
+      fi
+    done
+    if [ "$CMAKE_TARGET" == 'LOOKING' ]; then
+      echo "ERROR: Found -G but no following target argument"
+    fi
+    # No -G, figure out default!
+    if [ -z "$CMAKE_TARGET" ]; then
       if [ -n "$MSYSTEM" ]; then
-        CMAKE_G='MSYS Makefiles'
+        CMAKE_TARGET='MSYS Makefiles'
       else
-        CMAKE_G='Unix Makefiles'
+        CMAKE_TARGET='Unix Makefiles'
       fi
     fi
-    if [ -n "$1" ]; then
-      echo cmake -G "$CMAKE_G" "$@" ../
-      cmake -G "$CMAKE_G" "$@" ../
-    else
-      CMAKE_C=''
-      if [ -n "$MSYSTEM" ]; then
-        CMAKE_C='-DCMAKE_CXX_COMPILER=g++.exe'
-      else
+    #
+    # Figure out the -DCMAKE_CXX_COMPILER argument
+    CMAKE_CARG=''
+    if [[ "$@" != *'-DCMAKE_CXX_COMPILER'* ]]; then
+      if [ "$CMAKE_TARGET" == 'MSYS Makefiles' ]; then
+        CMAKE_CARG='-DCMAKE_CXX_COMPILER=g++.exe'
+      fi
+      if [ "$CMAKE_TARGET" == 'Unix Makefiles' ]; then
         if [ -x '/usr/bin/g++-14' ]; then
-          CMAKE_C='-DCMAKE_CXX_COMPILER=g++-14'
+          CMAKE_CARG='-DCMAKE_CXX_COMPILER=g++-14'
         else
-          CMAKE_C='-DCMAKE_CXX_COMPILER=g++'
+          CMAKE_CARG='-DCMAKE_CXX_COMPILER=g++'
         fi
       fi
-      echo cmake -G "$CMAKE_G" "$CMAKE_C" ..
-      cmake -G "$CMAKE_G" "$CMAKE_C" ..
+    fi
+    if [ "$DEBUG" == 'DEBUG' ]; then
+      echo $CMAKE_TARGET
+      echo $CMAKE_TARGET_SRC
+      echo $CMAKE_CARG
+    fi
+    #
+    # Run cmake
+    if [ "$CMAKE_TARGET_SRC" == "COMMAND_LINE" ]; then
+      if [ -z "$CMAKE_CARG" ]; then
+        echo AA cmake "$@" ../
+        cmake "$@" ../
+      else
+        echo BB cmake "$CMAKE_CARG" "$@" ../
+        cmake "$CMAKE_CARG" "$@" ../
+      fi
+    else
+      if [ -z "$CMAKE_CARG" ]; then
+        echo CC cmake -G "$CMAKE_TARGET" "$@" ../
+        cmake -G "$CMAKE_TARGET" "$@" ../
+      else
+        echo DD cmake -G "$CMAKE_TARGET" "$CMAKE_CARG" "$@" ../
+        cmake -G "$CMAKE_TARGET" "$CMAKE_CARG" "$@" ../
+      fi
     fi
   else
     echo "ERROR: Must run from build directory"
