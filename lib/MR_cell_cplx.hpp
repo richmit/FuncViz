@@ -1675,20 +1675,6 @@ namespace mjr {
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Cell Predicates */
-      //@{
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Return true if ALL vertexes are above the level by more than epsilon */
-      bool cell_above_level(const cell_t cell, int level_index, uft_t level, uft_t level_epsilon=epsilon) {
-        return std::all_of(cell.cbegin(), cell.cend(), [this, level_index, level, level_epsilon](int v) { return (pnt_idx_to_pnt_data[v][level_index] > level+level_epsilon); });
-      }
-      /** Return true if ALL vertexes are below the level by more than epsilon */
-      bool cell_below_level(const cell_t cell, int level_index, uft_t level, uft_t level_epsilon=epsilon) {
-        return std::all_of(cell.cbegin(), cell.cend(), [this, level_index, level, level_epsilon](int v) { return (pnt_idx_to_pnt_data[v][level_index] < level+level_epsilon); });
-      }
-      //@}
-
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /** @name Complex Computation. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1923,6 +1909,55 @@ namespace mjr {
             }
           }
         }
+      }
+      //@}
+
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /** @name Cell Predicates */
+      //@{
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Return true if ALL vertexes are above the level by more than epsilon */
+      bool cell_above_level(const cell_t cell, int level_index, uft_t level, uft_t level_epsilon=epsilon) {
+        return std::all_of(cell.cbegin(), cell.cend(), [this, level_index, level, level_epsilon](int v) { return (pnt_idx_to_pnt_data[v][level_index] > level+level_epsilon); });
+      }
+      /** Return true if ALL vertexes are below the level by more than epsilon */
+      bool cell_below_level(const cell_t cell, int level_index, uft_t level, uft_t level_epsilon=epsilon) {
+        return std::all_of(cell.cbegin(), cell.cend(), [this, level_index, level, level_epsilon](int v) { return (pnt_idx_to_pnt_data[v][level_index] < level+level_epsilon); });
+      }
+      /** Return true if cell is near SDF boundry */
+      bool cell_on_sdf_boundry(const cell_t cell, p2real_func_t sdf_function, uft_t sdf_epsilon=epsilon) {
+        int pos_cnt=0, neg_cnt=0;
+        for(auto v: cell) {
+          uft_t sv = sdf_function(pnt_idx_to_pnt_data[v]);
+          if (std::abs(sv)<sdf_epsilon)
+            return true;
+          if (sv < 0) {
+            neg_cnt++;
+          } else {
+            pos_cnt++;
+          }
+          if ((neg_cnt > 0) && (pos_cnt > 0))
+            return true;
+        }
+        return false;
+      }
+      /** Return true if cell crosses SDF boundry */
+      bool cell_cross_sdf_boundry(const cell_t cell, p2real_func_t sdf_function, uft_t sdf_epsilon=epsilon) {
+        int pos_cnt=0, neg_cnt=0;
+        for(auto v: cell) {
+          uft_t sv = sdf_function(pnt_idx_to_pnt_data[v]);
+          if (std::abs(sv)>=sdf_epsilon) {
+            if (sv < 0) {
+              neg_cnt++;
+            } else {
+              pos_cnt++;
+            }
+          }
+          if ((neg_cnt > 0) && (pos_cnt > 0))
+            return true;
+        }
+        return false;
       }
       //@}
 
