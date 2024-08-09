@@ -107,7 +107,6 @@ int main() {
   tt_t tree({-2.2, -1.2}, 
             { 2.2,  1.2});
   cc_t ccplx;
-  tc_t bridge;
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
   // Initial sample
@@ -176,14 +175,14 @@ int main() {
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
   // Create the cell complex from cells that have at least one point below our clipping plane.
-  auto tcret = bridge.construct_geometry_fans(ccplx,
-                                              tree,
-                                              tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), 
-                                                                       [&tree](tt_t::diti_t i) { return !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
-                                              2,
-                                              {{tc_t::val_src_spc_t::FDOMAIN, 0}, 
-                                               {tc_t::val_src_spc_t::FDOMAIN, 1},
-                                               {tc_t::val_src_spc_t::FRANGE,  4}});
+  auto tcret = tc_t::construct_geometry_fans(ccplx,
+                                             tree,
+                                             tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), 
+                                                                      [&tree](tt_t::diti_t i) { return !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
+                                             2,
+                                             {{tc_t::val_src_spc_t::FDOMAIN, 0}, 
+                                              {tc_t::val_src_spc_t::FDOMAIN, 1},
+                                              {tc_t::val_src_spc_t::FRANGE,  4}});
   std::cout << "TC Return: " << tcret << std::endl;
   ccplx.create_named_datasets({"Re(z)", "Im(z)", "abs(z)", "arg(z)", "Re(f(z))", "Im(f(z))", "abs(f(z))", "arg(f(z))"}, {{"COLORS", {8, 9, 10}}});
   std::cout << "POST CONST" << std::endl;
@@ -191,8 +190,8 @@ int main() {
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
   // Fold the triangles on our clipping plane
-  ccplx.triangle_folder([&bridge](cc_t::pnt_data_t x){return bridge.tsampf_to_cdatf(        cpf, x); }, 
-                        [&bridge](cc_t::pnt_data_t x){return bridge.tsampf_to_clcdf(4, 3.5, cpf, x); });
+  ccplx.triangle_folder([](cc_t::pnt_data_t x){return tc_t::tsampf_to_cdatf(        cpf, x); }, 
+                        [](cc_t::pnt_data_t x){return tc_t::tsampf_to_clcdf(4, 3.5, cpf, x); });
   std::cout << "POST FOLD" << std::endl;
   ccplx.dump_cplx(5);
 
@@ -203,7 +202,7 @@ int main() {
   // ccplx.cull_cells([&ccplx](cc_t::cell_t c){ return !(ccplx.cell_below_level(c, 6, 3.5)); });
 
   // Or we can use the index in the original sample function along with the converter rt_ran_idx_to_pd_idx().
-  ccplx.cull_cells([&bridge, &ccplx](cc_t::cell_t c){ return !(ccplx.cell_below_level(c, bridge.rt_ran_idx_to_pd_idx(4), 3.5)); });
+  ccplx.cull_cells([&ccplx](cc_t::cell_t c){ return !(ccplx.cell_below_level(c, tc_t::rt_ran_idx_to_pd_idx(4), 3.5)); });
 
   std::cout << "POST CULL" << std::endl;
   ccplx.dump_cplx(5);

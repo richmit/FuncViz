@@ -79,7 +79,6 @@ int main() {
   tt_t tree({-10.0, -6.5},
             { 10.0,  6.5});
   cc_t ccplx;
-  tc_t bridge;
 
   // First we sample the top cell.  Just one cell!
   tree.sample_cell(f);
@@ -93,12 +92,12 @@ int main() {
   tree.dump_tree(20);
 
   // Convert the geometry into a 3D dataset so we can see the contour on the surface
-  bridge.construct_geometry_fans(ccplx,
-                                 tree,
-                                 2,
-                                 {{tc_t::val_src_spc_t::FDOMAIN, 0},
-                                  {tc_t::val_src_spc_t::FDOMAIN, 1},
-                                  {tc_t::val_src_spc_t::FRANGE,  0}});
+  tc_t::construct_geometry_fans(ccplx,
+                                tree,
+                                2,
+                                {{tc_t::val_src_spc_t::FDOMAIN, 0},
+                                 {tc_t::val_src_spc_t::FDOMAIN, 1},
+                                 {tc_t::val_src_spc_t::FRANGE,  0}});
 
   ccplx.create_named_datasets({"x", "y", "f(x,y)"});
 

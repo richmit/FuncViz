@@ -90,7 +90,6 @@ int main() {
   tt_t tree({-2.1, -2.1}, 
             { 2.1,  2.1});
   cc_t ccplx;
-  tc_t bridge;
   
   // Make a few samples on a uniform grid
   tree.refine_grid(2, damp_cos_wave);
@@ -113,12 +112,12 @@ int main() {
 
   tree.dump_tree(5);
 
-  bridge.construct_geometry_fans(ccplx,
-                                 tree,
-                                 2,
-                                 {{tc_t::val_src_spc_t::FDOMAIN, 0}, 
-                                  {tc_t::val_src_spc_t::FDOMAIN, 1},
-                                  {tc_t::val_src_spc_t::FRANGE,  0}});
+  tc_t::construct_geometry_fans(ccplx,
+                                tree,
+                                2,
+                                {{tc_t::val_src_spc_t::FDOMAIN, 0}, 
+                                 {tc_t::val_src_spc_t::FDOMAIN, 1},
+                                 {tc_t::val_src_spc_t::FRANGE,  0}});
 
   // Note we use the single argument version of create_named_datasets() because we don't want to name elements 3, 4, & 5 (the components of the normal
   // Note if we had placed the ddiv component right after z, then we could have used the two argument version...

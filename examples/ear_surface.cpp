@@ -39,8 +39,6 @@
   This surface is defined by the zeros of the following polynomial
 
   @f[ x^2-y^2*z^2+z^3 @f]
-
-
 */
 /*******************************************************************************************************************************************************.H.E.**/
 /** @cond exj */
@@ -69,7 +67,6 @@ int main() {
   tt_t tree({-2.2, -2.2, -2.2}, 
             { 2.2,  2.2,  2.2});
   cc_t ccplx;
-  tc_t bridge; 
 
   /* Initial uniform sample */
   tree.refine_grid(3, isf);
@@ -95,13 +92,13 @@ int main() {
   tree.dump_tree(5);
 
   /* Convert our tree to a cell complex.  Note that we use an SDF to export only cells that contain our surface */
-  bridge.construct_geometry_fans(ccplx,
-                                 tree,
-                                 tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, isf)); }),
-                                 3,
-                                 {{tc_t::val_src_spc_t::FDOMAIN, 0}, 
-                                  {tc_t::val_src_spc_t::FDOMAIN, 1},
-                                  {tc_t::val_src_spc_t::FDOMAIN, 2}});
+  tc_t::construct_geometry_fans(ccplx,
+                                tree,
+                                tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, isf)); }),
+                                3,
+                                {{tc_t::val_src_spc_t::FDOMAIN, 0}, 
+                                 {tc_t::val_src_spc_t::FDOMAIN, 1},
+                                 {tc_t::val_src_spc_t::FDOMAIN, 2}});
 
   /* Name the data points */
   ccplx.create_named_datasets({"x", "y", "z", "f(x,y,z)"});

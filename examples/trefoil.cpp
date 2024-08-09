@@ -79,18 +79,17 @@ int main() {
   tt_t tree;
 
   cc_t ccplx;
-  tc_t bridge;
 
   tree.refine_grid(7, trefoil);
 
   tree.dump_tree(20);
 
-  bridge.construct_geometry_fans(ccplx,
-                                 tree,
-                                 2,
-                                 {{tc_t::val_src_spc_t::FRANGE,  0},
-                                  {tc_t::val_src_spc_t::FRANGE,  1},
-                                  {tc_t::val_src_spc_t::FRANGE,  2}});
+  tc_t::construct_geometry_fans(ccplx,
+                                tree,
+                                2,
+                                {{tc_t::val_src_spc_t::FRANGE,  0},
+                                 {tc_t::val_src_spc_t::FRANGE,  1},
+                                 {tc_t::val_src_spc_t::FRANGE,  2}});
 
   ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)", "nx", "ny", "nz"},
                               {{"NORMALS", {5, 6, 7}}});

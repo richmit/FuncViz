@@ -71,31 +71,30 @@ tt_t::rrpt_t par_sphere(tt_t::drpt_t xvec) {
 int main() {
   tt_t tree;
   cc_t ccplx;
-  tc_t bridge;
 
   /* Uniform sampling */
   tree.refine_grid(6, par_sphere);
 
 
   /* First we dump a tessellation made of triangles */
-  bridge.construct_geometry_fans(ccplx,
-                                 tree,
-                                 2,
-                                 {{tc_t::val_src_spc_t::FRANGE, 0},
-                                  {tc_t::val_src_spc_t::FRANGE, 1},
-                                  {tc_t::val_src_spc_t::FRANGE, 2}});
+  tc_t::construct_geometry_fans(ccplx,
+                                tree,
+                                2,
+                                {{tc_t::val_src_spc_t::FRANGE, 0},
+                                 {tc_t::val_src_spc_t::FRANGE, 1},
+                                 {tc_t::val_src_spc_t::FRANGE, 2}});
   ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)"});
   ccplx.dump_cplx(5);
   ccplx.write_xml_vtk("parametric_surface_with_defects-tri.vtu", "parametric_surface_with_defects-tri");
 
   /* Next we dump a tessellation made of rectangles */
   ccplx.clear(); // We need to clear out the old contents first!
-  bridge.construct_geometry_rects(ccplx,
-                                  tree,
-                                  2,
-                                  {{tc_t::val_src_spc_t::FRANGE, 0},
-                                   {tc_t::val_src_spc_t::FRANGE, 1},
-                                   {tc_t::val_src_spc_t::FRANGE, 2}});
+  tc_t::construct_geometry_rects(ccplx,
+                                 tree,
+                                 2,
+                                 {{tc_t::val_src_spc_t::FRANGE, 0},
+                                  {tc_t::val_src_spc_t::FRANGE, 1},
+                                  {tc_t::val_src_spc_t::FRANGE, 2}});
   ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)"});
   ccplx.dump_cplx(5);
   ccplx.write_xml_vtk("parametric_surface_with_defects-rect.vtu", "parametric_surface_with_defects-rect");

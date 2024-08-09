@@ -73,7 +73,6 @@ int main() {
   tt_t tree({-1.1, -1.1}, 
             { 1.1,  1.1});
   cc_t ccplx;
-  tc_t bridge;
 
   /* Here is another way to get fine samples on the circle, but with a SDF this time. */
   tree.refine_grid(5, half_sphere_hat);
@@ -88,12 +87,12 @@ int main() {
   tree.dump_tree(10);
 
   /* Generate a cell complex from the tree samples */
-  bridge.construct_geometry_fans(ccplx,
-                                 tree,
-                                 2,
-                                 {{tc_t::val_src_spc_t::FDOMAIN, 0}, 
-                                  {tc_t::val_src_spc_t::FDOMAIN, 1},
-                                  {tc_t::val_src_spc_t::FRANGE,  0}});
+  tc_t::construct_geometry_fans(ccplx,
+                                tree,
+                                2,
+                                {{tc_t::val_src_spc_t::FDOMAIN, 0}, 
+                                 {tc_t::val_src_spc_t::FDOMAIN, 1},
+                                 {tc_t::val_src_spc_t::FRANGE,  0}});
 
   /* The single argument form of create_named_datasets() allows us to easily name data points. */
   ccplx.create_named_datasets({"x", "y", "f(x,y)"});
@@ -102,8 +101,8 @@ int main() {
   ccplx.dump_cplx(10);
 
   /* Fold all triangles that cross the unit circle! */
-  ccplx.triangle_folder([&bridge](cc_t::pnt_data_t x){return bridge.tsampf_to_cdatf(half_sphere_hat, x); }, 
-                        [&bridge](cc_t::pnt_data_t x){return bridge.tsdf_to_csdf(unit_circle_sdf,    x); });
+  ccplx.triangle_folder([](cc_t::pnt_data_t x){return tc_t::tsampf_to_cdatf(half_sphere_hat, x); }, 
+                        [](cc_t::pnt_data_t x){return tc_t::tsdf_to_csdf(unit_circle_sdf,    x); });
 
   /* Notice how it changed after the fold */
   ccplx.dump_cplx(10);

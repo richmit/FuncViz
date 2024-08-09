@@ -82,7 +82,6 @@ int main() {
   std::chrono::time_point<std::chrono::system_clock> start_time = std::chrono::system_clock::now();
   tt_t tree;
   cc_t ccplx;
-  tc_t bridge;
   std::chrono::time_point<std::chrono::system_clock> construct_time = std::chrono::system_clock::now();
 
   tree.refine_grid(7, stripy_shell);
@@ -91,12 +90,12 @@ int main() {
   tree.dump_tree(20);
   std::chrono::time_point<std::chrono::system_clock> dump_time = std::chrono::system_clock::now();
 
-  bridge.construct_geometry_fans(ccplx,
-                                 tree,
-                                 2,
-                                 {{tc_t::val_src_spc_t::FRANGE,  0},
-                                  {tc_t::val_src_spc_t::FRANGE,  1},
-                                  {tc_t::val_src_spc_t::FRANGE,  2}});
+  tc_t::construct_geometry_fans(ccplx,
+                                tree,
+                                2,
+                                {{tc_t::val_src_spc_t::FRANGE,  0},
+                                 {tc_t::val_src_spc_t::FRANGE,  1},
+                                 {tc_t::val_src_spc_t::FRANGE,  2}});
   std::chrono::time_point<std::chrono::system_clock> fan_time = std::chrono::system_clock::now();
 
   ccplx.create_named_datasets({"u", "v", 

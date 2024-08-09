@@ -65,7 +65,6 @@ int main() {
   tt_t tree({-1.2, -1.2}, 
             { 1.2,  1.2});
   cc_t ccplx;
-  tc_t bridge;
 
   // Sample a uniform grid across the domain
   tree.refine_grid(5, half_sphere);
@@ -76,14 +75,14 @@ int main() {
   tree.dump_tree(10);
 
   /* By passing half_sphere() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired. */
-  bridge.construct_geometry_fans(ccplx,
-                                 tree,
-                                 2,
-                                 {{tc_t::val_src_spc_t::FDOMAIN, 0}, 
-                                  {tc_t::val_src_spc_t::FDOMAIN, 1},
-                                  {tc_t::val_src_spc_t::FRANGE,  0}},
-                                 half_sphere
-                                );
+  tc_t::construct_geometry_fans(ccplx,
+                                tree,
+                                2,
+                                {{tc_t::val_src_spc_t::FDOMAIN, 0}, 
+                                 {tc_t::val_src_spc_t::FDOMAIN, 1},
+                                 {tc_t::val_src_spc_t::FRANGE,  0}},
+                                half_sphere
+                               );
 
   ccplx.create_named_datasets({"x", "y", "f(x,y)"},
                               {{"NORMALS", {0, 1, 2}}});

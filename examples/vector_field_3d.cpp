@@ -64,18 +64,17 @@ int main() {
   tt_t vftree({-30.0, -30.0,  -0.0},
               { 30.0,  30.0,  60.0});
   cc_t vfccplx;
-  tc_t vfbridge;
 
   /* Uniform sampling */
   vftree.refine_grid(5, vf);
 
   /* Dump the vector field */
-  vfbridge.construct_geometry_rects(vfccplx,
-                                    vftree,
-                                    0,
-                                    {{tc_t::val_src_spc_t::FDOMAIN,  0},
-                                     {tc_t::val_src_spc_t::FDOMAIN,  1},
-                                     {tc_t::val_src_spc_t::FDOMAIN,  2}});
+  tc_t::construct_geometry_rects(vfccplx,
+                                 vftree,
+                                 0,
+                                 {{tc_t::val_src_spc_t::FDOMAIN,  0},
+                                  {tc_t::val_src_spc_t::FDOMAIN,  1},
+                                  {tc_t::val_src_spc_t::FDOMAIN,  2}});
 
   vfccplx.create_named_datasets({"x", "y", "z"},
                                 {{"d", {0, 1, 2}}});
