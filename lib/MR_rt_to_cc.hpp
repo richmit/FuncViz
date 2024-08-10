@@ -82,12 +82,12 @@ namespace mjr {
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Specify a source space for a data index. */
-      enum class val_src_spc_t { FDOMAIN,    //!< The domain space.
-                                 FRANGE,     //!< The range space.
+      enum class val_src_spc_t { FDOMAIN,    //!< Sample function domain space.
+                                 FRANGE,     //!< Sample function range space.
                                  CONSTANT   //!< A pseudo-source that returns a constant.
                                };
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type to hold an integer or double */
+      /** Type to hold an integer or float. */
       typedef std::variant<int, cc_uft_t> iorf_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Type used to hold a description of how to extract a scalar value from a tree object */
@@ -102,7 +102,10 @@ namespace mjr {
       /** @name Utility Functions. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** A list of val_src_t objects.  */
+      /** Create approprate inputs for ccplx.create_dataset_to_point_mapping() from tree data.  
+          @param rtree  The MR_rect_tree with source data
+          @param ccplx  The MR_cell_cplx to populate wiht a pont mapping
+          @param rt_dil Description of data sources */
       inline static void create_dataset_to_point_mapping(const rt_t& rtree, cc_t& ccplx, const val_src_lst_t& rt_dil) {
         cc_data_idx_lst_t cc_data_idx_lst(3);
         for(int i=0; i<3; ++i)
@@ -131,7 +134,7 @@ namespace mjr {
         return ccplx.add_point(tree_point_data_to_cplx_point_data(dom_pnt, rng_pnt));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Given rt coordinates, extract point/scalar/vector data, and return cc_t style point data vector.
+      /** Given rt_t domain & range points, produce a cc_t point data vector.
           @param dom_pnt  Domain point
           @param rng_pnt  Range point */
       inline static cc_pnt_data_t tree_point_data_to_cplx_point_data(rt_drpt_t dom_pnt, rt_rrpt_t rng_pnt)  {
@@ -418,12 +421,14 @@ namespace mjr {
           @param rtree                The MR_rect_tree with source data
           @param cells                List of tree cells from which to construct geometry
           @param output_dimension     Parts of cells to output
-          @param point_src            Point sources */
+          @param point_src            Point sources
+          @param degenerate_fallback  If the rectangle is degenerate, try and make a triangle. (only works for cc_t::cell_type_t::QUAD) */
       static int construct_geometry_rects(cc_t&          ccplx,
                                           const rt_t&    rtree,
                                           rt_diti_list_t cells,
                                           int            output_dimension,
-                                          val_src_lst_t  point_src
+                                          val_src_lst_t  point_src,
+                                          bool           degenerate_fallback = true
                                          ) {
         create_dataset_to_point_mapping(rtree, ccplx, point_src);
         for(auto& cell: cells) {
@@ -436,7 +441,16 @@ namespace mjr {
           if (rtree.domain_dimension == 1) {
             ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {cnr_pti[0], cnr_pti[1]}, output_dimension);
           } else if (rtree.domain_dimension == 2) {
-            ccplx.add_cell(cc_t::cell_type_t::QUAD, {cnr_pti[0], cnr_pti[1], cnr_pti[3], cnr_pti[2]}, output_dimension);
+            const std::array<int, 4> p = {0, 1, 3, 2};
+            bool try_harder = !(ccplx.add_cell(cc_t::cell_type_t::QUAD, {cnr_pti[0], cnr_pti[1], cnr_pti[3], cnr_pti[2]}, output_dimension));
+            if ( degenerate_fallback && try_harder) { // Try for a triangle if we have a NaN point or an adjacent pair of duplicate points
+              for(int i=0; i<4; i++) {
+                if ((cnr_pti[p[i]] < 0) || (cnr_pti[p[(i+0)%4]] == cnr_pti[p[(i+1)%4]])) {
+                  ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cnr_pti[p[(i+1)%4]], cnr_pti[p[(i+2)%4]], cnr_pti[p[(i+3)%4]]}, output_dimension);
+                  break;
+                }
+              }
+            }
           } else { // if(rtree.domain_dimension == 3) {
             ccplx.add_cell(cc_t::cell_type_t::HEXAHEDRON,
                            {cnr_pti[0], cnr_pti[1], cnr_pti[3], cnr_pti[2],
@@ -451,9 +465,10 @@ namespace mjr {
       static int construct_geometry_rects(cc_t&         ccplx,
                                           const rt_t&   rtree,
                                           int           output_dimension,
-                                          val_src_lst_t point_src
+                                          val_src_lst_t point_src,
+                                          bool          degenerate_fallback = true
                                          ) {
-        return construct_geometry_rects(ccplx, rtree, rtree.get_leaf_cells(), output_dimension, point_src);
+        return construct_geometry_rects(ccplx, rtree, rtree.get_leaf_cells(), output_dimension, point_src, degenerate_fallback);
       }
       //@}
 

@@ -45,21 +45,20 @@ set(TARGETS_EXAMPLE "hello_world"
                     "ear_surface"
                   )
 set(TARGETS_UTEST "check_cell_hexahedron" "check_cell_pyramid" "check_cell_quad" "check_cell_triangle" "check_cell_segment"
-                 "geomi_pnt_line_distance"
-                 "geomi_seg_isect_type"
-                 "geomr_pnt_pln_distance" "geomr_pnt_tri_distance" "geomr_pnt_line_distance"
-                 "tree_basics_7b1" "tree_basics_7b2" "tree_basics_7b3" "tree_basics_7b4" "tree_basics_7b5"
-                 "tree_basics_15b1" "tree_basics_15b3"
-                 "tree_corners"
-                 "tree_children" "tree_neighbors" "zzz_tbd_tree_exist_neighbors"
-               )
+                  "geomi_pnt_line_distance"
+                  "geomi_seg_isect_type"
+                  "geomr_pnt_pln_distance" "geomr_pnt_tri_distance" "geomr_pnt_line_distance"
+                  "tree_basics_7b1" "tree_basics_7b2" "tree_basics_7b3" "tree_basics_7b4" "tree_basics_7b5"
+                  "tree_basics_15b1" "tree_basics_15b3"
+                  "tree_corners"
+                  "tree_children" "tree_neighbors" "zzz_tbd_tree_exist_neighbors"
+                )
 set(TARGETS_FTEST "MR_cell_cplx_test_mpl" "MR_cell_cplx_test_wedge" "MR_cell_cplx_test_surf_wave_hole" 
-                  #"MR_rect_tree_test_surf_corner" 
                   "flat_test_tree_01"
                   "nan_solver"
-                  "segment_folder"
-                  "triangle_folder"
-               )
+                  "segment_folder" "triangle_folder"
+                  "rect_fix_dup" "rect_fix_nan"
+                )
 
 # Construct list of targets we can build
 set(TARGETS_ALL ${TARGETS_EXAMPLE} ${TARGETS_UTEST} ${TARGETS_FTEST})
@@ -116,6 +115,11 @@ foreach(CURTGT IN LISTS TARGETS_ALL)
 endforeach(CURTGT)
 
 ######################################################################################################################################################
+
+add_custom_target(ftest-build 
+  DEPENDS ${TARGETS_FTEST}
+  COMMENT "Building Functional Tests"
+)
 
 add_custom_target(test-build 
   DEPENDS ${TARGETS_UTEST}
