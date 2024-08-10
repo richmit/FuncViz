@@ -1,14 +1,14 @@
-*WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING*
-*WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING*
+
+
+#+BEGIN_QUOTE
+*WARNING* *WARNING* *WARNING* 
 
 This software is pre-alpha!
 
-About half of planned functionality is implemented. Unit test coverage is less than 5%.
+About 90% of planned functionality is implemented; however, unit test coverage is less than 5% and the API is in flux.
 
-*The exposed API is in flux.*
-
-*WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING*
-*WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING* *WARNING*
+*WARNING* *WARNING* *WARNING* 
+#+END_QUOTE
 
 * =MRPTree= (MR 2^P Tree)
 
