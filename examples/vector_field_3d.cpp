@@ -94,13 +94,13 @@ int main() {
   double b      = 28.0;
   double c      = 8.0 / 3.0;
 
-  auto p_old = cvccplx.add_point({x_old, y_old, z_old, t});
+  auto p_old = cvccplx.add_node({x_old, y_old, z_old, t});
   for(int num_steps=0;num_steps<max_steps;num_steps++) {    
     double x_new = x_old + a*(y_old-x_old)*delta;
     double y_new = y_old + (x_old*(b-z_old)-y_old)*delta;
     double z_new = z_old + (x_old*y_old-c*z_old)*delta;
     t += delta;
-    auto p_new = cvccplx.add_point({x_new, y_new, z_new, t});
+    auto p_new = cvccplx.add_node({x_new, y_new, z_new, t});
     cvccplx.add_cell(cc_t::cell_type_t::SEGMENT, {p_old, p_new});
     x_old=x_new;
     y_old=y_new;

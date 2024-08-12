@@ -73,8 +73,8 @@ int main() {
 
   ccplx.dump_cplx(10);
 
-  ccplx.triangle_folder([&bridge](cc_t::pnt_data_t x){return bridge.tsampf_to_cdatf(f, x); }, 
-                        [&bridge](cc_t::pnt_data_t x){return bridge.tsdf_to_csdf(   s, x); });
+  ccplx.triangle_folder([&bridge](cc_t::node_data_t x){return bridge.tsampf_to_cdatf(f, x); }, 
+                        [&bridge](cc_t::node_data_t x){return bridge.tsdf_to_csdf(   s, x); });
 
   ccplx.dump_cplx(10);
 

@@ -47,16 +47,16 @@ BOOST_AUTO_TEST_CASE(check_cell_quad) {
 
   mjr::MRccT5 aPoly;
 
-  aPoly.add_point({1.0, 1.0, 0.0}); // 0  
-  aPoly.add_point({1.0, 3.0, 0.0}); // 1 
-  aPoly.add_point({3.0, 3.0, 0.0}); // 2 
-  aPoly.add_point({3.0, 1.0, 0.0}); // 3 
+  aPoly.add_node({1.0, 1.0, 0.0}); // 0  
+  aPoly.add_node({1.0, 3.0, 0.0}); // 1 
+  aPoly.add_node({3.0, 3.0, 0.0}); // 2 
+  aPoly.add_node({3.0, 1.0, 0.0}); // 3 
 
-  aPoly.add_point({0.0, 0.0, 0.0}); // 4
-  aPoly.add_point({2.0, 2.0, 0.0}); // 5
-  aPoly.add_point({4.0, 4.0, 0.0}); // 6
+  aPoly.add_node({0.0, 0.0, 0.0}); // 4
+  aPoly.add_node({2.0, 2.0, 0.0}); // 5
+  aPoly.add_node({4.0, 4.0, 0.0}); // 6
 
-  aPoly.add_point({1.0, 1.0, 1.0}); // 7
+  aPoly.add_node({1.0, 1.0, 1.0}); // 7
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
 

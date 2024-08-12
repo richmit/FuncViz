@@ -190,8 +190,8 @@ int main() {
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
   // Fold the triangles on our clipping plane
-  ccplx.triangle_folder([](cc_t::pnt_data_t x){return tc_t::tsampf_to_cdatf(        cpf, x); }, 
-                        [](cc_t::pnt_data_t x){return tc_t::tsampf_to_clcdf(4, 3.5, cpf, x); });
+  ccplx.triangle_folder([](cc_t::node_data_t x){return tc_t::tsampf_to_cdatf(        cpf, x); }, 
+                        [](cc_t::node_data_t x){return tc_t::tsampf_to_clcdf(4, 3.5, cpf, x); });
   std::cout << "POST FOLD" << std::endl;
   ccplx.dump_cplx(5);
 
@@ -201,8 +201,8 @@ int main() {
   // We can do this directly with ccplx using index 6 into the point data (point data is domain data appended with range data)
   // ccplx.cull_cells([&ccplx](cc_t::cell_t c){ return !(ccplx.cell_below_level(c, 6, 3.5)); });
 
-  // Or we can use the index in the original sample function along with the converter rt_ran_idx_to_pd_idx().
-  ccplx.cull_cells([&ccplx](cc_t::cell_t c){ return !(ccplx.cell_below_level(c, tc_t::rt_ran_idx_to_pd_idx(4), 3.5)); });
+  // Or we can use the index in the original sample function along with the converter rt_rng_idx_to_pd_idx().
+  ccplx.cull_cells([&ccplx](cc_t::cell_t c){ return !(ccplx.cell_below_level(c, tc_t::rt_rng_idx_to_pd_idx(4), 3.5)); });
 
   std::cout << "POST CULL" << std::endl;
   ccplx.dump_cplx(5);

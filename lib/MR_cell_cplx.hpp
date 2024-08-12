@@ -139,13 +139,13 @@ namespace mjr {
       A number of quality checks may be performed on points and cells before they are added to the object.  These checks can slow down execution of add_cell()
       by an order of magnitude, and almost double the RAM required for this class.  These checks are entirely optional.
 
-        - uniq_points:
+        - chk_point_unique:
           - Many 3D file formats store the master list of potential points, and then use an integer index into this list when defining geometric objects.
           - Most visualization software is pretty tolerant of having duplicate points on this list when just doing rendering.
           - Duplicate points can break many software packages pretty badly when it comes to computation.
           - Depending on how points are added to this object, this check can avoid quite a bit of wasted RAM and produce *much* smaller output files.
           - I normally leave this check turned on.
-        - uniq_cells:
+        - chk_cell_unique:
           - Most packages can render objects with duplicate cells, but you might see graphical artifacts or glitching.
           - When using a mesh with duplicate cells, computations can sometimes fail or take a *very* long time
           - I normally leave this check turned on.
@@ -168,8 +168,8 @@ namespace mjr {
 
        \verbatim
        +-------------+-------------------+--------------------+--------------------+-------------------------------+-------------------------------+
-       |             | uniq_points       | uniq_points        | uniq_points        | uniq_points                   | uniq_points                   |
-       |             | uniq_cells        | uniq_cells         | uniq_cells         | uniq_cells                    | uniq_cells                    |
+       |             | chk_point_unique  | chk_point_unique   | chk_point_unique   | chk_point_unique              | chk_point_unique              |
+       |             | chk_cell_unique   | chk_cell_unique    | chk_cell_unique    | chk_cell_unique               | chk_cell_unique               |
        |             | chk_cell_vertexes | chk_cell_vertexes  | chk_cell_vertexes  | chk_cell_vertexes             | chk_cell_vertexes             |
        |             |                   | chk_cell_dimension | chk_cell_dimension | chk_cell_dimension            | chk_cell_dimension            |
        |             |                   |                    | chk_cell_edges     | chk_cell_edges                | chk_cell_edges                |
@@ -187,15 +187,15 @@ namespace mjr {
        \endverbatim
 
 
-        @tparam uniq_points        Only allow unique points on the master point list
-        @tparam uniq_cells         Only allow unique cells on the master cell list.  Won't prevent cells that are sub-cells of existing cells.
+        @tparam chk_point_unique   Only allow unique points on the master point list
+        @tparam chk_cell_unique    Only allow unique cells on the master cell list.  Won't prevent cells that are sub-cells of existing cells.
         @tparam chk_cell_vertexes  Do cell vertex checks (See: cell_stat_t)
         @tparam chk_cell_dimension Do cell dimension checks (See: cell_stat_t)
         @tparam chk_cell_edges     Do cell edge checks (See: cell_stat_t)
         @tparam flt_type           Type for floating point values (
         @tparam eps                Epsilon used to detect zero */
-  template <bool     uniq_points,
-            bool     uniq_cells,
+  template <bool     chk_point_unique,
+            bool     chk_cell_unique,
             bool     chk_cell_vertexes,
             bool     chk_cell_dimension,
             bool     chk_cell_edges,
@@ -203,267 +203,303 @@ namespace mjr {
             flt_type eps
             // double eps
             >
-  requires (std::is_floating_point<flt_type>::value)
+  requires ((std::is_floating_point<flt_type>::value) &&
+            (eps > std::numeric_limits<flt_type>::epsilon()))
   class MR_cell_cplx {
-
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public:
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Global Types & Constants*/
+      /** @name Global Types & Constants. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Universal floating point type -- used for point components, scalar data values, vector components, all computation, etc.... */
       typedef flt_type uft_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** epsilon */
-      constexpr static uft_t epsilon = eps;
+      constexpr static uft_t epsilon      = eps;
+      constexpr static uft_t uft_epsilon  = std::numeric_limits<uft_t>::epsilon();
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /** @name Node Data.
 
-      public:
-
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Master point list.
-
-          Cell complex objects have a master list of points.  Cells & data elements defined by referencing point indexes on this master list.
-
-          Points consist of three double values, think (x, y, z) in R^3.  Indexes in this list are used to identify points.  The first point added gets index
-          0, and each successive point gets the next integer. */
+          Cell complex objects have a central repository of nodes.  Each node has a simple data set consisting of a vector of uft_t values.  This data may be
+          used for various purposes; however, three of the values in the vector are always required to specify the node's location in R^3 (i.e. the node's
+          "point"). Other uses include normal vectors and RGB colors.  In addition subsets of these values may be named, and extracted by name.  Lists of
+          indexes are used to define cells. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Hold a tuple of real values defining a point. */
-      typedef std::array<uft_t, 3> pnt_t;
+      /** Type to hold a data for a single node. */
+      typedef std::vector<uft_t> node_data_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Integer type used to indentify/index points. */
-      typedef int pnt_idx_t;
+      /** Type used to hold an index into a node_data_t or a constant MR_cell_cplx::uft_t. */
+      typedef std::variant<int, uft_t> node_data_idx_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Type to hold a list of data indexes -- one element for scalars, 3 for vectors, etc.... */
+      typedef std::vector<node_data_idx_t> node_data_idx_lst_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Type to hold a list values extracted from node data via a MR_cell_cplx::node_data_idx_lst_t (also see MR_cell_cplx::fvec3_t). */
+      typedef node_data_t vdat_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** How to construct a point from a node dataset */
+      node_data_idx_lst_t node_data_to_pnt;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Integer type used to indentify/index nodes. */
+      typedef int node_idx_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** list of node indexes. */
+      typedef std::vector<node_idx_t> node_idx_list_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Hold a tuple of real values defining a point/vector in R^3 (also see MR_cell_cplx::vdat_t).  */
+      typedef std::array<uft_t, 3> fvec3_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Hold a list of MR_cell_cplx::fvec3_t objects. */
+      typedef std::vector<fvec3_t> fvec3_list_t;
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Point data sets. */
-      //@{
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type to hold a dataset for a single point. */
-      typedef std::vector<uft_t> pnt_data_t;
-      //@}
+      /** @name Named Node Datasets.
 
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Named Datasets.
-
-          Each point's data payload may be grouped into named datasets. These named datasets are written to geometry files. */
+          node data may be grouped into named datasets, and written to geometry files. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Type to hold a dataset name */
-      typedef std::string pdata_name_t;
+      typedef std::string named_data_name_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type to hold a single 3-vector data value */
-      typedef pnt_t vdat_t;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type used to hold an index into a pnt_data_t or a constant float. */
-      typedef std::variant<int, uft_t> data_idx_t;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type to hold a list of data indexes -- one element for scalars, 3 for vectors, etc.... */
-      typedef std::vector<data_idx_t> data_idx_lst_t;
+      /** Type to hold a list of dataset names */
+      typedef std::vector<named_data_name_t> named_data_name_list_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Type to map names to named data sets (index lists). */
-      typedef std::map<pdata_name_t, data_idx_lst_t> data_name_to_data_idx_lst_t;
+      typedef std::map<named_data_name_t, node_data_idx_lst_t> data_name_to_node_data_idx_lst_t;
+      //@}
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /** @name Cells. */
+      //@{
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Type to hold a poly cell -- a list of point indexes */
+      typedef node_idx_list_t cell_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Cell Status.  */
+      enum class cell_stat_t { GOOD,           //!< Looks like a good cell                                       N/A
+                               TOO_FEW_PNT,    //!< List of points was empty                                     check_cell_vertexes
+                               TOO_MANY_PNT,   //!< List of points was too long (>5)                             check_cell_vertexes
+                               NEG_PNT_IDX,    //!< Negative point index (i.e. not on the central node data)     check_cell_vertexes
+                               BIG_PNT_IDX,    //!< Point index was too big (i.e. not on the central node data)  check_cell_vertexes
+                               DUP_PNT,        //!< At least two points have the same index                      check_cell_vertexes
+                               DIM_LOW,        //!< Dimension low (degenerate)                                   check_cell_dimension
+                               BAD_EDGEI,      //!< Bad edge-edge intersection                                   check_cell_edge_intersections
+                               BAD_FACEI,      //!< Bad face-edge intersection                                   check_cell_face_intersections
+                               FACE_BENT,      //!< A face (QUAD, HEXAHEDRON, or PYRAMID) was not plainer        check_cell_faces_plainer
+                               CONCAVE,        //!< (QUAD, HEXAHEDRON, or PYRAMID) was concave                   TBD
+                             };
+
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Cell Types. */
+      enum class cell_type_t { POINT,
+                               SEGMENT,
+                               TRIANGLE,
+                               QUAD,
+                               HEXAHEDRON,
+                               PYRAMID,
+                             };
+      //@}
 
     private:
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Master point list. */
+      /** @name Node Data. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** The index of the last point added via the add_point() method. */
-      pnt_idx_t last_point_idx = -1;
+      /** The index of the last point added via the add_node() method. */
+      node_idx_t last_point_idx = -1;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** True if the last point given to the add_point() method was new -- i.e. not on the master point list.
-          Only updated if uniq_points is true.  See: last_point_added_was_new() */
+      /** True if the last point given to the add_node() method was new -- i.e. not on the central node data.
+          Only updated if chk_point_unique is true.  See: last_point_added_was_new() */
       bool last_point_new = true;
+      /** @cond */  // Leaving this out of doxygen because I don't like how it shows up...
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Less operator for pnt_lst_uniq_t.
-          @return If a & b are close in space, then return false.  Otherwise uses lexicographic ordering.
-          @bug Assumes 3==3. */
+          @return If a & b are close in space, then return false.  Otherwise uses lexicographic ordering. */
       struct pnt_less {
-          bool operator()(const pnt_t& a, const pnt_t& b) const { return (((std::abs(a[0]-b[0]) > eps) ||
-                                                                           (std::abs(a[1]-b[1]) > eps) ||
-                                                                           (std::abs(a[2]-b[2]) > eps)) &&
-                                                                          ((a[0] < b[0]) ||
-                                                                           ((a[0] == b[0]) &&
-                                                                            ((a[1] < b[1]) ||
-                                                                             ((a[1] == b[1]) && (a[2] < b[2])))))); }
+          bool operator()(const fvec3_t& a, const fvec3_t& b) const { return (((std::abs(a[0]-b[0]) > eps) ||
+                                                                               (std::abs(a[1]-b[1]) > eps) ||
+                                                                               (std::abs(a[2]-b[2]) > eps)) &&
+                                                                              ((a[0] < b[0]) ||
+                                                                               ((a[0] == b[0]) &&
+                                                                                ((a[1] < b[1]) ||
+                                                                                 ((a[1] == b[1]) && (a[2] < b[2])))))); }
       };
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** List of points */
-      typedef std::vector<pnt_t> pnt_idx_to_pnt_t;
+      /** @endcond */
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Used to uniquify points and assign point index values */
-      typedef std::map<pnt_t, pnt_idx_t, pnt_less> pnt_to_pnt_idx_map_t;
+      typedef std::map<fvec3_t, node_idx_t, pnt_less> pnt_to_node_idx_map_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Maps points to point index -- used to detect physically identical points in R^3 */
-      pnt_to_pnt_idx_map_t pnt_to_pnt_idx_map;
+      /** Maps points to point index -- used to detect points with nearly identical geometric points in R^3 */
+      pnt_to_node_idx_map_t pnt_to_node_idx_map;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Return point given index */
-      inline pnt_t get_pnt(pnt_idx_t pnt_idx) const { return get_dataset_vector(data_to_pnt, pnt_idx_to_pnt_data[pnt_idx]); }
+      /** Type to hold a all node data. */
+      typedef std::vector<node_data_t> node_idx_to_node_data_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Hold all node data sets */
+      node_idx_to_node_data_t node_idx_to_node_data;
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Point data sets. */
+      /** @name Named Node Datasets. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type to hold a all point datasets. */
-      typedef std::vector<pnt_data_t> pnt_idx_to_pnt_data_t;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /* Hold all point data sets */
-      pnt_idx_to_pnt_data_t pnt_idx_to_pnt_data;
+      /** Hold named descriptions of data (scalars & vectors) */
+      data_name_to_node_data_idx_lst_t data_name_to_data_idx_lst;
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Named Datasets. */
+      /** @name Cells. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /* Hold named descriptions of data (scalars & vectors) */
-      data_name_to_data_idx_lst_t data_name_to_data_idx_lst;
+      /** Type for a list of poly cells */
+      typedef std::vector<cell_t> cell_lst_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** How to construct a spatial point from a point dataset */
-      data_idx_lst_t data_to_pnt;
+      /** House all poly cells */
+      cell_lst_t cell_lst;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Used to uniquify cells */
+      typedef std::set<cell_t> uniq_cell_lst_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Unique cell list. */
+      uniq_cell_lst_t uniq_cell_lst;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** True if the last cell given to the add_cell() method was new -- i.e. not on the master cell list.
+          Only updated if chk_cell_unique is true.  Value is invalid if last_cell_stat is NOT cell_stat_t::GOOD.
+          See: last_cell_added_was_new() */
+      bool last_cell_new = true;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Status of the last cell added via add_cell() method.
+          Only updated if (chk_cell_vertexes || chk_cell_dimension | chk_cell_edges) is true. See: status_of_last_cell_added() */
+      cell_stat_t last_cell_stat = cell_stat_t::GOOD;
       //@}
 
     public:
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Named Datasets. */
+      /** @name Node Data. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /* Return the number of named scalar datasets */
-      inline int named_scalar_datasets_count() const {
-        return static_cast<int>(std::count_if(data_name_to_data_idx_lst.cbegin(), data_name_to_data_idx_lst.cend(), [](auto x) { return x.second.size()==1; }));
+      /** Return the number of points in the central node data list.
+          Note the return type is node_idx_t (a signed integer type) and not a size_t. */
+      inline node_idx_t node_count() const {
+        return static_cast<node_idx_t>(node_idx_to_node_data.size());  // Yes.  We mean node_idx_to_node_data.
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /* Return the number of named vector datasets */
-      inline int named_vector_datasets_count() const {
-        return static_cast<int>(std::count_if(data_name_to_data_idx_lst.cbegin(), data_name_to_data_idx_lst.cend(), [](auto x) { return x.second.size()!=1; }));
+      /** Return point given a node index */
+      inline fvec3_t get_pnt(node_idx_t pnt_idx) const { 
+        return fvec3_from_node_data(node_data_to_pnt, node_idx_to_node_data[pnt_idx]); 
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /* Return the number of named datasets */
-      inline int named_datasets_count() const {
-        return static_cast<int>(data_name_to_data_idx_lst.size());
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      inline void set_data_name_to_data_idx_lst(data_name_to_data_idx_lst_t names) {
-        data_name_to_data_idx_lst = names;
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** @overload */
-      inline void create_named_datasets(std::vector<pdata_name_t> scalar_name_strings) {
-        data_name_to_data_idx_lst.clear();
-        for(int i=0; i<static_cast<int>(scalar_name_strings.size()); ++i)
-          data_name_to_data_idx_lst[scalar_name_strings[i]] = {i};
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** @overload */
-      inline void create_named_datasets(std::vector<pdata_name_t> scalar_name_strings, data_name_to_data_idx_lst_t names) {
-        data_name_to_data_idx_lst.clear();
-        for(int i=0; i<static_cast<int>(scalar_name_strings.size()); ++i)
-          data_name_to_data_idx_lst[scalar_name_strings[i]] = {i};
-        for(auto kv : names)
-          data_name_to_data_idx_lst[kv.first] = kv.second;
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      inline void create_dataset_to_point_mapping(data_idx_lst_t point_data_index) {
-        data_to_pnt = point_data_index;
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      inline vdat_t get_dataset_vector(data_idx_lst_t data_idx_lst, pnt_data_t pnt_data) const {
-        vdat_t v;
-        for(int i=0; i<3; ++i)
-          if (data_idx_lst[i].index() == 0)
-            v[i] = pnt_data[std::get<int>(data_idx_lst[i])];
-          else
-            v[i] = std::get<uft_t>(data_idx_lst[i]);
-        return v;
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      inline uft_t get_data_scalar(data_idx_t data_idx, pnt_data_t pnt_data) const {
-        if (data_idx.index() == 0)
-          return (pnt_data[std::get<int>(data_idx)]);
-        else
-          return (std::get<int>(data_idx));
-      }
-      //@}
-
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Master point list. */
-      //@{
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Retruns the index of the last point given to the add_point() method. */
-      inline pnt_idx_t idx_of_last_point_added() const {
+      /** Retruns the index of the last point given to the add_node() method. */
+      inline node_idx_t idx_of_last_point_added() const {
         return last_point_idx;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Retruns true if the last point given to the add_point() method was a new point. */
-      inline pnt_idx_t last_point_added_was_new() const {
+      /** Retruns true if the last point given to the add_node() method was a new point. */
+      inline node_idx_t last_point_added_was_new() const {
         return last_point_new;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Add a point.
-          Cases
-            - Any of the coordinate values in the given point are NaN: last_point_idx=-1, last_point_new=false.
-            - The given point is already on the list: last_point_idx is ste to the existing point's index, and last_point_new=false
-            - The given point is not on the list: last_point_idx is set to th enew piont's index, and last_point_new=true
-          Note that last_point_idx is always the resturn value. */
-      inline pnt_idx_t add_point(pnt_data_t pnt_data) {
-        if (data_to_pnt.empty())
-          data_to_pnt = {0, 1, 2};
-        pnt_t new_pnt = get_dataset_vector(data_to_pnt, pnt_data);
+      /** Add a point to the central node data store.
+
+          The geometric point coordinates are extracted, and tested before the node data is added leading to three cases:
+
+          Case 1: If the geometric point contains a NaN, then the point is NOT added to the central node data store, last_point_idx=-1, and
+          last_point_new=false.  
+
+          Case 2: If the geometric point is already on the list and chk_point_unique is true, then the point is NOT added to the central node data store,
+          last_point_idx is stet to the existing point's index, and last_point_new=false.  Only the geometric point components are used to determine if a
+          point exists in the store.
+
+          Case 3: If the geometric point is not on the list, then the point is added to the central node data store, last_point_idx is set to the new point's
+          index, and last_point_new=true Note that last_point_idx is always the return value.
+
+          @param node_data The point to add! */
+      inline node_idx_t add_node(node_data_t node_data) {
+        if (node_data_to_pnt.empty())
+          node_data_to_pnt = {0, 1, 2};
+        fvec3_t new_pnt = fvec3_from_node_data(node_data_to_pnt, node_data);
         if (pnt_has_nan(new_pnt)) {
           last_point_idx = -1;
           last_point_new = false;
         } else {
-          if constexpr (uniq_points) {
-            if (pnt_to_pnt_idx_map.contains(new_pnt)) {
+          if constexpr (chk_point_unique) {
+            if (pnt_to_node_idx_map.contains(new_pnt)) {
               /* Point is already in list */
-              last_point_idx = pnt_to_pnt_idx_map[new_pnt];
+              last_point_idx = pnt_to_node_idx_map[new_pnt];
               last_point_new = false;
             } else {
               /* Point is not already in list */
-              last_point_idx = num_points();
-              pnt_to_pnt_idx_map[new_pnt] = last_point_idx;
-              //pnt_idx_to_pnt.push_back(new_pnt);
-              pnt_idx_to_pnt_data.push_back(pnt_data);
+              last_point_idx = node_count();
+              pnt_to_node_idx_map[new_pnt] = last_point_idx;
+              //node_idx_to_pnt.push_back(new_pnt);
+              node_idx_to_node_data.push_back(node_data);
               last_point_new = true;
             }
           } else {
             /* Add point without regard to uniqueness */
-            last_point_idx = num_points();
-            //pnt_idx_to_pnt.push_back(new_pnt);
-            pnt_idx_to_pnt_data.push_back(pnt_data);
+            last_point_idx = node_count();
+            //node_idx_to_pnt.push_back(new_pnt);
+            node_idx_to_node_data.push_back(node_data);
             last_point_new = true;
           }
         }
         return last_point_idx;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Print number of points in master point list.
-          Note the return type is pnt_idx_t (a signed integer type) and not a size_t. */
-      inline pnt_idx_t num_points() const {
-        return static_cast<pnt_idx_t>(pnt_idx_to_pnt_data.size());  // Yes.  We mean pnt_idx_to_pnt_data.
+      /** Construct a fvec3_t from a node_data_t and a node_data_idx_lst_t.
+          This is a speciazlied form of vector_from_node_data() that produces fvec3_t objects.  Primarly used to extract the location coordinates from node data.
+          Note data_idx_lst must contain at least three values, but only the first three are used.  If the node_data_idx_lst_t has fewer than three elements, then
+          this function will throw.
+          @param data_idx_lst  Index list used to identify the data to pull
+          @param node_data      node data vector from which to pull data */
+      inline fvec3_t fvec3_from_node_data(node_data_idx_lst_t data_idx_lst, node_data_t node_data) const {
+        fvec3_t v;
+        for(int i=0; i<3; ++i)
+          if (data_idx_lst[i].index() == 0)
+            v[i] = node_data[std::get<int>(data_idx_lst.at(i))];
+          else
+            v[i] = std::get<uft_t>(data_idx_lst.at(i));
+        return v;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Convert a pnt_t to a string representation */
-      inline std::string pnt_to_string(pnt_idx_t pnt_idx) const {
+      /** Construct a vdat_t from a node_data_t and a node_data_idx_lst_t.
+          @param data_idx_lst  Index list used to identify the data to pull
+          @param node_data      node data vector from which to pull data */
+      inline vdat_t vector_from_node_data(node_data_idx_lst_t data_idx_lst, node_data_t node_data) const {
+        vdat_t v;
+        for(decltype(data_idx_lst.size()) i=0; i<data_idx_lst.size(); ++i)
+          if (data_idx_lst[i].index() == 0)
+            v.push_back(node_data[std::get<int>(data_idx_lst.at(i))]);
+          else
+            v.push_back(std::get<uft_t>(data_idx_lst.at(i)));
+        return v;
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Extract a uft_t from a node_data_t and a node_data_idx_t.
+          @param data_idx  Index list used to identify the data to pull
+          @param node_data  node data vector from which to pull data */
+      inline uft_t scalar_from_node_data(node_data_idx_t data_idx, node_data_t node_data) const {
+        if (data_idx.index() == 0)
+          return (node_data[std::get<int>(data_idx)]);
+        else
+          return (std::get<int>(data_idx));
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Convert a fvec3_t to a string representation
+          @param pnt_idx The point to convert.*/
+      inline std::string node_to_string(node_idx_t pnt_idx) const {
         std::ostringstream convert;
         if (pnt_idx >= 0) {
           convert << "[ ";
-          for(auto c: get_pnt(pnt_idx))
+          for(auto c: node_idx_to_node_data[pnt_idx]) 
             convert << std::setprecision(5) << static_cast<uft_t>(c) << " ";
           convert << "]";
         } else {
@@ -475,35 +511,90 @@ namespace mjr {
       /** Print all points to STDOUT.
 
           @param max_num_print Maximum number of points to print.  Use 0 to print all points. */
-      inline void print_all_points(int max_num_print) const {
+      inline void print_all_nodes(int max_num_print) const {
         int num_printed = 0;
-        if (num_points() > 0) {
-          std::cout << "POINTS BEGIN (" << num_points() << ")" << std::endl;
-          for(pnt_idx_t pnt_idx = 0; pnt_idx<num_points(); ++pnt_idx) {
-            std::cout << "  " << pnt_idx << ": " << pnt_to_string(pnt_idx) << std::endl;
+        if (node_count() > 0) {
+          std::cout << "NODES BEGIN (" << node_count() << ")" << std::endl;
+          for(node_idx_t pnt_idx = 0; pnt_idx<node_count(); ++pnt_idx) {
+            std::cout << "  " << pnt_idx << ": " << node_to_string(pnt_idx) << std::endl;
             num_printed++;
             if ((max_num_print > 0) && (num_printed >= max_num_print)) {
-              std::cout << "  Maximum number of points reached.  Halting tree dump." << std::endl;
+              std::cout << "  Maximum number of nodes reached.  Halting tree dump." << std::endl;
               break;
             }
           }
-          std::cout << "POINTS END" << std::endl;
+          std::cout << "NODES END" << std::endl;
         }
       }
       //@}
 
-    public:
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name 3D Vector Computations. */
+      /** @name Named Node Datasets. */
+      //@{
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Return the number of named scalar datasets */
+      inline int named_scalar_datasets_count() const {
+        return static_cast<int>(std::count_if(data_name_to_data_idx_lst.cbegin(), data_name_to_data_idx_lst.cend(), [](auto x) { return x.second.size()==1; }));
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Return the number of named vector datasets */
+      inline int named_vector_datasets_count() const {
+        return static_cast<int>(std::count_if(data_name_to_data_idx_lst.cbegin(), data_name_to_data_idx_lst.cend(), [](auto x) { return x.second.size()!=1; }));
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Return the number of named (both vector and scalar) datasets */
+      inline int named_datasets_count() const {
+        return static_cast<int>(data_name_to_data_idx_lst.size());
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Create named data sets by setting raw member.
+          @param names value to set. */
+      inline void set_data_name_to_data_idx_lst(data_name_to_node_data_idx_lst_t names) {
+        data_name_to_data_idx_lst = names;
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Create named data sets.
+          Simple way to create named scalar datasets for the first n elements in each point's data.
+          @param scalar_name_strings Scalar data set names to apply, in order, to node data elements. */
+      inline void create_named_datasets(named_data_name_list_t scalar_name_strings) {
+        data_name_to_data_idx_lst.clear();
+        for(int i=0; i<static_cast<int>(scalar_name_strings.size()); ++i)
+          data_name_to_data_idx_lst[scalar_name_strings[i]] = {i};
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** @overload
+          @param scalar_name_strings Scalar data set names to apply, in order, to node data elements. 
+          @param names               data_name_to_data_idx entries to create -- frequently used to add a named vector dataset. */
+      inline void create_named_datasets(named_data_name_list_t scalar_name_strings, data_name_to_node_data_idx_lst_t names) {
+        data_name_to_data_idx_lst.clear();
+        for(int i=0; i<static_cast<int>(scalar_name_strings.size()); ++i)
+          data_name_to_data_idx_lst[scalar_name_strings[i]] = {i};
+        for(auto kv : names)
+          data_name_to_data_idx_lst[kv.first] = kv.second;
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Create mapping beteen node data and geometric pionts.
+          Geometric points are constructed from node data via a node_data_idx_lst_t -- just like named data sets.  Each time a geometric point is required,
+          it is dynamically pulled from the point's data via this mapping.
+          @param point_data_index A node_data_idx_lst_t defining how to construct a geometric point. */
+      inline void create_dataset_to_point_mapping(node_data_idx_lst_t point_data_index) {
+        node_data_to_pnt = point_data_index;
+      }
+      //@}
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /** @name 3D Vector Computations. 
+
+          These functions operate on fvec3_t objects (arrays of 3 real numbers), but treat them as 3-vectors. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the magnitude */
-      inline uft_t vec3_two_norm(const pnt_t& pnt) const {
+      inline uft_t vec3_two_norm(const fvec3_t& pnt) const {
         return std::sqrt(vec3_self_dot_product(pnt));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the self dot product -- i.e. magnitude squared */
-      inline uft_t vec3_self_dot_product(const pnt_t& pnt) const {
+      inline uft_t vec3_self_dot_product(const fvec3_t& pnt) const {
         uft_t tmp = 0.0;
         for(int i=0; i<3; ++i)
           tmp += pnt[i]*pnt[i];
@@ -511,7 +602,7 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the cross prodcut */
-      inline uft_t vec3_dot_product(const pnt_t& pnt1, const pnt_t& pnt2) const {
+      inline uft_t vec3_dot_product(const fvec3_t& pnt1, const fvec3_t& pnt2) const {
         uft_t tmp = 0.0;
         for(int i=0; i<3; ++i)
           tmp += pnt1[i]*pnt2[i];
@@ -519,8 +610,8 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the cross prodcut */
-      inline pnt_t vec3_cross_product(const pnt_t& pnt1, const pnt_t& pnt2) const {
-        pnt_t tmp;
+      inline fvec3_t vec3_cross_product(const fvec3_t& pnt1, const fvec3_t& pnt2) const {
+        fvec3_t tmp;
         tmp[0] = pnt1[1]*pnt2[2]-pnt1[2]*pnt2[1];
         tmp[1] = pnt1[2]*pnt2[0]-pnt1[0]*pnt2[2];
         tmp[2] = pnt1[0]*pnt2[1]-pnt1[1]*pnt2[0];
@@ -528,20 +619,20 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the vector diffrence */
-      inline pnt_t vec3_diff(const pnt_t& pnt1, const pnt_t& pnt2) const {
-        pnt_t tmp;
+      inline fvec3_t vec3_diff(const fvec3_t& pnt1, const fvec3_t& pnt2) const {
+        fvec3_t tmp;
         for(int i=0; i<3; ++i)
           tmp[i] = pnt1[i] - pnt2[i];
         return tmp;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the vector diffrence */
-      inline uft_t vec3_scalar_triple_product(const pnt_t& pnt1, const pnt_t& pnt2, const pnt_t& pnt3) const {
+      inline uft_t vec3_scalar_triple_product(const fvec3_t& pnt1, const fvec3_t& pnt2, const fvec3_t& pnt3) const {
         return vec3_dot_product(pnt1, vec3_cross_product(pnt2, pnt3));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Unitize the given point in place.  Return true if the result is valid, and false otherwise */
-      inline bool vec3_unitize(pnt_t& pnt) const {
+      inline bool vec3_unitize(fvec3_t& pnt) const {
         uft_t length = vec3_two_norm(pnt);
         if (std::abs(length) > eps) {
           for(int i=0; i<3; ++i)
@@ -553,15 +644,15 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the linear combination */
-      inline pnt_t vec3_linear_combination(uft_t scl1, const pnt_t& pnt1, uft_t scl2, const pnt_t& pnt2) const {
-        pnt_t tmp;
+      inline fvec3_t vec3_linear_combination(uft_t scl1, const fvec3_t& pnt1, uft_t scl2, const fvec3_t& pnt2) const {
+        fvec3_t tmp;
         for(int i=0; i<3; ++i)
           tmp[i] = scl1 * pnt1[i] + scl2 * pnt2[i];
         return tmp;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Determinant of 3x3 matrix with given vectors as columns/rows. */
-      inline uft_t vec3_det3(const pnt_t& pnt1, const pnt_t& pnt2, const pnt_t& pnt3) const {
+      inline uft_t vec3_det3(const fvec3_t& pnt1, const fvec3_t& pnt2, const fvec3_t& pnt3) const {
         //  MJR TODO NOTE <2024-07-22T15:48:31-0500> vec3_det3: UNTESTED! UNTESTED! UNTESTED! UNTESTED!
         static_assert(false, "vec3_det3: Under active development.  Untested!");
         return (pnt1[0] * pnt2[1] * pnt3[2] -
@@ -576,11 +667,8 @@ namespace mjr {
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /** @name 3D Geometry Computations.
 
-       Methods with geomi_ prefix take point index types while methods with a geomr_ prefix take double tuples.  */
+          Methods with geomi_ prefix take point index types while methods with a geomr_ prefix take double tuples.  */
       //@{
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** list of points */
-      typedef std::vector<pnt_idx_t> pnt_idx_list_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Segment intersection types */
       enum class seg_isect_t { C0_EMPTY,        //!< Cardinality=0.        Intersection is the empty set.
@@ -607,7 +695,7 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Determine the nature of the intersection between two line segments */
-      seg_isect_t geomi_seg_isect_type(pnt_idx_t ilin1pnt1, pnt_idx_t ilin1pnt2, pnt_idx_t ilin2pnt1, pnt_idx_t ilin2pnt2) const {
+      seg_isect_t geomi_seg_isect_type(node_idx_t ilin1pnt1, node_idx_t ilin1pnt2, node_idx_t ilin2pnt1, node_idx_t ilin2pnt2) const {
         //  MJR TODO NOTE <2024-08-02T09:41:48-0500> geomi_seg_isect_type: Repeated point look-up slows things down
         //  MJR TODO NOTE <2024-08-02T09:41:48-0500> geomi_seg_isect_type: Add unit tests for each code branch
         // Check for degenerate segments
@@ -616,7 +704,7 @@ namespace mjr {
         if (ilin2pnt1 == ilin2pnt2)
           return seg_isect_t::BAD_SEGMENT;
         // Count unique points & break into cases
-        std::set<pnt_idx_t> points_sorted;
+        std::set<node_idx_t> points_sorted;
         points_sorted.insert(ilin1pnt1);
         points_sorted.insert(ilin1pnt2);
         points_sorted.insert(ilin2pnt1);
@@ -640,7 +728,7 @@ namespace mjr {
           }
           return seg_isect_t::C0_EMPTY;
         } else if (points_sorted.size() == 3) { // .............................................. REMAINING CASES: C1_VERTEX1, CI_VERTEX1
-          pnt_idx_t ipnt1, ipnt2, ipntc;
+          node_idx_t ipnt1, ipnt2, ipntc;
           if (ilin1pnt1 == ilin2pnt1) {
             ipntc = ilin1pnt1; ipnt1 = ilin1pnt2; ipnt2 = ilin2pnt2;
           } else if (ilin1pnt1 == ilin2pnt2) {
@@ -671,12 +759,12 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if two line segments intersect in a single point */
-      inline bool geomi_seg_isect1(pnt_idx_t ilin1pnt1, pnt_idx_t ilin1pnt2, pnt_idx_t ilin2pnt1, pnt_idx_t ilin2pnt2) const {
+      inline bool geomi_seg_isect1(node_idx_t ilin1pnt1, node_idx_t ilin1pnt2, node_idx_t ilin2pnt1, node_idx_t ilin2pnt2) const {
         return geomr_seg_isect1(get_pnt(ilin1pnt1), get_pnt(ilin1pnt2), get_pnt(ilin2pnt1), get_pnt(ilin2pnt2));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if two line segments intersect in a single point */
-      inline bool geomr_seg_isect1(const pnt_t& lin1pnt1, const pnt_t& lin1pnt2, const pnt_t& lin2pnt1, const pnt_t& lin2pnt2) const {
+      inline bool geomr_seg_isect1(const fvec3_t& lin1pnt1, const fvec3_t& lin1pnt2, const fvec3_t& lin2pnt1, const fvec3_t& lin2pnt2) const {
         uft_t denom =
           lin1pnt1[0] * lin2pnt1[1] - lin1pnt1[0] * lin2pnt2[1] - lin1pnt1[1] * lin2pnt1[0] + lin1pnt1[1] * lin2pnt2[0] -
           lin1pnt2[0] * lin2pnt1[1] + lin1pnt2[0] * lin2pnt2[1] + lin1pnt2[1] * lin2pnt1[0] - lin1pnt2[1] * lin2pnt2[0];
@@ -703,17 +791,17 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Distance between a point and a line.
           See: geomr_pnt_line_distance(). */
-      inline uft_t geomi_pnt_line_distance(pnt_idx_t ilinpnt1, pnt_idx_t ilinpnt2, pnt_idx_t ipnt, bool seg_distance) const {
+      inline uft_t geomi_pnt_line_distance(node_idx_t ilinpnt1, node_idx_t ilinpnt2, node_idx_t ipnt, bool seg_distance) const {
         return geomr_pnt_line_distance(get_pnt(ilinpnt1), get_pnt(ilinpnt2), get_pnt(ipnt), seg_distance);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Distance between a point and a line.
           The result depends on the value of seg_distance:
-            - seg_distance==false: Distance between the point pnt and the line containing linpnt1 & linpnt2.
-            - seg_distance==true:  Distance between the point pnt and the line segment with endpoints linpnt1 & linpnt2. */
-      uft_t geomr_pnt_line_distance(const pnt_t& linpnt1, const pnt_t& linpnt2, const pnt_t& pnt, bool seg_distance) const {
+          - seg_distance==false: Distance between the point pnt and the line containing linpnt1 & linpnt2.
+          - seg_distance==true:  Distance between the point pnt and the line segment with endpoints linpnt1 & linpnt2. */
+      uft_t geomr_pnt_line_distance(const fvec3_t& linpnt1, const fvec3_t& linpnt2, const fvec3_t& pnt, bool seg_distance) const {
         uft_t segd = geomr_pnt_pnt_distance(linpnt1, linpnt2);
-        pnt_t d, p;
+        fvec3_t d, p;
         uft_t t = 0;
         for(int i=0; i<3; i++) {
           d[i] = (linpnt2[i] - linpnt1[i]) / segd;
@@ -734,36 +822,36 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the euculedian (2 norm) distance between two points */
-      inline uft_t geomr_pnt_pnt_distance(const pnt_t& pnt1, const pnt_t& pnt2) const {
+      inline uft_t geomr_pnt_pnt_distance(const fvec3_t& pnt1, const fvec3_t& pnt2) const {
         return vec3_two_norm(vec3_diff(pnt1, pnt2));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the normal of a triangle (or a plane defined by 3 points) */
-      inline pnt_t geomr_tri_normal(const pnt_t& tripnt1, const pnt_t& tripnt2, const pnt_t& tripnt3, bool unit) const {
-        pnt_t basisv1 = vec3_diff(tripnt1, tripnt2);  // basis vectors for pln containing triagnel
-        pnt_t basisv2 = vec3_diff(tripnt3, tripnt2);  // basis vectors for pln containing triagnel
-        pnt_t normal = vec3_cross_product(basisv1, basisv2); // normal vector for tri. n=pld1xpld2
+      inline fvec3_t geomr_tri_normal(const fvec3_t& tripnt1, const fvec3_t& tripnt2, const fvec3_t& tripnt3, bool unit) const {
+        fvec3_t basisv1 = vec3_diff(tripnt1, tripnt2);  // basis vectors for pln containing triagnel
+        fvec3_t basisv2 = vec3_diff(tripnt3, tripnt2);  // basis vectors for pln containing triagnel
+        fvec3_t normal = vec3_cross_product(basisv1, basisv2); // normal vector for tri. n=pld1xpld2
         if (unit)
           vec3_unitize(normal);
         return normal;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the distance between a point and a plane */
-      inline uft_t geomr_pnt_pln_distance(const pnt_t& plnpnt1, const pnt_t& plnpnt2, const pnt_t& plnpnt3, const pnt_t& pnt) const {
-        pnt_t n = geomr_tri_normal(plnpnt1, plnpnt2, plnpnt3, true);
+      inline uft_t geomr_pnt_pln_distance(const fvec3_t& plnpnt1, const fvec3_t& plnpnt2, const fvec3_t& plnpnt3, const fvec3_t& pnt) const {
+        fvec3_t n = geomr_tri_normal(plnpnt1, plnpnt2, plnpnt3, true);
         return std::abs(vec3_dot_product(n, pnt) - vec3_dot_product(n, plnpnt2));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute the distance between a point and a triangle */
-      inline uft_t geomr_pnt_tri_distance(const pnt_t& tripnt1, const pnt_t& tripnt2, const pnt_t& tripnt3, const pnt_t& pnt) const {
+      inline uft_t geomr_pnt_tri_distance(const fvec3_t& tripnt1, const fvec3_t& tripnt2, const fvec3_t& tripnt3, const fvec3_t& pnt) const {
         //  MJR TODO NOTE <2024-07-22T15:48:31-0500> geomr_pnt_tri_distance: UNTESTED! UNTESTED! UNTESTED! UNTESTED! UNTESTED!
-        pnt_t basisv1 = vec3_diff(tripnt1, tripnt2);  // basis vectors for pln containing triagnel
-        pnt_t basisv2 = vec3_diff(tripnt3, tripnt2);  // basis vectors for pln containing triagnel
-        pnt_t normal = vec3_cross_product(basisv1, basisv2); // normal vector for tri. ax+by+cz+d=0, a=normal[0], b=normal[1], c=normal[2]
+        fvec3_t basisv1 = vec3_diff(tripnt1, tripnt2);  // basis vectors for pln containing triagnel
+        fvec3_t basisv2 = vec3_diff(tripnt3, tripnt2);  // basis vectors for pln containing triagnel
+        fvec3_t normal = vec3_cross_product(basisv1, basisv2); // normal vector for tri. ax+by+cz+d=0, a=normal[0], b=normal[1], c=normal[2]
         vec3_unitize(normal);
         uft_t d = -vec3_dot_product(normal, tripnt2);            // ax+by+cz+d=0
         uft_t lambda = vec3_dot_product(normal, pnt) + d;
-        pnt_t q = vec3_diff(vec3_linear_combination(1.0, pnt, lambda, normal), tripnt2); // q is the point in the plane closest to pnt
+        fvec3_t q = vec3_diff(vec3_linear_combination(1.0, pnt, lambda, normal), tripnt2); // q is the point in the plane closest to pnt
         uft_t denom =  basisv1[0] * basisv2[1] - basisv2[0] * basisv1[1]; // If zero, then triangle is broken!
         uft_t u     = (q[0]       * basisv2[1] - basisv2[0] *       q[1]) / denom;
         uft_t v     = (basisv1[0] *       q[1] -       q[0] * basisv1[1]) / denom;
@@ -780,30 +868,30 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if points (just one point for this function) are zero.
           Checks if the infinity norm is less than epsilon.*/
-      inline bool geomr_pnt_zero(const pnt_t& p1) const {
+      inline bool geomr_pnt_zero(const fvec3_t& p1) const {
         return ((std::abs(p1[0]) < eps) &&
                 (std::abs(p1[1]) < eps) &&
                 (std::abs(p1[2]) < eps));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if points are colinear */
-      inline bool geomi_pts_colinear(pnt_idx_t pi1, pnt_idx_t pi2, pnt_idx_t pi3, pnt_idx_t pi4) const {
+      inline bool geomi_pts_colinear(node_idx_t pi1, node_idx_t pi2, node_idx_t pi3, node_idx_t pi4) const {
         return ( geomr_pts_colinear(get_pnt(pi1), get_pnt(pi2), get_pnt(pi3)) &&
                  geomr_pts_colinear(get_pnt(pi1), get_pnt(pi2), get_pnt(pi4)) );
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if points are colinear. */
-      inline bool geomi_pts_colinear(pnt_idx_t pi1, pnt_idx_t pi2, pnt_idx_t pi3) const {
+      inline bool geomi_pts_colinear(node_idx_t pi1, node_idx_t pi2, node_idx_t pi3) const {
         return geomr_pts_colinear(get_pnt(pi1), get_pnt(pi2), get_pnt(pi3));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if points are colinear */
-      inline bool geomr_pts_colinear(pnt_t p1, pnt_t p2, pnt_t p3) const {
+      inline bool geomr_pts_colinear(fvec3_t p1, fvec3_t p2, fvec3_t p3) const {
         return geomr_pnt_zero(vec3_cross_product(vec3_diff(p1, p2), vec3_diff(p1, p3)));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if points are coplanar */
-      inline bool geomi_pts_coplanar(const pnt_idx_list_t& pnt_list) const {
+      inline bool geomi_pts_coplanar(const node_idx_list_t& pnt_list) const {
         if (pnt_list.size() > 3) {
           if ( !(geomi_pts_coplanar(pnt_list[0], pnt_list[1], pnt_list[2], pnt_list[3])))
             return false;
@@ -815,17 +903,17 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if points are coplanar */
-      inline bool geomi_pts_coplanar(pnt_idx_t pi1, pnt_idx_t pi2, pnt_idx_t pi3, pnt_idx_t pi4) const {
+      inline bool geomi_pts_coplanar(node_idx_t pi1, node_idx_t pi2, node_idx_t pi3, node_idx_t pi4) const {
         return geomr_pts_coplanar(get_pnt(pi1), get_pnt(pi2), get_pnt(pi3), get_pnt(pi4));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Check if points are coplanar */
-      inline bool geomr_pts_coplanar(pnt_t p1, pnt_t p2, pnt_t p3, pnt_t p4) const {
+      inline bool geomr_pts_coplanar(fvec3_t p1, fvec3_t p2, fvec3_t p3, fvec3_t p4) const {
         return (std::abs(vec3_scalar_triple_product(vec3_diff(p3, p1), vec3_diff(p2, p1), vec3_diff(p4, p1))) < eps);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Compute intersection of a segment and a triangle */
-      inline bool geomr_seg_tri_intersection(pnt_t tp1, pnt_t tp2, pnt_t tp3, pnt_t sp1, pnt_t sp2) const {
+      inline bool geomr_seg_tri_intersection(fvec3_t tp1, fvec3_t tp2, fvec3_t tp3, fvec3_t sp1, fvec3_t sp2) const {
         //  MJR TODO NOTE <2024-07-11T16:08:16-0500> geomr_seg_tri_intersection: implement
         //  MJR TODO NOTE <2024-07-11T16:08:27-0500> geomr_seg_tri_intersection: Should this be a bool or an enum?
         static_assert(false, "geomr_seg_tri_intersection: Not yet implemented!");
@@ -833,95 +921,22 @@ namespace mjr {
       }
       //@}
 
-    public:
-
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /** @name Class utilities. */
       //@{
       void clear() {
         last_point_idx = -1;
         last_point_new = true;
-        pnt_to_pnt_idx_map.clear();
-        //pnt_idx_to_pnt.clear();
-        pnt_idx_to_pnt_data.clear();
+        pnt_to_node_idx_map.clear();
+        node_idx_to_node_data.clear();
         data_name_to_data_idx_lst.clear();
-        data_to_pnt.clear();
+        node_data_to_pnt.clear();
         cell_lst.clear();
         uniq_cell_lst.clear();
         last_cell_new = true;
         last_cell_stat = cell_stat_t::GOOD;
       }
       //@}
-
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public:
-
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Cells. */
-      //@{
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Cell Status.  */
-      enum class cell_stat_t { GOOD,           //!< Looks like a good cell                                       N/A
-                               TOO_FEW_PNT,    //!< List of points was empty                                     check_cell_vertexes
-                               TOO_MANY_PNT,   //!< List of points was too long (>5)                             check_cell_vertexes
-                               NEG_PNT_IDX,    //!< Negative point index (i.e. not on the master point list)     check_cell_vertexes
-                               BIG_PNT_IDX,    //!< Point index was too big (i.e. not on the master point list)  check_cell_vertexes
-                               DUP_PNT,        //!< At least two points have the same index                      check_cell_vertexes
-                               DIM_LOW,        //!< Dimension low (degenerate)                                   check_cell_dimension
-                               BAD_EDGEI,      //!< Bad edge-edge intersection                                   check_cell_edge_intersections
-                               BAD_FACEI,      //!< Bad face-edge intersection                                   check_cell_face_intersections
-                               FACE_BENT,      //!< A face (QUAD, HEXAHEDRON, or PYRAMID) was not plainer        check_cell_faces_plainer
-                               CONCAVE,        //!< (QUAD, HEXAHEDRON, or PYRAMID) was concave                   TBD
-                             };
-
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Cell Types. */
-      enum class cell_type_t { POINT,
-                               SEGMENT,
-                               TRIANGLE,
-                               QUAD,
-                               HEXAHEDRON,
-                               PYRAMID,
-                             };
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type to hold a poly cell -- a list of point indexes */
-      typedef pnt_idx_list_t cell_t;
-      //@}
-
-    private:
-
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Cells. */
-      //@{
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type for a list of poly cells */
-      typedef std::vector<cell_t> cell_lst_t;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** House all poly cells */
-      cell_lst_t cell_lst;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Used to uniquify cells */
-      // typedef std::map<pnt_t, pnt_idx_t> pnt_to_pnt_idx_map_t;
-      typedef std::set<cell_t> uniq_cell_lst_t;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Unique cell list. */
-      uniq_cell_lst_t uniq_cell_lst;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** True if the last cell given to the add_cell() method was new -- i.e. not on the master cell list.
-          Only updated if uniq_cells is true.  Value is invalid if last_cell_stat is NOT cell_stat_t::GOOD.
-          See: last_cell_added_was_new() */
-      bool last_cell_new = true;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Status of the last cell added via add_cell() method.
-          Only updated if (chk_cell_vertexes || chk_cell_dimension | chk_cell_edges) is true. See: status_of_last_cell_added() */
-      cell_stat_t last_cell_stat = cell_stat_t::GOOD;
-      //@}
-
-    public:
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /** @name Cells. */
@@ -1051,8 +1066,8 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Convert number of points in a cell to cell_type_t. */
-      inline cell_type_t req_pt_cnt_to_cell_type(std::vector<int>::size_type num_points) const {
-        switch(num_points) {
+      inline cell_type_t req_pt_cnt_to_cell_type(std::vector<int>::size_type node_count) const {
+        switch(node_count) {
           case 1: return (cell_type_t::POINT);      break;
           case 2: return (cell_type_t::SEGMENT);    break;
           case 3: return (cell_type_t::TRIANGLE);   break;
@@ -1104,15 +1119,15 @@ namespace mjr {
         if (a_cell_len > req_num_pts)
           return cell_stat_t::TOO_MANY_PNT;
         // Check for negative point index
-        if (std::any_of(a_cell.cbegin(), a_cell.cend(), [](pnt_idx_t i) { return (i < 0); }))
+        if (std::any_of(a_cell.cbegin(), a_cell.cend(), [](node_idx_t i) { return (i < 0); }))
           return cell_stat_t::NEG_PNT_IDX;
         // Check for too big point index
-        if (std::any_of(a_cell.cbegin(), a_cell.cend(), [this](pnt_idx_t i) { return (i >= num_points()); }))
+        if (std::any_of(a_cell.cbegin(), a_cell.cend(), [this](node_idx_t i) { return (i >= node_count()); }))
           return cell_stat_t::BIG_PNT_IDX;
         // Check for duplicate points
         if (a_cell_len > 1) {
-          std::set<pnt_idx_t> a_cell_pnt_sorted;
-          for(pnt_idx_t pnt_idx: a_cell) {
+          std::set<node_idx_t> a_cell_pnt_sorted;
+          for(node_idx_t pnt_idx: a_cell) {
             if (a_cell_pnt_sorted.contains(pnt_idx))
               return cell_stat_t::DUP_PNT;
             a_cell_pnt_sorted.insert(pnt_idx);
@@ -1166,7 +1181,7 @@ namespace mjr {
           for(decltype(segs.size()) i=0; i<segs.size()-1; i++) {
             for(decltype(segs.size()) j=i+1; j<segs.size(); j++) {
               //std::cout << segs[i][0] << "--" << segs[i][1] << " CAP " << segs[j][0] << "--" << segs[j][1] << std::endl;
-              std::set<pnt_idx_t> points_sorted;
+              std::set<node_idx_t> points_sorted;
               points_sorted.insert(segs[i][0]);
               points_sorted.insert(segs[i][1]);
               points_sorted.insert(segs[j][0]);
@@ -1220,10 +1235,6 @@ namespace mjr {
           cell_t face;
           for(auto idx: face_structure)
             face.push_back(a_cell[idx]);
-          // std::cout << "[ ";
-          // for(auto v: face)
-          //   std::cout << v << " ";
-          // std::cout << "]" << std::endl;
           if ( !(geomi_pts_coplanar(face)))
             return cell_stat_t::FACE_BENT;
         }
@@ -1286,7 +1297,7 @@ namespace mjr {
             return false;
         }
         // Geom was good or we didn't need to check.
-        if constexpr (uniq_cells) {
+        if constexpr (chk_cell_unique) {
           cell_t sorted_cell = new_cell;
           std::sort(sorted_cell.begin(), sorted_cell.end());
           if (uniq_cell_lst.contains(sorted_cell)) {
@@ -1332,18 +1343,11 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Retruns true if the last cell given to the add_cell() was new and the return value of status_of_last_cell_added() is cell_stat_t::GOOD.
-          If uniq_cells is true, this value is updated each time add_cell() is called.  Otherwise its value is always true. */
+          If chk_cell_unique is true, this value is updated each time add_cell() is called.  Otherwise its value is always true. */
       inline bool last_cell_added_was_new() const {
         return last_cell_new;
       }
       //@}
-
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public:
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /** @name I/O. */
@@ -1361,7 +1365,7 @@ namespace mjr {
           @return 0 if everything worked, and non-zero otherwise */
       io_result write_xml_vtk(std::string file_name, std::string description) {
         /* Check that we have data */
-        if (num_points() <= 0) {
+        if (node_count() <= 0) {
           std::cout << "ERROR(write_xml_vtk): No points!" << std::endl;
           return 1;
         }
@@ -1381,7 +1385,7 @@ namespace mjr {
         out_stream << "<VTKFile type='UnstructuredGrid' version='0.1' byte_order='LittleEndian'>" << std::endl;
         out_stream << "<!-- " << description << " -->" << std::endl;
         out_stream << "  <UnstructuredGrid>" << std::endl;
-        out_stream << "    <Piece NumberOfPoints='" << num_points() << "' NumberOfCells='" << num_cells() << "'>" << std::endl;
+        out_stream << "    <Piece NumberOfPoints='" << node_count() << "' NumberOfCells='" << num_cells() << "'>" << std::endl;
         if ( !(data_name_to_data_idx_lst.empty())) {
           std::string scalars_attr_value, vectors_attr_value, normals_attr_value;
           for (auto& kv : data_name_to_data_idx_lst)
@@ -1403,9 +1407,9 @@ namespace mjr {
           for (auto& kv : data_name_to_data_idx_lst) {
             out_stream << "        <DataArray Name='" << kv.first << "' type='Float64' format='ascii' NumberOfComponents='" << kv.second.size() << "'>" << std::endl;
             out_stream << "          ";
-            for (const auto& dv : pnt_idx_to_pnt_data) {
+            for (const auto& dv : node_idx_to_node_data) {
               for (auto& idx : kv.second)
-                out_stream << std::setprecision(10) << get_data_scalar(idx, dv) << " ";
+                out_stream << std::setprecision(10) << scalar_from_node_data(idx, dv) << " ";
             }
             out_stream << std::endl << "        </DataArray>" << std::endl;
           }
@@ -1413,8 +1417,8 @@ namespace mjr {
         }
         out_stream << "      <Points>" << std::endl;
         out_stream << "        <DataArray Name='Points' type='Float64' format='ascii' NumberOfComponents='3'>" << std::endl;
-        for(pnt_idx_t pnt_idx=0; pnt_idx<static_cast<pnt_idx_t>(pnt_idx_to_pnt_data.size()); pnt_idx++) {
-          pnt_t pnt = get_pnt(pnt_idx);
+        for(node_idx_t pnt_idx=0; pnt_idx<static_cast<node_idx_t>(node_idx_to_node_data.size()); pnt_idx++) {
+          fvec3_t pnt = get_pnt(pnt_idx);
           out_stream << "          " << std::setprecision(10) << pnt[0] << " " << pnt[1] << " " << pnt[2] << std::endl;
         }
         out_stream << "        </DataArray>" << std::endl;
@@ -1464,7 +1468,7 @@ namespace mjr {
           @return 0 if everything worked, and non-zero otherwise */
       io_result write_legacy_vtk(std::string file_name, std::string description) {
         /* Check that we have data */
-        if (num_points() <= 0) {
+        if (node_count() <= 0) {
           std::cout << "ERROR(write_legacy_vtk): No points!" << std::endl;
           return 1;
         }
@@ -1487,10 +1491,10 @@ namespace mjr {
         out_stream << "ASCII" << std::endl;
         out_stream << "DATASET UNSTRUCTURED_GRID" << std::endl;
         /* Dump the points */
-        out_stream << "POINTS " << num_points() << " double" << std::endl;
-        //for (const auto& pnt : pnt_idx_to_pnt)
-        for(pnt_idx_t pnt_idx=0; pnt_idx<static_cast<pnt_idx_t>(pnt_idx_to_pnt_data.size()); pnt_idx++) {
-          pnt_t pnt = get_pnt(pnt_idx);
+        out_stream << "POINTS " << node_count() << " double" << std::endl;
+        //for (const auto& pnt : node_idx_to_pnt)
+        for(node_idx_t pnt_idx=0; pnt_idx<static_cast<node_idx_t>(node_idx_to_node_data.size()); pnt_idx++) {
+          fvec3_t pnt = get_pnt(pnt_idx);
           out_stream << std::setprecision(10) << pnt[0] << " " << pnt[1] << " " << pnt[2] << std::endl;
         }
         /* Dump the cell data */
@@ -1510,14 +1514,14 @@ namespace mjr {
           out_stream << cell_type_to_vtk_type(req_pt_cnt_to_cell_type(poly.size())) << std::endl;
         /* Dump point scalar data */
         if (data_name_to_data_idx_lst.size() > 0) {
-          out_stream << "POINT_DATA " << num_points() << std::endl;
+          out_stream << "POINT_DATA " << node_count() << std::endl;
           if (named_scalar_datasets_count() > 0) {
             for (auto& kv : data_name_to_data_idx_lst) {
               if (kv.second.size() == 1) {
                 out_stream << "SCALARS " << kv.first << " double 1" << std::endl;
                 out_stream << "LOOKUP_TABLE default" << std::endl;
-                for (const auto& dv : pnt_idx_to_pnt_data) {
-                  uft_t v = get_data_scalar(kv.second[0], dv);
+                for (const auto& dv : node_idx_to_node_data) {
+                  uft_t v = scalar_from_node_data(kv.second[0], dv);
                   out_stream << std::setprecision(10) << v << std::endl;
                 }
               }
@@ -1525,16 +1529,16 @@ namespace mjr {
           }
           if (named_vector_datasets_count() > 0) {
             for (auto& kv : data_name_to_data_idx_lst) {
-              if (kv.second.size() == 3) {
+              if (kv.second.size() == 3) { // Legacy format only supports three element vectors
                 if ("NORMALS" == kv.first) {
                   out_stream << "NORMALS " << kv.first << " double" << std::endl;
                 } else if ("COLORS" == kv.first) {
                   out_stream << "COLOR_SCALARS " << kv.first << " 3" << std::endl;
                 } else {
-                  out_stream << "VECTORS " << kv.first << " double" << std::endl;
+                  out_stream << "VECTORS " << kv.first << " double" << std::endl; 
                 }
-                for (const auto& dv : pnt_idx_to_pnt_data) {
-                  vdat_t v = get_dataset_vector(kv.second, dv);
+                for (const auto& dv : node_idx_to_node_data) {
+                  vdat_t v = vector_from_node_data(kv.second, dv);
                   out_stream << std::setprecision(10) << v[0] << " " << v[1] << " " << v[2] << std::endl;
                 }
               }
@@ -1552,13 +1556,13 @@ namespace mjr {
           @param max_num_print Maximum number of points/cells to print.  Use 0 to print all points/cells. */
       void dump_cplx(int max_num_print) const {
         std::cout << "Meta Data" << std::endl;
-        std::cout << "  Points ............. " << num_points() << std::endl;
-        std::cout << "  Data Scalars Per Point .. " << pnt_idx_to_pnt_data.size() << std::endl;
+        std::cout << "  Points ............. " << node_count() << std::endl;
+        std::cout << "  Data Scalars Per Point .. " << node_idx_to_node_data.size() << std::endl;
         std::cout << "  Named Data Sets ......... " << named_datasets_count() << std::endl;
         std::cout << "    Scalar Data Sets ...... " << named_scalar_datasets_count() << std::endl;
         std::cout << "    Vector Data Sets ...... " << named_vector_datasets_count() << std::endl;
         std::cout << "  Cells ................... " << num_cells() << std::endl;
-        print_all_points(max_num_print);
+        print_all_nodes(max_num_print);
         print_all_cells(max_num_print);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1572,7 +1576,7 @@ namespace mjr {
           @return 0 if everything worked, and non-zero otherwise */
       io_result write_ply(std::string file_name, std::string description) {
         /* Check that we have data */
-        if (num_points() <= 0) {
+        if (node_count() <= 0) {
           std::cout << "ERROR(write_ply): No points!" << std::endl;
           return 1;
         }
@@ -1602,7 +1606,7 @@ namespace mjr {
         out_stream << "format ascii 1.0" << std::endl;
         out_stream << "comment software: Mitch Richling's MR_rect_tree package" << std::endl;
         out_stream << "comment note: " << description << std::endl;
-        out_stream << "element vertex " << num_points() << std::endl;
+        out_stream << "element vertex " << node_count() << std::endl;
         out_stream << "property float x" << std::endl;
         out_stream << "property float y" << std::endl;
         out_stream << "property float z" << std::endl;
@@ -1620,15 +1624,15 @@ namespace mjr {
         out_stream << "property list uchar int vertex_index" << std::endl;
         out_stream << "end_header" << std::endl;
         // Dump Vertex Data
-        for (int i=0; i<num_points(); i++) {
-          pnt_t pnt = get_pnt(i);
+        for (int i=0; i<node_count(); i++) {
+          fvec3_t pnt = get_pnt(i);
           out_stream << std::setprecision(10) << pnt[0] << " " << pnt[1] << " " << pnt[2];
           if (have_colors_data) {
-            vdat_t clr = get_dataset_vector(data_name_to_data_idx_lst["COLORS"], pnt_idx_to_pnt_data[i]);
+            fvec3_t clr = fvec3_from_node_data(data_name_to_data_idx_lst["COLORS"], node_idx_to_node_data[i]);
             out_stream << " " << static_cast<int>(255*clr[0]) << " " << static_cast<int>(255*clr[1]) << " " << static_cast<int>(255*clr[2]);
           }
           if (have_normal_data) {
-            vdat_t nml = get_dataset_vector(data_name_to_data_idx_lst["NORMALS"], pnt_idx_to_pnt_data[i]);
+            fvec3_t nml = fvec3_from_node_data(data_name_to_data_idx_lst["NORMALS"], node_idx_to_node_data[i]);
             vec3_unitize(nml);
             out_stream << " " << std::setprecision(10) << nml[0] << " " << nml[1] << " " << nml[2];
           }
@@ -1655,7 +1659,7 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Return true if any component of the point has a NaN.
           @param test_pnt The point to test */
-      inline bool pnt_has_nan(const pnt_t& test_pnt) {
+      inline bool pnt_has_nan(const fvec3_t& test_pnt) {
         return (std::isnan(test_pnt[0]) || std::isnan(test_pnt[1]) || std::isnan(test_pnt[2]));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1664,7 +1668,7 @@ namespace mjr {
           @param axis_index    Which axis to compare to the level
           @param level         Level to test aginst
           @param close_epsilon Epsilon used to check for "closeness". */
-      inline int pnt_vs_level(const pnt_t& test_pnt, int axis_index, uft_t level, uft_t close_epsilon=epsilon) {
+      inline int pnt_vs_level(const fvec3_t& test_pnt, int axis_index, uft_t level, uft_t close_epsilon=epsilon) {
         if (std::abs(test_pnt[axis_index]-level) < close_epsilon)
           return 0;
         else if(test_pnt[axis_index] < level)
@@ -1678,13 +1682,17 @@ namespace mjr {
       /** @name Complex Computation. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Function that takes and returns a pnt_data_t */
-      typedef std::function<pnt_data_t(const pnt_data_t&)> p2data_func_t;
-      typedef std::function<uft_t(const pnt_data_t&)>      p2real_func_t;
-      typedef std::function<bool(const pnt_data_t&)>       p2bool_func_t;
-      typedef std::function<bool(const cell_t&)>           c2bool_func_t;
+      /** Function that takes and returns a node_data_t (Node Data Transform) */
+      typedef std::function<node_data_t(const node_data_t&)> p2data_func_t;                // pd2pd
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Delete cells matching a predicate function
+      /** Function that takes node data and returns a float (Node Data SDF) */
+      typedef std::function<uft_t(const node_data_t&)>      p2real_func_t;                // pd2r
+      /** Function that takes node data and returns a bool (Node Data Predicate) */
+      typedef std::function<bool(const node_data_t&)>       p2bool_func_t;                // pd2b
+      /** Function that takes a cell and returns a bool (Cell Predicate) */
+      typedef std::function<bool(const cell_t&)>           c2bool_func_t;                // c2b
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Delete cells matching a predicate function.
 
           @param func       Predicate function -- if true we get rid of the cell */
       int cull_cells(c2bool_func_t func) {
@@ -1704,11 +1712,11 @@ namespace mjr {
       /** Add new cells with points from existing cells with the given coordinates negated.
 
           When zero_epsilon is positive, some existing points may be adjusted such that components on the flipped axis near zero will become zero.  When
-          uniq_points is true, both the original point coordinates and the new point coordinates will be mapped to the same point index -- that is to say if
+          chk_point_unique is true, both the original point coordinates and the new point coordinates will be mapped to the same point index -- that is to say if
           you add a new point to the complex with the old coordinates or the new coordinates, you will get the same index.  Note that a point collision may
           occur if the adjusted point is equal-ish to another, existing point -- a message is printed when this occurs.
 
-          @param flip_list            A vector of booleans (0 or 1).  1 indicates the coordinate in a pnt_data_t vector should be negated.
+          @param flip_list            A vector of booleans (0 or 1).  1 indicates the coordinate in a node_data_t vector should be negated.
           @param zero_epsilon         If non-negative, will collapse flipped coordinates near zero to be precisely zero.
           @param reverse_vertex_order Reverse the order of vertexes in each cell -- useful if vertex order impacts rendering. */
       void mirror(std::vector<int> flip_list, uft_t zero_epsilon=epsilon*1000, bool reverse_vertex_order=true) {
@@ -1716,23 +1724,23 @@ namespace mjr {
         for(int cell_idx=0; cell_idx<num_start_cells; ++cell_idx) {
           cell_t new_cell;
           for(auto pidx: cell_lst[cell_idx]) {
-            pnt_data_t od = pnt_idx_to_pnt_data[pidx];
+            node_data_t od = node_idx_to_node_data[pidx];
             for(int flip_list_idx=0; flip_list_idx<static_cast<int>(flip_list.size()); ++flip_list_idx)
               if ((flip_list[flip_list_idx]) && (std::abs(od[flip_list_idx]) < zero_epsilon))
                 od[flip_list_idx] = 0;
-            pnt_idx_to_pnt_data[pidx] = od;
-            pnt_t new_old_pnt = get_dataset_vector(data_to_pnt, od);
-            if constexpr (uniq_points) {
-              if (pnt_to_pnt_idx_map.contains(new_old_pnt))
-                if (pnt_to_pnt_idx_map[new_old_pnt] != pidx)
+            node_idx_to_node_data[pidx] = od;
+            fvec3_t new_old_pnt = fvec3_from_node_data(node_data_to_pnt, od);
+            if constexpr (chk_point_unique) {
+              if (pnt_to_node_idx_map.contains(new_old_pnt))
+                if (pnt_to_node_idx_map[new_old_pnt] != pidx)
                   std::cout << "ERROR(mirror): Collapse caused collision!" << std::endl;
-              pnt_to_pnt_idx_map[new_old_pnt] = pidx;
+              pnt_to_node_idx_map[new_old_pnt] = pidx;
             }
-            pnt_data_t nd = od;
+            node_data_t nd = od;
             for(int flip_list_idx=0; flip_list_idx<static_cast<int>(flip_list.size()); ++flip_list_idx)
               if (flip_list[flip_list_idx])
                 nd[flip_list_idx] = -nd[flip_list_idx];
-            pnt_idx_t p = add_point(nd);
+            node_idx_t p = add_node(nd);
             new_cell.push_back(p);
           }
           if (reverse_vertex_order)
@@ -1746,13 +1754,13 @@ namespace mjr {
         edge_solver_sdf(nullptr, 0, 0, nullptr, 0.0);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Solve an SDF function for zero on a line between two point data sets, and add the solution to the master point list.
+      /** Solve an SDF function for zero on a line between two node data sets, and add the solution to the central node data.
 
           The SDF must have different signs on the given points.  If this is not the case, then the endpoint with SDF closest to zero will be returned.
 
           Uses bisection.  Halting conditions:
-            - The SDF value at the most recent guess is within solve_epsilon of zero
-            - The absolute difference in SDF values at the end points is less than solve_epsilon
+          - The SDF value at the most recent guess is within solve_epsilon of zero
+          - The absolute difference in SDF values at the end points is less than solve_epsilon
 
           This function stores a cache of previous solution results.  This cache may be cleared by clear_cache_edge_solver_sdf().
 
@@ -1760,61 +1768,61 @@ namespace mjr {
           @param pnt_idx2       Second edge vertex
           @param sdf_func       Data function (if nullptr, then clear solver cache and return immediately)
           @param solve_epsilon  Used to detect SDF value near zero
-          @param dat_func       Produce the point data vector for the newly solved point. */
-      pnt_idx_t edge_solver_sdf(p2data_func_t dat_func, pnt_idx_t pnt_idx1, pnt_idx_t pnt_idx2, p2real_func_t sdf_func, uft_t solve_epsilon=epsilon/10) {
+          @param dat_func       Produce the node data vector for the newly solved point. */
+      node_idx_t edge_solver_sdf(p2data_func_t dat_func, node_idx_t pnt_idx1, node_idx_t pnt_idx2, p2real_func_t sdf_func, uft_t solve_epsilon=epsilon/10) {
         // Solver cache.
-        static std::unordered_map<pnt_idx_t, std::unordered_map<pnt_idx_t, pnt_idx_t>> edge_solver_cache;
+        static std::unordered_map<node_idx_t, std::unordered_map<node_idx_t, node_idx_t>> edge_solver_cache;
         if (sdf_func == nullptr) {
           edge_solver_cache.clear();
           return pnt_idx1;
         }
-        pnt_idx_t cache_key1 = std::min(pnt_idx1, pnt_idx2);
-        pnt_idx_t cache_key2 = std::max(pnt_idx1, pnt_idx2);
+        node_idx_t cache_key1 = std::min(pnt_idx1, pnt_idx2);
+        node_idx_t cache_key2 = std::max(pnt_idx1, pnt_idx2);
         // Check to see if we solved this one before
         if (edge_solver_cache.contains(cache_key1))
           if (edge_solver_cache[cache_key1].contains(cache_key2))
             return edge_solver_cache[cache_key1][cache_key2];
         // Gotta do the work and solve...
         // Init neg&pos with the points that have eng&pos sdf values
-        pnt_data_t neg_pnt_data;
+        node_data_t neg_node_data;
         uft_t      neg_pnt_sdfv;
-        pnt_data_t pos_pnt_data = pnt_idx_to_pnt_data[pnt_idx1];
-        uft_t      pos_pnt_sdfv = sdf_func(pos_pnt_data);
+        node_data_t pos_node_data = node_idx_to_node_data[pnt_idx1];
+        uft_t      pos_pnt_sdfv = sdf_func(pos_node_data);
         if (pos_pnt_sdfv > 0) {
-          neg_pnt_data = pnt_idx_to_pnt_data[pnt_idx2];
-          neg_pnt_sdfv = sdf_func(neg_pnt_data);
+          neg_node_data = node_idx_to_node_data[pnt_idx2];
+          neg_pnt_sdfv = sdf_func(neg_node_data);
         } else {
-          neg_pnt_data = pos_pnt_data;
+          neg_node_data = pos_node_data;
           neg_pnt_sdfv = pos_pnt_sdfv;
-          pos_pnt_data = pnt_idx_to_pnt_data[pnt_idx2];
-          pos_pnt_sdfv = sdf_func(pos_pnt_data);
+          pos_node_data = node_idx_to_node_data[pnt_idx2];
+          pos_pnt_sdfv = sdf_func(pos_node_data);
         }
-        // Init sol_pnt_data to end point with sdf value nearest zero
-        pnt_data_t sol_pnt_data;
+        // Init sol_node_data to end point with sdf value nearest zero
+        node_data_t sol_node_data;
         uft_t      sol_pnt_sdfv;
         if (std::abs(pos_pnt_sdfv) < std::abs(neg_pnt_sdfv)) {
-          sol_pnt_data = pos_pnt_data;
+          sol_node_data = pos_node_data;
           sol_pnt_sdfv = pos_pnt_sdfv;
         } else {
-          sol_pnt_data = neg_pnt_data;
+          sol_node_data = neg_node_data;
           sol_pnt_sdfv = neg_pnt_sdfv;
         }
         if (neg_pnt_sdfv < 0) {  // Just to make sure pos&neg are pos&neg...
           while ((std::abs(sol_pnt_sdfv) > solve_epsilon) && (pos_pnt_sdfv-neg_pnt_sdfv) > solve_epsilon) {
-            for(decltype(pos_pnt_data.size()) i=0; i<pos_pnt_data.size(); i++)
-              sol_pnt_data[i] = (pos_pnt_data[i] + neg_pnt_data[i])/static_cast<uft_t>(2.0);
-            sol_pnt_sdfv = sdf_func(sol_pnt_data);
+            for(decltype(pos_node_data.size()) i=0; i<pos_node_data.size(); i++)
+              sol_node_data[i] = (pos_node_data[i] + neg_node_data[i])/static_cast<uft_t>(2.0);
+            sol_pnt_sdfv = sdf_func(sol_node_data);
             if (sol_pnt_sdfv > 0) {
-              pos_pnt_data = sol_pnt_data;
+              pos_node_data = sol_node_data;
               pos_pnt_sdfv = sol_pnt_sdfv;
             } else {
-              neg_pnt_data = sol_pnt_data;
+              neg_node_data = sol_node_data;
               neg_pnt_sdfv = sol_pnt_sdfv;
             }
           }
         }
         // Add out point, update solver cache, and return index
-        pnt_idx_t sol_pnt_idx = add_point(dat_func(sol_pnt_data));
+        node_idx_t sol_pnt_idx = add_node(dat_func(sol_node_data));
         edge_solver_cache[cache_key1][cache_key2] = sol_pnt_idx;
         return sol_pnt_idx;
       }
@@ -1833,7 +1841,7 @@ namespace mjr {
             int zero_cnt= 0, plus_cnt= 0, negv_cnt= 0;
             int zero_loc=-1, plus_loc=-1, negv_loc=-1;
             for(int i=0; i<3; i++) {
-              uft_t sdf_val = sdf_func(pnt_idx_to_pnt_data[cur_cell[i]]);
+              uft_t sdf_val = sdf_func(node_idx_to_node_data[cur_cell[i]]);
               if (std::abs(sdf_val) <= solve_epsilon) {
                 zero_cnt++;
                 zero_loc = i;
@@ -1892,7 +1900,7 @@ namespace mjr {
             auto& cur_cell = cell_lst[cell_idx];
             int plus_cnt=0,  negv_cnt=0;
             for(int i=0; i<2; i++) {
-              uft_t sdf_val = sdf_func(pnt_idx_to_pnt_data[cur_cell[i]]);
+              uft_t sdf_val = sdf_func(node_idx_to_node_data[cur_cell[i]]);
               if (sdf_val < static_cast<uft_t>(0.0))
                 plus_cnt++;
               else if (sdf_val > static_cast<uft_t>(0.0))
@@ -1918,17 +1926,17 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Return true if ALL vertexes are above the level by more than epsilon */
       bool cell_above_level(const cell_t cell, int level_index, uft_t level, uft_t level_epsilon=epsilon) {
-        return std::all_of(cell.cbegin(), cell.cend(), [this, level_index, level, level_epsilon](int v) { return (pnt_idx_to_pnt_data[v][level_index] > level+level_epsilon); });
+        return std::all_of(cell.cbegin(), cell.cend(), [this, level_index, level, level_epsilon](int v) { return (node_idx_to_node_data[v][level_index] > level+level_epsilon); });
       }
       /** Return true if ALL vertexes are below the level by more than epsilon */
       bool cell_below_level(const cell_t cell, int level_index, uft_t level, uft_t level_epsilon=epsilon) {
-        return std::all_of(cell.cbegin(), cell.cend(), [this, level_index, level, level_epsilon](int v) { return (pnt_idx_to_pnt_data[v][level_index] < level+level_epsilon); });
+        return std::all_of(cell.cbegin(), cell.cend(), [this, level_index, level, level_epsilon](int v) { return (node_idx_to_node_data[v][level_index] < level+level_epsilon); });
       }
       /** Return true if cell is near SDF boundry */
       bool cell_on_sdf_boundry(const cell_t cell, p2real_func_t sdf_function, uft_t sdf_epsilon=epsilon) {
         int pos_cnt=0, neg_cnt=0;
         for(auto v: cell) {
-          uft_t sv = sdf_function(pnt_idx_to_pnt_data[v]);
+          uft_t sv = sdf_function(node_idx_to_node_data[v]);
           if (std::abs(sv)<sdf_epsilon)
             return true;
           if (sv < 0) {
@@ -1945,7 +1953,7 @@ namespace mjr {
       bool cell_cross_sdf_boundry(const cell_t cell, p2real_func_t sdf_function, uft_t sdf_epsilon=epsilon) {
         int pos_cnt=0, neg_cnt=0;
         for(auto v: cell) {
-          uft_t sv = sdf_function(pnt_idx_to_pnt_data[v]);
+          uft_t sv = sdf_function(node_idx_to_node_data[v]);
           if (std::abs(sv)>=sdf_epsilon) {
             if (sv < 0) {
               neg_cnt++;

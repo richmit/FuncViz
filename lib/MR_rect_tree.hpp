@@ -152,7 +152,6 @@ namespace mjr {
       typedef spc_real_t src_t;
       //@}
 
-
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /** @name Domain Real Coordinates */
       //@{
@@ -258,16 +257,16 @@ namespace mjr {
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Real input sample function */
-      typedef std::function<rrpt_t(drpt_t)> drpt2rrpt_func_t;
+      typedef std::function<rrpt_t(drpt_t)> drpt2rrpt_func_t;       // dr2rr (Sample Function)
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Integer input predicate function */
-      typedef std::function<bool(diti_t)>   diti2bool_func_t;
+      typedef std::function<bool(diti_t)>   diti2bool_func_t;      //  di2b (Domain Index Predicate)
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Real input predicate function */
-      typedef std::function<bool(drpt_t)>   drpt2bool_func_t;
+      typedef std::function<bool(drpt_t)>   drpt2bool_func_t;      //  dr2b (Domain Point Predicate)
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Real input, single real variable output function */
-      typedef std::function<src_t(drpt_t)>  drpt2real_func_t;
+      typedef std::function<src_t(drpt_t)>  drpt2real_func_t;      //  dr2r (Domain Point SDF)
       //@}
 
     private:

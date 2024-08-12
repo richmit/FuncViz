@@ -63,10 +63,10 @@ namespace mjr {
       /** @name Types imported from MR_rect_tree and MR_cell_cplx. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      typedef typename cc_t::data_idx_lst_t    cc_data_idx_lst_t;
-      typedef typename cc_t::pnt_data_t        cc_pnt_data_t;
-      typedef typename cc_t::pnt_idx_list_t    cc_pnt_idx_list_t;
-      typedef typename cc_t::pnt_idx_t         cc_pnt_idx_t;
+      typedef typename cc_t::node_data_idx_lst_t    cc_node_data_idx_lst_t;
+      typedef typename cc_t::node_data_t        cc_node_data_t;
+      typedef typename cc_t::node_idx_list_t    cc_node_idx_list_t;
+      typedef typename cc_t::node_idx_t         cc_node_idx_t;
       typedef typename cc_t::cell_t            cc_cell_t;
       typedef typename cc_t::uft_t             cc_uft_t;
       typedef typename rt_t::diti_list_t       rt_diti_list_t;
@@ -107,7 +107,7 @@ namespace mjr {
           @param ccplx  The MR_cell_cplx to populate wiht a pont mapping
           @param rt_dil Description of data sources */
       inline static void create_dataset_to_point_mapping(const rt_t& rtree, cc_t& ccplx, const val_src_lst_t& rt_dil) {
-        cc_data_idx_lst_t cc_data_idx_lst(3);
+        cc_node_data_idx_lst_t cc_data_idx_lst(3);
         for(int i=0; i<3; ++i)
           if(get<0>(rt_dil[i]) == val_src_spc_t::FDOMAIN)
             cc_data_idx_lst[i] = get<int>(get<1>(rt_dil[i]));
@@ -122,23 +122,23 @@ namespace mjr {
           @param ccplx  The MR_cell_cplx to populate with geometry
           @param rtree  The MR_rect_tree with source data
           @param diti   The point coordinate in rtree */
-      inline static cc_pnt_idx_t add_point_and_data_from_tree(cc_t& ccplx, const rt_t& rtree, rt_diti_t diti) {
-        return add_point_and_data_from_data(ccplx, rtree.diti_to_drpt(diti), rtree.get_sample(diti));
+      inline static cc_node_idx_t add_node(cc_t& ccplx, const rt_t& rtree, rt_diti_t diti) {
+        return add_node(ccplx, rtree.diti_to_drpt(diti), rtree.get_sample(diti));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Given rt coordinates, extract point/scalar/vector data, and add point/data to cc
           @param ccplx    The MR_cell_cplx to populate with geometry
           @param dom_pnt  Domain point
           @param rng_pnt  Range point */
-      inline static cc_pnt_idx_t add_point_and_data_from_data(cc_t& ccplx, rt_drpt_t dom_pnt, rt_rrpt_t rng_pnt) {
-        return ccplx.add_point(tree_point_data_to_cplx_point_data(dom_pnt, rng_pnt));
+      inline static cc_node_idx_t add_node(cc_t& ccplx, rt_drpt_t dom_pnt, rt_rrpt_t rng_pnt) {
+        return ccplx.add_node(rt_pnt_to_cc_pnt(dom_pnt, rng_pnt));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Given rt_t domain & range points, produce a cc_t point data vector.
           @param dom_pnt  Domain point
           @param rng_pnt  Range point */
-      inline static cc_pnt_data_t tree_point_data_to_cplx_point_data(rt_drpt_t dom_pnt, rt_rrpt_t rng_pnt)  {
-        cc_pnt_data_t pd;
+      inline static cc_node_data_t rt_pnt_to_cc_pnt(rt_drpt_t dom_pnt, rt_rrpt_t rng_pnt)  {
+        cc_node_data_t pd;
         if constexpr (rt_t::domain_dimension == 1)
           pd.push_back(dom_pnt);
         else
@@ -151,9 +151,90 @@ namespace mjr {
             pd.push_back(v);
         return pd;
       }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Transform a MR_cell_cplx::node_data_t value into MR_rect_tree::drpt_t.  
+          @param pd The point data to convert.*/
+      inline static rt_drpt_t node_data_to_drpt(const cc_node_data_t& pd) {
+        rt_drpt_t ret;
+        if constexpr (rt_t::domain_dimension == 1) {
+          ret = pd[0];
+        } else {
+          for(int i=0; i<rt_t::domain_dimension; ++i)
+            ret[i] = pd[i];
+        }
+        return ret;
+      }
       //@}
 
     public:
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /** @name Utility Functions. */
+      //@{
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Convert a MR_rect_tree range index into an index for a point data array
+          @param tree_range_index value to convert */
+      inline static int rt_rng_idx_to_pd_idx(int tree_range_index) {
+        return (tree_range_index + rt_t::domain_dimension);
+      }
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Given an edge with one good point and one NaN point, find the longest segment from the good point toward the NaN point.
+
+          Note we normally use this function when we detect a NaN in a geometric point (i.e. the things with a node_idx_t).  This solver solves until
+          the return of func has no NaNs.  Those two criteria might not be the same thing, but it's OK.
+
+          @param ccplx                   The MR_cell_cplx to populate with geometry
+          @param rtree                   The MR_rect_tree with source data
+          @param good_point_ccplx_index  Good point index in the ccplx object
+          @param good_point_rtree_index  Good point index in the rtree object
+          @param sick_point_rtree_index  Bad point index in the rtree object
+          @param func                    The function to use for the solver
+          @param solver_epsilon          Used as a distance threshold between sick point and solved endpoint in the tree domain space. */
+      static cc_node_idx_t nan_edge_solver(cc_t&               ccplx,
+                                          const rt_t&         rtree,
+                                          cc_node_idx_t        good_point_ccplx_index,
+                                          rt_diti_t           good_point_rtree_index,
+                                          rt_diti_t           sick_point_rtree_index,
+                                          rt_drpt2rrpt_func_t func,
+                                          cc_uft_t            solver_epsilon=cc_t::epsilon/100
+                                         ) {
+        // Solver cache.  Clear it if we have a different rtree object from last time.
+        static std::unordered_map<rt_diti_t, std::unordered_map<rt_diti_t, cc_node_idx_t>> nan_solver_cache;
+        static const rt_t* rtree_cache = nullptr;
+        if (rtree_cache != &rtree) {
+          nan_solver_cache.clear();
+          rtree_cache = &rtree;
+        }
+        // Check to see if we solved this one before
+        if (nan_solver_cache.contains(sick_point_rtree_index))
+          if (nan_solver_cache[sick_point_rtree_index].contains(good_point_rtree_index))
+            return  nan_solver_cache[sick_point_rtree_index][good_point_rtree_index];
+        // Apparently we need to solve this one as it's not in the case
+        rt_drpt_t good_point_drpt = rtree.diti_to_drpt(good_point_rtree_index);
+        rt_drpt_t sick_point_drpt = rtree.diti_to_drpt(sick_point_rtree_index);
+        rt_rrpt_t good_point_rrpt = rtree.get_sample(good_point_rtree_index);
+        rt_drpt_t init_point_drpt = good_point_drpt;
+        while ( (rtree.drpt_distance_inf(good_point_drpt, sick_point_drpt) > solver_epsilon) ) {
+          rt_drpt_t md_point_drpt = rtree.drpt_midpoint(good_point_drpt, sick_point_drpt);
+          rt_rrpt_t y = func(md_point_drpt);
+          if (rtree.rrpt_is_nan(y)) {
+            sick_point_drpt = md_point_drpt;
+          } else {
+            good_point_drpt = md_point_drpt;
+            good_point_rrpt = y;
+          }
+        }
+        // Figure out what to return, add it to the cache, and return.
+        cc_node_idx_t ret;
+        if (rtree.drpt_distance_inf(good_point_drpt, init_point_drpt) < (ccplx.epsilon)) // Use ccplx here!!!
+          ret = good_point_ccplx_index;
+        else
+          ret = add_node(ccplx, good_point_drpt, good_point_rrpt);
+        nan_solver_cache[sick_point_rtree_index][good_point_rtree_index] = ret;
+        return ret;
+      }
+      //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /** @name Poly data construction */
@@ -191,29 +272,29 @@ namespace mjr {
         create_dataset_to_point_mapping(rtree, ccplx, point_src);
         if (rtree.domain_dimension == 1) {
           for(auto& cell: cells) {
-            cc_pnt_idx_t ctr_pnti = add_point_and_data_from_tree(ccplx, rtree, cell);
+            cc_node_idx_t ctr_pnti = add_node(ccplx, rtree, cell);
             rt_diti_list_t corners = rtree.ccc_get_corners(cell);
-            cc_pnt_idx_t cn0_pnti = add_point_and_data_from_tree(ccplx, rtree, corners[0]);
-            cc_pnt_idx_t cn1_pnti = add_point_and_data_from_tree(ccplx, rtree, corners[1]);
+            cc_node_idx_t cn0_pnti = add_node(ccplx, rtree, corners[0]);
+            cc_node_idx_t cn1_pnti = add_node(ccplx, rtree, corners[1]);
             if (func) { // We have a func, so we can "heal" broken edges.
               if (ctr_pnti < 0) { // Center: Broken. Left:
                 if(cn0_pnti >= 0) { // Center: Broken.  Left: Good.
-                  cc_pnt_idx_t np = nan_edge_solver(ccplx, rtree, cn0_pnti, corners[0], cell, func);
+                  cc_node_idx_t np = nan_edge_solver(ccplx, rtree, cn0_pnti, corners[0], cell, func);
                   ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {cn0_pnti, np}, output_dimension);
                 }
                 if(cn1_pnti >= 0) { // Center: Broken.  Right: Good.
-                  cc_pnt_idx_t np = nan_edge_solver(ccplx, rtree, cn1_pnti, corners[1], cell, func);
+                  cc_node_idx_t np = nan_edge_solver(ccplx, rtree, cn1_pnti, corners[1], cell, func);
                   ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {np, cn1_pnti}, output_dimension);
                 }
               } else {             // Center: Good.
                 if(cn0_pnti < 0) { // Center: Good.  Left: Broken.
-                  cc_pnt_idx_t np = nan_edge_solver(ccplx, rtree, ctr_pnti, cell, corners[0], func);
+                  cc_node_idx_t np = nan_edge_solver(ccplx, rtree, ctr_pnti, cell, corners[0], func);
                   ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {np, ctr_pnti}, output_dimension);
                 } else {           // Center: Good.  Left: Good.
                   ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {cn0_pnti, ctr_pnti}, output_dimension);
                 }
                 if(cn1_pnti < 0) { // Center: Good.  Right: Broken.
-                  cc_pnt_idx_t np = nan_edge_solver(ccplx, rtree, ctr_pnti, cell, corners[1], func);
+                  cc_node_idx_t np = nan_edge_solver(ccplx, rtree, ctr_pnti, cell, corners[1], func);
                   ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {ctr_pnti, np}, output_dimension);
                 } else {           // Center: Good.  Left: Good.
                   ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {ctr_pnti, cn1_pnti}, output_dimension);
@@ -247,10 +328,10 @@ namespace mjr {
                       triangles.push_back({corners[0], corners[1], cell});
                   }
                   for(auto triangle: triangles) {
-                    std::array<cc_pnt_idx_t, 3> tpnts {add_point_and_data_from_tree(ccplx, rtree, triangle[0]),
-                                                       add_point_and_data_from_tree(ccplx, rtree, triangle[1]),
-                                                       add_point_and_data_from_tree(ccplx, rtree, triangle[2])};
-                    int num_bad = static_cast<int>(std::count_if(tpnts.begin(), tpnts.end(), [](cc_pnt_idx_t i) { return i<0; }));
+                    std::array<cc_node_idx_t, 3> tpnts {add_node(ccplx, rtree, triangle[0]),
+                                                       add_node(ccplx, rtree, triangle[1]),
+                                                       add_node(ccplx, rtree, triangle[2])};
+                    int num_bad = static_cast<int>(std::count_if(tpnts.begin(), tpnts.end(), [](cc_node_idx_t i) { return i<0; }));
                     if (num_bad == 0) {
                       ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {tpnts[0], tpnts[1], tpnts[2]}, output_dimension);
                     } else if ((num_bad == 1) || (num_bad == 2)) {
@@ -262,13 +343,13 @@ namespace mjr {
                         p = {2, 0, 1};
                       // Solve for edge 0-1 & 0-2
                       if (num_bad == 1) {
-                        cc_pnt_idx_t np1 = nan_edge_solver(ccplx, rtree, tpnts[p[1]], triangle[p[1]], triangle[p[0]], func);
-                        cc_pnt_idx_t np2 = nan_edge_solver(ccplx, rtree, tpnts[p[2]], triangle[p[2]], triangle[p[0]], func);
+                        cc_node_idx_t np1 = nan_edge_solver(ccplx, rtree, tpnts[p[1]], triangle[p[1]], triangle[p[0]], func);
+                        cc_node_idx_t np2 = nan_edge_solver(ccplx, rtree, tpnts[p[2]], triangle[p[2]], triangle[p[0]], func);
                         ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {np1, tpnts[p[1]], tpnts[p[2]]}, output_dimension);
                         ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {tpnts[p[2]], np2, np1}, output_dimension);
                       } else {
-                        cc_pnt_idx_t np1 = nan_edge_solver(ccplx, rtree, tpnts[p[0]], triangle[p[0]], triangle[p[1]], func);
-                        cc_pnt_idx_t np2 = nan_edge_solver(ccplx, rtree, tpnts[p[0]], triangle[p[0]], triangle[p[2]], func);
+                        cc_node_idx_t np1 = nan_edge_solver(ccplx, rtree, tpnts[p[0]], triangle[p[0]], triangle[p[1]], func);
+                        cc_node_idx_t np2 = nan_edge_solver(ccplx, rtree, tpnts[p[0]], triangle[p[0]], triangle[p[2]], func);
                         ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {tpnts[p[0]], np1, np2}, output_dimension);
                       }
                     }
@@ -276,7 +357,7 @@ namespace mjr {
                 }
               }
             } else { // We don't have a func, so we can can't "heal" broken edges.  This is much faster. ;)
-              cc_pnt_idx_t ctr_pnti = add_point_and_data_from_tree(ccplx, rtree, cell);
+              cc_node_idx_t ctr_pnti = add_node(ccplx, rtree, cell);
               if (ctr_pnti >= 0) { // Center point was good, let's try and make some triangles...
                 for(int i=0; i<2; i++) {
                   for(int j=-1; j<2; j+=2) {
@@ -284,16 +365,16 @@ namespace mjr {
                     if (nbrs.size() > 1) {
                       for(auto n: nbrs) {
                         rt_diti_list_t corners = rtree.ccc_get_corners(n, i, -j);
-                        cc_pnt_idx_t cn0_pnti = add_point_and_data_from_tree(ccplx, rtree, corners[0]);
-                        cc_pnt_idx_t cn1_pnti = add_point_and_data_from_tree(ccplx, rtree, corners[1]);
+                        cc_node_idx_t cn0_pnti = add_node(ccplx, rtree, corners[0]);
+                        cc_node_idx_t cn1_pnti = add_node(ccplx, rtree, corners[1]);
                         if( ((i == 0) && (j == -1)) || ((i == 1) && (j == 1)) )
                           std::swap(cn0_pnti, cn1_pnti);
                         ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cn0_pnti, cn1_pnti, ctr_pnti}, output_dimension);
                       }
                     } else {
                       rt_diti_list_t corners = rtree.ccc_get_corners(cell, i, j);
-                      cc_pnt_idx_t cn0_pnti = add_point_and_data_from_tree(ccplx, rtree, corners[0]);
-                      cc_pnt_idx_t cn1_pnti = add_point_and_data_from_tree(ccplx, rtree, corners[1]);
+                      cc_node_idx_t cn0_pnti = add_node(ccplx, rtree, corners[0]);
+                      cc_node_idx_t cn1_pnti = add_node(ccplx, rtree, corners[1]);
                       if( ((i == 0) && (j == -1)) || ((i == 1) && (j == 1)) )
                         std::swap(cn0_pnti, cn1_pnti);
                       ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cn0_pnti, cn1_pnti, ctr_pnti}, output_dimension);
@@ -305,8 +386,8 @@ namespace mjr {
           }
         } else if (rtree.domain_dimension == 3) {
           for(auto& cell: cells) {
-            cc_pnt_idx_list_t new_cell(5);
-            new_cell[4] = add_point_and_data_from_tree(ccplx, rtree, cell);
+            cc_node_idx_list_t new_cell(5);
+            new_cell[4] = add_node(ccplx, rtree, cell);
             std::array<int, 5> p {0, 1, 3, 2, 4};
             if (new_cell[4] >= 0) { // Center point was good, let's try and make some pyramids...
               for(int dim=0; dim<3; dim++) {
@@ -316,13 +397,13 @@ namespace mjr {
                     for(auto n: nbrs) {
                       rt_diti_list_t corners = rtree.ccc_get_corners(n, dim, -dir);
                       for(int k=0; k<4; ++k)
-                        new_cell[p[k]] = add_point_and_data_from_tree(ccplx, rtree, corners[k]);
+                        new_cell[p[k]] = add_node(ccplx, rtree, corners[k]);
                       ccplx.add_cell(cc_t::cell_type_t::PYRAMID, new_cell, output_dimension);
                     }
                   } else {
                     rt_diti_list_t corners = rtree.ccc_get_corners(cell, dim, dir);
                     for(int k=0; k<4; ++k)
-                      new_cell[p[k]] = add_point_and_data_from_tree(ccplx, rtree, corners[k]);
+                      new_cell[p[k]] = add_node(ccplx, rtree, corners[k]);
                     ccplx.add_cell(cc_t::cell_type_t::PYRAMID, new_cell, output_dimension);
                   }
                 }
@@ -378,14 +459,14 @@ namespace mjr {
         if (output_centers && output_corners) {
           for(auto& cell: cells)
             for(auto& vert: rtree.ccc_get_vertexes(cell))
-              ccplx.add_cell(cc_t::cell_type_t::POINT, {add_point_and_data_from_tree(ccplx, rtree, vert)});
+              ccplx.add_cell(cc_t::cell_type_t::POINT, {add_node(ccplx, rtree, vert)});
         } else if (output_centers) {
           for(auto& cell: cells)
-            ccplx.add_cell(cc_t::cell_type_t::POINT, {add_point_and_data_from_tree(ccplx, rtree, cell)});
+            ccplx.add_cell(cc_t::cell_type_t::POINT, {add_node(ccplx, rtree, cell)});
         } else if (output_corners) {
           for(auto& cell: cells)
             for(auto& vert: rtree.ccc_get_corners(cell))
-              ccplx.add_cell(cc_t::cell_type_t::POINT, {add_point_and_data_from_tree(ccplx, rtree, vert)});
+              ccplx.add_cell(cc_t::cell_type_t::POINT, {add_node(ccplx, rtree, vert)});
         } else {
           std::cout << "WARNING: construct_geometry_points: Both output_centers & output_corners are FALSE.  No geometry created!" << std::endl;
           return 1;
@@ -432,10 +513,10 @@ namespace mjr {
                                          ) {
         create_dataset_to_point_mapping(rtree, ccplx, point_src);
         for(auto& cell: cells) {
-          std::vector<cc_pnt_idx_t> cnr_pti;
+          std::vector<cc_node_idx_t> cnr_pti;
           rt_diti_list_t corners = rtree.ccc_get_corners(cell);
           for(auto& corner: corners) {
-            cc_pnt_idx_t pnti = add_point_and_data_from_tree(ccplx, rtree, corner);
+            cc_node_idx_t pnti = add_node(ccplx, rtree, corner);
             cnr_pti.push_back(pnti);
           }
           if (rtree.domain_dimension == 1) {
@@ -472,99 +553,29 @@ namespace mjr {
       }
       //@}
 
+
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      /** @name Mathematical Tools */
+      /** @name Function Adapters */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Given an edge with one good point and one NaN point, find the longest segment from the good point toward the NaN point.
-
-          Note we normally use this function when we detect a NaN in a geometric point (i.e. the things with a pnt_idx_t).  This solver solves until
-          the return of func has no NaNs.  Those two criteria might not be the same thing, but it's OK.
-
-          @param ccplx                   The MR_cell_cplx to populate with geometry
-          @param rtree                   The MR_rect_tree with source data
-          @param good_point_ccplx_index  Good point index in the ccplx object
-          @param good_point_rtree_index  Good point index in the rtree object
-          @param sick_point_rtree_index  Bad point index in the rtree object
-          @param func                    The function to use for the solver
-          @param solver_epsilon          Used as a distance threshold between sick point and solved endpoint in the tree domain space. */
-      static cc_pnt_idx_t nan_edge_solver(cc_t&               ccplx,
-                                          const rt_t&         rtree,
-                                          cc_pnt_idx_t        good_point_ccplx_index,
-                                          rt_diti_t           good_point_rtree_index,
-                                          rt_diti_t           sick_point_rtree_index,
-                                          rt_drpt2rrpt_func_t func,
-                                          cc_uft_t            solver_epsilon=cc_t::epsilon/100
-                                         ) {
-        // Solver cache.  Clear it if we have a different rtree object from last time.
-        static std::unordered_map<rt_diti_t, std::unordered_map<rt_diti_t, cc_pnt_idx_t>> nan_solver_cache;
-        static const rt_t* rtree_cache = nullptr;
-        if (rtree_cache != &rtree) {
-          nan_solver_cache.clear();
-          rtree_cache = &rtree;
-        }
-        // Check to see if we solved this one before
-        if (nan_solver_cache.contains(sick_point_rtree_index))
-          if (nan_solver_cache[sick_point_rtree_index].contains(good_point_rtree_index))
-            return  nan_solver_cache[sick_point_rtree_index][good_point_rtree_index];
-        // Apparently we need to solve this one as it's not in the case
-        rt_drpt_t good_point_drpt = rtree.diti_to_drpt(good_point_rtree_index);
-        rt_drpt_t sick_point_drpt = rtree.diti_to_drpt(sick_point_rtree_index);
-        rt_rrpt_t good_point_rrpt = rtree.get_sample(good_point_rtree_index);
-        rt_drpt_t init_point_drpt = good_point_drpt;
-        while ( (rtree.drpt_distance_inf(good_point_drpt, sick_point_drpt) > solver_epsilon) ) {
-          rt_drpt_t md_point_drpt = rtree.drpt_midpoint(good_point_drpt, sick_point_drpt);
-          rt_rrpt_t y = func(md_point_drpt);
-          if (rtree.rrpt_is_nan(y)) {
-            sick_point_drpt = md_point_drpt;
-          } else {
-            good_point_drpt = md_point_drpt;
-            good_point_rrpt = y;
-          }
-        }
-        // Figure out what to return, add it to the cache, and return.
-        cc_pnt_idx_t ret;
-        if (rtree.drpt_distance_inf(good_point_drpt, init_point_drpt) < (ccplx.epsilon)) // Use ccplx here!!!
-          ret = good_point_ccplx_index;
-        else
-          ret = add_point_and_data_from_data(ccplx, good_point_drpt, good_point_rrpt);
-        nan_solver_cache[sick_point_rtree_index][good_point_rtree_index] = ret;
-        return ret;
+      /** Adapt a MR_rect_tree::drpt2rrpt_func_t (sample function) to a MR_cell_cplx::p2data_func_t (Point Data Transform).
+          @param func The function to adapt
+          @param pd   Point data to be passed to func. */
+      inline static cc_node_data_t tsampf_to_cdatf(rt_drpt2rrpt_func_t func,
+                                                  cc_node_data_t       pd) {
+        rt_drpt_t xpt = node_data_to_drpt(pd);
+        return rt_pnt_to_cc_pnt(xpt, func(xpt));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Adapt a MR_rect_tree sample function to a MR_cell_cplx point data function.
-
-          @param func        The function to adapt
-          @param pd          Point data to be passed to func. */
-      inline static cc_pnt_data_t tsampf_to_cdatf(rt_drpt2rrpt_func_t func,
-                                                  cc_pnt_data_t       pd) {
-        rt_drpt_t xpt = pnt_data_to_drpt(pd);
-        return tree_point_data_to_cplx_point_data(xpt, func(xpt));
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Adapt a MR_rect_tree sdf function to a MR_cell_cplx point data function.
-
+      /** Adapt a MR_rect_tree::drpt2real_func_t (Domain Point SDF) to MR_cell_cplx::p2real_func_t (Point Data SDF).
           @param func        The function to adapt
           @param pd          Point data to be passed to func. */
       inline static cc_uft_t tsdf_to_csdf(rt_drpt2real_func_t func,
-                                          cc_pnt_data_t       pd) {
-        return static_cast<cc_uft_t>(func(pnt_data_to_drpt(pd)));
+                                          cc_node_data_t       pd) {
+        return static_cast<cc_uft_t>(func(node_data_to_drpt(pd)));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Transform a pnt_data_t value from a MR_cell_cplx into drpt_t from a MR_rect_tree */
-      inline static rt_drpt_t pnt_data_to_drpt(const cc_pnt_data_t& pd) {
-        rt_drpt_t ret;
-        if constexpr (rt_t::domain_dimension == 1) {
-          ret = pd[0];
-        } else {
-          for(int i=0; i<rt_t::domain_dimension; ++i)
-            ret[i] = pd[i];
-        }
-        return ret;
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Convert a MR_rect_tree sample function into a level test SDF'ish function.
-
+      /** Evalate an MR_cell_cplx::p2real_func_t (Point Data SDF) function from a MR_rect_tree::drpt2rrpt_func_t (Sample Function) and level data.
           @param range_index Index into range of origional sample function
           @param level       Level to check range element aginst
           @param func        The function to adapt
@@ -572,28 +583,24 @@ namespace mjr {
       inline static cc_uft_t tsampf_to_clcdf(int                 range_index,
                                              cc_uft_t            level,
                                              rt_drpt2rrpt_func_t func,
-                                             cc_pnt_data_t       pd) {
+                                             cc_node_data_t       pd) {
         if constexpr (rt_t::domain_dimension == 1) {
-          return static_cast<cc_uft_t>(func(pnt_data_to_drpt(pd))) - level;
+          return static_cast<cc_uft_t>(func(node_data_to_drpt(pd))) - level;
         } else {
-          return static_cast<cc_uft_t>(func(pnt_data_to_drpt(pd))[range_index]) - level;
+          return static_cast<cc_uft_t>(func(node_data_to_drpt(pd))[range_index]) - level;
         }
       }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Convert a MR_rect_tree range index into an index for a point data array
+      //@}
 
-          @param tree_range_index value to convert */
-      inline static int rt_ran_idx_to_pd_idx(int tree_range_index) {
-        return (tree_range_index + rt_t::domain_dimension);
-      }
-
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /** @name Mathematical Tools */
+      //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Drop cells from a MR_cell_cplx object using an MR_rect_tree domain SDF function.
        */
       inline static int cull_cc_cells_on_domain_sdf_boundry(cc_t&               ccplx,
-                                              //const rt_t&         rtree,
-                                              rt_drpt2real_func_t sdf_func) {
-        return ccplx.cull_cells([&ccplx, &sdf_func](cc_cell_t c) { return ccplx.cell_on_sdf_boundry(c, [&sdf_func](cc_pnt_data_t pd) { return (tsdf_to_csdf(sdf_func, pd)); }); });
+                                                            rt_drpt2real_func_t sdf_func) {
+        return ccplx.cull_cells([&ccplx, &sdf_func](cc_cell_t c) { return ccplx.cell_on_sdf_boundry(c, [&sdf_func](cc_node_data_t pd) { return (tsdf_to_csdf(sdf_func, pd)); }); });
       }
 
 

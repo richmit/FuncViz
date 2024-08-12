@@ -101,8 +101,8 @@ int main() {
   ccplx.dump_cplx(10);
 
   /* Fold all triangles that cross the unit circle! */
-  ccplx.triangle_folder([](cc_t::pnt_data_t x){return tc_t::tsampf_to_cdatf(half_sphere_hat, x); }, 
-                        [](cc_t::pnt_data_t x){return tc_t::tsdf_to_csdf(unit_circle_sdf,    x); });
+  ccplx.triangle_folder([](cc_t::node_data_t x){return tc_t::tsampf_to_cdatf(half_sphere_hat, x); }, 
+                        [](cc_t::node_data_t x){return tc_t::tsdf_to_csdf(unit_circle_sdf,    x); });
 
   /* Notice how it changed after the fold */
   ccplx.dump_cplx(10);

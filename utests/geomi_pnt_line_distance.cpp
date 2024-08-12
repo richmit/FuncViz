@@ -46,9 +46,9 @@
 BOOST_AUTO_TEST_CASE(geomi_pnt_line_distance) {
   mjr::MRccT5 aPoly;
 
-  aPoly.add_point({0.0, 1.0, 3.0}); // pl1
-  aPoly.add_point({3.0, 2.0, 0.0}); // pl2
-  aPoly.add_point({3.0, 1.0, 0.0}); // pnt
+  aPoly.add_node({0.0, 1.0, 3.0}); // pl1
+  aPoly.add_node({3.0, 2.0, 0.0}); // pl2
+  aPoly.add_node({3.0, 1.0, 0.0}); // pnt
 
   BOOST_TEST_CHECK(aPoly.geomi_pnt_line_distance(0, 1, 2, false) ==  0.973329,    boost::test_tools::tolerance(0.001) );  
 }

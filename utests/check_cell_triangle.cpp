@@ -47,10 +47,10 @@ BOOST_AUTO_TEST_CASE(check_cell_triangle) {
 
   mjr::MRccT5 aPoly;
 
-  aPoly.add_point({0.0, 0.0, 0.0});
-  aPoly.add_point({1.0, 1.0, 1.0});
-  aPoly.add_point({1.0, 2.0, 3.0});
-  aPoly.add_point({2.0, 2.0, 2.0});
+  aPoly.add_node({0.0, 0.0, 0.0});
+  aPoly.add_node({1.0, 1.0, 1.0});
+  aPoly.add_node({1.0, 2.0, 3.0});
+  aPoly.add_node({2.0, 2.0, 2.0});
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
 

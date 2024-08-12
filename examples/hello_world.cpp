@@ -58,6 +58,10 @@ int main() {
             { 2.1,  2.1});
   cc_t ccplx;
 
+std::cout << cc_t::epsilon << std::endl;
+std::cout << cc_t::uft_epsilon << std::endl;
+
+
   tree.refine_grid(7, damp_cos_wave);   // Sample on a uniform grid
   tree.dump_tree(5);                   // Dump some of the tree
 

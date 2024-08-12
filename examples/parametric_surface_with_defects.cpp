@@ -38,7 +38,7 @@
      This means for the rectangular tessellation, the rectangles at the poles are degenerate!  Then converting from tree to cell complex, these quads are
      removed because they are degenerate. This is not an issue for the triangular tessellation (FANS).
    - The v=0 edge meets up with the v=1 edge.  
-     Because we have uniq_points set to true for the cell complex object, the duplicate points are "welded" together when the points are added.  This results
+     Because we have chk_point_unique set to true for the cell complex object, the duplicate points are "welded" together when the points are added.  This results
      in a seamless edge.
 */
 /*******************************************************************************************************************************************************.H.E.**/

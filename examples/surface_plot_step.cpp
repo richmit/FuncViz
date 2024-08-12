@@ -98,7 +98,7 @@ int main() {
 
   /* We can do the above directly with MR_cell_cplx::cull_cells().  If you rewrote unit_circle_sdf(), you don't need to nest lambdas... */
   // ccplx.cull_cells([&ccplx](cc_t::cell_t c){ return ccplx.cell_cross_sdf_boundry(c, 
-  //                                                                                [](cc_t::pnt_data_t pd) { return (tc_t::tsdf_to_csdf(unit_circle_sdf, 
+  //                                                                                [](cc_t::node_data_t pd) { return (tc_t::tsdf_to_csdf(unit_circle_sdf, 
   //                                                                                                                                     pd)); 
   //                                                                                                        }); 
   //                                          });
