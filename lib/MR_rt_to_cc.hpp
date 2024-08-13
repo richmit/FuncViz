@@ -63,18 +63,18 @@ namespace mjr {
       /** @name Types imported from MR_rect_tree and MR_cell_cplx. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      typedef typename cc_t::node_data_idx_lst_t    cc_node_data_idx_lst_t;
-      typedef typename cc_t::node_data_t        cc_node_data_t;
-      typedef typename cc_t::node_idx_list_t    cc_node_idx_list_t;
-      typedef typename cc_t::node_idx_t         cc_node_idx_t;
-      typedef typename cc_t::cell_t            cc_cell_t;
-      typedef typename cc_t::uft_t             cc_uft_t;
-      typedef typename rt_t::diti_list_t       rt_diti_list_t;
-      typedef typename rt_t::diti_t            rt_diti_t;
-      typedef typename rt_t::drpt_t            rt_drpt_t;
-      typedef typename rt_t::drpt2real_func_t  rt_drpt2real_func_t;
-      typedef typename rt_t::rrpt_t            rt_rrpt_t;
-      typedef typename rt_t::drpt2rrpt_func_t  rt_drpt2rrpt_func_t;
+      typedef typename cc_t::node_data_idx_lst_t cc_node_data_idx_lst_t;
+      typedef typename cc_t::node_data_t         cc_node_data_t;
+      typedef typename cc_t::node_idx_list_t     cc_node_idx_list_t;
+      typedef typename cc_t::node_idx_t          cc_node_idx_t;
+      typedef typename cc_t::cell_t              cc_cell_t;
+      typedef typename cc_t::uft_t               cc_uft_t;
+      typedef typename rt_t::diti_list_t         rt_diti_list_t;
+      typedef typename rt_t::diti_t              rt_diti_t;
+      typedef typename rt_t::drpt_t              rt_drpt_t;
+      typedef typename rt_t::drpt2real_func_t    rt_drpt2real_func_t;
+      typedef typename rt_t::rrpt_t              rt_rrpt_t;
+      typedef typename rt_t::drpt2rrpt_func_t    rt_drpt2rrpt_func_t;
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

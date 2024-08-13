@@ -374,7 +374,7 @@ namespace mjr {
       cell_lst_t cell_lst;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Used to uniquify cells */
-      typedef std::set<cell_t> uniq_cell_lst_t;
+      typedef std::set<cell_verts_t> uniq_cell_lst_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Unique cell list. */
       uniq_cell_lst_t uniq_cell_lst;
@@ -1306,7 +1306,7 @@ namespace mjr {
         }
         // Geom was good or we didn't need to check.
         if constexpr (chk_cell_unique) {
-          cell_t new_cell_sorted_verts = new_cell_verts;
+          cell_verts_t new_cell_sorted_verts = new_cell_verts;
           std::sort(new_cell_sorted_verts.begin(), new_cell_sorted_verts.end());
           if (uniq_cell_lst.contains(new_cell_sorted_verts)) {
             last_cell_new = false;
@@ -1730,7 +1730,7 @@ namespace mjr {
       void mirror(std::vector<int> flip_list, uft_t zero_epsilon=epsilon*1000, bool reverse_vertex_order=true) {
         int num_start_cells = num_cells();
         for(int cell_idx=0; cell_idx<num_start_cells; ++cell_idx) {
-          cell_t new_cell;
+          cell_verts_t new_cell;
           for(auto pidx: cell_lst[cell_idx]) {
             node_data_t od = node_idx_to_node_data[pidx];
             for(int flip_list_idx=0; flip_list_idx<static_cast<int>(flip_list.size()); ++flip_list_idx)
