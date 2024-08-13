@@ -1,10 +1,9 @@
 #!/bin/bash
 
-# NOTE: This is a bash script that works within MSYS2 on WINDOWS!
-
 # NOTE: Run from the build directory!
 
-# NOTE: This is also a horrible way to do functional tests with floating point output.
+# WARNING: I developed this bash script for MSYS2 on WINDOWS!  It
+# should work on UNIX'ish systems, but I have not tested it.
 
 if [ "$(basename $(pwd))" == "build" -a -e '../CMakeLists.txt' ]; then
   echo " "
