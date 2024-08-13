@@ -3,6 +3,7 @@
 /**
  @file      surface_plot_corner.cpp
  @author    Mitch Richling http://www.mitchr.me/
+ @brief     Surface with a sharp edge.@EOL
  @date      2024-07-16
  @std       C++23
  @copyright 

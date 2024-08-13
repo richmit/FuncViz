@@ -54,22 +54,22 @@ BOOST_AUTO_TEST_CASE(check_cell_segment) {
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_type_t::SEGMENT, mjr::MRccT5::cell_t({0,-1}))      == mjr::MRccT5::cell_stat_t::NEG_PNT_IDX);
+  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_kind_t::SEGMENT, mjr::MRccT5::cell_t({0,-1}))      == mjr::MRccT5::cell_stat_t::NEG_PNT_IDX);
 
-  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_type_t::SEGMENT, mjr::MRccT5::cell_t({0,10}))      == mjr::MRccT5::cell_stat_t::BIG_PNT_IDX);
+  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_kind_t::SEGMENT, mjr::MRccT5::cell_t({0,10}))      == mjr::MRccT5::cell_stat_t::BIG_PNT_IDX);
 
-  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_type_t::SEGMENT, mjr::MRccT5::cell_t({0,1,2}))     == mjr::MRccT5::cell_stat_t::TOO_MANY_PNT);
+  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_kind_t::SEGMENT, mjr::MRccT5::cell_t({0,1,2}))     == mjr::MRccT5::cell_stat_t::TOO_MANY_PNT);
 
-  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_type_t::SEGMENT, mjr::MRccT5::cell_t({0}))         == mjr::MRccT5::cell_stat_t::TOO_FEW_PNT);
+  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_kind_t::SEGMENT, mjr::MRccT5::cell_t({0}))         == mjr::MRccT5::cell_stat_t::TOO_FEW_PNT);
 
-  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_type_t::SEGMENT, mjr::MRccT5::cell_t({0, 0}))      == mjr::MRccT5::cell_stat_t::DUP_PNT);
+  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_kind_t::SEGMENT, mjr::MRccT5::cell_t({0, 0}))      == mjr::MRccT5::cell_stat_t::DUP_PNT);
 
-  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_type_t::SEGMENT, mjr::MRccT5::cell_t({0,1}))       == mjr::MRccT5::cell_stat_t::GOOD);
+  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_kind_t::SEGMENT, mjr::MRccT5::cell_t({0,1}))       == mjr::MRccT5::cell_stat_t::GOOD);
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-  BOOST_CHECK(aPoly.check_cell_dimension(mjr::MRccT5::cell_type_t::SEGMENT, mjr::MRccT5::cell_t({0, 0}))     == mjr::MRccT5::cell_stat_t::GOOD); // Always returns GOOD for SEGMENTs.
+  BOOST_CHECK(aPoly.check_cell_dimension(mjr::MRccT5::cell_kind_t::SEGMENT, mjr::MRccT5::cell_t({0, 0}))     == mjr::MRccT5::cell_stat_t::GOOD); // Always returns GOOD for SEGMENTs.
 
-  BOOST_CHECK(aPoly.check_cell_dimension(mjr::MRccT5::cell_type_t::SEGMENT, mjr::MRccT5::cell_t({0,1}))      == mjr::MRccT5::cell_stat_t::GOOD);
+  BOOST_CHECK(aPoly.check_cell_dimension(mjr::MRccT5::cell_kind_t::SEGMENT, mjr::MRccT5::cell_t({0,1}))      == mjr::MRccT5::cell_stat_t::GOOD);
 
 }

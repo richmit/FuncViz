@@ -4,6 +4,7 @@
  @file      surface_plot_step.cpp
  @author    Mitch Richling http://www.mitchr.me/
  @date      2024-07-16
+ @brief     Surface with a step discontinuity along a curve.@EOL
  @std       C++23
  @copyright 
   @parblock

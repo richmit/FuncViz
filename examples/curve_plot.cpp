@@ -4,6 +4,7 @@
  @file      curve_plot.cpp
  @author    Mitch Richling http://www.mitchr.me/
  @date      2024-07-18
+ @brief     A simple curve plot.@EOL
  @std       C++23
  @copyright 
   @parblock

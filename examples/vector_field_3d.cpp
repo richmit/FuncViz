@@ -101,7 +101,7 @@ int main() {
     double z_new = z_old + (x_old*y_old-c*z_old)*delta;
     t += delta;
     auto p_new = cvccplx.add_node({x_new, y_new, z_new, t});
-    cvccplx.add_cell(cc_t::cell_type_t::SEGMENT, {p_old, p_new});
+    cvccplx.add_cell(cc_t::cell_kind_t::SEGMENT, {p_old, p_new});
     x_old=x_new;
     y_old=y_new;
     z_old=z_new;

@@ -65,43 +65,43 @@ BOOST_AUTO_TEST_CASE(check_cell_pyramid) {
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_type_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,-4}))          == mjr::MRccT5::cell_stat_t::NEG_PNT_IDX);
+  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_kind_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,-4}))          == mjr::MRccT5::cell_stat_t::NEG_PNT_IDX);
 
-  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_type_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,100}))         == mjr::MRccT5::cell_stat_t::BIG_PNT_IDX);
+  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_kind_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,100}))         == mjr::MRccT5::cell_stat_t::BIG_PNT_IDX);
 
-  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_type_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,4,5}))         == mjr::MRccT5::cell_stat_t::TOO_MANY_PNT);
+  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_kind_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,4,5}))         == mjr::MRccT5::cell_stat_t::TOO_MANY_PNT);
 
-  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_type_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3}))             == mjr::MRccT5::cell_stat_t::TOO_FEW_PNT);
+  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_kind_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3}))             == mjr::MRccT5::cell_stat_t::TOO_FEW_PNT);
 
-  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_type_t::PYRAMID, mjr::MRccT5::cell_t({0,0,1,2,3}))           == mjr::MRccT5::cell_stat_t::DUP_PNT);
+  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_kind_t::PYRAMID, mjr::MRccT5::cell_t({0,0,1,2,3}))           == mjr::MRccT5::cell_stat_t::DUP_PNT);
 
-  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_type_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,4}))           == mjr::MRccT5::cell_stat_t::GOOD);
-
-  //--------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-  BOOST_CHECK(aPoly.check_cell_dimension(mjr::MRccT5::cell_type_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,5}))          == mjr::MRccT5::cell_stat_t::DIM_LOW);
-
-  BOOST_CHECK(aPoly.check_cell_dimension(mjr::MRccT5::cell_type_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,4}))          == mjr::MRccT5::cell_stat_t::GOOD);
+  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_kind_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,4}))           == mjr::MRccT5::cell_stat_t::GOOD);
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-  BOOST_CHECK(aPoly.check_cell_edge_intersections(mjr::MRccT5::cell_type_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,9})) == mjr::MRccT5::cell_stat_t::BAD_EDGEI); // point on edge
+  BOOST_CHECK(aPoly.check_cell_dimension(mjr::MRccT5::cell_kind_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,5}))          == mjr::MRccT5::cell_stat_t::DIM_LOW);
 
-  BOOST_CHECK(aPoly.check_cell_edge_intersections(mjr::MRccT5::cell_type_t::PYRAMID, mjr::MRccT5::cell_t({0,2,1,3,4})) == mjr::MRccT5::cell_stat_t::BAD_EDGEI); // bow tie base
-
-  BOOST_CHECK(aPoly.check_cell_edge_intersections(mjr::MRccT5::cell_type_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,5})) == mjr::MRccT5::cell_stat_t::GOOD); // COPLN, but good
-
-  BOOST_CHECK(aPoly.check_cell_edge_intersections(mjr::MRccT5::cell_type_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,4})) == mjr::MRccT5::cell_stat_t::GOOD);
+  BOOST_CHECK(aPoly.check_cell_dimension(mjr::MRccT5::cell_kind_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,4}))          == mjr::MRccT5::cell_stat_t::GOOD);
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-  BOOST_CHECK(aPoly.check_cell_faces_plainer(mjr::MRccT5::cell_type_t::PYRAMID, mjr::MRccT5::cell_t({10,1,2,3,5}))     == mjr::MRccT5::cell_stat_t::FACE_BENT); // Bent
+  BOOST_CHECK(aPoly.check_cell_edge_intersections(mjr::MRccT5::cell_kind_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,9})) == mjr::MRccT5::cell_stat_t::BAD_EDGEI); // point on edge
 
-  BOOST_CHECK(aPoly.check_cell_faces_plainer(mjr::MRccT5::cell_type_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,4}))      == mjr::MRccT5::cell_stat_t::GOOD);
+  BOOST_CHECK(aPoly.check_cell_edge_intersections(mjr::MRccT5::cell_kind_t::PYRAMID, mjr::MRccT5::cell_t({0,2,1,3,4})) == mjr::MRccT5::cell_stat_t::BAD_EDGEI); // bow tie base
+
+  BOOST_CHECK(aPoly.check_cell_edge_intersections(mjr::MRccT5::cell_kind_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,5})) == mjr::MRccT5::cell_stat_t::GOOD); // COPLN, but good
+
+  BOOST_CHECK(aPoly.check_cell_edge_intersections(mjr::MRccT5::cell_kind_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,4})) == mjr::MRccT5::cell_stat_t::GOOD);
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-  BOOST_CHECK(aPoly.check_cell_face_intersections(mjr::MRccT5::cell_type_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,4})) == mjr::MRccT5::cell_stat_t::GOOD); // Always returns good
+  BOOST_CHECK(aPoly.check_cell_faces_plainer(mjr::MRccT5::cell_kind_t::PYRAMID, mjr::MRccT5::cell_t({10,1,2,3,5}))     == mjr::MRccT5::cell_stat_t::FACE_BENT); // Bent
+
+  BOOST_CHECK(aPoly.check_cell_faces_plainer(mjr::MRccT5::cell_kind_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,4}))      == mjr::MRccT5::cell_stat_t::GOOD);
+
+  //--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  BOOST_CHECK(aPoly.check_cell_face_intersections(mjr::MRccT5::cell_kind_t::PYRAMID, mjr::MRccT5::cell_t({0,1,2,3,4})) == mjr::MRccT5::cell_stat_t::GOOD); // Always returns good
 
 }
 

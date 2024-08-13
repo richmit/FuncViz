@@ -153,16 +153,16 @@ namespace mjr {
           - This check makes sure that cells have the correct number of vertexes and that those vertexes are valid (on the master point list)
           - This check also makes sure cells have no duplicate vertexes.
           - In general this check is pretty cheap, and catches a great many common mesh problems.
-          - This is the only check required for cell_type_t::POINT and cell_type_t::SEG cells
+          - This is the only check required for cell_kind_t::POINT and cell_kind_t::SEG cells
         - chk_cell_dimension:
           - This check makes sure that PYRAMIDS & HEXAHEDRONS are not co-planar and that TRIANGLES & QUADS are not co-linear.
-          - Combined with chk_cell_vertexes this check is all that is required for cell_type_t::TRIANGLE cells
+          - Combined with chk_cell_vertexes this check is all that is required for cell_kind_t::TRIANGLE cells
         - chk_cell_edges:
           - This check makes sure that no cell edges intersect in disallowed ways
           - This check when combined with the above checks, usually produce cells good enough for most software packages.
-            - cell_type_t::QUAD cells might be concave or non-plainer.
-            - cell_type_t::HEXAHEDRON cells might be concave or degenerate (bad edge-face intersections)
-            - cell_type_t::PYRAMID cells might be concave.
+            - cell_kind_t::QUAD cells might be concave or non-plainer.
+            - cell_kind_t::HEXAHEDRON cells might be concave or degenerate (bad edge-face intersections)
+            - cell_kind_t::PYRAMID cells might be concave.
 
       Levels Of Cell Goodness
 
@@ -278,9 +278,6 @@ namespace mjr {
       /** @name Cells. */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type to hold a poly cell -- a list of point indexes */
-      typedef node_idx_list_t cell_t;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Cell Status.  */
       enum class cell_stat_t { GOOD,           //!< Looks like a good cell                                       N/A
                                TOO_FEW_PNT,    //!< List of points was empty                                     check_cell_vertexes
@@ -294,16 +291,27 @@ namespace mjr {
                                FACE_BENT,      //!< A face (QUAD, HEXAHEDRON, or PYRAMID) was not plainer        check_cell_faces_plainer
                                CONCAVE,        //!< (QUAD, HEXAHEDRON, or PYRAMID) was concave                   TBD
                              };
-
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Cell Types. */
-      enum class cell_type_t { POINT,
+      enum class cell_kind_t { POINT,
                                SEGMENT,
                                TRIANGLE,
                                QUAD,
                                HEXAHEDRON,
                                PYRAMID,
                              };
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Type to hold the vertexes of a poly cell */
+      typedef node_idx_list_t cell_vert_list_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Type to hold a poly cell -- a list of point indexes */
+      typedef node_idx_list_t cell_t;
+      //--------------------------------------------------------------------------------------------------------------------------------------------------------
+      /** Type to hold a poly cell -- a list of point indexes */
+      // struct cell_t { 
+      //     cell_kind_t      type;
+      //     cell_vert_list_t verts;
+      // };
       //@}
 
     private:
@@ -950,10 +958,10 @@ namespace mjr {
         return static_cast<int>(cell_lst.size());
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Convert cell_type_t value to a list of vertexes. */
-      inline cell_structure_t& cell_type_to_structure(cell_type_t cell_type, int dimension) const {
-        //  MJR TODO NOTE <2024-07-11T16:06:42-0500> cell_type_to_structure: make sure polygons are all oriented correctly
-        int logical_dim = cell_type_to_dimension(cell_type);
+      /** Convert cell_kind_t value to a list of vertexes. */
+      inline cell_structure_t& cell_kind_to_structure(cell_kind_t cell_kind, int dimension) const {
+        //  MJR TODO NOTE <2024-07-11T16:06:42-0500> cell_kind_to_structure: make sure polygons are all oriented correctly
+        int logical_dim = cell_kind_to_dimension(cell_kind);
         if ( (dimension < 0) || (dimension > logical_dim) )
           dimension = logical_dim;
         if (logical_dim > 3) {
@@ -961,13 +969,13 @@ namespace mjr {
           exit(0);
         }
         int idx = 0;
-        switch(cell_type) {
-          case cell_type_t::POINT:       idx = 0; break;
-          case cell_type_t::SEGMENT:     idx = 1; break;
-          case cell_type_t::TRIANGLE:    idx = 2; break;
-          case cell_type_t::QUAD:        idx = 3; break;
-          case cell_type_t::PYRAMID:     idx = 4; break;
-          case cell_type_t::HEXAHEDRON:  idx = 5; break;
+        switch(cell_kind) {
+          case cell_kind_t::POINT:       idx = 0; break;
+          case cell_kind_t::SEGMENT:     idx = 1; break;
+          case cell_kind_t::TRIANGLE:    idx = 2; break;
+          case cell_kind_t::QUAD:        idx = 3; break;
+          case cell_kind_t::PYRAMID:     idx = 4; break;
+          case cell_kind_t::HEXAHEDRON:  idx = 5; break;
         }
         static std::vector<std::vector<cell_structure_t>> cst = {{{{0}},                             // vertex
                                                                   {{0},{1}},                         // segment
@@ -1010,72 +1018,72 @@ namespace mjr {
         return (cst[dimension][idx]);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Convert cell_type_t value to the logical dimension of the cell.
+      /** Convert cell_kind_t value to the logical dimension of the cell.
 
-          Note that the vertexes of a cell_type_t::QUAD cell might not be coplainer; however, the cell is logically a 2D cell.  Similarly, the vertexes of a
-          cell_type_t::PYRAMID might be coplainer; however, the cell is logically a 3D cell.  */
-      inline int cell_type_to_dimension(cell_type_t cell_type) const {
-        switch(cell_type) {
-          case cell_type_t::POINT:       return (0); break;
-          case cell_type_t::SEGMENT:     return (1); break;
-          case cell_type_t::TRIANGLE:    return (2); break;
-          case cell_type_t::QUAD:        return (2); break;
-          case cell_type_t::PYRAMID:     return (3); break;
-          case cell_type_t::HEXAHEDRON:  return (3); break;
+          Note that the vertexes of a cell_kind_t::QUAD cell might not be coplainer; however, the cell is logically a 2D cell.  Similarly, the vertexes of a
+          cell_kind_t::PYRAMID might be coplainer; however, the cell is logically a 3D cell.  */
+      inline int cell_kind_to_dimension(cell_kind_t cell_kind) const {
+        switch(cell_kind) {
+          case cell_kind_t::POINT:       return (0); break;
+          case cell_kind_t::SEGMENT:     return (1); break;
+          case cell_kind_t::TRIANGLE:    return (2); break;
+          case cell_kind_t::QUAD:        return (2); break;
+          case cell_kind_t::PYRAMID:     return (3); break;
+          case cell_kind_t::HEXAHEDRON:  return (3); break;
         }
         return -1;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Convert cell_type_t value to the number of points required for cell type. */
-      inline int cell_type_to_req_pt_cnt(cell_type_t cell_type) const {
-        switch(cell_type) {
-          case cell_type_t::POINT:       return (1); break;
-          case cell_type_t::SEGMENT:     return (2); break;
-          case cell_type_t::TRIANGLE:    return (3); break;
-          case cell_type_t::QUAD:        return (4); break;
-          case cell_type_t::PYRAMID:     return (5); break;
-          case cell_type_t::HEXAHEDRON:  return (8); break;
+      /** Convert cell_kind_t value to the number of points required for cell type. */
+      inline int cell_kind_to_req_pt_cnt(cell_kind_t cell_kind) const {
+        switch(cell_kind) {
+          case cell_kind_t::POINT:       return (1); break;
+          case cell_kind_t::SEGMENT:     return (2); break;
+          case cell_kind_t::TRIANGLE:    return (3); break;
+          case cell_kind_t::QUAD:        return (4); break;
+          case cell_kind_t::PYRAMID:     return (5); break;
+          case cell_kind_t::HEXAHEDRON:  return (8); break;
         }
         return -1;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Convert cell_type_t value to the VTK cell type integer. */
-      inline int cell_type_to_vtk_type(cell_type_t cell_type) const {
-        switch(cell_type) {
-          case cell_type_t::POINT:       return ( 1); break;
-          case cell_type_t::SEGMENT:     return ( 3); break;
-          case cell_type_t::TRIANGLE:    return ( 5); break;
-          case cell_type_t::QUAD:        return ( 9); break;
-          case cell_type_t::HEXAHEDRON:  return (12); break;
-          case cell_type_t::PYRAMID:     return (14); break;
+      /** Convert cell_kind_t value to the VTK cell type integer. */
+      inline int cell_kind_to_vtk_type(cell_kind_t cell_kind) const {
+        switch(cell_kind) {
+          case cell_kind_t::POINT:       return ( 1); break;
+          case cell_kind_t::SEGMENT:     return ( 3); break;
+          case cell_kind_t::TRIANGLE:    return ( 5); break;
+          case cell_kind_t::QUAD:        return ( 9); break;
+          case cell_kind_t::HEXAHEDRON:  return (12); break;
+          case cell_kind_t::PYRAMID:     return (14); break;
         }
         return -1;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Convert cell_type_t value to the VTK cell type integer. */
-      inline std::string cell_type_to_string(cell_type_t cell_type) const {
-        switch(cell_type) {
-          case cell_type_t::POINT:       return ("POINT"     ); break;
-          case cell_type_t::SEGMENT:     return ("SEGMENT"   ); break;
-          case cell_type_t::TRIANGLE:    return ("TRIANGLE"  ); break;
-          case cell_type_t::QUAD:        return ("QUAD"      ); break;
-          case cell_type_t::HEXAHEDRON:  return ("HEXAHEDRON"); break;
-          case cell_type_t::PYRAMID:     return ("PYRAMID"   ); break;
+      /** Convert cell_kind_t value to the VTK cell type integer. */
+      inline std::string cell_kind_to_string(cell_kind_t cell_kind) const {
+        switch(cell_kind) {
+          case cell_kind_t::POINT:       return ("POINT"     ); break;
+          case cell_kind_t::SEGMENT:     return ("SEGMENT"   ); break;
+          case cell_kind_t::TRIANGLE:    return ("TRIANGLE"  ); break;
+          case cell_kind_t::QUAD:        return ("QUAD"      ); break;
+          case cell_kind_t::HEXAHEDRON:  return ("HEXAHEDRON"); break;
+          case cell_kind_t::PYRAMID:     return ("PYRAMID"   ); break;
         }
         return ""; // Never get here.
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Convert number of points in a cell to cell_type_t. */
-      inline cell_type_t req_pt_cnt_to_cell_type(std::vector<int>::size_type node_count) const {
+      /** Convert number of points in a cell to cell_kind_t. */
+      inline cell_kind_t req_pt_cnt_to_cell_kind(std::vector<int>::size_type node_count) const {
         switch(node_count) {
-          case 1: return (cell_type_t::POINT);      break;
-          case 2: return (cell_type_t::SEGMENT);    break;
-          case 3: return (cell_type_t::TRIANGLE);   break;
-          case 4: return (cell_type_t::QUAD);       break;
-          case 5: return (cell_type_t::PYRAMID);    break;
-          case 8: return (cell_type_t::HEXAHEDRON); break;
+          case 1: return (cell_kind_t::POINT);      break;
+          case 2: return (cell_kind_t::SEGMENT);    break;
+          case 3: return (cell_kind_t::TRIANGLE);   break;
+          case 4: return (cell_kind_t::QUAD);       break;
+          case 5: return (cell_kind_t::PYRAMID);    break;
+          case 8: return (cell_kind_t::HEXAHEDRON); break;
         }
-        return (cell_type_t::POINT); // Never get here
+        return (cell_kind_t::POINT); // Never get here
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Convert cell_stat_t to a bool (true if GOOD). */
@@ -1108,12 +1116,12 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Perform cell vertex checks
 
-          @param cell_type The type for a_cell.
+          @param cell_kind The type for a_cell.
           @param a_cell    The cell to test.  */
-      inline cell_stat_t check_cell_vertexes(cell_type_t cell_type, cell_t a_cell) const {
+      inline cell_stat_t check_cell_vertexes(cell_kind_t cell_kind, cell_t a_cell) const {
         // Check number of points
         std::vector<int>::size_type a_cell_len  = a_cell.size();
-        std::vector<int>::size_type req_num_pts = cell_type_to_req_pt_cnt(cell_type);
+        std::vector<int>::size_type req_num_pts = cell_kind_to_req_pt_cnt(cell_kind);
         if (a_cell_len < req_num_pts)
           return cell_stat_t::TOO_FEW_PNT;
         if (a_cell_len > req_num_pts)
@@ -1141,21 +1149,21 @@ namespace mjr {
 
           @warning This function assumes that check_cell_vertexes() would have returned GOOD for the cell being checked!
 
-          @warning Will not detect degenerate cell_type_t::SEGMENT as that is handled by check_cell_vertexes.
+          @warning Will not detect degenerate cell_kind_t::SEGMENT as that is handled by check_cell_vertexes.
 
-          @param cell_type The type for a_cell.
+          @param cell_kind The type for a_cell.
           @param a_cell    The cell to test.  */
-      inline cell_stat_t check_cell_dimension(cell_type_t cell_type, cell_t a_cell) const {
-        if (cell_type == cell_type_t::TRIANGLE) {
+      inline cell_stat_t check_cell_dimension(cell_kind_t cell_kind, cell_t a_cell) const {
+        if (cell_kind == cell_kind_t::TRIANGLE) {
           if (geomi_pts_colinear(a_cell[0], a_cell[1], a_cell[2]))
             return cell_stat_t::DIM_LOW;
-        } else if (cell_type == cell_type_t::QUAD) {
+        } else if (cell_kind == cell_kind_t::QUAD) {
           if (geomi_pts_colinear(a_cell[0], a_cell[1], a_cell[2], a_cell[3]))
             return cell_stat_t::DIM_LOW;
-        } else if (cell_type == cell_type_t::HEXAHEDRON) {
+        } else if (cell_kind == cell_kind_t::HEXAHEDRON) {
           if ( geomi_pts_coplanar(a_cell))
             return cell_stat_t::DIM_LOW;
-        } else if (cell_type == cell_type_t::PYRAMID) {
+        } else if (cell_kind == cell_kind_t::PYRAMID) {
           if ( geomi_pts_coplanar(a_cell))
             return cell_stat_t::DIM_LOW;
         }
@@ -1170,13 +1178,13 @@ namespace mjr {
           @warning This function assumes that check_cell_vertexes() would have returned GOOD for the cell being checked!
 
           Note that this function will detect some conditions caught by other checks.  For example, this function will return cell_stat_t::BAD_EDGEI for
-          cell_type_t::SEG cells for which check_cell_dimension() returns cell_stat_t::DUP_PNT.  Note the cell_stat_t values are different depending upon which
+          cell_kind_t::SEG cells for which check_cell_dimension() returns cell_stat_t::DUP_PNT.  Note the cell_stat_t values are different depending upon which
           check function is called.
 
-          @param cell_type The type for a_cell.
+          @param cell_kind The type for a_cell.
           @param a_cell    The cell to test.  */
-      inline cell_stat_t check_cell_edge_intersections(cell_type_t cell_type, cell_t a_cell) const {
-        cell_structure_t& segs = cell_type_to_structure(cell_type, 1);
+      inline cell_stat_t check_cell_edge_intersections(cell_kind_t cell_kind, cell_t a_cell) const {
+        cell_structure_t& segs = cell_kind_to_structure(cell_kind, 1);
         if ( !(segs.empty())) {
           for(decltype(segs.size()) i=0; i<segs.size()-1; i++) {
             for(decltype(segs.size()) j=i+1; j<segs.size(); j++) {
@@ -1204,14 +1212,14 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Checks that cell faces have expected intersections.
 
-          @param cell_type The type for a_cell.
+          @param cell_kind The type for a_cell.
           @param a_cell    The cell to test.  */
-      inline cell_stat_t check_cell_face_intersections(cell_type_t cell_type, cell_t a_cell) const {
+      inline cell_stat_t check_cell_face_intersections(cell_kind_t cell_kind, cell_t a_cell) const {
         //  MJR TODO NOTE <2024-08-02T09:42:38-0500> check_cell_face_intersections: Implement
-        if (cell_type == cell_type_t::HEXAHEDRON) {
+        if (cell_kind == cell_kind_t::HEXAHEDRON) {
           if ( geomi_pts_coplanar(a_cell))
             return cell_stat_t::DIM_LOW;
-        } else if (cell_type == cell_type_t::PYRAMID) {
+        } else if (cell_kind == cell_kind_t::PYRAMID) {
           if ( geomi_pts_coplanar(a_cell))
             return cell_stat_t::DIM_LOW;
         }
@@ -1223,14 +1231,14 @@ namespace mjr {
           Returns cell_stat_t::FACE_BENT if the cell is *not* plainer, and cell_stat_t::GOOD if it is.
 
           Note that most visualization packages are tolerant of non-plainer faces, and can render them just fine.  For example, most applications will
-          automatically split a non-plainer cell_type_t::QUAD into two triangles.  That said such faces can be an issue when using a tessellation for
+          automatically split a non-plainer cell_kind_t::QUAD into two triangles.  That said such faces can be an issue when using a tessellation for
           computation.  Such issues are most severe for things like FEM, but they can also show up for common visualization computations like the extraction
           of level curves/surfaces.
 
-          @param cell_type The type for a_cell.
+          @param cell_kind The type for a_cell.
           @param a_cell    The cell to test.  */
-      inline cell_stat_t check_cell_faces_plainer(cell_type_t cell_type, cell_t a_cell) const {
-        const cell_structure_t& face_structures = cell_type_to_structure(cell_type, 2);
+      inline cell_stat_t check_cell_faces_plainer(cell_kind_t cell_kind, cell_t a_cell) const {
+        const cell_structure_t& face_structures = cell_kind_to_structure(cell_kind, 2);
         for(auto face_structure: face_structures) {
           cell_t face;
           for(auto idx: face_structure)
@@ -1243,28 +1251,28 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Add parts of a cell of the specified dimension.
 
-          Example 1: a valid cell_type_t::PYRAMID cell added wth dimension == 2 results in three cell_type_t::TRIANGLE cells and one cell_type_t::QUAD cell.
+          Example 1: a valid cell_kind_t::PYRAMID cell added wth dimension == 2 results in three cell_kind_t::TRIANGLE cells and one cell_kind_t::QUAD cell.
 
-          Example 2: a valid cell_type_t::PYRAMID cell added wth dimension == 3 results in one cell_type_t::PYRAMID cell added
+          Example 2: a valid cell_kind_t::PYRAMID cell added wth dimension == 3 results in one cell_kind_t::PYRAMID cell added
 
-          Example 3: a valid cell_type_t::PYRAMID cell added wth dimension == 1 results in 8 cell_type_t::SEG cells added
+          Example 3: a valid cell_kind_t::PYRAMID cell added wth dimension == 1 results in 8 cell_kind_t::SEG cells added
 
-          @param cell_type The type of cell to add.
+          @param cell_kind The type of cell to add.
           @param new_cell  The cell to add.
           @param dimension The dimension of the parts to add.
           @return Number of cells added */
-      inline int add_cell(cell_type_t cell_type, cell_t new_cell, int dimension) {
+      inline int add_cell(cell_kind_t cell_kind, cell_t new_cell, int dimension) {
         int num_added = 0;
-        if ( (dimension < 0) || (dimension >= cell_type_to_dimension(cell_type)) ) {
-          if (add_cell(cell_type, new_cell))
+        if ( (dimension < 0) || (dimension >= cell_kind_to_dimension(cell_kind)) ) {
+          if (add_cell(cell_kind, new_cell))
             num_added++;
         } else { // We need to break the cell up into lower dimensional bits, and add the bits.
-          const cell_structure_t& cell_parts = cell_type_to_structure(cell_type, dimension);
+          const cell_structure_t& cell_parts = cell_kind_to_structure(cell_kind, dimension);
           for(auto cell_part: cell_parts) {
             cell_t newer_cell;
             for(auto idx: cell_part)
               newer_cell.push_back(new_cell[idx]);
-            if (add_cell(req_pt_cnt_to_cell_type(newer_cell.size()), newer_cell))
+            if (add_cell(req_pt_cnt_to_cell_kind(newer_cell.size()), newer_cell))
               num_added++;
           }
         }
@@ -1272,27 +1280,27 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Add a cell
-          @param cell_type The type of cell to add.
+          @param cell_kind The type of cell to add.
           @param new_cell  The cell to add.
           @return A boolean indicateing success
           @retval true  The cell was added or had been added previously
           @retval false The cell could not be added (because of a failed geometric check) */
-      inline bool add_cell(cell_type_t cell_type, cell_t new_cell) {
+      inline bool add_cell(cell_kind_t cell_kind, cell_t new_cell) {
         // Check vertexes if required
         if constexpr (chk_cell_vertexes) {
-          last_cell_stat = check_cell_vertexes(cell_type, new_cell);
+          last_cell_stat = check_cell_vertexes(cell_kind, new_cell);
           if (cell_stat_is_bad(last_cell_stat))
             return false;
         }
         // Check dimension if required
         if constexpr (chk_cell_dimension) {
-          last_cell_stat = check_cell_dimension(cell_type, new_cell);
+          last_cell_stat = check_cell_dimension(cell_kind, new_cell);
           if (cell_stat_is_bad(last_cell_stat))
             return false;
         }
         // Check edges
         if constexpr (chk_cell_edges) {
-          last_cell_stat = check_cell_edge_intersections(cell_type, new_cell);
+          last_cell_stat = check_cell_edge_intersections(cell_kind, new_cell);
           if (cell_stat_is_bad(last_cell_stat))
             return false;
         }
@@ -1324,7 +1332,7 @@ namespace mjr {
             for(auto& vert: cell_lst[i]) {
               std::cout << vert << " ";
             }
-            std::cout << "   " << cell_type_to_string(req_pt_cnt_to_cell_type(cell_lst[i].size())) << std::endl;
+            std::cout << "   " << cell_kind_to_string(req_pt_cnt_to_cell_kind(cell_lst[i].size())) << std::endl;
             num_printed++;
             if ((max_num_print > 0) && (num_printed >= max_num_print)) {
               std::cout << "  Maximum number of cells reached.  Halting tree dump." << std::endl;
@@ -1444,7 +1452,7 @@ namespace mjr {
         out_stream << "        <DataArray type='Int8' Name='types' format='ascii'>" << std::endl;
         out_stream << "          ";
         for(auto& poly: cell_lst)
-          out_stream << cell_type_to_vtk_type(req_pt_cnt_to_cell_type(poly.size())) << " ";
+          out_stream << cell_kind_to_vtk_type(req_pt_cnt_to_cell_kind(poly.size())) << " ";
         out_stream << std::endl;
         out_stream << "        </DataArray>" << std::endl;
         out_stream << "      </Cells>" << std::endl;
@@ -1509,9 +1517,9 @@ namespace mjr {
           }
           out_stream << std::endl;
         }
-        out_stream << "CELL_TYPES " << num_cells() << std::endl;
+        out_stream << "CELL_KINDS " << num_cells() << std::endl;
         for(auto& poly: cell_lst)
-          out_stream << cell_type_to_vtk_type(req_pt_cnt_to_cell_type(poly.size())) << std::endl;
+          out_stream << cell_kind_to_vtk_type(req_pt_cnt_to_cell_kind(poly.size())) << std::endl;
         /* Dump point scalar data */
         if (data_name_to_data_idx_lst.size() > 0) {
           out_stream << "POINT_DATA " << node_count() << std::endl;
@@ -1585,8 +1593,8 @@ namespace mjr {
           return 2;
         }
         for(auto& poly: cell_lst) {
-          cell_type_t cell_type = req_pt_cnt_to_cell_type(poly.size());
-          if ( !((cell_type == cell_type_t::TRIANGLE) || (cell_type == cell_type_t::QUAD))) {
+          cell_kind_t cell_kind = req_pt_cnt_to_cell_kind(poly.size());
+          if ( !((cell_kind == cell_kind_t::TRIANGLE) || (cell_kind == cell_kind_t::QUAD))) {
             std::cout << "ERROR(write_ply): Cells must all be 2D (triangles or quads)!" << std::endl;
             return 2;
           }
@@ -1745,7 +1753,7 @@ namespace mjr {
           }
           if (reverse_vertex_order)
             std::reverse(new_cell.begin(), new_cell.end());
-          add_cell(req_pt_cnt_to_cell_type(new_cell.size()), new_cell);
+          add_cell(req_pt_cnt_to_cell_kind(new_cell.size()), new_cell);
         }
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1835,7 +1843,7 @@ namespace mjr {
         clear_cache_edge_solver_sdf();
         int num_start_cells = num_cells();
         for(int cell_idx=0; cell_idx<num_start_cells; ++cell_idx) {
-          if (static_cast<int>(cell_lst[cell_idx].size()) == cell_type_to_req_pt_cnt(cell_type_t::TRIANGLE)) {
+          if (static_cast<int>(cell_lst[cell_idx].size()) == cell_kind_to_req_pt_cnt(cell_kind_t::TRIANGLE)) {
             auto& cur_cell = cell_lst[cell_idx];
             // Find and count zeros, positive, and negative vertexes
             int zero_cnt= 0, plus_cnt= 0, negv_cnt= 0;
@@ -1870,8 +1878,8 @@ namespace mjr {
               if ((newv1 != orgv0) && (newv1 != orgv1) && (newv2 != orgv0) && (newv2 != orgv2)) {
                 cur_cell[p[1]] = newv1; // Modify current triangle in place
                 cur_cell[p[2]] = newv2; // Modify current triangle in place
-                add_cell(cell_type_t::TRIANGLE, {newv1, orgv1, newv2});  // Add new triangle
-                add_cell(cell_type_t::TRIANGLE, {orgv1, orgv2, newv2});  // Add new triangle
+                add_cell(cell_kind_t::TRIANGLE, {newv1, orgv1, newv2});  // Add new triangle
+                add_cell(cell_kind_t::TRIANGLE, {orgv1, orgv2, newv2});  // Add new triangle
               }
             } else if ((zero_cnt == 1) && (plus_cnt == 1) && (negv_cnt == 1)) { // two triangles
               p = pmat[zero_loc];
@@ -1881,7 +1889,7 @@ namespace mjr {
               auto newv0 = edge_solver_sdf(data_func, orgv1, orgv2, sdf_func, solve_epsilon);
               if ((newv0 != orgv1) && (newv0 != orgv2)) {
                 cur_cell[2] = newv0; // Modify current triangle in place
-                add_cell(cell_type_t::TRIANGLE, {orgv0, newv0, orgv2});  // Add new triangle
+                add_cell(cell_kind_t::TRIANGLE, {orgv0, newv0, orgv2});  // Add new triangle
               }
             }
           }
@@ -1896,7 +1904,7 @@ namespace mjr {
         clear_cache_edge_solver_sdf();
         int num_start_cells = num_cells();
         for(int cell_idx=0; cell_idx<num_start_cells; ++cell_idx) {
-          if (static_cast<int>(cell_lst[cell_idx].size()) == cell_type_to_req_pt_cnt(cell_type_t::SEGMENT)) {
+          if (static_cast<int>(cell_lst[cell_idx].size()) == cell_kind_to_req_pt_cnt(cell_kind_t::SEGMENT)) {
             auto& cur_cell = cell_lst[cell_idx];
             int plus_cnt=0,  negv_cnt=0;
             for(int i=0; i<2; i++) {
@@ -1912,7 +1920,7 @@ namespace mjr {
               auto newv  = edge_solver_sdf(data_func, orgv0, orgv1, sdf_func, solve_epsilon);
               if ((newv != orgv0) && (newv != orgv1)) {
                 cur_cell[1] = newv; // Modify current segment in place
-                add_cell(cell_type_t::SEGMENT, {newv, orgv1});  // Add new segment
+                add_cell(cell_kind_t::SEGMENT, {newv, orgv1});  // Add new segment
               }
             }
           }

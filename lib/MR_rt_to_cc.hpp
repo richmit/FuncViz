@@ -280,29 +280,29 @@ namespace mjr {
               if (ctr_pnti < 0) { // Center: Broken. Left:
                 if(cn0_pnti >= 0) { // Center: Broken.  Left: Good.
                   cc_node_idx_t np = nan_edge_solver(ccplx, rtree, cn0_pnti, corners[0], cell, func);
-                  ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {cn0_pnti, np}, output_dimension);
+                  ccplx.add_cell(cc_t::cell_kind_t::SEGMENT, {cn0_pnti, np}, output_dimension);
                 }
                 if(cn1_pnti >= 0) { // Center: Broken.  Right: Good.
                   cc_node_idx_t np = nan_edge_solver(ccplx, rtree, cn1_pnti, corners[1], cell, func);
-                  ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {np, cn1_pnti}, output_dimension);
+                  ccplx.add_cell(cc_t::cell_kind_t::SEGMENT, {np, cn1_pnti}, output_dimension);
                 }
               } else {             // Center: Good.
                 if(cn0_pnti < 0) { // Center: Good.  Left: Broken.
                   cc_node_idx_t np = nan_edge_solver(ccplx, rtree, ctr_pnti, cell, corners[0], func);
-                  ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {np, ctr_pnti}, output_dimension);
+                  ccplx.add_cell(cc_t::cell_kind_t::SEGMENT, {np, ctr_pnti}, output_dimension);
                 } else {           // Center: Good.  Left: Good.
-                  ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {cn0_pnti, ctr_pnti}, output_dimension);
+                  ccplx.add_cell(cc_t::cell_kind_t::SEGMENT, {cn0_pnti, ctr_pnti}, output_dimension);
                 }
                 if(cn1_pnti < 0) { // Center: Good.  Right: Broken.
                   cc_node_idx_t np = nan_edge_solver(ccplx, rtree, ctr_pnti, cell, corners[1], func);
-                  ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {ctr_pnti, np}, output_dimension);
+                  ccplx.add_cell(cc_t::cell_kind_t::SEGMENT, {ctr_pnti, np}, output_dimension);
                 } else {           // Center: Good.  Left: Good.
-                  ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {ctr_pnti, cn1_pnti}, output_dimension);
+                  ccplx.add_cell(cc_t::cell_kind_t::SEGMENT, {ctr_pnti, cn1_pnti}, output_dimension);
                 }
               }
             } else {
-              ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {cn0_pnti, ctr_pnti}, output_dimension);
-              ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {ctr_pnti, cn1_pnti}, output_dimension);
+              ccplx.add_cell(cc_t::cell_kind_t::SEGMENT, {cn0_pnti, ctr_pnti}, output_dimension);
+              ccplx.add_cell(cc_t::cell_kind_t::SEGMENT, {ctr_pnti, cn1_pnti}, output_dimension);
             }
           }
         } else if (rtree.domain_dimension == 2) {
@@ -333,7 +333,7 @@ namespace mjr {
                                                        add_node(ccplx, rtree, triangle[2])};
                     int num_bad = static_cast<int>(std::count_if(tpnts.begin(), tpnts.end(), [](cc_node_idx_t i) { return i<0; }));
                     if (num_bad == 0) {
-                      ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {tpnts[0], tpnts[1], tpnts[2]}, output_dimension);
+                      ccplx.add_cell(cc_t::cell_kind_t::TRIANGLE, {tpnts[0], tpnts[1], tpnts[2]}, output_dimension);
                     } else if ((num_bad == 1) || (num_bad == 2)) {
                       // Rotate points so we only have two cases to think about...
                       std::array<int, 3> p {0, 1, 2};
@@ -345,12 +345,12 @@ namespace mjr {
                       if (num_bad == 1) {
                         cc_node_idx_t np1 = nan_edge_solver(ccplx, rtree, tpnts[p[1]], triangle[p[1]], triangle[p[0]], func);
                         cc_node_idx_t np2 = nan_edge_solver(ccplx, rtree, tpnts[p[2]], triangle[p[2]], triangle[p[0]], func);
-                        ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {np1, tpnts[p[1]], tpnts[p[2]]}, output_dimension);
-                        ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {tpnts[p[2]], np2, np1}, output_dimension);
+                        ccplx.add_cell(cc_t::cell_kind_t::TRIANGLE, {np1, tpnts[p[1]], tpnts[p[2]]}, output_dimension);
+                        ccplx.add_cell(cc_t::cell_kind_t::TRIANGLE, {tpnts[p[2]], np2, np1}, output_dimension);
                       } else {
                         cc_node_idx_t np1 = nan_edge_solver(ccplx, rtree, tpnts[p[0]], triangle[p[0]], triangle[p[1]], func);
                         cc_node_idx_t np2 = nan_edge_solver(ccplx, rtree, tpnts[p[0]], triangle[p[0]], triangle[p[2]], func);
-                        ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {tpnts[p[0]], np1, np2}, output_dimension);
+                        ccplx.add_cell(cc_t::cell_kind_t::TRIANGLE, {tpnts[p[0]], np1, np2}, output_dimension);
                       }
                     }
                   }
@@ -369,7 +369,7 @@ namespace mjr {
                         cc_node_idx_t cn1_pnti = add_node(ccplx, rtree, corners[1]);
                         if( ((i == 0) && (j == -1)) || ((i == 1) && (j == 1)) )
                           std::swap(cn0_pnti, cn1_pnti);
-                        ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cn0_pnti, cn1_pnti, ctr_pnti}, output_dimension);
+                        ccplx.add_cell(cc_t::cell_kind_t::TRIANGLE, {cn0_pnti, cn1_pnti, ctr_pnti}, output_dimension);
                       }
                     } else {
                       rt_diti_list_t corners = rtree.ccc_get_corners(cell, i, j);
@@ -377,7 +377,7 @@ namespace mjr {
                       cc_node_idx_t cn1_pnti = add_node(ccplx, rtree, corners[1]);
                       if( ((i == 0) && (j == -1)) || ((i == 1) && (j == 1)) )
                         std::swap(cn0_pnti, cn1_pnti);
-                      ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cn0_pnti, cn1_pnti, ctr_pnti}, output_dimension);
+                      ccplx.add_cell(cc_t::cell_kind_t::TRIANGLE, {cn0_pnti, cn1_pnti, ctr_pnti}, output_dimension);
                     }
                   }
                 }
@@ -398,13 +398,13 @@ namespace mjr {
                       rt_diti_list_t corners = rtree.ccc_get_corners(n, dim, -dir);
                       for(int k=0; k<4; ++k)
                         new_cell[p[k]] = add_node(ccplx, rtree, corners[k]);
-                      ccplx.add_cell(cc_t::cell_type_t::PYRAMID, new_cell, output_dimension);
+                      ccplx.add_cell(cc_t::cell_kind_t::PYRAMID, new_cell, output_dimension);
                     }
                   } else {
                     rt_diti_list_t corners = rtree.ccc_get_corners(cell, dim, dir);
                     for(int k=0; k<4; ++k)
                       new_cell[p[k]] = add_node(ccplx, rtree, corners[k]);
-                    ccplx.add_cell(cc_t::cell_type_t::PYRAMID, new_cell, output_dimension);
+                    ccplx.add_cell(cc_t::cell_kind_t::PYRAMID, new_cell, output_dimension);
                   }
                 }
               }
@@ -459,14 +459,14 @@ namespace mjr {
         if (output_centers && output_corners) {
           for(auto& cell: cells)
             for(auto& vert: rtree.ccc_get_vertexes(cell))
-              ccplx.add_cell(cc_t::cell_type_t::POINT, {add_node(ccplx, rtree, vert)});
+              ccplx.add_cell(cc_t::cell_kind_t::POINT, {add_node(ccplx, rtree, vert)});
         } else if (output_centers) {
           for(auto& cell: cells)
-            ccplx.add_cell(cc_t::cell_type_t::POINT, {add_node(ccplx, rtree, cell)});
+            ccplx.add_cell(cc_t::cell_kind_t::POINT, {add_node(ccplx, rtree, cell)});
         } else if (output_corners) {
           for(auto& cell: cells)
             for(auto& vert: rtree.ccc_get_corners(cell))
-              ccplx.add_cell(cc_t::cell_type_t::POINT, {add_node(ccplx, rtree, vert)});
+              ccplx.add_cell(cc_t::cell_kind_t::POINT, {add_node(ccplx, rtree, vert)});
         } else {
           std::cout << "WARNING: construct_geometry_points: Both output_centers & output_corners are FALSE.  No geometry created!" << std::endl;
           return 1;
@@ -503,7 +503,7 @@ namespace mjr {
           @param cells                List of tree cells from which to construct geometry
           @param output_dimension     Parts of cells to output
           @param point_src            Point sources
-          @param degenerate_fallback  If the rectangle is degenerate, try and make a triangle. (only works for cc_t::cell_type_t::QUAD) */
+          @param degenerate_fallback  If the rectangle is degenerate, try and make a triangle. (only works for cc_t::cell_kind_t::QUAD) */
       static int construct_geometry_rects(cc_t&          ccplx,
                                           const rt_t&    rtree,
                                           rt_diti_list_t cells,
@@ -520,20 +520,20 @@ namespace mjr {
             cnr_pti.push_back(pnti);
           }
           if (rtree.domain_dimension == 1) {
-            ccplx.add_cell(cc_t::cell_type_t::SEGMENT, {cnr_pti[0], cnr_pti[1]}, output_dimension);
+            ccplx.add_cell(cc_t::cell_kind_t::SEGMENT, {cnr_pti[0], cnr_pti[1]}, output_dimension);
           } else if (rtree.domain_dimension == 2) {
             const std::array<int, 4> p = {0, 1, 3, 2};
-            bool try_harder = !(ccplx.add_cell(cc_t::cell_type_t::QUAD, {cnr_pti[0], cnr_pti[1], cnr_pti[3], cnr_pti[2]}, output_dimension));
+            bool try_harder = !(ccplx.add_cell(cc_t::cell_kind_t::QUAD, {cnr_pti[0], cnr_pti[1], cnr_pti[3], cnr_pti[2]}, output_dimension));
             if ( degenerate_fallback && try_harder) { // Try for a triangle if we have a NaN point or an adjacent pair of duplicate points
               for(int i=0; i<4; i++) {
                 if ((cnr_pti[p[i]] < 0) || (cnr_pti[p[(i+0)%4]] == cnr_pti[p[(i+1)%4]])) {
-                  ccplx.add_cell(cc_t::cell_type_t::TRIANGLE, {cnr_pti[p[(i+1)%4]], cnr_pti[p[(i+2)%4]], cnr_pti[p[(i+3)%4]]}, output_dimension);
+                  ccplx.add_cell(cc_t::cell_kind_t::TRIANGLE, {cnr_pti[p[(i+1)%4]], cnr_pti[p[(i+2)%4]], cnr_pti[p[(i+3)%4]]}, output_dimension);
                   break;
                 }
               }
             }
           } else { // if(rtree.domain_dimension == 3) {
-            ccplx.add_cell(cc_t::cell_type_t::HEXAHEDRON,
+            ccplx.add_cell(cc_t::cell_kind_t::HEXAHEDRON,
                            {cnr_pti[0], cnr_pti[1], cnr_pti[3], cnr_pti[2],
                             cnr_pti[4], cnr_pti[5], cnr_pti[7], cnr_pti[6]},
                            output_dimension);

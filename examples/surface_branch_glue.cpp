@@ -4,6 +4,7 @@
  @file      surface_branch_glue.cpp
  @author    Mitch Richling http://www.mitchr.me/
  @date      2024-07-16
+ @brief     Mirroring & gluing surfaces together.@EOL
  @std       C++23
  @copyright 
   @parblock

@@ -4,6 +4,7 @@
  @file      surface_plot_edge.cpp
  @author    Mitch Richling http://www.mitchr.me/
  @date      2024-07-16
+ @brief     Surface with an undefined regions.@EOL
  @std       C++23
  @copyright 
   @parblock

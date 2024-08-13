@@ -54,29 +54,29 @@ BOOST_AUTO_TEST_CASE(check_cell_triangle) {
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_type_t::TRIANGLE, mjr::MRccT5::cell_t({0,1,-2}))          == mjr::MRccT5::cell_stat_t::NEG_PNT_IDX);
+  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_kind_t::TRIANGLE, mjr::MRccT5::cell_t({0,1,-2}))          == mjr::MRccT5::cell_stat_t::NEG_PNT_IDX);
 
-  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_type_t::TRIANGLE, mjr::MRccT5::cell_t({0,1,10}))          == mjr::MRccT5::cell_stat_t::BIG_PNT_IDX);
+  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_kind_t::TRIANGLE, mjr::MRccT5::cell_t({0,1,10}))          == mjr::MRccT5::cell_stat_t::BIG_PNT_IDX);
 
-  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_type_t::TRIANGLE, mjr::MRccT5::cell_t({0,1,2,3}))         == mjr::MRccT5::cell_stat_t::TOO_MANY_PNT);
+  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_kind_t::TRIANGLE, mjr::MRccT5::cell_t({0,1,2,3}))         == mjr::MRccT5::cell_stat_t::TOO_MANY_PNT);
 
-  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_type_t::TRIANGLE, mjr::MRccT5::cell_t({0,1}))             == mjr::MRccT5::cell_stat_t::TOO_FEW_PNT);
+  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_kind_t::TRIANGLE, mjr::MRccT5::cell_t({0,1}))             == mjr::MRccT5::cell_stat_t::TOO_FEW_PNT);
 
-  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_type_t::TRIANGLE, mjr::MRccT5::cell_t({0,0,1}))           == mjr::MRccT5::cell_stat_t::DUP_PNT);
+  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_kind_t::TRIANGLE, mjr::MRccT5::cell_t({0,0,1}))           == mjr::MRccT5::cell_stat_t::DUP_PNT);
 
-  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_type_t::TRIANGLE, mjr::MRccT5::cell_t({0,1,2}))           == mjr::MRccT5::cell_stat_t::GOOD);
-
-  //--------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-  BOOST_CHECK(aPoly.check_cell_dimension(mjr::MRccT5::cell_type_t::TRIANGLE, mjr::MRccT5::cell_t({0,1,3}))          == mjr::MRccT5::cell_stat_t::DIM_LOW);
-
-  BOOST_CHECK(aPoly.check_cell_dimension(mjr::MRccT5::cell_type_t::TRIANGLE, mjr::MRccT5::cell_t({0,1,2}))          == mjr::MRccT5::cell_stat_t::GOOD);
+  BOOST_CHECK(aPoly.check_cell_vertexes(mjr::MRccT5::cell_kind_t::TRIANGLE, mjr::MRccT5::cell_t({0,1,2}))           == mjr::MRccT5::cell_stat_t::GOOD);
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-  BOOST_CHECK(aPoly.check_cell_edge_intersections(mjr::MRccT5::cell_type_t::TRIANGLE, mjr::MRccT5::cell_t({0,1,3})) == mjr::MRccT5::cell_stat_t::BAD_EDGEI);
+  BOOST_CHECK(aPoly.check_cell_dimension(mjr::MRccT5::cell_kind_t::TRIANGLE, mjr::MRccT5::cell_t({0,1,3}))          == mjr::MRccT5::cell_stat_t::DIM_LOW);
 
-  BOOST_CHECK(aPoly.check_cell_edge_intersections(mjr::MRccT5::cell_type_t::TRIANGLE, mjr::MRccT5::cell_t({0,1,2})) == mjr::MRccT5::cell_stat_t::GOOD);
+  BOOST_CHECK(aPoly.check_cell_dimension(mjr::MRccT5::cell_kind_t::TRIANGLE, mjr::MRccT5::cell_t({0,1,2}))          == mjr::MRccT5::cell_stat_t::GOOD);
+
+  //--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  BOOST_CHECK(aPoly.check_cell_edge_intersections(mjr::MRccT5::cell_kind_t::TRIANGLE, mjr::MRccT5::cell_t({0,1,3})) == mjr::MRccT5::cell_stat_t::BAD_EDGEI);
+
+  BOOST_CHECK(aPoly.check_cell_edge_intersections(mjr::MRccT5::cell_kind_t::TRIANGLE, mjr::MRccT5::cell_t({0,1,2})) == mjr::MRccT5::cell_stat_t::GOOD);
 
 }
 
