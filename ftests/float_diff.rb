@@ -1,71 +1,62 @@
 #!/usr/bin/env -S ruby
 
+# Super simple file diff that ignores small differences in floating
+# point values.
+
 epsilon = 1.0e-5
+allline = true
 
-fpre = Regexp.new(/([-+]{0,1}[0-9]\.[0-9]+(e[-+]{0,1}[0-9]+){0,1})/);
+file_size = ARGV.map { |fname|
+  begin  
+    File::Stat.new(fname).size
+  rescue 
+    puts("ERROR: Could not stat file argument: '#{fname}'")
+    exit(1)
+  end
+}
 
-begin  
-  file0_size = File::Stat.new(ARGV[0]).size
-rescue 
-  puts("ERROR: Could not stat first file argument: '#{ARGV[0]}'")
-  exit(1)
-end
-
-begin  
-  file1_size = File::Stat.new(ARGV[1]).size
-rescue 
-  puts("ERROR: Could not stat second file argument: ' #{ARGV[1]}")
-  exit(2)
-end
-
-if (file0_size != file1_size) then
-  puts("Files have diffrent sizes");
+if (file_size[0] != file_size[1]) then
+  puts("Files have different sizes");
   exit 3
 end
 
-file0_lines = Array.new
-open(ARGV[0], "r") do |file|
-  file0_lines = file.readlines()
-end
+file_lines = ARGV.map { |fname|
+  open(fname, "r") do |file|
+    file.readlines()
+  end
+}
 
-file1_lines = Array.new
-open(ARGV[1], "r") do |file|
-  file1_lines = file.readlines()
-end
-
-if (file0_lines.length != file1_lines.length) then
-  puts("Files have diffrent line counts");
+if (file_lines[0].length != file_lines[1].length) then
+  puts("Files have different line counts");
   exit 4
 end
 
-0.upto(file0_lines.length-1) do |idx|
+fpre = Regexp.new(/([-+]{0,1}[0-9]\.[0-9]+(e[-+]{0,1}[0-9]+){0,1})/);
+
+file_lines[0].each_index do |idx|
   line_num = idx + 1
 
-  line0_floats = file0_lines[idx].scan(fpre).map { |m| m[0].to_f }
-  line1_floats = file1_lines[idx].scan(fpre).map { |m| m[0].to_f }
+  line_floats = [0, 1].map { |i| file_lines[i][idx].scan(fpre).map { |m| m[0].to_f } }
 
-  if (line0_floats.size != line1_floats.size) then
-    puts("Files have diffrent float counts on line #{line_num}");
-    puts("  <<<#{file0_lines[idx]}")
-    puts("  >>>#{file1_lines[idx]}")
-    exit 5
+  if (line_floats[0].size != line_floats[1].size) then
+    puts("Files have different float counts on line #{line_num}");
+    puts("  <<<#{file_lines[0][idx]}")
+    puts("  >>>#{file_lines[1][idx]}")
+    exit 5 if !allline
   end
 
-  line0_floats = file0_lines[idx].scan(fpre).map { |m| m[0].to_f }
-  line1_floats = file1_lines[idx].scan(fpre).map { |m| m[0].to_f }
-
-  if (line0_floats.zip(line1_floats).any? { |f0, f1| f0 != f1 }) then
-    puts("Files have diffrent float values on line #{line_num}");
-    puts("  <<<#{file0_lines[idx]}")
-    puts("  >>>#{file1_lines[idx]}")
-    exit 6
+  if (line_floats[0].zip(line_floats[1]).any? { |f0, f1| f0 != f1 }) then
+    puts("Files have different float values on line #{line_num}");
+    puts("  <<<#{file_lines[0][idx]}")
+    puts("  >>>#{file_lines[1][idx]}")
+    exit 6 if !allline
   end
 
-  if (file0_lines[idx].gsub(fpre, '') != file1_lines[idx].gsub(fpre, '')) then
-    puts("Files have diffrent non-float content on line #{line_num}");
-    puts("  <<<#{file0_lines[idx]}")
-    puts("  >>>#{file1_lines[idx]}")
-    exit 7
+  if (file_lines[0][idx].gsub(fpre, '') != file_lines[1][idx].gsub(fpre, '')) then
+    puts("Files have different non-float content on line #{line_num}");
+    puts("  <<<#{file_lines[0][idx]}")
+    puts("  >>>#{file_lines[1][idx]}")
+    exit 7 if !allline
   end
 
 end
