@@ -87,8 +87,8 @@ int main() {
   tree.refine_grid(7, stripy_shell);
   std::chrono::time_point<std::chrono::system_clock> sample_time = std::chrono::system_clock::now();
 
-  tree.dump_tree(20);
-  std::chrono::time_point<std::chrono::system_clock> dump_time = std::chrono::system_clock::now();
+  tree.dump_tree(10);
+  std::chrono::time_point<std::chrono::system_clock> tdump_time = std::chrono::system_clock::now();
 
   tc_t::construct_geometry_fans(ccplx,
                                 tree,
@@ -106,15 +106,19 @@ int main() {
                               {{"NORMALS", {12, 13, 14}}});
   std::chrono::time_point<std::chrono::system_clock> dat_anno_time = std::chrono::system_clock::now();
 
+  ccplx.dump_cplx(10);
+  std::chrono::time_point<std::chrono::system_clock> cdump_time = std::chrono::system_clock::now();
+
   ccplx.write_xml_vtk("performance_with_large_surface.vtu", "performance_with_large_surface");
   std::chrono::time_point<std::chrono::system_clock> write_time = std::chrono::system_clock::now();
 
   std::cout << "construct_time time .. " << static_cast<std::chrono::duration<double>>(construct_time-start_time)   << " sec" << std::endl;
   std::cout << "sample_time time ..... " << static_cast<std::chrono::duration<double>>(sample_time-construct_time)  << " sec" << std::endl;
-  std::cout << "dump_time time ....... " << static_cast<std::chrono::duration<double>>(dump_time-sample_time)       << " sec" << std::endl;
-  std::cout << "bridge time .......... " << static_cast<std::chrono::duration<double>>(fan_time-dump_time)          << " sec" << std::endl;
+  std::cout << "tree dump time ....... " << static_cast<std::chrono::duration<double>>(tdump_time-sample_time)      << " sec" << std::endl;
+  std::cout << "bridge time .......... " << static_cast<std::chrono::duration<double>>(fan_time-tdump_time)         << " sec" << std::endl;
   std::cout << "dataset anno time .... " << static_cast<std::chrono::duration<double>>(dat_anno_time-fan_time)      << " sec" << std::endl;
-  std::cout << "write_vtk time ....... " << static_cast<std::chrono::duration<double>>(write_time-dat_anno_time)    << " sec" << std::endl;
+  std::cout << "complex dump time .... " << static_cast<std::chrono::duration<double>>(cdump_time-dat_anno_time)    << " sec" << std::endl;
+  std::cout << "write_vtk time ....... " << static_cast<std::chrono::duration<double>>(write_time-cdump_time)       << " sec" << std::endl;
   std::cout << "Total Run _time ...... " << static_cast<std::chrono::duration<double>>(write_time-start_time)       << " sec" << std::endl;
 }
 /** @endcond */

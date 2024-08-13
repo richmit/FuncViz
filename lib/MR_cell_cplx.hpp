@@ -306,9 +306,6 @@ namespace mjr {
       typedef node_idx_list_t cell_verts_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Type to hold a poly cell -- a list of point indexes */
-      typedef node_idx_list_t cell_t;
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Type to hold a poly cell -- a list of point indexes */
       // struct cell_t { 
       //     cell_kind_t  type;
       //     cell_verts_t verts;
@@ -368,7 +365,7 @@ namespace mjr {
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Type for a list of poly cells */
-      typedef std::vector<cell_t> cell_lst_t;
+      typedef std::vector<cell_verts_t> cell_lst_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** House all poly cells */
       cell_lst_t cell_lst;
@@ -1694,11 +1691,11 @@ namespace mjr {
       typedef std::function<node_data_t(const node_data_t&)> p2data_func_t;                // pd2pd
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Function that takes node data and returns a float (Node Data SDF) */
-      typedef std::function<uft_t(const node_data_t&)>      p2real_func_t;                // pd2r
+      typedef std::function<uft_t(const node_data_t&)>       p2real_func_t;                // pd2r
       /** Function that takes node data and returns a bool (Node Data Predicate) */
-      typedef std::function<bool(const node_data_t&)>       p2bool_func_t;                // pd2b
+      typedef std::function<bool(const node_data_t&)>        p2bool_func_t;                // pd2b
       /** Function that takes a cell and returns a bool (Cell Predicate) */
-      typedef std::function<bool(const cell_t&)>           c2bool_func_t;                // c2b
+      typedef std::function<bool(const cell_verts_t&)>             c2bool_func_t;                // c2b
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Delete cells matching a predicate function.
 
@@ -1933,17 +1930,17 @@ namespace mjr {
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Return true if ALL vertexes are above the level by more than epsilon */
-      bool cell_above_level(const cell_t cell, int level_index, uft_t level, uft_t level_epsilon=epsilon) {
-        return std::all_of(cell.cbegin(), cell.cend(), [this, level_index, level, level_epsilon](int v) { return (node_idx_to_node_data[v][level_index] > level+level_epsilon); });
+      bool cell_above_level(const cell_verts_t cell_verts, int level_index, uft_t level, uft_t level_epsilon=epsilon) {
+        return std::all_of(cell_verts.cbegin(), cell_verts.cend(), [this, level_index, level, level_epsilon](int v) { return (node_idx_to_node_data[v][level_index] > level+level_epsilon); });
       }
       /** Return true if ALL vertexes are below the level by more than epsilon */
-      bool cell_below_level(const cell_t cell, int level_index, uft_t level, uft_t level_epsilon=epsilon) {
-        return std::all_of(cell.cbegin(), cell.cend(), [this, level_index, level, level_epsilon](int v) { return (node_idx_to_node_data[v][level_index] < level+level_epsilon); });
+      bool cell_below_level(const cell_verts_t cell_verts, int level_index, uft_t level, uft_t level_epsilon=epsilon) {
+        return std::all_of(cell_verts.cbegin(), cell_verts.cend(), [this, level_index, level, level_epsilon](int v) { return (node_idx_to_node_data[v][level_index] < level+level_epsilon); });
       }
       /** Return true if cell is near SDF boundry */
-      bool cell_on_sdf_boundry(const cell_t cell, p2real_func_t sdf_function, uft_t sdf_epsilon=epsilon) {
+      bool cell_on_sdf_boundry(const cell_verts_t cell_verts, p2real_func_t sdf_function, uft_t sdf_epsilon=epsilon) {
         int pos_cnt=0, neg_cnt=0;
-        for(auto v: cell) {
+        for(auto v: cell_verts) {
           uft_t sv = sdf_function(node_idx_to_node_data[v]);
           if (std::abs(sv)<sdf_epsilon)
             return true;
@@ -1958,9 +1955,9 @@ namespace mjr {
         return false;
       }
       /** Return true if cell crosses SDF boundry */
-      bool cell_cross_sdf_boundry(const cell_t cell, p2real_func_t sdf_function, uft_t sdf_epsilon=epsilon) {
+      bool cell_cross_sdf_boundry(const cell_verts_t cell_verts, p2real_func_t sdf_function, uft_t sdf_epsilon=epsilon) {
         int pos_cnt=0, neg_cnt=0;
-        for(auto v: cell) {
+        for(auto v: cell_verts) {
           uft_t sv = sdf_function(node_idx_to_node_data[v]);
           if (std::abs(sv)>=sdf_epsilon) {
             if (sv < 0) {
