@@ -60,7 +60,7 @@ namespace mjr {
       is on computations that require knowledge related to the function being approximated.
 
       This code is a quick-n-dirty hack job.  I simply wanted to quickly get to a point where I could visually test MR_rect_tree objects.  Logically this
-      class should be split into several classes (unique point list, unique cell list, 3D vectors, 3D analytic geometry, etc...).  It's a bit of a mess.
+      class should be split into several classes (point, point list, cell, cell list, 3D vectors, 3D analytic geometry, etc...).  It's a bit of a mess.
 
       Design Constraints:
         - Geometry
@@ -122,12 +122,12 @@ namespace mjr {
          - The fifth point, the apex, must not be co-planar with the base points.
 
          \verbatim
-                                                                                                                    4
-                                                                                                                   .^.
+                                                                              HEXAHEDRON                            4
+                                                                                                       PYRAMID     .^.
                                                                               3---------2                       .  / \ .
-                                                                             /|        /|                     .   /   \  .
+                                        TRIANGLE          QUAD               /|        /|                     .   /   \  .
                                                                             / |       / |                  .     /     \   .
-                                           2            3---------2        7---------6  |                 1...../.......\.....0  Back
+          POINT    SEGMENT                 2            3---------2        7---------6  |                 1...../.......\.....0  Back
                                           / \           |         |        |  |      |  |                 |    /         \    |
           0        0-------1             /   \          |         |        |  0------|--1 Back            |   /           \   |
                                         /     \         |         |        | /       | /                  |  /             \  |
@@ -297,20 +297,21 @@ namespace mjr {
                                SEGMENT,
                                TRIANGLE,
                                QUAD,
+                               // TETRAHEDRON
                                HEXAHEDRON,
                                PYRAMID,
                              };
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Type to hold the vertexes of a poly cell */
-      typedef node_idx_list_t cell_vert_list_t;
+      typedef node_idx_list_t cell_verts_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Type to hold a poly cell -- a list of point indexes */
       typedef node_idx_list_t cell_t;
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Type to hold a poly cell -- a list of point indexes */
       // struct cell_t { 
-      //     cell_kind_t      type;
-      //     cell_vert_list_t verts;
+      //     cell_kind_t  type;
+      //     cell_verts_t verts;
       // };
       //@}
 
@@ -1116,29 +1117,29 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Perform cell vertex checks
 
-          @param cell_kind The type for a_cell.
-          @param a_cell    The cell to test.  */
-      inline cell_stat_t check_cell_vertexes(cell_kind_t cell_kind, cell_t a_cell) const {
+          @param cell_kind  The type of the potential cell.
+          @param cell_verts The vertexes of the potential cell.  */
+      inline cell_stat_t check_cell_vertexes(cell_kind_t cell_kind, cell_verts_t cell_verts) const {
         // Check number of points
-        std::vector<int>::size_type a_cell_len  = a_cell.size();
+        std::vector<int>::size_type num_verts   = cell_verts.size();
         std::vector<int>::size_type req_num_pts = cell_kind_to_req_pt_cnt(cell_kind);
-        if (a_cell_len < req_num_pts)
+        if (num_verts < req_num_pts)
           return cell_stat_t::TOO_FEW_PNT;
-        if (a_cell_len > req_num_pts)
+        if (num_verts > req_num_pts)
           return cell_stat_t::TOO_MANY_PNT;
         // Check for negative point index
-        if (std::any_of(a_cell.cbegin(), a_cell.cend(), [](node_idx_t i) { return (i < 0); }))
+        if (std::any_of(cell_verts.cbegin(), cell_verts.cend(), [](node_idx_t i) { return (i < 0); }))
           return cell_stat_t::NEG_PNT_IDX;
         // Check for too big point index
-        if (std::any_of(a_cell.cbegin(), a_cell.cend(), [this](node_idx_t i) { return (i >= node_count()); }))
+        if (std::any_of(cell_verts.cbegin(), cell_verts.cend(), [this](node_idx_t i) { return (i >= node_count()); }))
           return cell_stat_t::BIG_PNT_IDX;
         // Check for duplicate points
-        if (a_cell_len > 1) {
-          std::set<node_idx_t> a_cell_pnt_sorted;
-          for(node_idx_t pnt_idx: a_cell) {
-            if (a_cell_pnt_sorted.contains(pnt_idx))
+        if (num_verts > 1) {
+          std::set<node_idx_t> cell_verts_sorted;
+          for(node_idx_t pnt_idx: cell_verts) {
+            if (cell_verts_sorted.contains(pnt_idx))
               return cell_stat_t::DUP_PNT;
-            a_cell_pnt_sorted.insert(pnt_idx);
+            cell_verts_sorted.insert(pnt_idx);
           }
         }
         // Return GOOD
@@ -1151,20 +1152,20 @@ namespace mjr {
 
           @warning Will not detect degenerate cell_kind_t::SEGMENT as that is handled by check_cell_vertexes.
 
-          @param cell_kind The type for a_cell.
-          @param a_cell    The cell to test.  */
-      inline cell_stat_t check_cell_dimension(cell_kind_t cell_kind, cell_t a_cell) const {
+          @param cell_kind  The type of the potential cell.
+          @param cell_verts The vertexes of the potential cell.  */
+      inline cell_stat_t check_cell_dimension(cell_kind_t cell_kind, cell_verts_t cell_verts) const {
         if (cell_kind == cell_kind_t::TRIANGLE) {
-          if (geomi_pts_colinear(a_cell[0], a_cell[1], a_cell[2]))
+          if (geomi_pts_colinear(cell_verts[0], cell_verts[1], cell_verts[2]))
             return cell_stat_t::DIM_LOW;
         } else if (cell_kind == cell_kind_t::QUAD) {
-          if (geomi_pts_colinear(a_cell[0], a_cell[1], a_cell[2], a_cell[3]))
+          if (geomi_pts_colinear(cell_verts[0], cell_verts[1], cell_verts[2], cell_verts[3]))
             return cell_stat_t::DIM_LOW;
         } else if (cell_kind == cell_kind_t::HEXAHEDRON) {
-          if ( geomi_pts_coplanar(a_cell))
+          if ( geomi_pts_coplanar(cell_verts))
             return cell_stat_t::DIM_LOW;
         } else if (cell_kind == cell_kind_t::PYRAMID) {
-          if ( geomi_pts_coplanar(a_cell))
+          if ( geomi_pts_coplanar(cell_verts))
             return cell_stat_t::DIM_LOW;
         }
         return cell_stat_t::GOOD;
@@ -1181,20 +1182,19 @@ namespace mjr {
           cell_kind_t::SEG cells for which check_cell_dimension() returns cell_stat_t::DUP_PNT.  Note the cell_stat_t values are different depending upon which
           check function is called.
 
-          @param cell_kind The type for a_cell.
-          @param a_cell    The cell to test.  */
-      inline cell_stat_t check_cell_edge_intersections(cell_kind_t cell_kind, cell_t a_cell) const {
+          @param cell_kind  The type of the potential cell.
+          @param cell_verts The vertexes of the potential cell.  */
+      inline cell_stat_t check_cell_edge_intersections(cell_kind_t cell_kind, cell_verts_t cell_verts) const {
         cell_structure_t& segs = cell_kind_to_structure(cell_kind, 1);
         if ( !(segs.empty())) {
           for(decltype(segs.size()) i=0; i<segs.size()-1; i++) {
             for(decltype(segs.size()) j=i+1; j<segs.size(); j++) {
-              //std::cout << segs[i][0] << "--" << segs[i][1] << " CAP " << segs[j][0] << "--" << segs[j][1] << std::endl;
               std::set<node_idx_t> points_sorted;
               points_sorted.insert(segs[i][0]);
               points_sorted.insert(segs[i][1]);
               points_sorted.insert(segs[j][0]);
               points_sorted.insert(segs[j][1]);
-              auto it = geomi_seg_isect_type(a_cell[segs[i][0]], a_cell[segs[i][1]], a_cell[segs[j][0]], a_cell[segs[j][1]]);
+              auto it = geomi_seg_isect_type(cell_verts[segs[i][0]], cell_verts[segs[i][1]], cell_verts[segs[j][0]], cell_verts[segs[j][1]]);
               if(points_sorted.size() == 4) {
                 if (it != seg_isect_t::C0_EMPTY)
                   return cell_stat_t::BAD_EDGEI;
@@ -1212,15 +1212,15 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Checks that cell faces have expected intersections.
 
-          @param cell_kind The type for a_cell.
-          @param a_cell    The cell to test.  */
-      inline cell_stat_t check_cell_face_intersections(cell_kind_t cell_kind, cell_t a_cell) const {
+          @param cell_kind  The type of the potential cell.
+          @param cell_verts The vertexes of the potential cell.  */
+      inline cell_stat_t check_cell_face_intersections(cell_kind_t cell_kind, cell_verts_t cell_verts) const {
         //  MJR TODO NOTE <2024-08-02T09:42:38-0500> check_cell_face_intersections: Implement
         if (cell_kind == cell_kind_t::HEXAHEDRON) {
-          if ( geomi_pts_coplanar(a_cell))
+          if ( geomi_pts_coplanar(cell_verts))
             return cell_stat_t::DIM_LOW;
         } else if (cell_kind == cell_kind_t::PYRAMID) {
-          if ( geomi_pts_coplanar(a_cell))
+          if ( geomi_pts_coplanar(cell_verts))
             return cell_stat_t::DIM_LOW;
         }
         return cell_stat_t::GOOD;
@@ -1235,14 +1235,14 @@ namespace mjr {
           computation.  Such issues are most severe for things like FEM, but they can also show up for common visualization computations like the extraction
           of level curves/surfaces.
 
-          @param cell_kind The type for a_cell.
-          @param a_cell    The cell to test.  */
-      inline cell_stat_t check_cell_faces_plainer(cell_kind_t cell_kind, cell_t a_cell) const {
+          @param cell_kind  The type of the potential cell.
+          @param cell_verts The vertexes of the potential cell.  */
+      inline cell_stat_t check_cell_faces_plainer(cell_kind_t cell_kind, cell_verts_t cell_verts) const {
         const cell_structure_t& face_structures = cell_kind_to_structure(cell_kind, 2);
         for(auto face_structure: face_structures) {
-          cell_t face;
+          cell_verts_t face;
           for(auto idx: face_structure)
-            face.push_back(a_cell[idx]);
+            face.push_back(cell_verts[idx]);
           if ( !(geomi_pts_coplanar(face)))
             return cell_stat_t::FACE_BENT;
         }
@@ -1257,22 +1257,22 @@ namespace mjr {
 
           Example 3: a valid cell_kind_t::PYRAMID cell added wth dimension == 1 results in 8 cell_kind_t::SEG cells added
 
-          @param cell_kind The type of cell to add.
-          @param new_cell  The cell to add.
+          @param new_cell_kind   The type of the new cell
+          @param new_cell_verts  The vertexes of the new cell
           @param dimension The dimension of the parts to add.
           @return Number of cells added */
-      inline int add_cell(cell_kind_t cell_kind, cell_t new_cell, int dimension) {
+      inline int add_cell(cell_kind_t new_cell_kind, cell_verts_t new_cell_verts, int dimension) {
         int num_added = 0;
-        if ( (dimension < 0) || (dimension >= cell_kind_to_dimension(cell_kind)) ) {
-          if (add_cell(cell_kind, new_cell))
+        if ( (dimension < 0) || (dimension >= cell_kind_to_dimension(new_cell_kind)) ) {
+          if (add_cell(new_cell_kind, new_cell_verts))
             num_added++;
         } else { // We need to break the cell up into lower dimensional bits, and add the bits.
-          const cell_structure_t& cell_parts = cell_kind_to_structure(cell_kind, dimension);
+          const cell_structure_t& cell_parts = cell_kind_to_structure(new_cell_kind, dimension);
           for(auto cell_part: cell_parts) {
-            cell_t newer_cell;
+            cell_verts_t newer_cell_verts;
             for(auto idx: cell_part)
-              newer_cell.push_back(new_cell[idx]);
-            if (add_cell(req_pt_cnt_to_cell_kind(newer_cell.size()), newer_cell))
+              newer_cell_verts.push_back(new_cell_verts[idx]);
+            if (add_cell(req_pt_cnt_to_cell_kind(newer_cell_verts.size()), newer_cell_verts))
               num_added++;
           }
         }
@@ -1280,43 +1280,43 @@ namespace mjr {
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Add a cell
-          @param cell_kind The type of cell to add.
-          @param new_cell  The cell to add.
+          @param new_cell_kind   The type of the new cell
+          @param new_cell_verts  The vertexes of the new cell
           @return A boolean indicateing success
           @retval true  The cell was added or had been added previously
           @retval false The cell could not be added (because of a failed geometric check) */
-      inline bool add_cell(cell_kind_t cell_kind, cell_t new_cell) {
+      inline bool add_cell(cell_kind_t new_cell_kind, cell_verts_t new_cell_verts) {
         // Check vertexes if required
         if constexpr (chk_cell_vertexes) {
-          last_cell_stat = check_cell_vertexes(cell_kind, new_cell);
+          last_cell_stat = check_cell_vertexes(new_cell_kind, new_cell_verts);
           if (cell_stat_is_bad(last_cell_stat))
             return false;
         }
         // Check dimension if required
         if constexpr (chk_cell_dimension) {
-          last_cell_stat = check_cell_dimension(cell_kind, new_cell);
+          last_cell_stat = check_cell_dimension(new_cell_kind, new_cell_verts);
           if (cell_stat_is_bad(last_cell_stat))
             return false;
         }
         // Check edges
         if constexpr (chk_cell_edges) {
-          last_cell_stat = check_cell_edge_intersections(cell_kind, new_cell);
+          last_cell_stat = check_cell_edge_intersections(new_cell_kind, new_cell_verts);
           if (cell_stat_is_bad(last_cell_stat))
             return false;
         }
         // Geom was good or we didn't need to check.
         if constexpr (chk_cell_unique) {
-          cell_t sorted_cell = new_cell;
-          std::sort(sorted_cell.begin(), sorted_cell.end());
-          if (uniq_cell_lst.contains(sorted_cell)) {
+          cell_t new_cell_sorted_verts = new_cell_verts;
+          std::sort(new_cell_sorted_verts.begin(), new_cell_sorted_verts.end());
+          if (uniq_cell_lst.contains(new_cell_sorted_verts)) {
             last_cell_new = false;
           } else {
             last_cell_new = true;
-            cell_lst.push_back(new_cell);
-            uniq_cell_lst.insert(sorted_cell);
+            cell_lst.push_back(new_cell_verts);
+            uniq_cell_lst.insert(new_cell_sorted_verts);
           }
         } else {
-          cell_lst.push_back(new_cell);
+          cell_lst.push_back(new_cell_verts);
         }
         return true;
       }
