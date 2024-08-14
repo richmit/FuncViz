@@ -48,6 +48,15 @@ You can read more about the way the data structure works here: [[https://richmit
 * Change Log
 
  - 2024-08-14: I have bumped the status from pre-alpha to alpha!
+ - 2024-08-13: Refactored cplx.  I feel good about the API now.
+ - 2024-08-12: Functional test framework prototype working..
+ - 2024-08-10: I feel good about MSVC & Clang support.
+ - 2024-08-08: Improved unit test coverage of tree components.
+ - 2024-08-06: Triangle folding for better corner rendering!
+ - 2024-08-05: Solid objects may now be composed of pyramids
+ - 2024-07-31: NaN solver to detect edges of undefined regions!
+ - 2024-07-20: Working prototype.
+ - 2024-07-07: Started coding.
 
 Have fun!!
 
