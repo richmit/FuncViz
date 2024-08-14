@@ -34,7 +34,8 @@ endif()
 
 
 set(TARGETS_EXAMPLE "hello_world" 
-                    "surface_with_normals" "surface_plot_edge" "surface_branch_glue" "surface_plot_corner" "surface_plot_step"
+                    "surface_with_normals" 
+                    "surface_plot_edge" "surface_branch_glue" "surface_plot_corner" "surface_plot_step" "surface_plot_annular_edge"
                     "parametric_surface_with_defects" "performance_with_large_surface" "trefoil" 
                     "parametric_curve_3d"
                     "implicit_surface" 
@@ -53,7 +54,7 @@ set(TARGETS_UTEST "check_cell_hexahedron" "check_cell_pyramid" "check_cell_quad"
                   "tree_corners"
                   "tree_children" "tree_neighbors" "zzz_tbd_tree_exist_neighbors"
                 )
-set(TARGETS_FTEST "MR_cell_cplx_test_mpl" "MR_cell_cplx_test_wedge" "MR_cell_cplx_test_surf_wave_hole" 
+set(TARGETS_FTEST "holy_wave_surf"
                   "flat_test_tree_01"
                   "nan_solver"
                   "segment_folder" "triangle_folder"

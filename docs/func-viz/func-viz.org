@@ -782,6 +782,98 @@ int main() {
 }
 #+end_src
 
+** Surface Plot With Annular Edge
+:PROPERTIES:
+:CUSTOM_ID: surface_plot_annular_edge
+:END:
+
+#+begin_src sh :results output raw :exports results 
+./src2org.sh ../../examples/surface_plot_annular_edge.cpp
+#+end_src
+
+#+RESULTS:
+
+  In example [[#surface_plot_edge][surface_plot_edge.cpp]] we had a surface plot with a large, undefined region easily discovered by Maple & Nathematica.  In this example we have a
+  surface with a smaller, annular undefined region that is harder for automatic software to get right.  The function in question is as follows:
+
+    \[ \sqrt{\sqrt{\vert 1 - x^2 - y^2\vert} - \frac{3}{20}} \]
+
+  This example differs from [[#surface_plot_edge][surface_plot_edge.cpp]] in that we direct additional sampling near the unit circle.  Other than that, it's just about identical.
+
+#+BEGIN_CENTER
+MRPtree Version \\
+[[file:media/surface_plot_annular_edge_rot_100_crf30.html][file:media/surface_plot_annular_edge_rot_25.gif]] \\
+Mathematica (from the side & top) \\
+[[file:media/mathematica_anan-s_100.png][file:media/mathematica_anan-s_10.png]]
+[[file:media/mathematica_anan-t_100.png][file:media/mathematica_anan-t_10.png]]
+#+END_CENTER
+
+Source code: https://github.com/richmit/MRPTree/blob/main/examples/surface_plot_annular_edge.cpp
+
+#+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
+grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_plot_annular_edge.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+#+end_src
+
+#+RESULTS:
+#+begin_src c++ :eval never :tangle no
+
+#include "MR_rect_tree.hpp"
+#include "MR_cell_cplx.hpp"
+#include "MR_rt_to_cc.hpp"
+
+typedef mjr::tree15b2d1rT            tt_t;
+typedef mjr::MRccT5                  cc_t;
+typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
+
+tt_t::rrpt_t annular_hat(tt_t::drpt_t xvec) {
+  double v = std::sqrt(std::abs(1 - xvec[0] * xvec[0] - xvec[1] * xvec[1])) - 0.15;
+  if (v < 0.0) {
+    return std::numeric_limits<double>::quiet_NaN();
+  } else {
+    return std::sqrt(v);
+  }
+}
+
+tt_t::src_t unit_circle_sdf(tt_t::drpt_t xvec) {
+  double m = xvec[0] * xvec[0] + xvec[1] * xvec[1];
+  return (1-m);
+}
+
+int main() {
+  tt_t tree({-1.1, -1.1}, 
+            { 1.1,  1.1});
+  cc_t ccplx;
+
+  // Sample a uniform grid across the domain
+  tree.refine_grid(5, annular_hat);
+
+  /* annular_hat produces NaNs in a thin annulus near the unit circle.*/
+  tree.refine_leaves_recursive_cell_pred(7, annular_hat, [&tree](int i) { return (tree.cell_cross_sdf(i, unit_circle_sdf)); });
+
+  /* Balance the three to the traditional level of 1 (no cell borders a cell more than half it's size) */
+  tree.balance_tree(1, annular_hat);
+
+  tree.dump_tree(10);
+
+  /* By passing annular_hat() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired. */
+  tc_t::construct_geometry_fans(ccplx,
+                                tree,
+                                2,
+                                {{tc_t::val_src_spc_t::FDOMAIN, 0}, 
+                                 {tc_t::val_src_spc_t::FDOMAIN, 1},
+                                 {tc_t::val_src_spc_t::FRANGE,  0}},
+                                annular_hat
+                               );
+
+  ccplx.create_named_datasets({"x", "y", "f(x,y)"},
+                              {{"NORMALS", {0, 1, 2}}});
+
+  ccplx.dump_cplx(10);
+
+  ccplx.write_xml_vtk("surface_plot_annular_edge.vtu", "surface_plot_annular_edge");
+}
+#+end_src
+
 
 ** Surface Plot With An Corner
 :PROPERTIES:
@@ -1730,16 +1822,6 @@ done
 #+end_src
 
 #+RESULTS:
-#+begin_example
-make media/surface_plot_step-cut_100.png
-make media/surface_plot_step-cut_50.png
-make media/surface_plot_step-cut_25.png
-make media/surface_plot_step-cut_10.png
-make media/surface_plot_step-noCut_100.png
-make media/surface_plot_step-noCut_50.png
-make media/surface_plot_step-noCut_25.png
-make media/surface_plot_step-noCut_10.png
-#+end_example
 
 *** Image Processing: GIFs
 
@@ -1758,9 +1840,9 @@ done
 
 #+RESULTS:
 #+begin_example
-make media/complex_magnitude_surface_rot_10.gif
-make media/complex_magnitude_surface_rot_25.gif
-make media/complex_magnitude_surface_rot_50.gif
+make media/surface_plot_annular_edge_rot_10.gif
+make media/surface_plot_annular_edge_rot_25.gif
+make media/surface_plot_annular_edge_rot_50.gif
 #+end_example
 
 ** Out Of Date Code
@@ -1797,8 +1879,8 @@ for f in ../../paraview/*_crf30.webm; do
   if [ $f -nt $fn ]; then
     echo make $fn
     cp $f $fn
-  else
-    echo skip $fn
+  # else
+  #   echo skip $fn
   fi
 done
 rm media/lorenz_rot_100_crf30.webm
@@ -1806,33 +1888,16 @@ rm media/lorenz_rot_100_crf30.webm
 
 #+RESULTS:
 #+begin_example
-make media/complex_magnitude_surface_rot_100_crf30.webm
-make media/complex_magnitude_surface_rot_25_crf30.webm
-make media/complex_magnitude_surface_rot_50_crf30.webm
-skip media/ear_surface_rot_100_crf30.webm
-skip media/ear_surface_rot_25_crf30.webm
-skip media/ear_surface_rot_50_crf30.webm
-skip media/implicit_surface_rot_100_crf30.webm
-skip media/implicit_surface_rot_25_crf30.webm
-skip media/implicit_surface_rot_50_crf30.webm
 make media/lorenz_rot_100_crf30.webm
-skip media/lorenz_rot_25_crf30.webm
-skip media/lorenz_rot_50_crf30.webm
-skip media/parametric_curve_3d_rot_100_crf30.webm
-skip media/parametric_curve_3d_rot_25_crf30.webm
-skip media/parametric_curve_3d_rot_50_crf30.webm
-skip media/surface_plot_corner_rot_100_crf30.webm
-skip media/surface_plot_corner_rot_25_crf30.webm
-skip media/surface_plot_corner_rot_50_crf30.webm
-skip media/trefoil_rot_100_crf30.webm
-skip media/trefoil_rot_25_crf30.webm
-skip media/trefoil_rot_50_crf30.webm
+make media/surface_plot_annular_edge_rot_100_crf30.webm
+make media/surface_plot_annular_edge_rot_25_crf30.webm
+make media/surface_plot_annular_edge_rot_50_crf30.webm
 #+end_example
 
 *** Create HTML Wrappers
 
 #+begin_src sh :results output verbatum
-for e in complex_magnitude_surface implicit_surface lorenz trefoil parametric_curve_3d surface_plot_corner ear_surface; do
+for e in complex_magnitude_surface implicit_surface lorenz trefoil parametric_curve_3d surface_plot_corner ear_surface surface_plot_annular_edge; do
   echo Processing Example $e
   he=$(echo $e | sed 's/_/ /g; s/\b\(.\)/\u\1/g')
   for f in media/$e*_crf30.webm; do
@@ -1851,9 +1916,9 @@ done
 #+RESULTS:
 #+begin_example
 Processing Example complex_magnitude_surface
-  make media/complex_magnitude_surface_rot_100_crf30.html
-  make media/complex_magnitude_surface_rot_25_crf30.html
-  make media/complex_magnitude_surface_rot_50_crf30.html
+  skip media/complex_magnitude_surface_rot_100_crf30.html
+  skip media/complex_magnitude_surface_rot_25_crf30.html
+  skip media/complex_magnitude_surface_rot_50_crf30.html
 Processing Example implicit_surface
   skip media/implicit_surface_rot_100_crf30.html
   skip media/implicit_surface_rot_25_crf30.html
@@ -1877,6 +1942,10 @@ Processing Example ear_surface
   skip media/ear_surface_rot_100_crf30.html
   skip media/ear_surface_rot_25_crf30.html
   skip media/ear_surface_rot_50_crf30.html
+Processing Example surface_plot_annular_edge
+  skip media/surface_plot_annular_edge_rot_100_crf30.html
+  skip media/surface_plot_annular_edge_rot_25_crf30.html
+  skip media/surface_plot_annular_edge_rot_50_crf30.html
 #+end_example
 
 * xx :noexport:

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-08-14 Wed 12:54 -->
+<!-- 2024-08-14 Wed 15:35 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Function Visualization</title>
@@ -272,12 +272,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-08-14 12:54:13</i></td>
+<td class="org-left"><i>2024-08-14 15:35:53</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-08-14 12:54:14</i></td>
+<td class="org-left"><i>2024-08-14 15:35:55</i></td>
 </tr>
 </tbody>
 </table>
@@ -298,12 +298,13 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <li><a href="#vector_field_3d">2.4. 3D Vector Field</a></li>
 <li><a href="#surface_with_normals">2.5. Surface Plot With Normals</a></li>
 <li><a href="#surface_plot_edge">2.6. Surface Plot With An Edge</a></li>
-<li><a href="#surface_plot_corner">2.7. Surface Plot With An Corner</a></li>
-<li><a href="#surface_plot_step">2.8. Surface Plot With An Step</a></li>
-<li><a href="#surface_branch_glue">2.9. Surface Branches &amp; Glue</a></li>
-<li><a href="#curve_plot">2.10. Curve Plot</a></li>
-<li><a href="#parametric_surface_with_defects">2.11. Parametric Surface With Defects</a></li>
-<li><a href="#performance_with_large_surface">2.12. High Resolution Parametric Surface</a></li>
+<li><a href="#surface_plot_annular_edge">2.7. Surface Plot With Annular Edge</a></li>
+<li><a href="#surface_plot_corner">2.8. Surface Plot With An Corner</a></li>
+<li><a href="#surface_plot_step">2.9. Surface Plot With An Step</a></li>
+<li><a href="#surface_branch_glue">2.10. Surface Branches &amp; Glue</a></li>
+<li><a href="#curve_plot">2.11. Curve Plot</a></li>
+<li><a href="#parametric_surface_with_defects">2.12. Parametric Surface With Defects</a></li>
+<li><a href="#performance_with_large_surface">2.13. High Resolution Parametric Surface</a></li>
 </ul>
 </li>
 <li><a href="#extra_examples">3. Extra Examples</a>
@@ -1064,9 +1065,101 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
 </div>
 </div>
 
+<div id="outline-container-surface_plot_annular_edge" class="outline-3">
+<h3 id="surface_plot_annular_edge"><span class="section-number-3">2.7.</span> Surface Plot With Annular Edge</h3>
+<div class="outline-text-3" id="text-surface_plot_annular_edge">
+<p>
+In example <a href="#surface_plot_edge">surface_plot_edge.cpp</a> we had a surface plot with a large, undefined region easily discovered by Maple &amp; Nathematica.  In this example we have a
+surface with a smaller, annular undefined region that is harder for automatic software to get right.  The function in question is as follows:
+</p>
+
+<p>
+\[ \sqrt{\sqrt{\vert 1 - x^2 - y^2\vert} - \frac{3}{20}} \]
+</p>
+
+<p>
+This example differs from <a href="#surface_plot_edge">surface_plot_edge.cpp</a> in that we direct additional sampling near the unit circle.  Other than that, it's just about identical.
+</p>
+
+<div class="org-center">
+<p>
+MRPtree Version <br />
+<a href="media/surface_plot_annular_edge_rot_100_crf30.html"><img src="media/surface_plot_annular_edge_rot_25.gif" alt="surface_plot_annular_edge_rot_25.gif" /></a> <br />
+Mathematica (from the side &amp; top) <br />
+<a href="media/mathematica_anan-s_100.png"><img src="media/mathematica_anan-s_10.png" alt="mathematica_anan-s_10.png" /></a>
+<a href="media/mathematica_anan-t_100.png"><img src="media/mathematica_anan-t_10.png" alt="mathematica_anan-t_10.png" /></a>
+</p>
+</div>
+
+<p>
+Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surface_plot_annular_edge.cpp">https://github.com/richmit/MRPTree/blob/main/examples/surface_plot_annular_edge.cpp</a>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c++">
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
+
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b2d1rT</span>            <span style="color: #63b8ff;">tt_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
+
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">annular_hat</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">v</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(<span style="color: #8470ff; font-weight: bold;">std</span>::abs(1 - xvec[0] * xvec[0] - xvec[1] * xvec[1])) - 0.15;
+  <span style="color: #00ffff;">if</span> (v &lt; 0.0) {
+    <span style="color: #00ffff;">return</span> <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numeric_limits</span>&lt;<span style="color: #63b8ff;">double</span>&gt;::quiet_NaN();
+  } <span style="color: #00ffff;">else</span> {
+    <span style="color: #00ffff;">return</span> <span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(v);
+  }
+}
+
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #00fa9a; font-weight: bold;">unit_circle_sdf</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">m</span> = xvec[0] * xvec[0] + xvec[1] * xvec[1];
+  <span style="color: #00ffff;">return</span> (1-m);
+}
+
+<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
+  <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">tree</span>({-1.1, -1.1}, 
+            { 1.1,  1.1});
+  <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">ccplx</span>;
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Sample a uniform grid across the domain</span>
+  tree.refine_grid(5, annular_hat);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">annular_hat produces NaNs in a thin annulus near the unit circle.</span><span style="color: #ffa500;">*/</span>
+  tree.refine_leaves_recursive_cell_pred(7, annular_hat, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #63b8ff;">int</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_cross_sdf(i, unit_circle_sdf)); });
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Balance the three to the traditional level of 1 (no cell borders a cell more than half it's size)</span><span style="color: #ffa500;"> */</span>
+  tree.balance_tree(1, annular_hat);
+
+  tree.dump_tree(10);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">By passing annular_hat() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired.</span><span style="color: #ffa500;"> */</span>
+  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::construct_geometry_fans(ccplx,
+                                tree,
+                                2,
+                                {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FDOMAIN, 0}, 
+                                 {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FDOMAIN, 1},
+                                 {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FRANGE,  0}},
+                                annular_hat
+                               );
+
+  ccplx.create_named_datasets({<span style="color: #fa8072;">"x"</span>, <span style="color: #fa8072;">"y"</span>, <span style="color: #fa8072;">"f(x,y)"</span>},
+                              {{<span style="color: #fa8072;">"NORMALS"</span>, {0, 1, 2}}});
+
+  ccplx.dump_cplx(10);
+
+  ccplx.write_xml_vtk(<span style="color: #fa8072;">"surface_plot_annular_edge.vtu"</span>, <span style="color: #fa8072;">"surface_plot_annular_edge"</span>);
+}
+</pre>
+</div>
+</div>
+</div>
+
 
 <div id="outline-container-surface_plot_corner" class="outline-3">
-<h3 id="surface_plot_corner"><span class="section-number-3">2.7.</span> Surface Plot With An Corner</h3>
+<h3 id="surface_plot_corner"><span class="section-number-3">2.8.</span> Surface Plot With An Corner</h3>
 <div class="outline-text-3" id="text-surface_plot_corner">
 <p>
 The function illustrated here is continuous on the entire plane, but has no derivative on the unit circle.  While no derivative exists on the unit circle,
@@ -1170,7 +1263,7 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
 </div>
 
 <div id="outline-container-surface_plot_step" class="outline-3">
-<h3 id="surface_plot_step"><span class="section-number-3">2.8.</span> Surface Plot With An Step</h3>
+<h3 id="surface_plot_step"><span class="section-number-3">2.9.</span> Surface Plot With An Step</h3>
 <div class="outline-text-3" id="text-surface_plot_step">
 <p>
 The function illustrated here is defined on the entire plan, but has a step discontinuity on the unit circle.  Except on the unit circle, the function's
@@ -1271,7 +1364,7 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
 </div>
 
 <div id="outline-container-surface_branch_glue" class="outline-3">
-<h3 id="surface_branch_glue"><span class="section-number-3">2.9.</span> Surface Branches &amp; Glue</h3>
+<h3 id="surface_branch_glue"><span class="section-number-3">2.10.</span> Surface Branches &amp; Glue</h3>
 <div class="outline-text-3" id="text-surface_branch_glue">
 <p>
 In <a href="#surface_plot_edge">surface_plot_edge.cpp</a> we encountered the unit sphere defined by the zeros of \(1^2=x^2+y^2+z^2\), and the related function 
@@ -1287,7 +1380,7 @@ any holes.  This is really the only change from <a href="#surface_plot_edge">sur
 
 <div class="org-center">
 
-<div id="org7d0d9c3" class="figure">
+<div id="orga250f55" class="figure">
 <p><a href="media/surface_branch_glue_100.png"><img src="media/surface_branch_glue_10.png" alt="surface_branch_glue_10.png" /></a>
 </p>
 </div>
@@ -1354,7 +1447,7 @@ any holes.  This is really the only change from <a href="#surface_plot_edge">sur
 </div>
 
 <div id="outline-container-curve_plot" class="outline-3">
-<h3 id="curve_plot"><span class="section-number-3">2.10.</span> Curve Plot</h3>
+<h3 id="curve_plot"><span class="section-number-3">2.11.</span> Curve Plot</h3>
 <div class="outline-text-3" id="text-curve_plot">
 <p>
 Univariate function plots are the bread-and-butter of the plotting world.  Normally a simple, uniformly spaced, sequence is enough to get the job 
@@ -1375,7 +1468,7 @@ Note that most of the items above are listed TBD.  A few features need to be add
 
 <div class="org-center">
 
-<div id="org73e156e" class="figure">
+<div id="org7713004" class="figure">
 <p><a href="media/sq_curve_plot_heal_100.png"><img src="media/sq_curve_plot_heal_10.png" alt="sq_curve_plot_heal_10.png" /></a>
 </p>
 </div>
@@ -1465,7 +1558,7 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/curv
 </div>
 
 <div id="outline-container-parametric_surface_with_defects" class="outline-3">
-<h3 id="parametric_surface_with_defects"><span class="section-number-3">2.11.</span> Parametric Surface With Defects</h3>
+<h3 id="parametric_surface_with_defects"><span class="section-number-3">2.12.</span> Parametric Surface With Defects</h3>
 <div class="outline-text-3" id="text-parametric_surface_with_defects">
 <p>
 This example illustrates some of the things that can go wrong when generating parametric surfaces.  We dump two version of the tessellation &#x2013; one with
@@ -1552,7 +1645,7 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/para
 
 
 <div id="outline-container-performance_with_large_surface" class="outline-3">
-<h3 id="performance_with_large_surface"><span class="section-number-3">2.12.</span> High Resolution Parametric Surface</h3>
+<h3 id="performance_with_large_surface"><span class="section-number-3">2.13.</span> High Resolution Parametric Surface</h3>
 <div class="outline-text-3" id="text-performance_with_large_surface">
 <p>
 Just a nice parametric surface without any weirdness.  Some things demonstrated:
@@ -1682,7 +1775,7 @@ This example doesn't really demonstrate anything not found in the other examples
 
 <div class="org-center">
 
-<div id="org00d4c08" class="figure">
+<div id="org763fbed" class="figure">
 <p><a href="media/trefoil_rot_50_crf30.html"><img src="media/trefoil_rot_10.gif" alt="trefoil_rot_10.gif" /></a>
 </p>
 </div>
@@ -1779,7 +1872,7 @@ Alternately the curve is also the intersection of two surfaces in \(\mathbb{R}^3
 The "typical" way to graph a surface like \(f_2\) is to transform it into pseudo-parametric form.  In Maple that might look like this
 </p>
 
-<pre class="example" id="orgba4bafe">
+<pre class="example" id="orga4f155f">
 plot3d([u, u^2, v], u=-1..1, v=-1..1):
 </pre>
 
@@ -1795,7 +1888,7 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
 
 <div class="org-center">
 
-<div id="org8bbf0e6" class="figure">
+<div id="org14afd7c" class="figure">
 <p><a href="media/parametric_curve_3d_rot_100_crf30.html"><img src="media/parametric_curve_3d_rot_10.gif" alt="parametric_curve_3d_rot_10.gif" /></a>
 </p>
 </div>
@@ -1918,7 +2011,7 @@ This surface is defined by the zeros of the following polynomial
 
 <div class="org-center">
 
-<div id="org72c9ba5" class="figure">
+<div id="org01063cd" class="figure">
 <p><a href="media/ear_surface_rot_100_crf30.html"><img src="media/ear_surface_rot_10.gif" alt="ear_surface_rot_10.gif" /></a>
 </p>
 </div>
