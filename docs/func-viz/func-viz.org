@@ -83,7 +83,7 @@ This group of core examples is intended to illistrate various features of MRPTre
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/complex_magnitude_surface.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
+./src2org.sh ../../examples/complex_magnitude_surface.cpp
 #+end_src
 
 #+RESULTS:
@@ -104,7 +104,6 @@ grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/complex_magn
 
   References:
     Richardson (1991); Visualizing quantum scattering on the CM-2 supercomputer; Computer Physics Communications 63; pp 84-94"
-
 
 #+BEGIN_CENTER
 [[file:media/complex_magnitude_surface-2D_100.png][file:media/complex_magnitude_surface-2D_10.png]]
@@ -276,7 +275,7 @@ int main() {
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/implicit_curve_2d.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
+./src2org.sh ../../examples/implicit_curve_2d.cpp
 #+end_src
 
 #+RESULTS:
@@ -299,6 +298,7 @@ grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/implicit_cur
   Today we extract the curve with Paraview, but I hope to extend MR_rt_to_cc to extract level sets in the future:
    - Extract "standard" midpoint level sets (TBD)
    - Solve for accurate edge/function level intersections, and construct high quality level sets. (TBD)
+
 
 
 #+BEGIN_CENTER
@@ -372,17 +372,16 @@ int main() {
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/implicit_surface.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
+./src2org.sh ../../examples/implicit_surface.cpp
 #+end_src
 
 #+RESULTS:
 
-  This example is very similar to implicit_curve_2d.cpp; however, instead of extracting a curve from a triangulation of a surface, this time we extract a
-  surface from a quad tessellation of a hexahedron.  In addition to what we demonstrate with implicit_curve_2d.cpp, this example also demonstrates:
+  This example is very similar to [[#implicit_curve_2d][implicit_curve_2d.cpp]]; however, instead of extracting a curve from a triangulation of a surface, this time we extract a
+  surface from a quad tessellation of a hexahedron.  In addition to what we demonstrate with [[#implicit_curve_2d][implicit_curve_2d.cpp]], this example also demonstrates:
 
    - How to use an SDF to identify cells that contain the level set
    - How to export only a subset of cells 
-
 
 #+BEGIN_CENTER
 [[file:media/implicit_surface_rot_100_crf30.html][file:media/implicit_surface_rot_10.gif]]
@@ -453,7 +452,7 @@ int main() {
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/vector_field_3d.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
+./src2org.sh ../../examples/vector_field_3d.cpp
 #+end_src
 
 #+RESULTS:
@@ -556,7 +555,7 @@ int main() {
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_with_normals.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
+./src2org.sh ../../examples/surface_with_normals.cpp
 #+end_src
 
 #+RESULTS:
@@ -578,7 +577,7 @@ Surfaces with and without normals \\
 [[file:media/surface_with_normals-withN_100.png][file:media/surface_with_normals-withN_10.png]] \\
 The mesh without any refinement \\
 [[file:media/sq_surface_with_normals_grid_noref_100.png][file:media/sq_surface_with_normals_grid_noref_10.png]] \\
-The mesh with any refinement (sdf, partial derivative, directional derivative) \\
+The mesh with refinement (sdf, partial derivative, directional derivative) \\
 [[file:media/sq_surface_with_normals_grid_sdf_100.png][file:media/sq_surface_with_normals_grid_sdf_10.png]] 
 [[file:media/sq_surface_with_normals_grid_pd_100.png][file:media/sq_surface_with_normals_grid_pd_10.png]] 
 [[file:media/sq_surface_with_normals_grid_dd_100.png][file:media/sq_surface_with_normals_grid_dd_10.png]] \\
@@ -689,7 +688,7 @@ int main() {
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_plot_edge.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
+./src2org.sh ../../examples/surface_plot_edge.cpp
 #+end_src
 
 #+RESULTS:
@@ -790,7 +789,7 @@ int main() {
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_plot_corner.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
+./src2org.sh ../../examples/surface_plot_corner.cpp
 #+end_src
 
 #+RESULTS:
@@ -894,7 +893,7 @@ int main() {
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_plot_step.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
+./src2org.sh ../../examples/surface_plot_step.cpp
 #+end_src
 
 #+RESULTS:
@@ -997,18 +996,18 @@ int main() {
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_branch_glue.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
+./src2org.sh ../../examples/surface_branch_glue.cpp
 #+end_src
 
 #+RESULTS:
 
-  In surface_plot_edge.cpp we encountered the unit sphere defined by the zeros of \(1^2=x^2+y^2+z^2\), and the related function 
+  In [[#surface_plot_edge][surface_plot_edge.cpp]] we encountered the unit sphere defined by the zeros of \(1^2=x^2+y^2+z^2\), and the related function 
   \(f(x,y)=\sqrt{1-x^2-y^2}\) obtained by "solving" for \(z\).  Note that if \(z=f(x, y)\), then both \(z\) and \(-z\) satisfy the original equation.
   While the square root function is positive by definition, we might wish to think of  \(f(x, y)\) as a multi-valued function with two branches -- a
   positive one and a negative one.
 
   In simple cases like this, where the two branches are reflections across an axis plane, we can use MR_cell_cplx::mirror() to mirror the geometry and seal up
-  any holes.  This is really the only change from surface_plot_edge.cpp.
+  any holes.  This is really the only change from [[#surface_plot_edge][surface_plot_edge.cpp]].
 
 #+BEGIN_CENTER
 [[file:media/surface_branch_glue_100.png][file:media/surface_branch_glue_10.png]]
@@ -1082,7 +1081,7 @@ int main() {
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/curve_plot.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
+./src2org.sh ../../examples/curve_plot.cpp
 #+end_src
 
 #+RESULTS:
@@ -1191,7 +1190,7 @@ int main() {
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/parametric_surface_with_defects.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
+./src2org.sh ../../examples/parametric_surface_with_defects.cpp
 #+end_src
 
 #+RESULTS:
@@ -1205,7 +1204,7 @@ grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/parametric_s
      This means for the rectangular tessellation, the rectangles at the poles are degenerate!  Then converting from tree to cell complex, these quads are
      removed because they are degenerate. This is not an issue for the triangular tessellation (FANS).
    - The v=0 edge meets up with the v=1 edge.  
-     Because we have uniq_points set to true for the cell complex object, the duplicate points are "welded" together when the points are added.  This results
+     Because we have chk_point_unique set to true for the cell complex object, the duplicate points are "welded" together when the points are added.  This results
      in a seamless edge.
 
 #+BEGIN_CENTER
@@ -1280,7 +1279,7 @@ int main() {
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/performance_with_large_surface.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
+./src2org.sh ../../examples/performance_with_large_surface.cpp
 #+end_src
 
 #+RESULTS:
@@ -1400,7 +1399,7 @@ fore examples.
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/trefoil.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
+./src2org.sh ../../examples/trefoil.cpp
 #+end_src
 
 #+RESULTS:
@@ -1484,7 +1483,7 @@ int main() {
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/parametric_curve_3d.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
+./src2org.sh ../../examples/parametric_curve_3d.cpp
 #+end_src
 
 #+RESULTS:
@@ -1614,13 +1613,13 @@ int main() {
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/ear_surface.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
+./src2org.sh ../../examples/ear_surface.cpp
 #+end_src
 
 #+RESULTS:
 
-  This example is very similar to implicit_surface.cpp; however, instead of extracting a surface from a quad tessellation of a hexahedrona we extract the
-  surface from a tessellation of a pyramids.  Why use pyramids instead of hexahedrona?  In the example implicit_surface.cpp all of the underlying cells are
+  This example is very similar to [[#implicit_surface][implicit_surface.cpp]]; however, instead of extracting a surface from a quad tessellation of a hexahedrona we extract the
+  surface from a tessellation of a pyramids.  Why use pyramids instead of hexahedrona?  In the example [[#implicit_surface][implicit_surface.cpp]] all of the underlying cells are
   the same size, and thus no gaps occur in the extracted level set (the surface).  In this example we have cells that vary a great deal in size.
 
   This example demonstrates scratch made cell predicates, and uses them to increse sample resolution on parts of the surface that are particularly difficlut
@@ -1759,33 +1758,9 @@ done
 
 #+RESULTS:
 #+begin_example
-skip media/complex_magnitude_surface_rot_10.gif
-skip media/complex_magnitude_surface_rot_25.gif
-skip media/complex_magnitude_surface_rot_50.gif
-make media/ear_surface_rot_10.gif
-make media/ear_surface_rot_25.gif
-make media/ear_surface_rot_50.gif
-skip media/implicit_surface_make_10.gif
-skip media/implicit_surface_make_25.gif
-skip media/implicit_surface_make_50.gif
-skip media/implicit_surface_rot_10.gif
-skip media/implicit_surface_rot_25.gif
-skip media/implicit_surface_rot_50.gif
-skip media/lorenz_rot_10.gif
-skip media/lorenz_rot_25.gif
-skip media/lorenz_rot_50.gif
-skip media/parametric_curve_3d_rot_10.gif
-skip media/parametric_curve_3d_rot_25.gif
-skip media/parametric_curve_3d_rot_50.gif
-skip media/sq_complex_magnitude_surface_rot_10.gif
-skip media/sq_implicit_surface_rot_10.gif
-skip media/sq_lorenz_rot_10.gif
-skip media/surface_plot_corner_rot_10.gif
-skip media/surface_plot_corner_rot_25.gif
-skip media/surface_plot_corner_rot_50.gif
-skip media/trefoil_rot_10.gif
-skip media/trefoil_rot_25.gif
-skip media/trefoil_rot_50.gif
+make media/complex_magnitude_surface_rot_10.gif
+make media/complex_magnitude_surface_rot_25.gif
+make media/complex_magnitude_surface_rot_50.gif
 #+end_example
 
 ** Out Of Date Code
@@ -1831,12 +1806,12 @@ rm media/lorenz_rot_100_crf30.webm
 
 #+RESULTS:
 #+begin_example
-skip media/complex_magnitude_surface_rot_100_crf30.webm
-skip media/complex_magnitude_surface_rot_25_crf30.webm
-skip media/complex_magnitude_surface_rot_50_crf30.webm
-make media/ear_surface_rot_100_crf30.webm
-make media/ear_surface_rot_25_crf30.webm
-make media/ear_surface_rot_50_crf30.webm
+make media/complex_magnitude_surface_rot_100_crf30.webm
+make media/complex_magnitude_surface_rot_25_crf30.webm
+make media/complex_magnitude_surface_rot_50_crf30.webm
+skip media/ear_surface_rot_100_crf30.webm
+skip media/ear_surface_rot_25_crf30.webm
+skip media/ear_surface_rot_50_crf30.webm
 skip media/implicit_surface_rot_100_crf30.webm
 skip media/implicit_surface_rot_25_crf30.webm
 skip media/implicit_surface_rot_50_crf30.webm
@@ -1876,9 +1851,9 @@ done
 #+RESULTS:
 #+begin_example
 Processing Example complex_magnitude_surface
-  skip media/complex_magnitude_surface_rot_100_crf30.html
-  skip media/complex_magnitude_surface_rot_25_crf30.html
-  skip media/complex_magnitude_surface_rot_50_crf30.html
+  make media/complex_magnitude_surface_rot_100_crf30.html
+  make media/complex_magnitude_surface_rot_25_crf30.html
+  make media/complex_magnitude_surface_rot_50_crf30.html
 Processing Example implicit_surface
   skip media/implicit_surface_rot_100_crf30.html
   skip media/implicit_surface_rot_25_crf30.html
@@ -1899,9 +1874,9 @@ Processing Example surface_plot_corner
   skip media/surface_plot_corner_rot_25_crf30.html
   skip media/surface_plot_corner_rot_50_crf30.html
 Processing Example ear_surface
-  make media/ear_surface_rot_100_crf30.html
-  make media/ear_surface_rot_25_crf30.html
-  make media/ear_surface_rot_50_crf30.html
+  skip media/ear_surface_rot_100_crf30.html
+  skip media/ear_surface_rot_25_crf30.html
+  skip media/ear_surface_rot_50_crf30.html
 #+end_example
 
 * xx :noexport:
@@ -1912,7 +1887,7 @@ Processing Example ear_surface
 :END:
 
 #+begin_src sh :results output raw :exports results 
-grep -EB 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/PROGRAM_EXAMPLE.cpp | grep -EA 10000 '@filedetails' | head -n -2 | grep -v '@filedetails' | sed 's/ @f\$/ \\(/g; s/@f\$\([ .,!:]\)/\\)\1/g; s/@f\[/\\[/g; s/@f]/\\]/g; s/^ *\\verbatim/#+BEGIN_EXAMPLE/; s/^ *\\endverbatim/#+END_EXAMPLE/;'
+./src2org.sh ../../examples/PROGRAM_EXAMPLE.cpp
 #+end_src
 
 #+BEGIN_CENTER

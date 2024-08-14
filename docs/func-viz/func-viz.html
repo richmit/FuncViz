@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-08-09 Fri 15:19 -->
+<!-- 2024-08-14 Wed 12:54 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Function Visualization</title>
@@ -272,12 +272,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-08-09 15:19:46</i></td>
+<td class="org-left"><i>2024-08-14 12:54:13</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-08-09 15:19:47</i></td>
+<td class="org-left"><i>2024-08-14 12:54:14</i></td>
 </tr>
 </tbody>
 </table>
@@ -386,7 +386,6 @@ described by Richardson in 1991.  In this example, we demonstrates several techn
 References:
   Richardson (1991); Visualizing quantum scattering on the CM-2 supercomputer; Computer Physics Communications 63; pp 84-94"
 </p>
-
 
 <div class="org-center">
 <p>
@@ -589,6 +588,7 @@ Today we extract the curve with Paraview, but I hope to extend MR_rt_to_cc to ex
 </ul>
 
 
+
 <div class="org-center">
 <p>
 <a href="media/implicit_curve_2d-2D_100.png"><img src="media/implicit_curve_2d-2D_10.png" alt="implicit_curve_2d-2D_10.png" /></a>
@@ -660,15 +660,14 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/impl
 <h3 id="implicit_surface"><span class="section-number-3">2.3.</span> Implicit Surface</h3>
 <div class="outline-text-3" id="text-implicit_surface">
 <p>
-This example is very similar to implicit_curve_2d.cpp; however, instead of extracting a curve from a triangulation of a surface, this time we extract a
-surface from a quad tessellation of a hexahedron.  In addition to what we demonstrate with implicit_curve_2d.cpp, this example also demonstrates:
+This example is very similar to <a href="#implicit_curve_2d">implicit_curve_2d.cpp</a>; however, instead of extracting a curve from a triangulation of a surface, this time we extract a
+surface from a quad tessellation of a hexahedron.  In addition to what we demonstrate with <a href="#implicit_curve_2d">implicit_curve_2d.cpp</a>, this example also demonstrates:
 </p>
 
 <ul class="org-ul">
 <li>How to use an SDF to identify cells that contain the level set</li>
 <li>How to export only a subset of cells</li>
 </ul>
-
 
 <div class="org-center">
 <p>
@@ -859,7 +858,7 @@ Surfaces with and without normals <br />
 <a href="media/surface_with_normals-withN_100.png"><img src="media/surface_with_normals-withN_10.png" alt="surface_with_normals-withN_10.png" /></a> <br />
 The mesh without any refinement <br />
 <a href="media/sq_surface_with_normals_grid_noref_100.png"><img src="media/sq_surface_with_normals_grid_noref_10.png" alt="sq_surface_with_normals_grid_noref_10.png" /></a> <br />
-The mesh with any refinement (sdf, partial derivative, directional derivative) <br />
+The mesh with refinement (sdf, partial derivative, directional derivative) <br />
 <a href="media/sq_surface_with_normals_grid_sdf_100.png"><img src="media/sq_surface_with_normals_grid_sdf_10.png" alt="sq_surface_with_normals_grid_sdf_10.png" /></a> 
 <a href="media/sq_surface_with_normals_grid_pd_100.png"><img src="media/sq_surface_with_normals_grid_pd_10.png" alt="sq_surface_with_normals_grid_pd_10.png" /></a> 
 <a href="media/sq_surface_with_normals_grid_dd_100.png"><img src="media/sq_surface_with_normals_grid_dd_10.png" alt="sq_surface_with_normals_grid_dd_10.png" /></a> <br />
@@ -1275,7 +1274,7 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
 <h3 id="surface_branch_glue"><span class="section-number-3">2.9.</span> Surface Branches &amp; Glue</h3>
 <div class="outline-text-3" id="text-surface_branch_glue">
 <p>
-In surface_plot_edge.cpp we encountered the unit sphere defined by the zeros of \(1^2=x^2+y^2+z^2\), and the related function 
+In <a href="#surface_plot_edge">surface_plot_edge.cpp</a> we encountered the unit sphere defined by the zeros of \(1^2=x^2+y^2+z^2\), and the related function 
 \(f(x,y)=\sqrt{1-x^2-y^2}\) obtained by "solving" for \(z\).  Note that if \(z=f(x, y)\), then both \(z\) and \(-z\) satisfy the original equation.
 While the square root function is positive by definition, we might wish to think of  \(f(x, y)\) as a multi-valued function with two branches &#x2013; a
 positive one and a negative one.
@@ -1283,12 +1282,12 @@ positive one and a negative one.
 
 <p>
 In simple cases like this, where the two branches are reflections across an axis plane, we can use MR_cell_cplx::mirror() to mirror the geometry and seal up
-any holes.  This is really the only change from surface_plot_edge.cpp.
+any holes.  This is really the only change from <a href="#surface_plot_edge">surface_plot_edge.cpp</a>.
 </p>
 
 <div class="org-center">
 
-<div id="orgb1dd726" class="figure">
+<div id="org7d0d9c3" class="figure">
 <p><a href="media/surface_branch_glue_100.png"><img src="media/surface_branch_glue_10.png" alt="surface_branch_glue_10.png" /></a>
 </p>
 </div>
@@ -1376,7 +1375,7 @@ Note that most of the items above are listed TBD.  A few features need to be add
 
 <div class="org-center">
 
-<div id="org367adc0" class="figure">
+<div id="org73e156e" class="figure">
 <p><a href="media/sq_curve_plot_heal_100.png"><img src="media/sq_curve_plot_heal_10.png" alt="sq_curve_plot_heal_10.png" /></a>
 </p>
 </div>
@@ -1480,7 +1479,7 @@ most tools including Paraview &amp; meshlab.</li>
 This means for the rectangular tessellation, the rectangles at the poles are degenerate!  Then converting from tree to cell complex, these quads are
 removed because they are degenerate. This is not an issue for the triangular tessellation (FANS).</li>
 <li>The v=0 edge meets up with the v=1 edge.  
-Because we have uniq_points set to true for the cell complex object, the duplicate points are "welded" together when the points are added.  This results
+Because we have chk_point_unique set to true for the cell complex object, the duplicate points are "welded" together when the points are added.  This results
 in a seamless edge.</li>
 </ul>
 
@@ -1683,7 +1682,7 @@ This example doesn't really demonstrate anything not found in the other examples
 
 <div class="org-center">
 
-<div id="orgb6d8432" class="figure">
+<div id="org00d4c08" class="figure">
 <p><a href="media/trefoil_rot_50_crf30.html"><img src="media/trefoil_rot_10.gif" alt="trefoil_rot_10.gif" /></a>
 </p>
 </div>
@@ -1780,7 +1779,7 @@ Alternately the curve is also the intersection of two surfaces in \(\mathbb{R}^3
 The "typical" way to graph a surface like \(f_2\) is to transform it into pseudo-parametric form.  In Maple that might look like this
 </p>
 
-<pre class="example" id="org1126710">
+<pre class="example" id="orgba4bafe">
 plot3d([u, u^2, v], u=-1..1, v=-1..1):
 </pre>
 
@@ -1796,7 +1795,7 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
 
 <div class="org-center">
 
-<div id="org2c22c21" class="figure">
+<div id="org8bbf0e6" class="figure">
 <p><a href="media/parametric_curve_3d_rot_100_crf30.html"><img src="media/parametric_curve_3d_rot_10.gif" alt="parametric_curve_3d_rot_10.gif" /></a>
 </p>
 </div>
@@ -1898,8 +1897,8 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
 <h3 id="ear_surface"><span class="section-number-3">3.3.</span> Ear Surface</h3>
 <div class="outline-text-3" id="text-ear_surface">
 <p>
-This example is very similar to implicit_surface.cpp; however, instead of extracting a surface from a quad tessellation of a hexahedrona we extract the
-surface from a tessellation of a pyramids.  Why use pyramids instead of hexahedrona?  In the example implicit_surface.cpp all of the underlying cells are
+This example is very similar to <a href="#implicit_surface">implicit_surface.cpp</a>; however, instead of extracting a surface from a quad tessellation of a hexahedrona we extract the
+surface from a tessellation of a pyramids.  Why use pyramids instead of hexahedrona?  In the example <a href="#implicit_surface">implicit_surface.cpp</a> all of the underlying cells are
 the same size, and thus no gaps occur in the extracted level set (the surface).  In this example we have cells that vary a great deal in size.
 </p>
 
@@ -1919,7 +1918,7 @@ This surface is defined by the zeros of the following polynomial
 
 <div class="org-center">
 
-<div id="org544a7d8" class="figure">
+<div id="org72c9ba5" class="figure">
 <p><a href="media/ear_surface_rot_100_crf30.html"><img src="media/ear_surface_rot_10.gif" alt="ear_surface_rot_10.gif" /></a>
 </p>
 </div>
