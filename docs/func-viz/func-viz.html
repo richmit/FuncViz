@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-08-14 Wed 15:35 -->
+<!-- 2024-08-15 Thu 13:57 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Function Visualization</title>
@@ -272,12 +272,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-08-14 15:35:53</i></td>
+<td class="org-left"><i>2024-08-15 13:56:55</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-08-14 15:35:55</i></td>
+<td class="org-left"><i>2024-08-15 13:56:57</i></td>
 </tr>
 </tbody>
 </table>
@@ -312,6 +312,7 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <li><a href="#trefoil">3.1. Trefoil Parametric Surface</a></li>
 <li><a href="#parametric_curve_3d">3.2. Twisted Cubic As A Surface Intersection</a></li>
 <li><a href="#ear_surface">3.3. Ear Surface</a></li>
+<li><a href="#holy_wave_surf">3.4. Holy Wave Surface</a></li>
 </ul>
 </li>
 </ul>
@@ -1380,7 +1381,7 @@ any holes.  This is really the only change from <a href="#surface_plot_edge">sur
 
 <div class="org-center">
 
-<div id="orga250f55" class="figure">
+<div id="org4610ef0" class="figure">
 <p><a href="media/surface_branch_glue_100.png"><img src="media/surface_branch_glue_10.png" alt="surface_branch_glue_10.png" /></a>
 </p>
 </div>
@@ -1468,7 +1469,7 @@ Note that most of the items above are listed TBD.  A few features need to be add
 
 <div class="org-center">
 
-<div id="org7713004" class="figure">
+<div id="org4df13bb" class="figure">
 <p><a href="media/sq_curve_plot_heal_100.png"><img src="media/sq_curve_plot_heal_10.png" alt="sq_curve_plot_heal_10.png" /></a>
 </p>
 </div>
@@ -1775,7 +1776,7 @@ This example doesn't really demonstrate anything not found in the other examples
 
 <div class="org-center">
 
-<div id="org763fbed" class="figure">
+<div id="orgc37512c" class="figure">
 <p><a href="media/trefoil_rot_50_crf30.html"><img src="media/trefoil_rot_10.gif" alt="trefoil_rot_10.gif" /></a>
 </p>
 </div>
@@ -1872,7 +1873,7 @@ Alternately the curve is also the intersection of two surfaces in \(\mathbb{R}^3
 The "typical" way to graph a surface like \(f_2\) is to transform it into pseudo-parametric form.  In Maple that might look like this
 </p>
 
-<pre class="example" id="orga4f155f">
+<pre class="example" id="org174e24d">
 plot3d([u, u^2, v], u=-1..1, v=-1..1):
 </pre>
 
@@ -1888,7 +1889,7 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
 
 <div class="org-center">
 
-<div id="org14afd7c" class="figure">
+<div id="org34a6527" class="figure">
 <p><a href="media/parametric_curve_3d_rot_100_crf30.html"><img src="media/parametric_curve_3d_rot_10.gif" alt="parametric_curve_3d_rot_10.gif" /></a>
 </p>
 </div>
@@ -1984,8 +1985,6 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
 </div>
 </div>
 
-
-
 <div id="outline-container-ear_surface" class="outline-3">
 <h3 id="ear_surface"><span class="section-number-3">3.3.</span> Ear Surface</h3>
 <div class="outline-text-3" id="text-ear_surface">
@@ -2011,7 +2010,7 @@ This surface is defined by the zeros of the following polynomial
 
 <div class="org-center">
 
-<div id="org01063cd" class="figure">
+<div id="org74ceb05" class="figure">
 <p><a href="media/ear_surface_rot_100_crf30.html"><img src="media/ear_surface_rot_10.gif" alt="ear_surface_rot_10.gif" /></a>
 </p>
 </div>
@@ -2082,6 +2081,113 @@ This surface is defined by the zeros of the following polynomial
   <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Write out our cell complex</span><span style="color: #ffa500;"> */</span>
   ccplx.write_xml_vtk(<span style="color: #fa8072;">"ear_surface.vtu"</span>, <span style="color: #fa8072;">"ear_surface"</span>);
 }
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-holy_wave_surf" class="outline-3">
+<h3 id="holy_wave_surf"><span class="section-number-3">3.4.</span> Holy Wave Surface</h3>
+<div class="outline-text-3" id="text-holy_wave_surf">
+<p>
+Just a fun example directly using MR_cell_cplx to drop randomly placed triangles on a surface.
+</p>
+
+<div class="org-center">
+<p>
+High Resolution Still Image (click on it) <br />
+<a href="media/holy_wave_surf_100.png"><img src="media/holy_wave_surf_10.png" alt="holy_wave_surf_10.png" /></a> <br />
+Movie of the surface (click on it) <br />
+<a href="media/holy_wave_surf_rot_100_crf30.html"><img src="media/holy_wave_surf_rot_10.gif" alt="holy_wave_surf_rot_10.gif" /></a>
+</p>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-c++">
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">&lt;random&gt;</span>                                                        <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">C++ random numbers      C++11</span><span style="color: #ffa500;">    */</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">&lt;chrono&gt;</span>                                                        <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">time                    C++11</span><span style="color: #ffa500;">    */</span>
+
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
+
+<span style="color: #63b8ff;">double</span> <span style="color: #00fa9a; font-weight: bold;">f</span>(<span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x</span>, <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y</span>) {
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">d</span> = x*x+y*y;
+  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::exp(-d/4)*<span style="color: #8470ff; font-weight: bold;">std</span>::cos(4*<span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(d));
+  <span style="color: #00ffff;">return</span> z;
+}
+
+<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"PROGRAM: START"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">program_start_time</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
+
+  <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span> <span style="color: #7fffd4;">aPoly</span>;
+
+  aPoly.create_dataset_to_point_mapping({0, 1, 2});
+  aPoly.create_named_datasets({<span style="color: #fa8072;">"x"</span>, <span style="color: #fa8072;">"y"</span>, <span style="color: #fa8072;">"z"</span>, <span style="color: #fa8072;">"za"</span>, <span style="color: #fa8072;">"xyMag"</span>, <span style="color: #fa8072;">"xyzMag"</span>, <span style="color: #fa8072;">"dir"</span>});
+
+  <span style="color: #00ffff;">const</span> <span style="color: #63b8ff;">int</span>    <span style="color: #7fffd4;">num_tri</span> =  20000;
+  <span style="color: #00ffff;">const</span> <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">tri_siz</span> =  0.07;
+  <span style="color: #00ffff;">const</span> <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x_min</span>   = -2.1;
+  <span style="color: #00ffff;">const</span> <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x_max</span>   =  2.1;
+  <span style="color: #00ffff;">const</span> <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y_min</span>   = -2.1;
+  <span style="color: #00ffff;">const</span> <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y_max</span>   =  2.1;
+
+  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #63b8ff;">random_device</span> <span style="color: #7fffd4;">rd</span>;
+  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #63b8ff;">mt19937</span> <span style="color: #7fffd4;">rEng</span>(rd());
+  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #63b8ff;">uniform_real_distribution</span>&lt;<span style="color: #63b8ff;">double</span>&gt; <span style="color: #7fffd4;">x_uniform_dist_float</span>(x_min, x_max);
+  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #63b8ff;">uniform_real_distribution</span>&lt;<span style="color: #63b8ff;">double</span>&gt; <span style="color: #7fffd4;">y_uniform_dist_float</span>(y_min, y_max);
+  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #63b8ff;">uniform_real_distribution</span>&lt;<span style="color: #63b8ff;">double</span>&gt; <span style="color: #7fffd4;">siz_uniform_dist_float</span>(-tri_siz, tri_siz);
+
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"SAMPLE: START"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;  
+  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">sample_start_time</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
+  <span style="color: #00ffff;">for</span>(<span style="color: #63b8ff;">int</span> <span style="color: #7fffd4;">i</span>=0; i&lt;num_tri; i++) {
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">xc</span> = x_uniform_dist_float(rEng);
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">yc</span> = y_uniform_dist_float(rEng);
+
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x1</span> = xc + siz_uniform_dist_float(rEng);
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y1</span> = yc + siz_uniform_dist_float(rEng);
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z1</span> = f(x1, y1);
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x2</span> = xc + siz_uniform_dist_float(rEng);
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y2</span> = yc + siz_uniform_dist_float(rEng);
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z2</span> = f(x2, y2);
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x3</span> = xc + siz_uniform_dist_float(rEng);
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y3</span> = yc + siz_uniform_dist_float(rEng);
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z3</span> = f(x3, y3);
+
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">xa</span> = (x1+x2+x3)/3;
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">ya</span> = (y1+y2+y3)/3;
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">za</span> = (z1+z2+z3)/3;
+
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">xy_mag</span>  = <span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(xa*xa+ya*ya);
+    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">xyz_mag</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(xa*xa+ya*ya+za*za);
+
+    <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #8470ff; font-weight: bold;">MRccT5</span>::<span style="color: #63b8ff;">node_idx_t</span> <span style="color: #7fffd4;">p1i</span> = aPoly.add_node({x1, y1, z1, za, xy_mag, xyz_mag});
+    <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #8470ff; font-weight: bold;">MRccT5</span>::<span style="color: #63b8ff;">node_idx_t</span> <span style="color: #7fffd4;">p2i</span> = aPoly.add_node({x2, y2, z2, za, xy_mag, xyz_mag});
+    <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #8470ff; font-weight: bold;">MRccT5</span>::<span style="color: #63b8ff;">node_idx_t</span> <span style="color: #7fffd4;">p3i</span> = aPoly.add_node({x3, y3, z3, za, xy_mag, xyz_mag});
+
+    aPoly.add_cell(<span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #8470ff; font-weight: bold;">MRccT5</span>::<span style="color: #8470ff; font-weight: bold;">cell_kind_t</span>::TRIANGLE, {p1i, p2i, p3i});
+  }
+
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"SAMPLE: Total Points: "</span> &lt;&lt; aPoly.node_count() &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"SAMPLE: Total Cells: "</span> &lt;&lt; aPoly.num_cells() &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+
+  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt; <span style="color: #7fffd4;">sample_run_time</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now() - sample_start_time;
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"SAMPLE: Total Runtime "</span> &lt;&lt; sample_run_time.count() &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"SAMPLE: END"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;  
+
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"XML WRITE: START"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">xwrite_start_time</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
+  <span style="color: #63b8ff;">int</span> <span style="color: #7fffd4;">xwrite_result</span> = aPoly.write_xml_vtk(<span style="color: #fa8072;">"holy_wave_surf.vtu"</span>, <span style="color: #fa8072;">"holy_wave_surf"</span>);
+  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt; <span style="color: #7fffd4;">xwrite_run_time</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now() - xwrite_start_time;
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"XML WRITE: Total Runtime "</span> &lt;&lt; xwrite_run_time.count() &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"XML WRITE: END -- "</span> &lt;&lt; (xwrite_result != 0 ? <span style="color: #fa8072;">"BAD"</span> : <span style="color: #fa8072;">"GOOD"</span>) &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+
+  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt; <span style="color: #7fffd4;">program_run_time</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now() - program_start_time;
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"PROGRAM: Total Runtime "</span> &lt;&lt; program_run_time.count() &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"PROGRAM: END"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
+
+  <span style="color: #00ffff;">return</span> 0;
+}
+
 </pre>
 </div>
 </div>

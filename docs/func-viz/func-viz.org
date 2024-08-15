@@ -1697,8 +1697,6 @@ int main() {
 }
 #+end_src
 
-
-
 ** Ear Surface
 :PROPERTIES:
 :CUSTOM_ID: ear_surface
@@ -1798,6 +1796,118 @@ int main() {
 }
 #+end_src
 
+** Holy Wave Surface
+:PROPERTIES:
+:CUSTOM_ID: holy_wave_surf
+:END:
+
+#+begin_src sh :results output raw :exports results 
+./src2org.sh ../../examples/holy_wave_surf.cpp
+#+end_src
+
+#+RESULTS:
+  Just a fun example directly using MR_cell_cplx to drop randomly placed triangles on a surface.
+
+#+BEGIN_CENTER
+High Resolution Still Image (click on it) \\
+[[file:media/holy_wave_surf_100.png][file:media/holy_wave_surf_10.png]] \\
+Movie of the surface (click on it) \\
+[[file:media/holy_wave_surf_rot_100_crf30.html][file:media/holy_wave_surf_rot_10.gif]]
+#+END_CENTER
+
+#+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
+grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/holy_wave_surf.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+#+end_src
+
+#+RESULTS:
+#+begin_src c++ :eval never :tangle no
+
+#include <random>                                                        /* C++ random numbers      C++11    */
+#include <chrono>                                                        /* time                    C++11    */
+
+#include "MR_cell_cplx.hpp"
+
+double f(double x, double y) {
+  double d = x*x+y*y;
+  double z = std::exp(-d/4)*std::cos(4*std::sqrt(d));
+  return z;
+}
+
+int main() {
+  std::cout << "PROGRAM: START" << std::endl;
+  std::chrono::time_point<std::chrono::system_clock> program_start_time = std::chrono::system_clock::now();
+
+  mjr::MRccT5 aPoly;
+
+  aPoly.create_dataset_to_point_mapping({0, 1, 2});
+  aPoly.create_named_datasets({"x", "y", "z", "za", "xyMag", "xyzMag", "dir"});
+
+  const int    num_tri =  20000;
+  const double tri_siz =  0.07;
+  const double x_min   = -2.1;
+  const double x_max   =  2.1;
+  const double y_min   = -2.1;
+  const double y_max   =  2.1;
+
+  std::random_device rd;
+  std::mt19937 rEng(rd());
+  std::uniform_real_distribution<double> x_uniform_dist_float(x_min, x_max);
+  std::uniform_real_distribution<double> y_uniform_dist_float(y_min, y_max);
+  std::uniform_real_distribution<double> siz_uniform_dist_float(-tri_siz, tri_siz);
+
+  std::cout << "SAMPLE: START" << std::endl;  
+  std::chrono::time_point<std::chrono::system_clock> sample_start_time = std::chrono::system_clock::now();
+  for(int i=0; i<num_tri; i++) {
+    double xc = x_uniform_dist_float(rEng);
+    double yc = y_uniform_dist_float(rEng);
+
+    double x1 = xc + siz_uniform_dist_float(rEng);
+    double y1 = yc + siz_uniform_dist_float(rEng);
+    double z1 = f(x1, y1);
+    double x2 = xc + siz_uniform_dist_float(rEng);
+    double y2 = yc + siz_uniform_dist_float(rEng);
+    double z2 = f(x2, y2);
+    double x3 = xc + siz_uniform_dist_float(rEng);
+    double y3 = yc + siz_uniform_dist_float(rEng);
+    double z3 = f(x3, y3);
+
+    double xa = (x1+x2+x3)/3;
+    double ya = (y1+y2+y3)/3;
+    double za = (z1+z2+z3)/3;
+
+    double xy_mag  = std::sqrt(xa*xa+ya*ya);
+    double xyz_mag = std::sqrt(xa*xa+ya*ya+za*za);
+    
+    mjr::MRccT5::node_idx_t p1i = aPoly.add_node({x1, y1, z1, za, xy_mag, xyz_mag});
+    mjr::MRccT5::node_idx_t p2i = aPoly.add_node({x2, y2, z2, za, xy_mag, xyz_mag});
+    mjr::MRccT5::node_idx_t p3i = aPoly.add_node({x3, y3, z3, za, xy_mag, xyz_mag});
+
+    aPoly.add_cell(mjr::MRccT5::cell_kind_t::TRIANGLE, {p1i, p2i, p3i});
+  }
+
+  std::cout << "SAMPLE: Total Points: " << aPoly.node_count() << std::endl;
+  std::cout << "SAMPLE: Total Cells: " << aPoly.num_cells() << std::endl;
+
+  std::chrono::duration<double> sample_run_time = std::chrono::system_clock::now() - sample_start_time;
+  std::cout << "SAMPLE: Total Runtime " << sample_run_time.count() << " sec" << std::endl;
+  std::cout << "SAMPLE: END" << std::endl;  
+
+  std::cout << "XML WRITE: START" << std::endl;
+  std::chrono::time_point<std::chrono::system_clock> xwrite_start_time = std::chrono::system_clock::now();
+  int xwrite_result = aPoly.write_xml_vtk("holy_wave_surf.vtu", "holy_wave_surf");
+  std::chrono::duration<double> xwrite_run_time = std::chrono::system_clock::now() - xwrite_start_time;
+  std::cout << "XML WRITE: Total Runtime " << xwrite_run_time.count() << " sec" << std::endl;
+  std::cout << "XML WRITE: END -- " << (xwrite_result != 0 ? "BAD" : "GOOD") << std::endl;
+
+  std::chrono::duration<double> program_run_time = std::chrono::system_clock::now() - program_start_time;
+  std::cout << "PROGRAM: Total Runtime " << program_run_time.count() << " sec" << std::endl;
+  std::cout << "PROGRAM: END" << std::endl;
+
+  return 0;
+}
+
+#+end_src
+
 * Meta Stuff :noexport:
 
 ** Media
@@ -1822,6 +1932,12 @@ done
 #+end_src
 
 #+RESULTS:
+#+begin_example
+make media/holy_wave_surf_100.png
+make media/holy_wave_surf_50.png
+make media/holy_wave_surf_25.png
+make media/holy_wave_surf_10.png
+#+end_example
 
 *** Image Processing: GIFs
 
@@ -1840,9 +1956,9 @@ done
 
 #+RESULTS:
 #+begin_example
-make media/surface_plot_annular_edge_rot_10.gif
-make media/surface_plot_annular_edge_rot_25.gif
-make media/surface_plot_annular_edge_rot_50.gif
+make media/holy_wave_surf_rot_10.gif
+make media/holy_wave_surf_rot_25.gif
+make media/holy_wave_surf_rot_50.gif
 #+end_example
 
 ** Out Of Date Code
@@ -1888,24 +2004,28 @@ rm media/lorenz_rot_100_crf30.webm
 
 #+RESULTS:
 #+begin_example
+make media/holy_wave_surf_rot_100_crf30.webm
+make media/holy_wave_surf_rot_25_crf30.webm
+make media/holy_wave_surf_rot_50_crf30.webm
 make media/lorenz_rot_100_crf30.webm
-make media/surface_plot_annular_edge_rot_100_crf30.webm
-make media/surface_plot_annular_edge_rot_25_crf30.webm
-make media/surface_plot_annular_edge_rot_50_crf30.webm
 #+end_example
 
 *** Create HTML Wrappers
 
 #+begin_src sh :results output verbatum
-for e in complex_magnitude_surface implicit_surface lorenz trefoil parametric_curve_3d surface_plot_corner ear_surface surface_plot_annular_edge; do
+for e in complex_magnitude_surface implicit_surface lorenz trefoil parametric_curve_3d surface_plot_corner ear_surface surface_plot_annular_edge holy_wave_surf; do
   echo Processing Example $e
   he=$(echo $e | sed 's/_/ /g; s/\b\(.\)/\u\1/g')
   for f in media/$e*_crf30.webm; do
     b=$(echo $f | sed 's/\.webm$//; s/^.*\///')
+    hr=$(basename $f | sed 's/_[0-9][0-9]*_crf30\.webm$/_100_lossless.html/;')
     fn="media/${b}.html"
-    if [ "$f" -nt "$fn" -o 'misc/movie_template.html' -nt "$fn" ]; then
+    if [ 1 == 1 -o "$f" -nt "$fn" -o 'misc/movie_template.html' -nt "$fn" ]; then
+      if [ ! -e "$HOME/Documents/WWW/site/SS/MRPtree/media/$hr" ]; then
+        hr='HRLINK'
+      fi
       echo "  make $fn"
-      sed "s/LINKT/$e/; s/TITLE/$he/; s/MOVIEFILE/$b/;" < 'misc/movie_template.html' > "$fn"
+      sed "s/HRLINK/$hr/; s/LINKT/$e/; s/TITLE/$he/; s/MOVIEFILE/$b/;" < 'misc/movie_template.html' | grep -v 'HRLINK' > "$fn"
     else
       echo "  skip $fn"
     fi
@@ -1916,36 +2036,40 @@ done
 #+RESULTS:
 #+begin_example
 Processing Example complex_magnitude_surface
-  skip media/complex_magnitude_surface_rot_100_crf30.html
-  skip media/complex_magnitude_surface_rot_25_crf30.html
-  skip media/complex_magnitude_surface_rot_50_crf30.html
+  make media/complex_magnitude_surface_rot_100_crf30.html
+  make media/complex_magnitude_surface_rot_25_crf30.html
+  make media/complex_magnitude_surface_rot_50_crf30.html
 Processing Example implicit_surface
-  skip media/implicit_surface_rot_100_crf30.html
-  skip media/implicit_surface_rot_25_crf30.html
-  skip media/implicit_surface_rot_50_crf30.html
+  make media/implicit_surface_rot_100_crf30.html
+  make media/implicit_surface_rot_25_crf30.html
+  make media/implicit_surface_rot_50_crf30.html
 Processing Example lorenz
-  skip media/lorenz_rot_25_crf30.html
-  skip media/lorenz_rot_50_crf30.html
+  make media/lorenz_rot_25_crf30.html
+  make media/lorenz_rot_50_crf30.html
 Processing Example trefoil
-  skip media/trefoil_rot_100_crf30.html
-  skip media/trefoil_rot_25_crf30.html
-  skip media/trefoil_rot_50_crf30.html
+  make media/trefoil_rot_100_crf30.html
+  make media/trefoil_rot_25_crf30.html
+  make media/trefoil_rot_50_crf30.html
 Processing Example parametric_curve_3d
-  skip media/parametric_curve_3d_rot_100_crf30.html
-  skip media/parametric_curve_3d_rot_25_crf30.html
-  skip media/parametric_curve_3d_rot_50_crf30.html
+  make media/parametric_curve_3d_rot_100_crf30.html
+  make media/parametric_curve_3d_rot_25_crf30.html
+  make media/parametric_curve_3d_rot_50_crf30.html
 Processing Example surface_plot_corner
-  skip media/surface_plot_corner_rot_100_crf30.html
-  skip media/surface_plot_corner_rot_25_crf30.html
-  skip media/surface_plot_corner_rot_50_crf30.html
+  make media/surface_plot_corner_rot_100_crf30.html
+  make media/surface_plot_corner_rot_25_crf30.html
+  make media/surface_plot_corner_rot_50_crf30.html
 Processing Example ear_surface
-  skip media/ear_surface_rot_100_crf30.html
-  skip media/ear_surface_rot_25_crf30.html
-  skip media/ear_surface_rot_50_crf30.html
+  make media/ear_surface_rot_100_crf30.html
+  make media/ear_surface_rot_25_crf30.html
+  make media/ear_surface_rot_50_crf30.html
 Processing Example surface_plot_annular_edge
-  skip media/surface_plot_annular_edge_rot_100_crf30.html
-  skip media/surface_plot_annular_edge_rot_25_crf30.html
-  skip media/surface_plot_annular_edge_rot_50_crf30.html
+  make media/surface_plot_annular_edge_rot_100_crf30.html
+  make media/surface_plot_annular_edge_rot_25_crf30.html
+  make media/surface_plot_annular_edge_rot_50_crf30.html
+Processing Example holy_wave_surf
+  make media/holy_wave_surf_rot_100_crf30.html
+  make media/holy_wave_surf_rot_25_crf30.html
+  make media/holy_wave_surf_rot_50_crf30.html
 #+end_example
 
 * xx :noexport:

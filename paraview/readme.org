@@ -187,6 +187,27 @@ magick -delay 1 -loop 0 -dispose previous ../old-media/surface_plot_annular_edge
 ~/world/my_prog/WINutils/say.sh ". Render Finished . "
 #+end_src
 
+* holy_wave_surf_rot
+
+#+begin_src sh
+ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -pix_fmt yuv420p holy_wave_surf_rot_100.mp4;
+ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*4" -pix_fmt yuv420p holy_wave_surf_rot_50.mp4;
+ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*8" -pix_fmt yuv420p holy_wave_surf_rot_25.mp4;
+
+ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2"  -c:v libvpx-vp9 -lossless 1    -c:a libopus holy_wave_surf_rot_100_lossless.webm;
+ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2"  -c:v libvpx-vp9 -crf 30 -b:v 0 -c:a libopus holy_wave_surf_rot_100_crf30.webm;
+ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2"  -c:v libvpx-vp9 -lossless 1    -c:a libopus holy_wave_surf_rot_50_lossless.webm;
+ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2"  -c:v libvpx-vp9 -crf 30 -b:v 0 -c:a libopus holy_wave_surf_rot_50_crf30.webm;
+ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*2"  -c:v libvpx-vp9 -lossless 1    -c:a libopus holy_wave_surf_rot_25_lossless.webm;
+ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*2"  -c:v libvpx-vp9 -crf 30 -b:v 0 -c:a libopus holy_wave_surf_rot_25_crf30.webm;
+
+magick -delay 1 -loop 0 -dispose previous ../old-media/holy_wave_surf_rot.*.png -resize 25% holy_wave_surf_rot_50.gif;
+magick -delay 1 -loop 0 -dispose previous ../old-media/holy_wave_surf_rot.*.png -resize 25% holy_wave_surf_rot_25.gif;
+magick -delay 1 -loop 0 -dispose previous ../old-media/holy_wave_surf_rot.*.png -resize 10% holy_wave_surf_rot_10.gif;
+
+~/world/my_prog/WINutils/say.sh ". Render Finished . "
+#+end_src
+
 
 
 * Tags For Video
