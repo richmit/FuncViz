@@ -2020,7 +2020,7 @@ for e in complex_magnitude_surface implicit_surface lorenz trefoil parametric_cu
     b=$(echo $f | sed 's/\.webm$//; s/^.*\///')
     hr=$(basename $f | sed 's/_[0-9][0-9]*_crf30\.webm$/_100_lossless.html/;')
     fn="media/${b}.html"
-    if [ 1 == 1 -o "$f" -nt "$fn" -o 'misc/movie_template.html' -nt "$fn" ]; then
+    if [ "$f" -nt "$fn" -o 'misc/movie_template.html' -nt "$fn" ]; then
       if [ ! -e "$HOME/Documents/WWW/site/SS/MRPtree/media/$hr" ]; then
         hr='HRLINK'
       fi
