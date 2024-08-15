@@ -169,7 +169,7 @@ magick -delay 1 -loop 0 -dispose previous ../old-media/sq_ear_surface_rot.????.p
 #+begin_src sh
 # for f in surface_plot_annular_edge_rot.*.png { echo $f; magick $f -gravity center -crop 1665x1665+0+0 +repage -rotate -90 ../old-media/$f }
 
-ffmpeg -y -framerate 15 -i ../old-media/surface_plot_annular_edge_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -pix_fmt yuv420p surface_plot_annular_edge_rot_100.mp4;
+ffmpeg -y -framerate 15 -i ../old-media/surface_plot_annular_edge_rot.%4d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -pix_fmt yuv420p surface_plot_annular_edge_rot_100.mp4;
 ffmpeg -y -framerate 15 -i ../old-media/surface_plot_annular_edge_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*4" -pix_fmt yuv420p surface_plot_annular_edge_rot_50.mp4;
 ffmpeg -y -framerate 15 -i ../old-media/surface_plot_annular_edge_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*8" -pix_fmt yuv420p surface_plot_annular_edge_rot_25.mp4;
 
@@ -190,9 +190,13 @@ magick -delay 1 -loop 0 -dispose previous ../old-media/surface_plot_annular_edge
 * holy_wave_surf_rot
 
 #+begin_src sh
-ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -pix_fmt yuv420p holy_wave_surf_rot_100.mp4;
-ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*4" -pix_fmt yuv420p holy_wave_surf_rot_50.mp4;
-ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*8" -pix_fmt yuv420p holy_wave_surf_rot_25.mp4;
+
+ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -c:v libx264 -crf 30 -b:v 0 -pix_fmt yuv420p holy_wave_surf_rot_100_crf30.mp4;
+ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -c:v libx264 -crf  3 -b:v 0 -pix_fmt yuv420p holy_wave_surf_rot_100_crf01.mp4;
+ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -c:v libx264 -crf 30 -b:v 0 -pix_fmt yuv420p holy_wave_surf_rot_50_crf30.mp4;
+ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -c:v libx264 -crf  3 -b:v 0 -pix_fmt yuv420p holy_wave_surf_rot_50_crf01.mp4;
+ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*2" -c:v libx264 -crf 30 -b:v 0 -pix_fmt yuv420p holy_wave_surf_rot_25_crf30.mp4;
+ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*2" -c:v libx264 -crf  3 -b:v 0 -pix_fmt yuv420p holy_wave_surf_rot_25_crf01.mp4;
 
 ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2"  -c:v libvpx-vp9 -lossless 1    -c:a libopus holy_wave_surf_rot_100_lossless.webm;
 ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2"  -c:v libvpx-vp9 -crf 30 -b:v 0 -c:a libopus holy_wave_surf_rot_100_crf30.webm;
