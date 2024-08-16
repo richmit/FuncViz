@@ -18,20 +18,28 @@ mark_as_advanced(PROJECT_VERSION_DATE PROJECT_VERSION_ID)
 
 OPTION(O_DOXYGEN "Include support for doxygen"         ON )
 OPTION(O_BTEST   "Include support for boost.test"      ON )
+OPTION(O_MRASTER "Include support for MRaster"         ON )
 
 ######################################################################################################################################################
-# Find tools & libraries used to build primary/secondary/tertiary targets
+# Find tools & libraries used to build targets
 
 if(O_DOXYGEN)
   find_package(Doxygen)
 endif()
 
 if(O_BTEST)
-find_package(Boost COMPONENTS unit_test_framework)
+  find_package(Boost COMPONENTS unit_test_framework)
+endif()
+
+if(O_MRASTER)
+  find_file (MRASTER_PATH "ramCanvasTpl.hpp" PATHS "mraster"  "../mraster" PATH_SUFFIXES "lib")
+  if(NOT MRASTER_PATH STREQUAL "MRASTER_PATH-NOTFOUND")
+    cmake_path(GET MRASTER_PATH PARENT_PATH MRASTER_PATH)
+    set(MRASTER_FOUND "YES")
+  endif()
 endif()
 
 ######################################################################################################################################################
-
 
 set(TARGETS_EXAMPLE "hello_world" 
                     "surface_with_normals" 
@@ -60,13 +68,23 @@ set(TARGETS_FTEST "flat_test_tree_01"
                   "segment_folder" "triangle_folder"
                   "rect_fix_dup" "rect_fix_nan"
                 )
+set(TARGETS_MRASTER  )
 
 # Construct list of targets we can build
 set(TARGETS_ALL ${TARGETS_EXAMPLE} ${TARGETS_UTEST} ${TARGETS_FTEST})
 
 list(REMOVE_DUPLICATES TARGETS_ALL)
 
+# If we found boost test, then enable it. If not, then remove targets requiring it.
 if(TARGETS_UTEST)
+  if(NOT MRASTER_FOUND)
+    list(REMOVE_ITEM TARGETS_ALL ${TARGETS_MRASTER})
+    message(WARNING "Examples requiring MRaster NOT be built!")
+  endif()
+endif()
+
+# If we found didn't find MRaster, then remove targets requiring it.
+if(TARGETS_MRASTER)
   if(Boost_FOUND)
     enable_testing()
   else()
@@ -111,6 +129,14 @@ foreach(CURTGT IN LISTS TARGETS_ALL)
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/utests/${CURTGT}.cpp")
     target_link_libraries(${CURTGT} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
     add_test(NAME "${CURTGT}" COMMAND "${CURTGT}")
+  endif()
+
+  # targets that require MRaster
+  if(MRASTER_FOUND)
+    list (FIND TARGETS_MRASTER ${CURTGT} TMPR)
+    if(${TMPR} GREATER -1)
+      target_include_directories(${CURTGT} PRIVATE ${MRASTER_PATH})
+    endif()
   endif()
 
 endforeach(CURTGT)
