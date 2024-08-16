@@ -48,12 +48,15 @@ if [[ "${@}" == *'-h'* ]]; then
      * Compiler -- leave it off to get the default
        - -DCMAKE_CXX_COMPILER=clang++
        - -DCMAKE_CXX_COMPILER=g++      <-- Default for 'MSYS Makefiles'
-       - -DCMAKE_CXX_COMPILER=g++-14   <-- Default for 'Unix Makefiles' if /usr/bin/g++-14 exists
-       - -DCMAKE_CXX_COMPILER=g++      <-- Default for 'Unix Makefiles' if /usr/bin/g++-14 missing
+       - -DCMAKE_CXX_COMPILER=g++-##   <-- Default for 'Unix Makefiles' if /usr/bin/g++-[0-9][0-9] exists
+                                           in which case the highest numbered version is selcted.
+                                           This code base needs at least GCC-14.
+       - -DCMAKE_CXX_COMPILER=g++      <-- Default for 'Unix Makefiles' if /usr/bin/g++-[0-9][0-9] missing
        -                               <-- Default for 'Visual Studio 17 2022'
      * Optional features -- leave them off to enable everything
-       - -DO_DOXYGEN=[YES|NO]  -- For documentation
-       - -DO_BTEST=[YES|NO]    -- Used for BOOT unit tests
+       - -DO_DOXYGEN=[YES|NO]  -- Doxygen (to build documentation)
+       - -DO_BTEST=[YES|NO]    -- BOOT unit tests (to run unit tests)
+       - -DO_MRASTER=[YES|NO]  -- MRaster (used for some examples)
 EOF
 exit
 fi
@@ -92,7 +95,8 @@ if [ -e ../CMakeLists.txt ]; then
         CMAKE_CARG='-DCMAKE_CXX_COMPILER=g++.exe'
       fi
       if [ "$CMAKE_TARGET" == 'Unix Makefiles' ]; then
-        if [ -x '/usr/bin/g++-14' ]; then
+        HIGCC=$(ls /usr/bin/gcc-[0-9][0-9] 2>/dev/null | sort | tail -n 1)
+        if [ -x "$HIGCC" ]; then
           CMAKE_CARG='-DCMAKE_CXX_COMPILER=g++-14'
         else
           CMAKE_CARG='-DCMAKE_CXX_COMPILER=g++'
