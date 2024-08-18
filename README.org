@@ -47,6 +47,7 @@ You can read more about the way the data structure works here: [[https://richmit
 
 * Change Log
 
+ - 2024-08-16: MRaster integration & an example using it
  - 2024-08-14: I have bumped the status from pre-alpha to alpha!
  - 2024-08-13: Refactored cplx.  I feel good about the API now.
  - 2024-08-12: Functional test framework prototype working..
