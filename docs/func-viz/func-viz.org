@@ -1759,7 +1759,7 @@ int main() {
 }
 #+end_src
 
-** Ear Surface
+** Ear Surface (Implicit)
 :PROPERTIES:
 :CUSTOM_ID: ear_surface
 :END:
@@ -1783,6 +1783,7 @@ int main() {
 
 
 #+BEGIN_CENTER
+[[file:media/ear_surface_100.png][file:media/ear_surface_10.png]] 
 [[file:media/ear_surface_rot_100_crf30.html][file:media/ear_surface_rot_10.gif]]
 #+END_CENTER
 
@@ -1861,6 +1862,101 @@ int main() {
 
   /* Write out our cell complex */
   ccplx.write_xml_vtk("ear_surface.vtu", "ear_surface");
+}
+#+end_src
+
+** Ear Surface (Solve & Glue)
+:PROPERTIES:
+:CUSTOM_ID: ear_surface_glue
+:END:
+
+#+begin_src sh :results output raw :exports results 
+./src2org.sh ../../examples/ear_surface_glue.cpp
+#+end_src
+
+#+RESULTS:
+
+  This example illustrates the same object as [[#ear_surface][ear_surface.cpp]], but uses a different strategy to generate the triangulation.  For reference, the surface we
+  are interested in is defined by the zeros of the following polynomial:
+
+  \[ x^2-y^2*z^2+z^3 \]
+
+  In [[#ear_surface][ear_surface.cpp]] we used a mesh of cubes covering a 3D region, and extracted the triangulation as a contour surface.  In this example, we solve this equation
+  for \(x\) giving us two surfaces:
+
+  \[ +z\cdot\sqrt{y^2-z} \]
+  \[ -z\cdot\sqrt{y^2-z} \]
+
+  As in the example [[#surface_plot_edge][surface_plot_edge.cpp]], we use the NaN solver to flesh the surface out so that it hits the X plane.  And as in [[#surface_branch_glue][surface_branch_glue.cpp]], we
+  then glue the two surfaces together.
+
+#+BEGIN_CENTER
+[[file:media/ear_surface_glue_100.png][file:media/ear_surface_glue_10.png]]
+[[file:media/ear_surface_glue_rot_100_crf30.html][file:media/ear_surface_glue_rot_10.gif]]
+#+END_CENTER
+
+Paraview State File: https://github.com/richmit/MRPTree/blob/main/paraview/ear_surface_glue.pvsm
+
+XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/ear_surface_glue.vtu
+
+Source code: https://github.com/richmit/MRPTree/blob/main/examples/ear_surface_glue.cpp
+
+#+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
+grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/ear_surface_glue.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+#+end_src
+
+#+RESULTS:
+#+begin_src c++ :eval never :tangle no
+
+#include "MR_rect_tree.hpp"
+#include "MR_cell_cplx.hpp"
+#include "MR_rt_to_cc.hpp"
+
+typedef mjr::tree15b2d1rT            tt_t;
+typedef mjr::MRccT5                  cc_t;
+typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
+
+tt_t::rrpt_t ear_yz(tt_t::drpt_t xvec) {
+  tt_t::src_t y = xvec[0];
+  tt_t::src_t z = xvec[1];
+  tt_t::src_t m = y*y-z;
+  if (m < 0) {
+    return std::numeric_limits<double>::quiet_NaN();
+  } else {
+    return std::sqrt(m)*z;
+  }
+}
+
+int main() {
+  tt_t tree;
+  cc_t ccplx;
+
+  // Sample a uniform grid across the domain
+  tree.refine_grid(7, ear_yz);
+
+  /* Refine near the edge */
+  tree.refine_recursive_if_cell_vertex_is_nan(8, ear_yz);
+
+  tree.dump_tree(10);
+
+  /* By passing half_sphere() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired. */
+  tc_t::construct_geometry_fans(ccplx,
+                                tree,
+                                2,
+                                {{tc_t::val_src_spc_t::FRANGE,  0},
+                                 {tc_t::val_src_spc_t::FDOMAIN, 0}, 
+                                 {tc_t::val_src_spc_t::FDOMAIN, 1}},
+                                ear_yz
+                               );
+
+  ccplx.create_named_datasets({"y", "z", "x=f(x,z)"});
+
+  /* This is the magic.  We add new cells with the third element of each point data vector negated. */
+  ccplx.mirror({0, 0, 1}, 1.0e-5);
+
+  ccplx.dump_cplx(10);
+
+  ccplx.write_xml_vtk("ear_surface_glue.vtu", "ear_surface_glue");
 }
 #+end_src
 
@@ -1997,8 +2093,8 @@ for d in ../../paraview/ ../../misc/; do
       if [ "$f" -nt "$fn" ]; then
         echo make "$fn"
         magick "$f" -resize $s% "$fn"
-        # else
-        #   echo skip "$fn"
+      # else
+      #   echo skip "$fn"
       fi
     done
   done
@@ -2006,16 +2102,6 @@ done
 #+end_src
 
 #+RESULTS:
-#+begin_example
-make media/hello_MRaster_100.png
-make media/hello_MRaster_50.png
-make media/hello_MRaster_25.png
-make media/hello_MRaster_10.png
-make media/hello_world_100.png
-make media/hello_world_50.png
-make media/hello_world_25.png
-make media/hello_world_10.png
-#+end_example
 
 *** Image Processing: GIFs
 
@@ -2034,58 +2120,39 @@ done
 
 #+RESULTS:
 #+begin_example
-make media/holy_wave_surf_rot_10.gif
-make media/holy_wave_surf_rot_25.gif
-make media/holy_wave_surf_rot_50.gif
+make media/ear_surface_glue_rot_10.gif
+make media/ear_surface_glue_rot_25.gif
+make media/ear_surface_glue_rot_50.gif
 #+end_example
 
-** Out Of Date Code
-
-#+begin_src sh :results output verbatum
-for f in ../../examples/*.cpp; do
-  if [ $f -nt func-viz.org ]; then
-    echo NEWER: $f
-  fi
-done
-#+end_src
-
-#+RESULTS:
-#+begin_example
-NEWER: ../../examples/complex_magnitude_surface.cpp
-NEWER: ../../examples/curve_plot.cpp
-NEWER: ../../examples/hello_world.cpp
-NEWER: ../../examples/implicit_curve_2d.cpp
-NEWER: ../../examples/implicit_surface.cpp
-NEWER: ../../examples/parametric_surface_with_defects.cpp
-NEWER: ../../examples/performance_with_large_surface.cpp
-NEWER: ../../examples/surface_plot_edge.cpp
-NEWER: ../../examples/surface_with_normals.cpp
-NEWER: ../../examples/vector_field_3d.cpp
-#+end_example
 ** Image Processing: WEBMs
 
 *** Put media in place
 
 #+begin_src sh  :results output verbatum :exports both
+bad_list='media/lorenz_rot_100_crf30.webm'
 for f in ../../paraview/*_crf30.webm; do
   b=$(echo $f | sed 's/^.*\///')
-  fn="media/${b}"
-  if [ $f -nt $fn ]; then
-    echo make $fn
-    cp $f $fn
-  # else
-  #   echo skip $fn
+  if echo $bad_list | grep $b >/dev/null; then
+    echo "bad  $f"
+  else
+    fn="media/${b}"
+    if [ $f -nt $fn ]; then
+      echo "make $fn"
+      cp $f $fn
+    # else
+    #   echo "skip $fn"
+    fi
   fi
 done
-rm media/lorenz_rot_100_crf30.webm
 #+end_src
 
 #+RESULTS:
 #+begin_example
-make media/holy_wave_surf_rot_100_crf30.webm
-make media/holy_wave_surf_rot_25_crf30.webm
-make media/holy_wave_surf_rot_50_crf30.webm
-make media/lorenz_rot_100_crf30.webm
+make media/ear_surface_glue_rot_100_crf30.webm
+make media/ear_surface_glue_rot_25_crf30.webm
+make media/ear_surface_glue_rot_50_crf30.webm
+bad  ../../paraview/lorenz_rot_100_crf30.webm
 #+end_example
 
 *** Create HTML Wrappers
@@ -2137,6 +2204,9 @@ Processing Example surface_plot_corner
   skip media/surface_plot_corner_rot_25_crf30.html
   skip media/surface_plot_corner_rot_50_crf30.html
 Processing Example ear_surface
+  make media/ear_surface_glue_rot_100_crf30.html
+  make media/ear_surface_glue_rot_25_crf30.html
+  make media/ear_surface_glue_rot_50_crf30.html
   skip media/ear_surface_rot_100_crf30.html
   skip media/ear_surface_rot_25_crf30.html
   skip media/ear_surface_rot_50_crf30.html

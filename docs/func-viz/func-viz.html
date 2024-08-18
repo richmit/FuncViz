@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-08-18 Sun 00:12 -->
+<!-- 2024-08-18 Sun 14:38 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Function Visualization</title>
@@ -272,12 +272,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-08-18 00:12:10</i></td>
+<td class="org-left"><i>2024-08-18 14:38:10</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-08-18 00:12:45</i></td>
+<td class="org-left"><i>2024-08-18 14:38:11</i></td>
 </tr>
 </tbody>
 </table>
@@ -311,8 +311,9 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <ul>
 <li><a href="#trefoil">3.1. Trefoil Parametric Surface</a></li>
 <li><a href="#parametric_curve_3d">3.2. Twisted Cubic As A Surface Intersection</a></li>
-<li><a href="#ear_surface">3.3. Ear Surface</a></li>
-<li><a href="#holy_wave_surf">3.4. Holy Wave Surface</a></li>
+<li><a href="#ear_surface">3.3. Ear Surface (Implicit)</a></li>
+<li><a href="#ear_surface_glue">3.4. Ear Surface (Solve &amp; Glue)</a></li>
+<li><a href="#holy_wave_surf">3.5. Holy Wave Surface</a></li>
 </ul>
 </li>
 </ul>
@@ -1445,7 +1446,7 @@ any holes.  This is really the only change from <a href="#surface_plot_edge">sur
 
 <div class="org-center">
 
-<div id="org2692e31" class="figure">
+<div id="org6632db7" class="figure">
 <p><a href="media/surface_branch_glue_100.png"><img src="media/surface_branch_glue_10.png" alt="surface_branch_glue_10.png" /></a>
 </p>
 </div>
@@ -1545,7 +1546,7 @@ Note that most of the items above are listed TBD.  A few features need to be add
 
 <div class="org-center">
 
-<div id="org92e9392" class="figure">
+<div id="orge2b50aa" class="figure">
 <p><a href="media/sq_curve_plot_heal_100.png"><img src="media/sq_curve_plot_heal_10.png" alt="sq_curve_plot_heal_10.png" /></a>
 </p>
 </div>
@@ -1880,7 +1881,7 @@ This example doesn't really demonstrate anything not found in the other examples
 
 <div class="org-center">
 
-<div id="org52aaa41" class="figure">
+<div id="org71127e2" class="figure">
 <p><a href="media/trefoil_rot_50_crf30.html"><img src="media/trefoil_rot_10.gif" alt="trefoil_rot_10.gif" /></a>
 </p>
 </div>
@@ -1977,7 +1978,7 @@ Alternately the curve is also the intersection of two surfaces in \(\mathbb{R}^3
 The "typical" way to graph a surface like \(f_2\) is to transform it into pseudo-parametric form.  In Maple that might look like this
 </p>
 
-<pre class="example" id="org45ab3b0">
+<pre class="example" id="org9be68c7">
 plot3d([u, u^2, v], u=-1..1, v=-1..1):
 </pre>
 
@@ -1993,7 +1994,7 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
 
 <div class="org-center">
 
-<div id="orgf4f7ee5" class="figure">
+<div id="org5e8d676" class="figure">
 <p><a href="media/parametric_curve_3d_rot_100_crf30.html"><img src="media/parametric_curve_3d_rot_10.gif" alt="parametric_curve_3d_rot_10.gif" /></a>
 </p>
 </div>
@@ -2110,7 +2111,7 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/para
 </div>
 
 <div id="outline-container-ear_surface" class="outline-3">
-<h3 id="ear_surface"><span class="section-number-3">3.3.</span> Ear Surface</h3>
+<h3 id="ear_surface"><span class="section-number-3">3.3.</span> Ear Surface (Implicit)</h3>
 <div class="outline-text-3" id="text-ear_surface">
 <p>
 This example is very similar to <a href="#implicit_surface">implicit_surface.cpp</a>; however, instead of extracting a surface from a quad tessellation of a hexahedrona we extract the
@@ -2133,11 +2134,10 @@ This surface is defined by the zeros of the following polynomial
 
 
 <div class="org-center">
-
-<div id="org858124c" class="figure">
-<p><a href="media/ear_surface_rot_100_crf30.html"><img src="media/ear_surface_rot_10.gif" alt="ear_surface_rot_10.gif" /></a>
+<p>
+<a href="media/ear_surface_100.png"><img src="media/ear_surface_10.png" alt="ear_surface_10.png" /></a> 
+<a href="media/ear_surface_rot_100_crf30.html"><img src="media/ear_surface_rot_10.gif" alt="ear_surface_rot_10.gif" /></a>
 </p>
-</div>
 </div>
 
 <p>
@@ -2222,8 +2222,111 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/ear_
 </div>
 </div>
 
+<div id="outline-container-ear_surface_glue" class="outline-3">
+<h3 id="ear_surface_glue"><span class="section-number-3">3.4.</span> Ear Surface (Solve &amp; Glue)</h3>
+<div class="outline-text-3" id="text-ear_surface_glue">
+<p>
+This example illustrates the same object as <a href="#ear_surface">ear_surface.cpp</a>, but uses a different strategy to generate the triangulation.  For reference, the surface we
+are interested in is defined by the zeros of the following polynomial:
+</p>
+
+<p>
+\[ x^2-y^2*z^2+z^3 \]
+</p>
+
+<p>
+In <a href="#ear_surface">ear_surface.cpp</a> we used a mesh of cubes covering a 3D region, and extracted the triangulation as a contour surface.  In this example, we solve this equation
+for \(x\) giving us two surfaces:
+</p>
+
+<p>
+\[ +z\cdot\sqrt{y^2-z} \]
+\[ -z\cdot\sqrt{y^2-z} \]
+</p>
+
+<p>
+As in the example <a href="#surface_plot_edge">surface_plot_edge.cpp</a>, we use the NaN solver to flesh the surface out so that it hits the X plane.  And as in <a href="#surface_branch_glue">surface_branch_glue.cpp</a>, we
+then glue the two surfaces together.
+</p>
+
+<div class="org-center">
+<p>
+<a href="media/ear_surface_glue_100.png"><img src="media/ear_surface_glue_10.png" alt="ear_surface_glue_10.png" /></a>
+<a href="media/ear_surface_glue_rot_100_crf30.html"><img src="media/ear_surface_glue_rot_10.gif" alt="ear_surface_glue_rot_10.gif" /></a>
+</p>
+</div>
+
+<p>
+Paraview State File: <a href="https://github.com/richmit/MRPTree/blob/main/paraview/ear_surface_glue.pvsm">https://github.com/richmit/MRPTree/blob/main/paraview/ear_surface_glue.pvsm</a>
+</p>
+
+<p>
+XML VTK Data File: <a href="https://github.com/richmit/MRPTree/blob/main/paraview/ear_surface_glue.vtu">https://github.com/richmit/MRPTree/blob/main/paraview/ear_surface_glue.vtu</a>
+</p>
+
+<p>
+Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/ear_surface_glue.cpp">https://github.com/richmit/MRPTree/blob/main/examples/ear_surface_glue.cpp</a>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c++">
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
+
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b2d1rT</span>            <span style="color: #63b8ff;">tt_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
+
+<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">ear_yz</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
+  <span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">y</span> = xvec[0];
+  <span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">z</span> = xvec[1];
+  <span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">m</span> = y*y-z;
+  <span style="color: #00ffff;">if</span> (m &lt; 0) {
+    <span style="color: #00ffff;">return</span> <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numeric_limits</span>&lt;<span style="color: #63b8ff;">double</span>&gt;::quiet_NaN();
+  } <span style="color: #00ffff;">else</span> {
+    <span style="color: #00ffff;">return</span> <span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(m)*z;
+  }
+}
+
+<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
+  <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">tree</span>;
+  <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">ccplx</span>;
+
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Sample a uniform grid across the domain</span>
+  tree.refine_grid(7, ear_yz);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Refine near the edge</span><span style="color: #ffa500;"> */</span>
+  tree.refine_recursive_if_cell_vertex_is_nan(8, ear_yz);
+
+  tree.dump_tree(10);
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">By passing half_sphere() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired.</span><span style="color: #ffa500;"> */</span>
+  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::construct_geometry_fans(ccplx,
+                                tree,
+                                2,
+                                {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FRANGE,  0},
+                                 {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FDOMAIN, 0}, 
+                                 {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FDOMAIN, 1}},
+                                ear_yz
+                               );
+
+  ccplx.create_named_datasets({<span style="color: #fa8072;">"y"</span>, <span style="color: #fa8072;">"z"</span>, <span style="color: #fa8072;">"x=f(x,z)"</span>});
+
+  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">This is the magic.  We add new cells with the third element of each point data vector negated.</span><span style="color: #ffa500;"> */</span>
+  ccplx.mirror({0, 0, 1}, 1.0e-5);
+
+  ccplx.dump_cplx(10);
+
+  ccplx.write_xml_vtk(<span style="color: #fa8072;">"ear_surface_glue.vtu"</span>, <span style="color: #fa8072;">"ear_surface_glue"</span>);
+}
+</pre>
+</div>
+</div>
+</div>
+
 <div id="outline-container-holy_wave_surf" class="outline-3">
-<h3 id="holy_wave_surf"><span class="section-number-3">3.4.</span> Holy Wave Surface</h3>
+<h3 id="holy_wave_surf"><span class="section-number-3">3.5.</span> Holy Wave Surface</h3>
 <div class="outline-text-3" id="text-holy_wave_surf">
 <p>
 Just a fun example directly using MR_cell_cplx to drop randomly placed triangles on a surface.

@@ -49,7 +49,7 @@ set(TARGETS "hello_world"
             "curve_plot"
             "complex_magnitude_surface"
             ### Extra examples
-            "ear_surface"
+            "ear_surface" "ear_surface_glue"
             "trefoil" 
             ### MR_cell_cplx examples (don't use MR_rect_tree or MR_rt_to_cc)
             "holy_wave_surf"

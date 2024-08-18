@@ -143,24 +143,53 @@ magick -delay 1 -loop 0 -dispose previous ../old-media/sq_surface_plot_corner_ro
 * ear_surface
 
 #+begin_src eshell
-for f in ear_surface_rot.????.png { magick $f -gravity center -crop 1665x1665+0+0 +repage sq_$f }; ls -l sq_ear_surface_rot*.png
+for f in ear_surface_rot.????.png { echo $f; magick $f -gravity center -crop 1665x1665+0+0 +repage ../old-media/$f };
 
-mv ear_surface_rot.????.png sq_ear_surface_rot*.png ../old-media/
+ffmpeg -y -framerate 15 -i ../old-media/ear_surface_rot.%4d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -c:v libx264 -crf 30 -b:v 0 -pix_fmt yuv420p ear_surface_rot_100_crf30.mp4;
+ffmpeg -y -framerate 15 -i ../old-media/ear_surface_rot.%4d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -c:v libx264 -crf  3 -b:v 0 -pix_fmt yuv420p ear_surface_rot_100_crf01.mp4;
+ffmpeg -y -framerate 15 -i ../old-media/ear_surface_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -c:v libx264 -crf 30 -b:v 0 -pix_fmt yuv420p ear_surface_rot_50_crf30.mp4;
+ffmpeg -y -framerate 15 -i ../old-media/ear_surface_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -c:v libx264 -crf  3 -b:v 0 -pix_fmt yuv420p ear_surface_rot_50_crf01.mp4;
+ffmpeg -y -framerate 15 -i ../old-media/ear_surface_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*2" -c:v libx264 -crf 30 -b:v 0 -pix_fmt yuv420p ear_surface_rot_25_crf30.mp4;
+ffmpeg -y -framerate 15 -i ../old-media/ear_surface_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*2" -c:v libx264 -crf  3 -b:v 0 -pix_fmt yuv420p ear_surface_rot_25_crf01.mp4;
 
-ffmpeg -y -framerate 15 -i ../old-media/sq_ear_surface_rot.%4d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2"  -c:v libx264 -crf 30 -b:v 0 -pix_fmt yuv420p ear_surface__rot_100_crf30.mp4;
-ffmpeg -y -framerate 15 -i ../old-media/sq_ear_surface_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2"  -c:v libx264 -crf 30 -b:v 0 -pix_fmt yuv420p ear_surface__rot_50_crf30.mp4;
-ffmpeg -y -framerate 15 -i ../old-media/sq_ear_surface_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*2"  -c:v libx264 -crf 30 -b:v 0 -pix_fmt yuv420p ear_surface__rot_25_crf30.mp4;
+ffmpeg -y -framerate 10 -i ../old-media/ear_surface_rot.%4d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2"  -c:v libvpx-vp9 -lossless 1    -c:a libopus ear_surface_rot_100_lossless.webm;
+ffmpeg -y -framerate 10 -i ../old-media/ear_surface_rot.%4d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2"  -c:v libvpx-vp9 -crf 30 -b:v 0 -c:a libopus ear_surface_rot_100_crf30.webm;
+ffmpeg -y -framerate 10 -i ../old-media/ear_surface_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2"  -c:v libvpx-vp9 -lossless 1    -c:a libopus ear_surface_rot_50_lossless.webm;
+ffmpeg -y -framerate 10 -i ../old-media/ear_surface_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2"  -c:v libvpx-vp9 -crf 30 -b:v 0 -c:a libopus ear_surface_rot_50_crf30.webm;
+ffmpeg -y -framerate 10 -i ../old-media/ear_surface_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*2"  -c:v libvpx-vp9 -lossless 1    -c:a libopus ear_surface_rot_25_lossless.webm;
+ffmpeg -y -framerate 10 -i ../old-media/ear_surface_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*2"  -c:v libvpx-vp9 -crf 30 -b:v 0 -c:a libopus ear_surface_rot_25_crf30.webm;
 
-ffmpeg -y -framerate 10 -i ../old-media/sq_ear_surface_rot.%4d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2"  -c:v libvpx-vp9 -lossless 1    -c:a libopus ear_surface_rot_100_lossless.webm;
-ffmpeg -y -framerate 10 -i ../old-media/sq_ear_surface_rot.%4d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2"  -c:v libvpx-vp9 -crf 30 -b:v 0 -c:a libopus ear_surface_rot_100_crf30.webm;
-ffmpeg -y -framerate 10 -i ../old-media/sq_ear_surface_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2"  -c:v libvpx-vp9 -lossless 1    -c:a libopus ear_surface_rot_50_lossless.webm;
-ffmpeg -y -framerate 10 -i ../old-media/sq_ear_surface_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2"  -c:v libvpx-vp9 -crf 30 -b:v 0 -c:a libopus ear_surface_rot_50_crf30.webm;
-ffmpeg -y -framerate 10 -i ../old-media/sq_ear_surface_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*2"  -c:v libvpx-vp9 -lossless 1    -c:a libopus ear_surface_rot_25_lossless.webm;
-ffmpeg -y -framerate 10 -i ../old-media/sq_ear_surface_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*2"  -c:v libvpx-vp9 -crf 30 -b:v 0 -c:a libopus ear_surface_rot_25_crf30.webm;
+magick -delay 1 -loop 0 -dispose previous ../old-media/ear_surface_rot.????.png -resize 50% ear_surface_rot_50.gif;
+magick -delay 1 -loop 0 -dispose previous ../old-media/ear_surface_rot.????.png -resize 25% ear_surface_rot_25.gif;
+magick -delay 1 -loop 0 -dispose previous ../old-media/ear_surface_rot.????.png -resize 10% ear_surface_rot_10.gif;
 
-magick -delay 1 -loop 0 -dispose previous ../old-media/sq_ear_surface_rot.????.png -resize 50% ear_surface_rot_50.gif;
-magick -delay 1 -loop 0 -dispose previous ../old-media/sq_ear_surface_rot.????.png -resize 25% ear_surface_rot_25.gif;
-magick -delay 1 -loop 0 -dispose previous ../old-media/sq_ear_surface_rot.????.png -resize 10% ear_surface_rot_10.gif;
+~/world/my_prog/WINutils/say.sh ". Render Finished . "
+#+end_src
+
+* ear_surface_glue
+
+#+begin_src eshell
+for f in ear_surface_glue_rot.????.png { echo $f; magick $f -gravity center -crop 1665x1665+0+0 +repage ../old-media/$f };
+
+ffmpeg -y -framerate 15 -i ../old-media/ear_surface_glue_rot.%4d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -c:v libx264 -crf 30 -b:v 0 -pix_fmt yuv420p ear_surface_glue_rot_100_crf30.mp4;
+ffmpeg -y -framerate 15 -i ../old-media/ear_surface_glue_rot.%4d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -c:v libx264 -crf  3 -b:v 0 -pix_fmt yuv420p ear_surface_glue_rot_100_crf01.mp4;
+ffmpeg -y -framerate 15 -i ../old-media/ear_surface_glue_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -c:v libx264 -crf 30 -b:v 0 -pix_fmt yuv420p ear_surface_glue_rot_50_crf30.mp4;
+ffmpeg -y -framerate 15 -i ../old-media/ear_surface_glue_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -c:v libx264 -crf  3 -b:v 0 -pix_fmt yuv420p ear_surface_glue_rot_50_crf01.mp4;
+ffmpeg -y -framerate 15 -i ../old-media/ear_surface_glue_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*2" -c:v libx264 -crf 30 -b:v 0 -pix_fmt yuv420p ear_surface_glue_rot_25_crf30.mp4;
+ffmpeg -y -framerate 15 -i ../old-media/ear_surface_glue_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*2" -c:v libx264 -crf  3 -b:v 0 -pix_fmt yuv420p ear_surface_glue_rot_25_crf01.mp4;
+
+ffmpeg -y -framerate 10 -i ../old-media/ear_surface_glue_rot.%4d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2"  -c:v libvpx-vp9 -lossless 1    -c:a libopus ear_surface_glue_rot_100_lossless.webm;
+ffmpeg -y -framerate 10 -i ../old-media/ear_surface_glue_rot.%4d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2"  -c:v libvpx-vp9 -crf 30 -b:v 0 -c:a libopus ear_surface_glue_rot_100_crf30.webm;
+ffmpeg -y -framerate 10 -i ../old-media/ear_surface_glue_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2"  -c:v libvpx-vp9 -lossless 1    -c:a libopus ear_surface_glue_rot_50_lossless.webm;
+ffmpeg -y -framerate 10 -i ../old-media/ear_surface_glue_rot.%4d.png -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2"  -c:v libvpx-vp9 -crf 30 -b:v 0 -c:a libopus ear_surface_glue_rot_50_crf30.webm;
+ffmpeg -y -framerate 10 -i ../old-media/ear_surface_glue_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*2"  -c:v libvpx-vp9 -lossless 1    -c:a libopus ear_surface_glue_rot_25_lossless.webm;
+ffmpeg -y -framerate 10 -i ../old-media/ear_surface_glue_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*2"  -c:v libvpx-vp9 -crf 30 -b:v 0 -c:a libopus ear_surface_glue_rot_25_crf30.webm;
+
+magick -delay 1 -loop 0 -dispose previous ../old-media/ear_surface_glue_rot.????.png -resize 50% ear_surface_glue_rot_50.gif;
+magick -delay 1 -loop 0 -dispose previous ../old-media/ear_surface_glue_rot.????.png -resize 25% ear_surface_glue_rot_25.gif;
+magick -delay 1 -loop 0 -dispose previous ../old-media/ear_surface_glue_rot.????.png -resize 10% ear_surface_glue_rot_10.gif;
+
+~/world/my_prog/WINutils/say.sh ". Render Finished . "
 #+end_src
 
 
@@ -180,7 +209,7 @@ ffmpeg -y -framerate 15 -i ../old-media/surface_plot_annular_edge_rot.%4d.png -v
 ffmpeg -y -framerate 15 -i ../old-media/surface_plot_annular_edge_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*2"  -c:v libvpx-vp9 -lossless 1    -c:a libopus surface_plot_annular_edge_rot_25_lossless.webm;
 ffmpeg -y -framerate 15 -i ../old-media/surface_plot_annular_edge_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*2"  -c:v libvpx-vp9 -crf 30 -b:v 0 -c:a libopus surface_plot_annular_edge_rot_25_crf30.webm;
 
-magick -delay 1 -loop 0 -dispose previous ../old-media/surface_plot_annular_edge_rot.*.png -resize 25% surface_plot_annular_edge_rot_50.gif;
+magick -delay 1 -loop 0 -dispose previous ../old-media/surface_plot_annular_edge_rot.*.png -resize 50% surface_plot_annular_edge_rot_50.gif;
 magick -delay 1 -loop 0 -dispose previous ../old-media/surface_plot_annular_edge_rot.*.png -resize 25% surface_plot_annular_edge_rot_25.gif;
 magick -delay 1 -loop 0 -dispose previous ../old-media/surface_plot_annular_edge_rot.*.png -resize 10% surface_plot_annular_edge_rot_10.gif;
 
@@ -205,7 +234,7 @@ ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=tr
 ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*2"  -c:v libvpx-vp9 -lossless 1    -c:a libopus holy_wave_surf_rot_25_lossless.webm;
 ffmpeg -y -framerate 15 -i ../old-media/holy_wave_surf_rot.%4d.png -vf "scale=trunc(iw/8)*2:trunc(ih/8)*2"  -c:v libvpx-vp9 -crf 30 -b:v 0 -c:a libopus holy_wave_surf_rot_25_crf30.webm;
 
-magick -delay 1 -loop 0 -dispose previous ../old-media/holy_wave_surf_rot.*.png -resize 25% holy_wave_surf_rot_50.gif;
+magick -delay 1 -loop 0 -dispose previous ../old-media/holy_wave_surf_rot.*.png -resize 50% holy_wave_surf_rot_50.gif;
 magick -delay 1 -loop 0 -dispose previous ../old-media/holy_wave_surf_rot.*.png -resize 25% holy_wave_surf_rot_25.gif;
 magick -delay 1 -loop 0 -dispose previous ../old-media/holy_wave_surf_rot.*.png -resize 10% holy_wave_surf_rot_10.gif;
 
