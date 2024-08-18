@@ -1933,10 +1933,14 @@ done
 
 #+RESULTS:
 #+begin_example
-make media/holy_wave_surf_100.png
-make media/holy_wave_surf_50.png
-make media/holy_wave_surf_25.png
-make media/holy_wave_surf_10.png
+make media/hello_MRaster_100.png
+make media/hello_MRaster_50.png
+make media/hello_MRaster_25.png
+make media/hello_MRaster_10.png
+make media/hello_world_100.png
+make media/hello_world_50.png
+make media/hello_world_25.png
+make media/hello_world_10.png
 #+end_example
 
 *** Image Processing: GIFs
