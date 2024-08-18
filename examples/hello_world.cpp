@@ -7,8 +7,8 @@
  @brief     Minimal example for MR_rect_tree/MR_cell_cplx/MR_rt_to_cc.@EOL
  @keywords  surface plot 2d 3d
  @std       C++23
- @see       
- @copyright 
+ @see
+ @copyright
   @parblock
   Copyright (c) 2024, Mitchell Jay Richling <http://www.mitchr.me/> All rights reserved.
 
@@ -39,8 +39,8 @@
 #include "MR_rt_to_cc.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef mjr::tree15b2d1rT          tt_t;
-typedef mjr::MRccT5                cc_t;
+typedef mjr::tree15b2d1rT            tt_t;
+typedef mjr::MRccT5                  cc_t;
 typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,24 +54,20 @@ tt_t::rrpt_t damp_cos_wave(tt_t::drpt_t xvec) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int main() {
-  tt_t tree({-2.1, -2.1}, 
+  tt_t tree({-2.1, -2.1},
             { 2.1,  2.1});
   cc_t ccplx;
 
-std::cout << cc_t::epsilon << std::endl;
-std::cout << cc_t::uft_epsilon << std::endl;
+  tree.refine_grid(7, damp_cos_wave);
+  tree.dump_tree(5);
 
-
-  tree.refine_grid(7, damp_cos_wave);   // Sample on a uniform grid
-  tree.dump_tree(5);                   // Dump some of the tree
-
-  // Convert the tree to poly data
   tc_t::construct_geometry_fans(ccplx,
                                 tree,
                                 2,
-                                {{tc_t::val_src_spc_t::FDOMAIN, 0}, 
+                                {{tc_t::val_src_spc_t::FDOMAIN, 0},
                                  {tc_t::val_src_spc_t::FDOMAIN, 1},
                                  {tc_t::val_src_spc_t::FRANGE,  0}});
+  ccplx.create_named_datasets({"x", "y", "f(x,y)"});
 
   ccplx.write_xml_vtk("hello_world.vtu", "hello_world");
 }
