@@ -110,6 +110,10 @@ This group of core examples is intended to illistrate various features of MRPTre
 [[file:media/complex_magnitude_surface_rot_100_crf30.html][file:media/complex_magnitude_surface_rot_10.gif]]
 #+END_CENTER
 
+Paraview State File: https://github.com/richmit/MRPTree/blob/main/paraview/complex_magnitude_surface.pvsm
+
+XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/complex_magnitude_surface.vtu
+
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/complex_magnitude_surface.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
@@ -306,6 +310,10 @@ int main() {
 [[file:media/implicit_curve_2d-3D_100.png][file:media/implicit_curve_2d-3D_10.png]]
 #+END_CENTER
 
+Paraview State File: https://github.com/richmit/MRPTree/blob/main/paraview/implicit_curve_2d.pvsm
+
+XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/implicit_curve_2d.vtu
+
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/implicit_curve_2d.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
@@ -388,6 +396,10 @@ int main() {
 [[file:media/implicit_surface_make_50.gif][file:media/implicit_surface_make_10.gif]]
 #+END_CENTER
 
+Paraview State File: https://github.com/richmit/MRPTree/blob/main/paraview/implicit_surface.pvsm
+
+XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/implicit_surface.vtu
+
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/implicit_surface.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
@@ -464,6 +476,10 @@ int main() {
 [[file:media/lorenz_100.png][file:media/lorenz_10.png]]
 [[file:media/lorenz_rot_50_crf30.html][file:media/lorenz_rot_10.gif]]
 #+END_CENTER
+
+XML VTK Data File 1: https://github.com/richmit/MRPTree/blob/main/paraview/vector_field_3d-c.vtu
+
+XML VTK Data File 2: https://github.com/richmit/MRPTree/blob/main/paraview/vector_field_3d-f.vtu
 
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/vector_field_3d.cpp
 
@@ -584,6 +600,10 @@ The mesh with refinement (sdf, partial derivative, directional derivative) \\
 Mesh with directional directional refinement but unbalanced) \\
 [[file:media/sq_surface_with_normals_grid_ddu_100.png][file:media/sq_surface_with_normals_grid_ddu_10.png]] 
 #+END_CENTER
+
+Paraview State File: https://github.com/richmit/MRPTree/blob/main/paraview/surface_with_normals.pvsm
+
+XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/surface_with_normals.vtu
 
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/surface_with_normals.cpp
 
@@ -714,6 +734,10 @@ Examples From Maple (With & Without Adaptive Mesh) \\
 [[file:media/maple_sphere_no_adap_100.png][file:media/maple_sphere_no_adap_10.png]]
 #+END_CENTER
 
+Paraview State File: https://github.com/richmit/MRPTree/blob/main/paraview/surface_plot_edge.pvsm
+
+XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/surface_plot_edge.vtu
+
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/surface_plot_edge.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
@@ -807,6 +831,10 @@ Mathematica (from the side & top) \\
 [[file:media/mathematica_anan-s_100.png][file:media/mathematica_anan-s_10.png]]
 [[file:media/mathematica_anan-t_100.png][file:media/mathematica_anan-t_10.png]]
 #+END_CENTER
+
+Paraview State File: https://github.com/richmit/MRPTree/blob/main/paraview/surface_plot_annular_edge.pvsm
+
+XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/surface_plot_annular_edge.vtu
 
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/surface_plot_annular_edge.cpp
 
@@ -908,6 +936,10 @@ Matlab 2023b & Mathematica 12 & Maple 2024.1\\
 MRPtree Version \\
 [[file:media/surface_plot_corner_rot_100_crf30.html][file:media/surface_plot_corner_rot_10.gif]]
 #+END_CENTER
+
+Paraview State File: https://github.com/richmit/MRPTree/blob/main/paraview/surface_plot_corner.pvsm
+
+XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/surface_plot_corner.vtu
 
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/surface_plot_corner.cpp
 
@@ -1105,6 +1137,12 @@ int main() {
 [[file:media/surface_branch_glue_100.png][file:media/surface_branch_glue_10.png]]
 #+END_CENTER
 
+Paraview State File: https://github.com/richmit/MRPTree/blob/main/paraview/surface_branch_glue.pvsm
+
+XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/surface_branch_glue.vtu
+
+Source code: https://github.com/richmit/MRPTree/blob/main/examples/surface_branch_glue.cpp
+
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
 grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_branch_glue.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
 #+end_src
@@ -1192,6 +1230,10 @@ int main() {
 #+BEGIN_CENTER
 [[file:media/sq_curve_plot_heal_100.png][file:media/sq_curve_plot_heal_10.png]]
 #+END_CENTER
+
+Paraview State File: https://github.com/richmit/MRPTree/blob/main/paraview/curve_plot.pvsm
+
+XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/curve_plot.vtu
 
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/curve_plot.cpp
 
@@ -1304,6 +1346,12 @@ int main() {
 [[file:media/parametric_surface_with_defects-tri_100.png][file:media/parametric_surface_with_defects-tri_10.png]]
 #+END_CENTER
 
+Paraview State File: https://github.com/richmit/MRPTree/blob/main/paraview/parametric_surface_with_defects.pvsm
+
+XML VTK Data File 1: https://github.com/richmit/MRPTree/blob/main/paraview/parametric_surface_with_defects-tri.vtu
+
+XML VTK Data File 2:  https://github.com/richmit/MRPTree/blob/main/paraview/parametric_surface_with_defects-rect.vtu
+
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/parametric_surface_with_defects.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
@@ -1394,6 +1442,10 @@ Surfaces with and without normals \\
 Stripes!! \\
 [[file:media/performance_with_large_surface_stripes_100.png][file:media/performance_with_large_surface_stripes_10.png]]
 #+END_CENTER
+
+Paraview State File: https://github.com/richmit/MRPTree/blob/main/paraview/performance_with_large_surface.pvsm
+
+XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/performance_with_large_surface.vtu
 
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/performance_with_large_surface.cpp
 
@@ -1605,6 +1657,16 @@ int main() {
 [[file:media/parametric_curve_3d_rot_100_crf30.html][file:media/parametric_curve_3d_rot_10.gif]]
 #+END_CENTER
 
+Paraview State File: https://github.com/richmit/MRPTree/blob/main/paraview/parametric_curve_3d.pvsm
+
+XML VTK Data File 1: https://github.com/richmit/MRPTree/blob/main/paraview/parametric_curve_3d-crv.vtu
+
+XML VTK Data File 2: https://github.com/richmit/MRPTree/blob/main/paraview/parametric_curve_3d-srf1.vtu
+
+XML VTK Data File 3: https://github.com/richmit/MRPTree/blob/main/paraview/parametric_curve_3d-srf2.vtu
+
+Source code: https://github.com/richmit/MRPTree/blob/main/examples/parametric_curve_3d.cpp
+
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
 grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/parametric_curve_3d.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
 #+end_src
@@ -1724,6 +1786,12 @@ int main() {
 [[file:media/ear_surface_rot_100_crf30.html][file:media/ear_surface_rot_10.gif]]
 #+END_CENTER
 
+Paraview State File: https://github.com/richmit/MRPTree/blob/main/paraview/ear_surface.pvsm
+
+XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/ear_surface.vtu
+
+Source code: https://github.com/richmit/MRPTree/blob/main/examples/ear_surface.cpp
+
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
 grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/ear_surface.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
 #+end_src
@@ -1814,6 +1882,12 @@ High Resolution Still Image (click on it) \\
 Movie of the surface (click on it) \\
 [[file:media/holy_wave_surf_rot_100_crf30.html][file:media/holy_wave_surf_rot_10.gif]]
 #+END_CENTER
+
+Paraview State File: https://github.com/richmit/MRPTree/blob/main/paraview/holy_wave_surf.pvsm
+
+XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/holy_wave_surf.vtu
+
+Source code: https://github.com/richmit/MRPTree/blob/main/examples/holy_wave_surf.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
 grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/holy_wave_surf.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
@@ -2076,7 +2150,7 @@ Processing Example holy_wave_surf
   skip media/holy_wave_surf_rot_50_crf30.html
 #+end_example
 
-* xx :noexport:
+* Program Example Template                                         :noexport:
 
 ** PROGRAM_EXAMPLE
 :PROPERTIES:
@@ -2090,6 +2164,12 @@ Processing Example holy_wave_surf
 #+BEGIN_CENTER
 [[file:media/PROGRAM_EXAMPLE_100.png][file:media/PROGRAM_EXAMPLE_10.png]]
 #+END_CENTER
+
+Paraview State File: https://github.com/richmit/MRPTree/blob/main/paraview/PROGRAM_EXAMPLE.pvsm
+
+XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/PROGRAM_EXAMPLE.vtu
+
+Source code: https://github.com/richmit/MRPTree/blob/main/examples/PROGRAM_EXAMPLE.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
 grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/PROGRAM_EXAMPLE.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
