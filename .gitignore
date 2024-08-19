@@ -7,7 +7,7 @@
 /old-media
 
 /paraview/*_lossless.webm
-paraview/*_crf01.mp4
+/paraview/*_crf01.mp4
 
 /paraview/lorenz_rot_100_lossless.webm
 /paraview/lorenz_rot_100_crf30.webm
