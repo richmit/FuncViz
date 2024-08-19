@@ -19,13 +19,15 @@ About 80% of planned functionality is implemented and the API has stabilized; ho
 
 You can read more about the way the data structure works here: [[https://richmit.github.io/MRPTree/tree_theory/trees.html][2^P Tree Theory]]
 
+Documentation for the library may be found here: [[https://www.mitchr.me/SS/MRPtree/doc-lib/autodocs/html/index.html][MRPTree API Documentation]]
+
 * Repository Contents (Current & Planned)
 
  - [[https://richmit.github.io/MRPTree/tree_theory/trees.html][Documentation about how data structure works]]
  - [[https://richmit.github.io/MRPTree/func-viz/func-viz.html][Example code for mathematical function visualization]]
+   - [[https://www.mitchr.me/SS/MRPtree/doc-examples/autodocs/html/index.html][Doxygen documentation for the examples]] is also available
  - [[https://richmit.github.io/MRPTree/roadmap.html][Development roadmap]]
  - The =MRPTree= itself (See: [[https://github.com/richmit/MRPTree/blob/main/lib/MR_rect_tree.hpp][lib/MR_rect_tree.hpp]])
- - Several examples of mathematical function visualization illustrating MRPTree in 1, 2, & 3 dimensions
  - An unstructured cell-complex/mesh library (See: [[https://github.com/richmit/MRPTree/blob/main/lib/MR_cell_cplx.hpp][lib/MR_cell_cplx.hpp]])
  - A library to tessellate an =MR_rect_tree= object into an =MR_cell_cplx= object (See: [[https://github.com/richmit/MRPTree/blob/main/lib/MR_rt_to_cc.hpp][lib/MR_rt_to_cc.hpp]])
 
@@ -47,6 +49,7 @@ You can read more about the way the data structure works here: [[https://richmit
 
 * Change Log
 
+ - 2024-08-19: Published Doxygen documentation
  - 2024-08-16: MRaster integration & an example using it
  - 2024-08-14: I have bumped the status from pre-alpha to alpha!
  - 2024-08-13: Refactored cplx.  I feel good about the API now.
