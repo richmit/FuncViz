@@ -23,6 +23,7 @@ Documentation for the library may be found here: [[https://www.mitchr.me/SS/MRPt
 
 * Repository Contents (Current & Planned)
 
+ -  [[https://richmit.github.io/MRPTree/QuickStart.html][Quick Start Guide]]
  - [[https://richmit.github.io/MRPTree/tree_theory/trees.html][Documentation about how data structure works]]
  - [[https://richmit.github.io/MRPTree/func-viz/func-viz.html][Example code for mathematical function visualization]]
    - [[https://www.mitchr.me/SS/MRPtree/doc-examples/autodocs/html/index.html][Doxygen documentation for the examples]] is also available
@@ -49,6 +50,7 @@ Documentation for the library may be found here: [[https://www.mitchr.me/SS/MRPt
 
 * Change Log
 
+ - 2024-08-20: Published quick start & improved MRaster examples
  - 2024-08-19: Published Doxygen documentation
  - 2024-08-16: MRaster integration & an example using it
  - 2024-08-14: I have bumped the status from pre-alpha to alpha!
