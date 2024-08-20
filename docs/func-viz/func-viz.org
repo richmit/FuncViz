@@ -98,12 +98,10 @@ This group of core examples is intended to illistrate various features of MRPTre
    - Sample near level curves
    - Sample based on a data value that is *not* part of the geometry
    - Sample near domain axis
+   - Use MRaster to compute colors for complex numbers
    - Directly attach colors to geometric points
    - Do rough clipping with high sampling and cell filtering.  
    - Precision clipping by folding & culling.
-
-  References:
-    Richardson (1991); Visualizing quantum scattering on the CM-2 supercomputer; Computer Physics Communications 63; pp 84-94"
 
 #+BEGIN_CENTER
 [[file:media/complex_magnitude_surface-2D_100.png][file:media/complex_magnitude_surface-2D_10.png]]
@@ -126,10 +124,12 @@ grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/complex_magn
 #include "MR_rect_tree.hpp"
 #include "MR_cell_cplx.hpp"
 #include "MR_rt_to_cc.hpp"
+#include "color.hpp"
 
 typedef mjr::tree15b2d9rT            tt_t;
 typedef mjr::MRccT5                  cc_t;
 typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
+typedef mjr::color3c64F              ct_t;
 
 tt_t::rrpt_t cpf(tt_t::drpt_t xvec) {
   std::complex<double> z(xvec[0], xvec[1]);
@@ -140,20 +140,15 @@ tt_t::rrpt_t cpf(tt_t::drpt_t xvec) {
 
   if ( (std::abs(z-1.0) > 1.0e-5) && (std::abs(z+1.0) > 1.0e-5) ) {
     std::complex<double> f;
-    double f_abs2, f_re_scl, f_im_scl, f_abs2p1, ofs;
     f        = 1.0/(z+1.0) + 1.0/(z-1.0);
     f_re     = std::real(f);
     f_im     = std::imag(f);
     f_abs    = std::abs(f);
     f_arg    = std::arg(f);
-    f_abs2   = f_abs * f_abs;
-    f_re_scl = f_re / std::sqrt(30.0/5.0);
-    f_im_scl = f_im / std::sqrt(2.0);
-    f_abs2p1 = 1 + f_abs2;
-    ofs      = (f_abs<1 ? -1.0 : 1.0) * (0.5 - f_abs/f_abs2p1);
-    red      = ofs + (0.5 + (std::sqrt(2.0/3.0) * f_re) / f_abs2p1);
-    green    = ofs + (0.5 - (f_re_scl - f_im_scl)       / f_abs2p1);
-    blue     = ofs + (0.5 - (f_re_scl + f_im_scl)       / f_abs2p1);
+    ct_t c   = ct_t::cs2dIdxPalArg<ct_t::csCColdeRainbow, 3, 5.0, 20.0, 2.0, 1>::c(f); 
+    red      = c.getRed();
+    green    = c.getGreen();
+    blue     = c.getBlue();
   } else {
     f_re = f_im = f_abs = f_arg = red = green = blue = std::numeric_limits<double>::quiet_NaN();
   }
@@ -176,12 +171,11 @@ int main() {
   tt_t tree({-2.2, -1.2}, 
             { 2.2,  1.2});
   cc_t ccplx;
-  tc_t bridge;
 
   // Initial sample
 
   // On a uniform grid
-  tree.refine_grid(3, cpf);
+  tree.refine_grid(7, cpf);
 
   // Alternately we can use refine_recursive() instead (refine_grid() is faster)
   // tree.refine_recursive(4, cpf);
@@ -236,32 +230,32 @@ int main() {
   tree.dump_tree(5);
 
   // Create the cell complex from cells that have at least one point below our clipping plane.
-  auto tcret = bridge.construct_geometry_fans(ccplx,
-                                              tree,
-                                              tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), 
-                                                                       [&tree](tt_t::diti_t i) { return !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
-                                              2,
-                                              {{tc_t::val_src_spc_t::DOMAIN, 0}, 
-                                               {tc_t::val_src_spc_t::DOMAIN, 1},
-                                               {tc_t::val_src_spc_t::RANGE,  4}});
+  auto tcret = tc_t::construct_geometry_fans(ccplx,
+                                             tree,
+                                             tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), 
+                                                                      [&tree](tt_t::diti_t i) { return !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
+                                             2,
+                                             {{tc_t::val_src_spc_t::FDOMAIN, 0}, 
+                                              {tc_t::val_src_spc_t::FDOMAIN, 1},
+                                              {tc_t::val_src_spc_t::FRANGE,  4}});
   std::cout << "TC Return: " << tcret << std::endl;
   ccplx.create_named_datasets({"Re(z)", "Im(z)", "abs(z)", "arg(z)", "Re(f(z))", "Im(f(z))", "abs(f(z))", "arg(f(z))"}, {{"COLORS", {8, 9, 10}}});
   std::cout << "POST CONST" << std::endl;
   ccplx.dump_cplx(5);
 
   // Fold the triangles on our clipping plane
-  ccplx.triangle_folder([&bridge](cc_t::pnt_data_t x){return bridge.tsampf_to_cdatf(        cpf, x); }, 
-                        [&bridge](cc_t::pnt_data_t x){return bridge.tsampf_to_clcdf(4, 3.5, cpf, x); });
+  ccplx.triangle_folder([](cc_t::node_data_t x){return tc_t::tsampf_to_cdatf(        cpf, x); }, 
+                        [](cc_t::node_data_t x){return tc_t::tsampf_to_clcdf(4, 3.5, cpf, x); });
   std::cout << "POST FOLD" << std::endl;
   ccplx.dump_cplx(5);
 
   // Remove all triangles above our clipping plane
 
   // We can do this directly with ccplx using index 6 into the point data (point data is domain data appended with range data)
-  // ccplx.cull_cells([&ccplx](cc_t::cell_t c){ return !(ccplx.cell_below_level(c, 6, 3.5)); });
+  // ccplx.cull_cells([&ccplx](cc_t::cell_verts_t c){ return !(ccplx.cell_below_level(c, 6, 3.5)); });
 
-  // Or we can use the index in the original sample function along with the converter rt_ran_idx_to_pd_idx().
-  ccplx.cull_cells([&bridge, &ccplx](cc_t::cell_t c){ return !(ccplx.cell_below_level(c, bridge.rt_ran_idx_to_pd_idx(4), 3.5)); });
+  // Or we can use the index in the original sample function along with the converter rt_rng_idx_to_pd_idx().
+  ccplx.cull_cells([&ccplx](cc_t::cell_verts_t c){ return !(ccplx.cell_below_level(c, tc_t::rt_rng_idx_to_pd_idx(4), 3.5)); });
 
   std::cout << "POST CULL" << std::endl;
   ccplx.dump_cplx(5);
@@ -271,7 +265,6 @@ int main() {
   ccplx.write_ply(       "complex_magnitude_surface.ply", "complex_magnitude_surface");
 }
 #+end_src
-
 
 ** Implicit Curve
 :PROPERTIES:

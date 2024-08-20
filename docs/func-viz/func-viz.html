@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-08-18 Sun 14:38 -->
+<!-- 2024-08-20 Tue 15:31 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Function Visualization</title>
@@ -272,12 +272,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-08-18 14:38:10</i></td>
+<td class="org-left"><i>2024-08-20 15:31:47</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-08-18 14:38:11</i></td>
+<td class="org-left"><i>2024-08-20 15:31:49</i></td>
 </tr>
 </tbody>
 </table>
@@ -380,15 +380,11 @@ described by Richardson in 1991.  In this example, we demonstrates several techn
 <li>Sample near level curves</li>
 <li>Sample based on a data value that is <b>not</b> part of the geometry</li>
 <li>Sample near domain axis</li>
+<li>Use MRaster to compute colors for complex numbers</li>
 <li>Directly attach colors to geometric points</li>
 <li>Do rough clipping with high sampling and cell filtering.</li>
 <li>Precision clipping by folding &amp; culling.</li>
 </ul>
-
-<p>
-References:
-  Richardson (1991); Visualizing quantum scattering on the CM-2 supercomputer; Computer Physics Communications 63; pp 84-94"
-</p>
 
 <div class="org-center">
 <p>
@@ -414,10 +410,12 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/comp
 <span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
 <span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
 <span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
+<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"color.hpp"</span>
 
 <span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b2d9rT</span>            <span style="color: #63b8ff;">tt_t</span>;
 <span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;
 <span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
+<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">color3c64F</span>              <span style="color: #63b8ff;">ct_t</span>;
 
 <span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">cpf</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
   <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #63b8ff;">complex</span>&lt;<span style="color: #63b8ff;">double</span>&gt; <span style="color: #7fffd4;">z</span>(xvec[0], xvec[1]);
@@ -428,20 +426,15 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/comp
 
   <span style="color: #00ffff;">if</span> ( (<span style="color: #8470ff; font-weight: bold;">std</span>::abs(z-1.0) &gt; 1.0e-5) &amp;&amp; (<span style="color: #8470ff; font-weight: bold;">std</span>::abs(z+1.0) &gt; 1.0e-5) ) {
     <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #63b8ff;">complex</span>&lt;<span style="color: #63b8ff;">double</span>&gt; <span style="color: #7fffd4;">f</span>;
-    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">f_abs2</span>, <span style="color: #7fffd4;">f_re_scl</span>, <span style="color: #7fffd4;">f_im_scl</span>, <span style="color: #7fffd4;">f_abs2p1</span>, <span style="color: #7fffd4;">ofs</span>;
     f        = 1.0/(z+1.0) + 1.0/(z-1.0);
     f_re     = <span style="color: #8470ff; font-weight: bold;">std</span>::real(f);
     f_im     = <span style="color: #8470ff; font-weight: bold;">std</span>::imag(f);
     f_abs    = <span style="color: #8470ff; font-weight: bold;">std</span>::abs(f);
     f_arg    = <span style="color: #8470ff; font-weight: bold;">std</span>::arg(f);
-    f_abs2   = f_abs * f_abs;
-    f_re_scl = f_re / <span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(30.0/5.0);
-    f_im_scl = f_im / <span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(2.0);
-    f_abs2p1 = 1 + f_abs2;
-    ofs      = (f_abs&lt;1 ? -1.0 : 1.0) * (0.5 - f_abs/f_abs2p1);
-    red      = ofs + (0.5 + (<span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(2.0/3.0) * f_re) / f_abs2p1);
-    green    = ofs + (0.5 - (f_re_scl - f_im_scl)       / f_abs2p1);
-    blue     = ofs + (0.5 - (f_re_scl + f_im_scl)       / f_abs2p1);
+    <span style="color: #63b8ff;">ct_t</span> <span style="color: #7fffd4;">c</span>   = <span style="color: #8470ff; font-weight: bold;">ct_t</span>::<span style="color: #8470ff; font-weight: bold;">cs2dIdxPalArg</span>&lt;<span style="color: #8470ff; font-weight: bold;">ct_t</span>::csCColdeRainbow, 3, 5.0, 20.0, 2.0, 1&gt;::c(f); 
+    red      = c.getRed();
+    green    = c.getGreen();
+    blue     = c.getBlue();
   } <span style="color: #00ffff;">else</span> {
     f_re = f_im = f_abs = f_arg = red = green = blue = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numeric_limits</span>&lt;<span style="color: #63b8ff;">double</span>&gt;::quiet_NaN();
   }
@@ -464,12 +457,11 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/comp
   <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">tree</span>({-2.2, -1.2}, 
             { 2.2,  1.2});
   <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">ccplx</span>;
-  <span style="color: #63b8ff;">tc_t</span> <span style="color: #7fffd4;">bridge</span>;
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Initial sample</span>
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">On a uniform grid</span>
-  tree.refine_grid(3, cpf);
+  tree.refine_grid(7, cpf);
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Alternately we can use refine_recursive() instead (refine_grid() is faster)</span>
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">tree.refine_recursive(4, cpf);</span>
@@ -524,32 +516,32 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/comp
   tree.dump_tree(5);
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Create the cell complex from cells that have at least one point below our clipping plane.</span>
-  <span style="color: #00ffff;">auto</span> <span style="color: #7fffd4;">tcret</span> = bridge.construct_geometry_fans(ccplx,
-                                              tree,
-                                              tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), 
-                                                                       [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
-                                              2,
-                                              {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::DOMAIN, 0}, 
-                                               {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::DOMAIN, 1},
-                                               {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::RANGE,  4}});
+  <span style="color: #00ffff;">auto</span> <span style="color: #7fffd4;">tcret</span> = <span style="color: #8470ff; font-weight: bold;">tc_t</span>::construct_geometry_fans(ccplx,
+                                             tree,
+                                             tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), 
+                                                                      [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
+                                             2,
+                                             {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FDOMAIN, 0}, 
+                                              {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FDOMAIN, 1},
+                                              {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FRANGE,  4}});
   <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"TC Return: "</span> &lt;&lt; tcret &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
   ccplx.create_named_datasets({<span style="color: #fa8072;">"Re(z)"</span>, <span style="color: #fa8072;">"Im(z)"</span>, <span style="color: #fa8072;">"abs(z)"</span>, <span style="color: #fa8072;">"arg(z)"</span>, <span style="color: #fa8072;">"Re(f(z))"</span>, <span style="color: #fa8072;">"Im(f(z))"</span>, <span style="color: #fa8072;">"abs(f(z))"</span>, <span style="color: #fa8072;">"arg(f(z))"</span>}, {{<span style="color: #fa8072;">"COLORS"</span>, {8, 9, 10}}});
   <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"POST CONST"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
   ccplx.dump_cplx(5);
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Fold the triangles on our clipping plane</span>
-  ccplx.triangle_folder([&amp;<span style="color: #7fffd4;">bridge</span>](<span style="color: #8470ff; font-weight: bold;">cc_t</span>::<span style="color: #63b8ff;">pnt_data_t</span> <span style="color: #7fffd4;">x</span>){<span style="color: #00ffff;">return</span> bridge.tsampf_to_cdatf(        cpf, x); }, 
-                        [&amp;<span style="color: #7fffd4;">bridge</span>](<span style="color: #8470ff; font-weight: bold;">cc_t</span>::<span style="color: #63b8ff;">pnt_data_t</span> <span style="color: #7fffd4;">x</span>){<span style="color: #00ffff;">return</span> bridge.tsampf_to_clcdf(4, 3.5, cpf, x); });
+  ccplx.triangle_folder([](<span style="color: #8470ff; font-weight: bold;">cc_t</span>::<span style="color: #63b8ff;">node_data_t</span> <span style="color: #7fffd4;">x</span>){<span style="color: #00ffff;">return</span> <span style="color: #8470ff; font-weight: bold;">tc_t</span>::tsampf_to_cdatf(        cpf, x); }, 
+                        [](<span style="color: #8470ff; font-weight: bold;">cc_t</span>::<span style="color: #63b8ff;">node_data_t</span> <span style="color: #7fffd4;">x</span>){<span style="color: #00ffff;">return</span> <span style="color: #8470ff; font-weight: bold;">tc_t</span>::tsampf_to_clcdf(4, 3.5, cpf, x); });
   <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"POST FOLD"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
   ccplx.dump_cplx(5);
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Remove all triangles above our clipping plane</span>
 
   <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">We can do this directly with ccplx using index 6 into the point data (point data is domain data appended with range data)</span>
-  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">ccplx.cull_cells([&amp;ccplx](cc_t::cell_t c){ return !(ccplx.cell_below_level(c, 6, 3.5)); });</span>
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">ccplx.cull_cells([&amp;ccplx](cc_t::cell_verts_t c){ return !(ccplx.cell_below_level(c, 6, 3.5)); });</span>
 
-  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Or we can use the index in the original sample function along with the converter rt_ran_idx_to_pd_idx().</span>
-  ccplx.cull_cells([&amp;<span style="color: #7fffd4;">bridge</span>, &amp;<span style="color: #7fffd4;">ccplx</span>](<span style="color: #8470ff; font-weight: bold;">cc_t</span>::<span style="color: #63b8ff;">cell_t</span> <span style="color: #7fffd4;">c</span>){ <span style="color: #00ffff;">return</span> !(ccplx.cell_below_level(c, bridge.rt_ran_idx_to_pd_idx(4), 3.5)); });
+  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Or we can use the index in the original sample function along with the converter rt_rng_idx_to_pd_idx().</span>
+  ccplx.cull_cells([&amp;<span style="color: #7fffd4;">ccplx</span>](<span style="color: #8470ff; font-weight: bold;">cc_t</span>::<span style="color: #63b8ff;">cell_verts_t</span> <span style="color: #7fffd4;">c</span>){ <span style="color: #00ffff;">return</span> !(ccplx.cell_below_level(c, <span style="color: #8470ff; font-weight: bold;">tc_t</span>::rt_rng_idx_to_pd_idx(4), 3.5)); });
 
   <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"POST CULL"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
   ccplx.dump_cplx(5);
@@ -562,7 +554,6 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/comp
 </div>
 </div>
 </div>
-
 
 <div id="outline-container-implicit_curve_2d" class="outline-3">
 <h3 id="implicit_curve_2d"><span class="section-number-3">2.2.</span> Implicit Curve</h3>
@@ -1446,7 +1437,7 @@ any holes.  This is really the only change from <a href="#surface_plot_edge">sur
 
 <div class="org-center">
 
-<div id="org6632db7" class="figure">
+<div id="orgba60450" class="figure">
 <p><a href="media/surface_branch_glue_100.png"><img src="media/surface_branch_glue_10.png" alt="surface_branch_glue_10.png" /></a>
 </p>
 </div>
@@ -1546,7 +1537,7 @@ Note that most of the items above are listed TBD.  A few features need to be add
 
 <div class="org-center">
 
-<div id="orge2b50aa" class="figure">
+<div id="orgf77a371" class="figure">
 <p><a href="media/sq_curve_plot_heal_100.png"><img src="media/sq_curve_plot_heal_10.png" alt="sq_curve_plot_heal_10.png" /></a>
 </p>
 </div>
@@ -1881,7 +1872,7 @@ This example doesn't really demonstrate anything not found in the other examples
 
 <div class="org-center">
 
-<div id="org71127e2" class="figure">
+<div id="org391d131" class="figure">
 <p><a href="media/trefoil_rot_50_crf30.html"><img src="media/trefoil_rot_10.gif" alt="trefoil_rot_10.gif" /></a>
 </p>
 </div>
@@ -1978,7 +1969,7 @@ Alternately the curve is also the intersection of two surfaces in \(\mathbb{R}^3
 The "typical" way to graph a surface like \(f_2\) is to transform it into pseudo-parametric form.  In Maple that might look like this
 </p>
 
-<pre class="example" id="org9be68c7">
+<pre class="example" id="org2ee6790">
 plot3d([u, u^2, v], u=-1..1, v=-1..1):
 </pre>
 
@@ -1994,7 +1985,7 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
 
 <div class="org-center">
 
-<div id="org5e8d676" class="figure">
+<div id="org7ba7a06" class="figure">
 <p><a href="media/parametric_curve_3d_rot_100_crf30.html"><img src="media/parametric_curve_3d_rot_10.gif" alt="parametric_curve_3d_rot_10.gif" /></a>
 </p>
 </div>

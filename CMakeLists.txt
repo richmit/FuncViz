@@ -39,22 +39,22 @@ endif()
 
 ######################################################################################################################################################
 
-set(TARGETS "hello_world" 
-            "surface_with_normals" 
+set(TARGETS "hello_world"
+            "surface_with_normals"
             "surface_plot_edge" "surface_branch_glue" "surface_plot_corner" "surface_plot_step" "surface_plot_annular_edge"
-            "parametric_surface_with_defects" "performance_with_large_surface" 
+            "parametric_surface_with_defects" "performance_with_large_surface"
             "parametric_curve_3d"
-            "implicit_surface" "implicit_curve_2d" 
+            "implicit_surface" "implicit_curve_2d"
             "vector_field_3d"
             "curve_plot"
-            "complex_magnitude_surface"
             ### Extra examples
             "ear_surface" "ear_surface_glue"
-            "trefoil" 
+            "trefoil"
             ### MR_cell_cplx examples (don't use MR_rect_tree or MR_rt_to_cc)
             "holy_wave_surf"
             ### Examples using MRaster
             "hello_MRaster"
+            "complex_magnitude_surface"
             ### Unit Tests
             "check_cell_hexahedron" "check_cell_pyramid" "check_cell_quad" "check_cell_triangle" "check_cell_segment"
             "geomi_pnt_line_distance" "geomi_seg_isect_type"
@@ -70,6 +70,7 @@ set(TARGETS "hello_world"
             "rect_fix_dup" "rect_fix_nan"
            )
 set(REQ_MRASTER "hello_MRaster"
+                "complex_magnitude_surface"
                )
 
 # Add a target for each one we can build
@@ -102,7 +103,7 @@ foreach(CURTGT IN LISTS TARGETS)
     message("Warning: Unable to find source for target ${CURTGT}!")
     continue()
   endif()
-  
+
   target_include_directories(${CURTGT} PRIVATE lib)
   target_compile_features(${CURTGT} PUBLIC cxx_std_23)
   target_include_directories(${CURTGT} PRIVATE ${CMAKE_BINARY_DIR})
@@ -136,12 +137,12 @@ endforeach(CURTGT)
 
 ######################################################################################################################################################
 
-add_custom_target(ftest-build 
+add_custom_target(ftest-build
   DEPENDS ${TARGETS_FTEST}
   COMMENT "Building Functional Tests"
 )
 
-add_custom_target(test-build 
+add_custom_target(test-build
   DEPENDS ${TARGETS_UTEST}
   COMMENT "Building Unit Tests"
 )

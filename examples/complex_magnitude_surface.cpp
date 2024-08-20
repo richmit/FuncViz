@@ -39,12 +39,10 @@
    - Sample near level curves
    - Sample based on a data value that is *not* part of the geometry
    - Sample near domain axis
+   - Use MRaster to compute colors for complex numbers
    - Directly attach colors to geometric points
    - Do rough clipping with high sampling and cell filtering.  
    - Precision clipping by folding & culling.
-
-  References:
-    Richardson (1991); Visualizing quantum scattering on the CM-2 supercomputer; Computer Physics Communications 63; pp 84-94"
 */
 /*******************************************************************************************************************************************************.H.E.**/
 /** @cond exj */
@@ -53,11 +51,13 @@
 #include "MR_rect_tree.hpp"
 #include "MR_cell_cplx.hpp"
 #include "MR_rt_to_cc.hpp"
+#include "color.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 typedef mjr::tree15b2d9rT            tt_t;
 typedef mjr::MRccT5                  cc_t;
 typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
+typedef mjr::color3c64F              ct_t;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 tt_t::rrpt_t cpf(tt_t::drpt_t xvec) {
@@ -69,20 +69,15 @@ tt_t::rrpt_t cpf(tt_t::drpt_t xvec) {
 
   if ( (std::abs(z-1.0) > 1.0e-5) && (std::abs(z+1.0) > 1.0e-5) ) {
     std::complex<double> f;
-    double f_abs2, f_re_scl, f_im_scl, f_abs2p1, ofs;
     f        = 1.0/(z+1.0) + 1.0/(z-1.0);
     f_re     = std::real(f);
     f_im     = std::imag(f);
     f_abs    = std::abs(f);
     f_arg    = std::arg(f);
-    f_abs2   = f_abs * f_abs;
-    f_re_scl = f_re / std::sqrt(30.0/5.0);
-    f_im_scl = f_im / std::sqrt(2.0);
-    f_abs2p1 = 1 + f_abs2;
-    ofs      = (f_abs<1 ? -1.0 : 1.0) * (0.5 - f_abs/f_abs2p1);
-    red      = ofs + (0.5 + (std::sqrt(2.0/3.0) * f_re) / f_abs2p1);
-    green    = ofs + (0.5 - (f_re_scl - f_im_scl)       / f_abs2p1);
-    blue     = ofs + (0.5 - (f_re_scl + f_im_scl)       / f_abs2p1);
+    ct_t c   = ct_t::cs2dIdxPalArg<ct_t::csCColdeRainbow, 3, 5.0, 20.0, 2.0, 1>::c(f); 
+    red      = c.getRed();
+    green    = c.getGreen();
+    blue     = c.getBlue();
   } else {
     f_re = f_im = f_abs = f_arg = red = green = blue = std::numeric_limits<double>::quiet_NaN();
   }
@@ -112,7 +107,7 @@ int main() {
   // Initial sample
 
   // On a uniform grid
-  tree.refine_grid(3, cpf);
+  tree.refine_grid(7, cpf);
 
   // Alternately we can use refine_recursive() instead (refine_grid() is faster)
   // tree.refine_recursive(4, cpf);
