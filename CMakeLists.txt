@@ -5,11 +5,14 @@ cmake_minimum_required(VERSION 3.20.0 FATAL_ERROR)
 ######################################################################################################################################################
 # Proejct meta data
 
-project(MRPTree CXX)
+project(MRPTree 
+  VERSION 0.0.0.60
+  DESCRIPTION "Generalized bitree/quadtree/octree library"
+  HOMEPAGE_URL "https://github.com/richmit/MRPTree/"
+  LANGUAGES CXX)
 
-set(PROJECT_VERSION_DATE  2024-08-20)
-set(PROJECT_VERSION_ID    v0.0.50)
-mark_as_advanced(PROJECT_VERSION_DATE PROJECT_VERSION_ID)
+set(MRPTREE_VERSION_DATE  2024-08-20)
+mark_as_advanced(MRPTREE_VERSION_DATE)
 
 ######################################################################################################################################################
 # Here are the options we use to modify the build -- these options are passed to cmake like so: cmake -DO_BTEST=YES or -DO_BTEST=NO
@@ -36,6 +39,29 @@ if(O_MRASTER)
     set(MRASTER_FOUND "YES")
   endif()
 endif()
+
+######################################################################################################################################################
+# Setup variables for use in config include files
+
+if(Doxygen_FOUND)
+  set(MRPTREE_FOUND_DOXYGEN "1")
+else()
+  set(MRPTREE_FOUND_DOXYGEN "0")
+endif()
+
+if(Boost_FOUND)
+  set(MRPTREE_FOUND_BOOST "1")
+else()
+  set(MRPTREE_FOUND_BOOST "0")
+endif()
+
+if(MRASTER_FOUND)
+  set(MRPTREE_FOUND_MRASTER "1")
+else()
+  set(MRPTREE_FOUND_MRASTER "0")
+endif()
+
+mark_as_advanced(MRPTREE_FOUND_MRASTER MRPTREE_FOUND_BOOST MRPTREE_FOUND_DOXYGEN)
 
 ######################################################################################################################################################
 # Create Targets for examples, functional tests, & unit tests
@@ -192,7 +218,7 @@ if(Doxygen_FOUND)
     add_custom_target(doc-${DOXINPUT}
       COMMAND ${DOXYGEN_EXECUTABLE} > dox.out
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc-${DOXINPUT}
-      COMMENT "Generating documentation with Doxygen"
+      COMMENT "Generating ${DOXINPUT} documentation with Doxygen"
       VERBATIM)
   endforeach(DOXINPUT)
 else()
