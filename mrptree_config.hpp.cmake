@@ -3,6 +3,7 @@
 
 #cmakedefine Doxygen_FOUND
 #cmakedefine Boost_FOUND
+#cmakedefine MRASTER_FOUND
 
 #define PROJECT_DATE      @PROJECT_VERSION_DATE@
 #define PROJECT_VERSION   @PROJECT_VERSION_ID@

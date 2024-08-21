@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.20.0 FATAL_ERROR)
 ######################################################################################################################################################
 # Proejct meta data
 
-project(MRTree CXX)
+project(MRPTree CXX)
 
 set(PROJECT_VERSION_DATE  2024-08-20)
 set(PROJECT_VERSION_ID    v0.0.50)
@@ -180,7 +180,7 @@ endif()
 ######################################################################################################################################################
 # Generate an include file with various methdata about the build.
 
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.hpp.cmake ${CMAKE_BINARY_DIR}/config.hpp)
+CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/mrptree_config.hpp.cmake ${CMAKE_BINARY_DIR}/mrptree_config.hpp)
 
 ######################################################################################################################################################
 
