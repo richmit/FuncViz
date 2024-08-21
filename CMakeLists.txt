@@ -7,8 +7,8 @@ cmake_minimum_required(VERSION 3.20.0 FATAL_ERROR)
 
 project(MRTree CXX)
 
-set(PROJECT_VERSION_DATE  2024-06-24)
-set(PROJECT_VERSION_ID    v0.0.30)
+set(PROJECT_VERSION_DATE  2024-08-20)
+set(PROJECT_VERSION_ID    v0.0.50)
 mark_as_advanced(PROJECT_VERSION_DATE PROJECT_VERSION_ID)
 
 ######################################################################################################################################################
@@ -38,7 +38,9 @@ if(O_MRASTER)
 endif()
 
 ######################################################################################################################################################
+# Create Targets for examples, functional tests, & unit tests
 
+# Master list of targets
 set(TARGETS "hello_world"
             "surface_with_normals"
             "surface_plot_edge" "surface_branch_glue" "surface_plot_corner" "surface_plot_step" "surface_plot_annular_edge"
@@ -69,6 +71,8 @@ set(TARGETS "hello_world"
             "segment_folder" "triangle_folder"
             "rect_fix_dup" "rect_fix_nan"
            )
+
+# Targets listed here require MRaster to build
 set(REQ_MRASTER "hello_MRaster"
                 "complex_magnitude_surface"
                )
@@ -172,7 +176,6 @@ if(EXISTS "c:/Users/richmit/Documents/WWW/site/SS/MRPTree/doc-examples/")
     COMMENT "Put doc-examples data in web site directory"
   )
 endif()
-
 
 ######################################################################################################################################################
 # Generate an include file with various methdata about the build.
