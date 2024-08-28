@@ -14,6 +14,9 @@ project(MRPTree
 set(MRPTREE_VERSION_DATE  2024-08-20)
 mark_as_advanced(MRPTREE_VERSION_DATE)
 
+string(TIMESTAMP MRPTREE_CONFIG_DATE "%Y-%m-%d")
+mark_as_advanced(MRPTREE_CONFIG_DATE)
+
 ######################################################################################################################################################
 # Here are the options we use to modify the build -- these options are passed to cmake like so: cmake -DO_BTEST=YES or -DO_BTEST=NO
 
@@ -25,43 +28,63 @@ OPTION(O_MRASTER "Include support for MRaster"         ON )
 # Find tools & libraries used to build targets
 
 if(O_DOXYGEN)
+  set(MRPTREE_OPT_DOXYGEN "1")
   find_package(Doxygen)
+  if(Doxygen_FOUND)
+    set(MRPTREE_FOUND_DOXYGEN "1")
+  else()
+    set(MRPTREE_FOUND_DOXYGEN "0")
+  endif()
+else()
+  set(MRPTREE_OPT_DOXYGEN "0")
 endif()
 
 if(O_BTEST)
+  set(MRPTREE_OPT_BTEST "1")
   find_package(Boost COMPONENTS unit_test_framework)
+  if(Boost_FOUND)
+    set(MRPTREE_FOUND_BTEST "1")
+  else()
+    set(MRPTREE_FOUND_BTEST "0")
+  endif()
+else()
+  set(MRPTREE_OPT_BTEST "0")
 endif()
 
 if(O_MRASTER)
-  find_file (MRASTER_PATH "ramCanvasTpl.hpp" PATHS "mraster"  "../mraster" PATH_SUFFIXES "lib")
-  if(NOT MRASTER_PATH STREQUAL "MRASTER_PATH-NOTFOUND")
-    cmake_path(GET MRASTER_PATH PARENT_PATH MRASTER_PATH)
-    set(MRASTER_FOUND "YES")
+  set(MRPTREE_OPT_MRASTER "1")
+  find_package(MRaster HINTS "../mraster/build/" "../mraster/build/install/lib/cmake/MRaster/")
+  if(MRaster_FOUND)
+    set(MRaster_FOUND "YES")
+    set(MRPTREE_FOUND_MRASTER "1")
+    set(MRASTER_FOUND_WHAT "PACKAGE")
+  else()
+    find_file (MRASTER_PATH "CMakeLists.txt" PATHS "mraster"  "../mraster")
+    if(NOT MRASTER_PATH STREQUAL "MRASTER_PATH-NOTFOUND")
+      cmake_path(GET MRASTER_PATH PARENT_PATH MRASTER_PATH)
+      if(EXISTS "${MRASTER_PATH}/build/MRasterLib.cmake")
+        set(MRaster_FOUND "YES")
+        set(MRPTREE_FOUND_MRASTER "1")
+        set(MRASTER_FOUND_WHAT "EXPORT")
+        include("${MRASTER_PATH}/build/MRasterLib.cmake")
+      elseif(EXISTS "${MRASTER_PATH}/lib/ramCanvasTpl.hpp")
+        set(MRaster_FOUND "YES")
+        set(MRPTREE_FOUND_MRASTER "1")
+        set(MRASTER_FOUND_WHAT "SOURCE")
+      else()
+        set(MRPTREE_FOUND_MRASTER "0")
+      endif()
+    else()
+      set(MRPTREE_OPT_MRASTER "0")
+    endif()
   endif()
-endif()
-
-######################################################################################################################################################
-# Setup variables for use in config include files
-
-if(Doxygen_FOUND)
-  set(MRPTREE_FOUND_DOXYGEN "1")
 else()
-  set(MRPTREE_FOUND_DOXYGEN "0")
+  set(MRPTREE_OPT_MRASTER "0")
 endif()
 
-if(Boost_FOUND)
-  set(MRPTREE_FOUND_BOOST "1")
-else()
-  set(MRPTREE_FOUND_BOOST "0")
-endif()
-
-if(MRASTER_FOUND)
-  set(MRPTREE_FOUND_MRASTER "1")
-else()
-  set(MRPTREE_FOUND_MRASTER "0")
-endif()
-
-mark_as_advanced(MRPTREE_FOUND_MRASTER MRPTREE_FOUND_BOOST MRPTREE_FOUND_DOXYGEN)
+mark_as_advanced(MRASTER_FOUND_WHAT)
+mark_as_advanced(MRPTREE_FOUND_MRASTER MRPTREE_FOUND_BTEST MRPTREE_FOUND_DOXYGEN)
+mark_as_advanced(MRPTREE_OPT_MRASTER   MRPTREE_OPT_BOOST   MRPTREE_OPT_DOXYGEN)
 
 ######################################################################################################################################################
 # Create Targets for examples, functional tests, & unit tests
@@ -96,6 +119,8 @@ set(TARGETS "hello_world"
             "nan_solver"
             "segment_folder" "triangle_folder"
             "rect_fix_dup" "rect_fix_nan"
+            ### Config
+            "mrptree_config"
            )
 
 # Targets listed here require MRaster to build
@@ -114,20 +139,21 @@ foreach(CURTGT IN LISTS TARGETS)
   endif()
 
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/examples/${CURTGT}.cpp")
-    if(CURTGT_REQ_MRASTER AND NOT MRASTER_FOUND)
+    if(CURTGT_REQ_MRASTER AND NOT MRaster_FOUND)
       message(NOTICE "Target ${CURTGT} will not be built (no MRaster support)")
       continue()
     endif()
-    add_executable(${CURTGT} "examples/${CURTGT}.cpp")
+    add_executable(${CURTGT} EXCLUDE_FROM_ALL "examples/${CURTGT}.cpp")
+    list(APPEND TARGETS_EXAMPLES ${CURTGT})
   elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ftests/${CURTGT}.cpp")
-    add_executable(${CURTGT} "ftests/${CURTGT}.cpp")
+    add_executable(${CURTGT} EXCLUDE_FROM_ALL "ftests/${CURTGT}.cpp")
     list(APPEND TARGETS_FTEST ${CURTGT})
   elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/utests/${CURTGT}.cpp")
     if(NOT Boost_FOUND)
       message(NOTICE "Target ${CURTGT} will not be built (no boost support)")
       continue()
     endif()
-    add_executable(${CURTGT} "utests/${CURTGT}.cpp")
+    add_executable(${CURTGT} EXCLUDE_FROM_ALL "utests/${CURTGT}.cpp")
     list(APPEND TARGETS_UTEST ${CURTGT})
   else()
     message("Warning: Unable to find source for target ${CURTGT}!")
@@ -160,25 +186,29 @@ foreach(CURTGT IN LISTS TARGETS)
 
   # targets that require MRaster
   if(CURTGT_REQ_MRASTER)
-    target_include_directories(${CURTGT} PRIVATE ${MRASTER_PATH})
+    if(MRASTER_FOUND_WHAT STREQUAL "SOURCE")
+      target_include_directories(${CURTGT} PRIVATE "${MRASTER_PATH}/lib")
+    else()
+      target_link_libraries(${CURTGT} PRIVATE MRaster)
+    endif()
   endif()
 
 endforeach(CURTGT)
 
 ######################################################################################################################################################
 
-add_custom_target(ftest-build
+add_custom_target(ftests
   DEPENDS ${TARGETS_FTEST}
   COMMENT "Building Functional Tests"
 )
 
-add_custom_target(test-build
+add_custom_target(utests
   DEPENDS ${TARGETS_UTEST}
   COMMENT "Building Unit Tests"
 )
 
 add_custom_target(examples
-  DEPENDS ${TARGETS}
+  DEPENDS ${TARGETS_EXAMPLES}
   COMMENT "Building Examples"
 )
 

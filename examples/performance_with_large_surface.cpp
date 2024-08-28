@@ -36,8 +36,13 @@
      - Try reducing the number of data variables stored in the cell complex
      - Try removing the normal vector from the output
      - Try both MRccT5 & MRccF5 for cc_t
-   - How to include a synthetic value that can be used for color mapping --  c(u,v) can be used to render stripes on the surface.
-   - How to compute a normal to a parametric surface
+   - How to include a synthetic value that can be used for color mapping --  @f$ c(u,v) @f$ can be used to render stripes on the surface.
+   - How to compute a normal to a parametric surface.  If the surface is defined by 
+     @f[ \vec{f}(u,v)=(x(u,v), y(u,v), z(u,v)) @f]
+     Then the normal vector is given by:
+     @f[ \vec{n}=\frac{\partial \vec{f}}{\partial u}\times\frac{\partial \vec{f}}{\partial v} @f]
+     Note that @f$ \frac{\partial \vec{f}}{\partial u} = \left[ \frac{\partial x}{\partial u}, \frac{\partial y}{\partial u}, \frac{\partial z}{\partial u} \right] @f$ &
+      @f$ \frac{\partial \vec{f}}{\partial v} = \left[ \frac{\partial x}{\partial v}, \frac{\partial y}{\partial v}, \frac{\partial z}{\partial v} \right] @f$
    - How to include a normal in the cell complex
 */
 /*******************************************************************************************************************************************************.H.E.**/
@@ -71,7 +76,7 @@ tt_t::rrpt_t stripy_shell(tt_t::drpt_t xvec) {
   double dydv = -u*std::cos(u)*std::sin(v);                            // dY/dv
   double dzdu = std::sin(v);                                           // dZ/du
   double dzdv = u*std::cos(v);                                         // dZ/dv
-  double nx   = dydu*dzdv-dydv*dzdu;                                   // normal_X     This noraml 
+  double nx   = dydu*dzdv-dydv*dzdu;                                   // normal_X     This noraml      
   double ny   = dxdv*dzdu-dxdu*dzdv;                                   // normal_Y     will not be of 
   double nz   = dxdu*dydv-dxdv*dydu;                                   // normal_Z     unit length
   return {x, y, z, c, dxdu, dxdv, dydu, dydv, dzdu, dzdv, nx, ny, nz};

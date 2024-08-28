@@ -51,8 +51,8 @@ or you can do it at the top level of the *=MRPtree=* repository.  Whatever direc
 git clone 'https://github.com/richmit/mraster.git'
 #+END_EXAMPLE
 
-Note that *=MRaster=* can make use of several optional development packages; hoewver, none of them are needed for the functionaly used by the *=MRPtree=*
-examples.
+The above is all you need for the examples as they don't use any advanced functionality from *=MRaster=*.  If you want to make use of advanced *=MRaster=*
+features in your own programs, then see the section [[Accessing *=MRaster=* features]] additional for options.
 
 The source code for the example programs is located in the "=examples=" directory in the *=MRPtree=* repository -- note the *=MRaster=* repository also has an
 "=examples=", but that's not the one you want.  *=MRPtree=* ships with a =cmake= build system that should be able to interrogate your environment, and produce
@@ -113,6 +113,18 @@ at the "=configure.sh=" script in the root directory of the git repository.  Her
        - -DO_BTEST=[YES|NO]    -- BOOT unit tests (to run unit tests)
        - -DO_MRASTER=[YES|NO]  -- MRaster (used for some examples)
 #+end_example
+
+** Accessing *=MRaster=* features
+
+*=MRaster=* can be found & used in various different ways:
+
+ - Simply clone the repo as described above: *=MRPtree=* will find the headers. Advanced TIFF support will unavailable.
+ - Clone and configure the repo: *=MRPtree=* will import a package in the build directory (=build/MRasterConfig*.cmake=).
+ - Clone, configure the repo, and delete the package files in the build directory: *=MRPtree=* will then use the exported target in =build/MRasterLib.cmake=
+ - Clone, configure, and install without a custom install prefix: *=MRPtree=* will import the package from =build/install/lib/cmake/MRaster/MRasterConfig*.cmake=).
+ - Clone, configure, and install with a custom install prefix.  
+   - If the custom install prefix is known by cmake (perhaps it's on your path), then *=MRPtree=* will import the package from wherever you installed it
+   - Otherwise you need to tell cmake where to find the package install (for example, by setting the =MRaster_DIR= variable in the =CMakeLists.txt= file)
 
 * Quick Start (The absolute minimum for people who hate cmake)
 :PROPERTIES:

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-08-20 Tue 15:30 -->
+<!-- 2024-08-28 Wed 15:39 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>MRPTree Quick Start</title>
@@ -231,7 +231,11 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#examples">1. Playing With <b><code>MRPtree</code></b>'s Example Programs</a></li>
+<li><a href="#examples">1. Playing With <b><code>MRPtree</code></b>'s Example Programs</a>
+<ul>
+<li><a href="#org75751dd">1.1. Accessing <b><code>MRaster</code></b> features</a></li>
+</ul>
+</li>
 <li><a href="#qs-min">2. Quick Start (The absolute minimum for people who hate cmake)</a></li>
 </ul>
 </div>
@@ -248,7 +252,7 @@ I suggest starting iwth the example programs.
 The first step is to download <b><code>MRPtree</code></b>.  Simply clone the repository with GIT like this:
 </p>
 
-<pre class="example" id="org705a172">
+<pre class="example" id="orgb64dcf2">
 git clone 'https://github.com/richmit/MRPTree.git'
 </pre>
 
@@ -257,13 +261,13 @@ This next step is optional, but some of the examples won't build without <b><cod
 or you can do it at the top level of the <b><code>MRPtree</code></b> repository.  Whatever directory you chose, the clone command will look something like this:
 </p>
 
-<pre class="example" id="org0eba1b6">
+<pre class="example" id="org4fc9057">
 git clone 'https://github.com/richmit/mraster.git'
 </pre>
 
 <p>
-Note that <b><code>MRaster</code></b> can make use of several optional development packages; hoewver, none of them are needed for the functionaly used by the <b><code>MRPtree</code></b>
-examples.
+The above is all you need for the examples as they don't use any advanced functionality from <b><code>MRaster</code></b>.  If you want to make use of advanced <b><code>MRaster</code></b>
+features in your own programs, then see the section <a href="#org75751dd">1.1</a> additional for options.
 </p>
 
 <p>
@@ -307,7 +311,7 @@ at the "<code>configure.sh</code>" script in the root directory of the git repos
 </pre>
 </div>
 
-<pre class="example" id="org1ded9b6">
+<pre class="example" id="org7e3bd98">
 
 Run this script from the 'build' directory.
 
@@ -335,6 +339,27 @@ Use: configure.sh [cmake arguments]
      - -DO_MRASTER=[YES|NO]  -- MRaster (used for some examples)
 </pre>
 </div>
+
+<div id="outline-container-org75751dd" class="outline-3">
+<h3 id="org75751dd"><span class="section-number-3">1.1.</span> Accessing <b><code>MRaster</code></b> features</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+<b><code>MRaster</code></b> can be found &amp; used in various different ways:
+</p>
+
+<ul class="org-ul">
+<li>Simply clone the repo as described above: <b><code>MRPtree</code></b> will find the headers. Advanced TIFF support will unavailable.</li>
+<li>Clone and configure the repo: <b><code>MRPtree</code></b> will import a package in the build directory (<code>build/MRasterConfig*.cmake</code>).</li>
+<li>Clone, configure the repo, and delete the package files in the build directory: <b><code>MRPtree</code></b> will then use the exported target in <code>build/MRasterLib.cmake</code></li>
+<li>Clone, configure, and install without a custom install prefix: <b><code>MRPtree</code></b> will import the package from <code>build/install/lib/cmake/MRaster/MRasterConfig*.cmake</code>).</li>
+<li>Clone, configure, and install with a custom install prefix.  
+<ul class="org-ul">
+<li>If the custom install prefix is known by cmake (perhaps it's on your path), then <b><code>MRPtree</code></b> will import the package from wherever you installed it</li>
+<li>Otherwise you need to tell cmake where to find the package install (for example, by setting the MRaster_DIR variable in the <code>CMakeLists.txt</code> file)</li>
+</ul></li>
+</ul>
+</div>
+</div>
 </div>
 
 <div id="outline-container-qs-min" class="outline-2">
@@ -348,7 +373,7 @@ If you are interested playing around with <b><code>MRPtree</code></b> as quickly
 The first step is to download <b><code>MRPtree</code></b>.  Simply clone the repository with GIT like this:
 </p>
 
-<pre class="example" id="orgf9fb3fc">
+<pre class="example" id="orgde31264">
 git clone 'https://github.com/richmit/MRPTree.git'
 </pre>
 
