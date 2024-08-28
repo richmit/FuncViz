@@ -37,9 +37,12 @@ if [[ "${@}" == *'-h'* ]]; then
 
   If you don't have a 'build' directory yet, then create one!
 
-  Use: configure.sh [cmake arguments]
+  Use: configure.sh [configure options] [cmake arguments]
 
-    Common Arguments:
+    Configure Options
+     * -C Clean the build directory before running cmake
+
+    Common Cmake Arguments:
      * Target -- leave it off to get the default
        - -G 'MSYS Makefiles'           <-- Default on MSYS2
        - -G 'Visual Studio 17 2022'
@@ -49,7 +52,7 @@ if [[ "${@}" == *'-h'* ]]; then
        - -DCMAKE_CXX_COMPILER=clang++
        - -DCMAKE_CXX_COMPILER=g++      <-- Default for 'MSYS Makefiles'
        - -DCMAKE_CXX_COMPILER=g++-##   <-- Default for 'Unix Makefiles' if /usr/bin/g++-[0-9][0-9] exists
-                                           in which case the highest numbered version is selcted.
+                                           in which case the highest numbered version is selected.
                                            This code base needs at least GCC-14.
        - -DCMAKE_CXX_COMPILER=g++      <-- Default for 'Unix Makefiles' if /usr/bin/g++-[0-9][0-9] missing
        -                               <-- Default for 'Visual Studio 17 2022'
@@ -61,9 +64,23 @@ EOF
 exit
 fi
 
+if [ "$1" == "-C" ]; then
+  shift
+  CLEAN_DIR='YES'
+else
+  CLEAN_DIR='NO'
+fi
+
+
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------
 if [ -e ../CMakeLists.txt ]; then
   if [ "$(basename $(pwd))" == "build" ]; then
+    #
+    # If we need to clean, then CLEAN!!
+    if [ "$CLEAN_DIR" == 'YES' ]; then
+      ls
+      rm -rI *
+    fi
     #
     # Figure out target
     CMAKE_TARGET=''
