@@ -58,14 +58,21 @@ tt_t::rrpt_t isf(tt_t::drpt_t xvec) {
   double x = xvec[0];
   double y = xvec[1];
   double z = xvec[2];
-
   return x*x-y*y*z*z+z*z*z;
 }
 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+tt_t::rrpt_t besdf(tt_t::drpt_t xvec) {
+  double x = xvec[0];
+  double y = xvec[1];
+  double z = xvec[2];
+  return x*(z-y*y); // Inner ear edge
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int main() {
-  // tt_t tree({-2.2, -2.2, -2.2}, 
-  //           { 2.2,  2.2,  2.2});
   tt_t tree;
   cc_t ccplx;
 
@@ -75,17 +82,11 @@ int main() {
   /* Refine near surface */
   tree.refine_leaves_recursive_cell_pred(6, isf, [&tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, isf)); });
 
+  /* Refine between the ears.  Could have also just refined on x=0 plane.  */
+  tree.refine_leaves_recursive_cell_pred(8, isf, [&tree](tt_t::diti_t i) { auto x = tree.diti_to_drpt(i); return (std::abs(x[1])<0.5) && (tree.cell_cross_sdf(i, besdf)); });
+
   /* Refine on the x-y plane */
   tree.refine_leaves_recursive_cell_pred(7, isf, [&tree](tt_t::diti_t i) { return (tree.cell_cross_domain_level(i, 2, 0.0, 1.0e-6)); });
-
-  /* Refine between the ears */
-  tree.refine_leaves_recursive_cell_pred(7,  isf, [&tree](tt_t::diti_t i) { auto x = tree.diti_to_drpt(i); return ((std::abs(x[0]) < 0.07)&&(std::abs(x[1]) < 0.6)); });
-  tree.refine_leaves_recursive_cell_pred(8,  isf, [&tree](tt_t::diti_t i) { auto x = tree.diti_to_drpt(i); return ((std::abs(x[0]) < 0.04)&&(std::abs(x[1]) < 0.3)); });
-  tree.refine_leaves_recursive_cell_pred(9,  isf, [&tree](tt_t::diti_t i) { auto x = tree.diti_to_drpt(i); return ((std::abs(x[0]) < 0.02)&&(std::abs(x[1]) < 0.2)); });
-  tree.refine_leaves_recursive_cell_pred(10, isf, [&tree](tt_t::diti_t i) { auto x = tree.diti_to_drpt(i); return ((std::abs(x[0]) < 0.01)&&(std::abs(x[1]) < 0.15)); });
-
-  /* Refine lower edge of ears */
-  tree.refine_leaves_recursive_cell_pred(7, isf, [&tree](tt_t::diti_t i) { auto x = tree.diti_to_drpt(i); return ((std::abs(x[0]) < 0.3)&&(std::abs(x[1]) > 0.2)&&(std::abs(x[1]) < 1.0)); });
 
   /* Balance the tree */
   tree.balance_tree(1, isf);

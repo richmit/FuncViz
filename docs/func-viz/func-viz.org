@@ -115,16 +115,15 @@ XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/complex
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/complex_magnitude_surface.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/complex_magnitude_surface.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+./src2listing.sh ../../examples/complex_magnitude_surface.cpp
 #+end_src
 
 #+RESULTS:
 #+begin_src c++ :eval never :tangle no
-
 #include "MR_rect_tree.hpp"
 #include "MR_cell_cplx.hpp"
 #include "MR_rt_to_cc.hpp"
-#include "color.hpp"
+#include "MRcolor.hpp"
 
 typedef mjr::tree15b2d9rT            tt_t;
 typedef mjr::MRccT5                  cc_t;
@@ -310,12 +309,11 @@ XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/implici
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/implicit_curve_2d.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/implicit_curve_2d.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+./src2listing.sh ../../examples/implicit_curve_2d.cpp
 #+end_src
 
 #+RESULTS:
 #+begin_src c++ :eval never :tangle no
-
 #include "MR_rect_tree.hpp"
 #include "MR_cell_cplx.hpp"
 #include "MR_rt_to_cc.hpp"
@@ -340,7 +338,6 @@ int main() {
   tt_t tree({-10.0, -6.5},
             { 10.0,  6.5});
   cc_t ccplx;
-  tc_t bridge;
 
   // First we sample the top cell.  Just one cell!
   tree.sample_cell(f);
@@ -354,12 +351,12 @@ int main() {
   tree.dump_tree(20);
 
   // Convert the geometry into a 3D dataset so we can see the contour on the surface
-  bridge.construct_geometry_fans(ccplx,
-                                 tree,
-                                 2,
-                                 {{tc_t::tree_val_src_t::DOMAIN, 0},
-                                  {tc_t::tree_val_src_t::DOMAIN, 1},
-                                  {tc_t::tree_val_src_t::RANGE,  0}});
+  tc_t::construct_geometry_fans(ccplx,
+                                tree,
+                                2,
+                                {{tc_t::val_src_spc_t::FDOMAIN, 0},
+                                 {tc_t::val_src_spc_t::FDOMAIN, 1},
+                                 {tc_t::val_src_spc_t::FRANGE,  0}});
 
   ccplx.create_named_datasets({"x", "y", "f(x,y)"});
 
@@ -396,12 +393,11 @@ XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/implici
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/implicit_surface.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/implicit_surface.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+./src2listing.sh ../../examples/implicit_surface.cpp
 #+end_src
 
 #+RESULTS:
 #+begin_src c++ :eval never :tangle no
-
 #include "MR_rect_tree.hpp"
 #include "MR_cell_cplx.hpp"
 #include "MR_rt_to_cc.hpp"
@@ -421,7 +417,6 @@ int main() {
   tt_t tree({-2.3, -2.3, -2.3}, 
             { 2.3,  2.3,  2.3});
   cc_t ccplx;
-  tc_t bridge;
 
   /* Initial uniform sample */
   tree.refine_grid(4, isf);
@@ -432,13 +427,13 @@ int main() {
   tree.dump_tree(5);
 
   /* Convert our tree to a cell complex.  Note that we use an SDF to export only cells that contain our surface */
-  bridge.construct_geometry_rects(ccplx,
-                                  tree,
-                                  tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, isf)); }),
-                                  3,
-                                  {{tc_t::tree_val_src_t::DOMAIN, 0}, 
-                                   {tc_t::tree_val_src_t::DOMAIN, 1},
-                                   {tc_t::tree_val_src_t::DOMAIN, 2}});
+  tc_t::construct_geometry_rects(ccplx,
+                                 tree,
+                                 tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, isf)); }),
+                                 3,
+                                 {{tc_t::val_src_spc_t::FDOMAIN, 0}, 
+                                  {tc_t::val_src_spc_t::FDOMAIN, 1},
+                                  {tc_t::val_src_spc_t::FDOMAIN, 2}});
 
   /* Name the data points */
   ccplx.create_named_datasets({"x", "y", "z", "f(x,y,z)"});
@@ -477,12 +472,11 @@ XML VTK Data File 2: https://github.com/richmit/MRPTree/blob/main/paraview/vecto
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/vector_field_3d.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/vector_field_3d.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+./src2listing.sh ../../examples/vector_field_3d.cpp
 #+end_src
 
 #+RESULTS:
 #+begin_src c++ :eval never :tangle no
-
 #include "MR_rect_tree.hpp"
 #include "MR_cell_cplx.hpp"
 #include "MR_rt_to_cc.hpp"
@@ -508,18 +502,17 @@ int main() {
   tt_t vftree({-30.0, -30.0,  -0.0},
               { 30.0,  30.0,  60.0});
   cc_t vfccplx;
-  tc_t vfbridge;
 
   /* Uniform sampling */
   vftree.refine_grid(5, vf);
 
   /* Dump the vector field */
-  vfbridge.construct_geometry_rects(vfccplx,
-                                    vftree,
-                                    0,
-                                    {{tc_t::tree_val_src_t::DOMAIN,  0},
-                                     {tc_t::tree_val_src_t::DOMAIN,  1},
-                                     {tc_t::tree_val_src_t::DOMAIN,  2}});
+  tc_t::construct_geometry_rects(vfccplx,
+                                 vftree,
+                                 0,
+                                 {{tc_t::val_src_spc_t::FDOMAIN,  0},
+                                  {tc_t::val_src_spc_t::FDOMAIN,  1},
+                                  {tc_t::val_src_spc_t::FDOMAIN,  2}});
 
   vfccplx.create_named_datasets({"x", "y", "z"},
                                 {{"d", {0, 1, 2}}});
@@ -539,14 +532,14 @@ int main() {
   double b      = 28.0;
   double c      = 8.0 / 3.0;
 
-  auto p_old = cvccplx.add_point({x_old, y_old, z_old, t});
+  auto p_old = cvccplx.add_node({x_old, y_old, z_old, t});
   for(int num_steps=0;num_steps<max_steps;num_steps++) {    
     double x_new = x_old + a*(y_old-x_old)*delta;
     double y_new = y_old + (x_old*(b-z_old)-y_old)*delta;
     double z_new = z_old + (x_old*y_old-c*z_old)*delta;
     t += delta;
-    auto p_new = cvccplx.add_point({x_new, y_new, z_new, t});
-    cvccplx.add_cell(cc_t::cell_type_t::SEGMENT, {p_old, p_new});
+    auto p_new = cvccplx.add_node({x_new, y_new, z_new, t});
+    cvccplx.add_cell(cc_t::cell_kind_t::SEGMENT, {p_old, p_new});
     x_old=x_new;
     y_old=y_new;
     z_old=z_new;
@@ -601,12 +594,11 @@ XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/surface
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/surface_with_normals.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_with_normals.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+./src2listing.sh ../../examples/surface_with_normals.cpp
 #+end_src
 
 #+RESULTS:
 #+begin_src c++ :eval never :tangle no
-
 #include "MR_rect_tree.hpp"
 #include "MR_cell_cplx.hpp"
 #include "MR_rt_to_cc.hpp"
@@ -649,7 +641,6 @@ int main() {
   tt_t tree({-2.1, -2.1}, 
             { 2.1,  2.1});
   cc_t ccplx;
-  tc_t bridge;
   
   // Make a few samples on a uniform grid
   tree.refine_grid(2, damp_cos_wave);
@@ -672,12 +663,12 @@ int main() {
 
   tree.dump_tree(5);
 
-  bridge.construct_geometry_fans(ccplx,
-                                 tree,
-                                 2,
-                                 {{tc_t::tree_val_src_t::DOMAIN, 0}, 
-                                  {tc_t::tree_val_src_t::DOMAIN, 1},
-                                  {tc_t::tree_val_src_t::RANGE,  0}});
+  tc_t::construct_geometry_fans(ccplx,
+                                tree,
+                                2,
+                                {{tc_t::val_src_spc_t::FDOMAIN, 0}, 
+                                 {tc_t::val_src_spc_t::FDOMAIN, 1},
+                                 {tc_t::val_src_spc_t::FRANGE,  0}});
 
   // Note we use the single argument version of create_named_datasets() because we don't want to name elements 3, 4, & 5 (the components of the normal
   // Note if we had placed the ddiv component right after z, then we could have used the two argument version...
@@ -734,12 +725,11 @@ XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/surface
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/surface_plot_edge.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_plot_edge.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+./src2listing.sh ../../examples/surface_plot_edge.cpp
 #+end_src
 
 #+RESULTS:
 #+begin_src c++ :eval never :tangle no
-
 #include "MR_rect_tree.hpp"
 #include "MR_cell_cplx.hpp"
 #include "MR_rt_to_cc.hpp"
@@ -761,7 +751,6 @@ int main() {
   tt_t tree({-1.1, -1.1}, 
             { 1.1,  1.1});
   cc_t ccplx;
-  tc_t bridge;
 
   // Sample a uniform grid across the domain
   tree.refine_grid(5, half_sphere);
@@ -781,14 +770,14 @@ int main() {
   tree.dump_tree(10);
 
   /* By passing half_sphere() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired. */
-  bridge.construct_geometry_fans(ccplx,
-                                 tree,
-                                 2,
-                                 {{tc_t::tree_val_src_t::DOMAIN, 0}, 
-                                  {tc_t::tree_val_src_t::DOMAIN, 1},
-                                  {tc_t::tree_val_src_t::RANGE,  0}},
-                                 half_sphere
-                                );
+  tc_t::construct_geometry_fans(ccplx,
+                                tree,
+                                2,
+                                {{tc_t::val_src_spc_t::FDOMAIN, 0}, 
+                                 {tc_t::val_src_spc_t::FDOMAIN, 1},
+                                 {tc_t::val_src_spc_t::FRANGE,  0}},
+                                half_sphere
+                               );
 
   ccplx.create_named_datasets({"x", "y", "f(x,y)"},
                               {{"NORMALS", {0, 1, 2}}});
@@ -832,12 +821,11 @@ XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/surface
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/surface_plot_annular_edge.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_plot_annular_edge.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+./src2listing.sh ../../examples/surface_plot_annular_edge.cpp
 #+end_src
 
 #+RESULTS:
 #+begin_src c++ :eval never :tangle no
-
 #include "MR_rect_tree.hpp"
 #include "MR_cell_cplx.hpp"
 #include "MR_rt_to_cc.hpp"
@@ -937,12 +925,11 @@ XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/surface
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/surface_plot_corner.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_plot_corner.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+./src2listing.sh ../../examples/surface_plot_corner.cpp
 #+end_src
 
 #+RESULTS:
 #+begin_src c++ :eval never :tangle no
-
 #include "MR_rect_tree.hpp"
 #include "MR_cell_cplx.hpp"
 #include "MR_rt_to_cc.hpp"
@@ -950,7 +937,6 @@ grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_plot
 typedef mjr::tree15b2d1rT            tt_t;
 typedef mjr::MRccT5                  cc_t;
 typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
-
 
 tt_t::rrpt_t half_sphere_hat(tt_t::drpt_t xvec) {
   double m = xvec[0] * xvec[0] + xvec[1] * xvec[1];
@@ -994,8 +980,8 @@ int main() {
   ccplx.dump_cplx(10);
 
   /* Fold all triangles that cross the unit circle! */
-  ccplx.triangle_folder([](cc_t::pnt_data_t x){return tc_t::tsampf_to_cdatf(half_sphere_hat, x); }, 
-                        [](cc_t::pnt_data_t x){return tc_t::tsdf_to_csdf(unit_circle_sdf,    x); });
+  ccplx.triangle_folder([](cc_t::node_data_t x){return tc_t::tsampf_to_cdatf(half_sphere_hat, x); }, 
+                        [](cc_t::node_data_t x){return tc_t::tsdf_to_csdf(unit_circle_sdf,    x); });
 
   /* Notice how it changed after the fold */
   ccplx.dump_cplx(10);
@@ -1035,12 +1021,11 @@ Mathematica 12 & Maple 2024.1\\
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/surface_plot_step.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_plot_step.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+./src2listing.sh ../../examples/surface_plot_step.cpp
 #+end_src
 
 #+RESULTS:
 #+begin_src c++ :eval never :tangle no
-
 #include "MR_rect_tree.hpp"
 #include "MR_cell_cplx.hpp"
 #include "MR_rt_to_cc.hpp"
@@ -1048,7 +1033,6 @@ grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_plot
 typedef mjr::tree15b2d1rT            tt_t;
 typedef mjr::MRccT5                  cc_t;
 typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
-
 
 tt_t::rrpt_t hover_circle(tt_t::drpt_t xvec) {
   return (xvec[0] * xvec[0] + xvec[1] * xvec[1] < 1);
@@ -1094,8 +1078,8 @@ int main() {
   tc_t::cull_cc_cells_on_domain_sdf_boundry(ccplx, unit_circle_sdf);
 
   /* We can do the above directly with MR_cell_cplx::cull_cells().  If you rewrote unit_circle_sdf(), you don't need to nest lambdas... */
-  // ccplx.cull_cells([&ccplx](cc_t::cell_t c){ return ccplx.cell_cross_sdf_boundry(c, 
-  //                                                                                [](cc_t::pnt_data_t pd) { return (tc_t::tsdf_to_csdf(unit_circle_sdf, 
+  // ccplx.cull_cells([&ccplx](cc_t::cell_verts_t c){ return ccplx.cell_cross_sdf_boundry(c, 
+  //                                                                                [](cc_t::node_data_t pd) { return (tc_t::tsdf_to_csdf(unit_circle_sdf, 
   //                                                                                                                                     pd)); 
   //                                                                                                        }); 
   //                                          });
@@ -1137,12 +1121,11 @@ XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/surface
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/surface_branch_glue.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/surface_branch_glue.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+./src2listing.sh ../../examples/surface_branch_glue.cpp
 #+end_src
 
 #+RESULTS:
 #+begin_src c++ :eval never :tangle no
-
 #include "MR_rect_tree.hpp"
 #include "MR_cell_cplx.hpp"
 #include "MR_rt_to_cc.hpp"
@@ -1164,7 +1147,6 @@ int main() {
   tt_t tree({-1.2, -1.2}, 
             { 1.2,  1.2});
   cc_t ccplx;
-  tc_t bridge;
 
   // Sample a uniform grid across the domain
   tree.refine_grid(5, half_sphere);
@@ -1175,14 +1157,14 @@ int main() {
   tree.dump_tree(10);
 
   /* By passing half_sphere() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired. */
-  bridge.construct_geometry_fans(ccplx,
-                                 tree,
-                                 2,
-                                 {{tc_t::tree_val_src_t::DOMAIN, 0}, 
-                                  {tc_t::tree_val_src_t::DOMAIN, 1},
-                                  {tc_t::tree_val_src_t::RANGE,  0}},
-                                 half_sphere
-                                );
+  tc_t::construct_geometry_fans(ccplx,
+                                tree,
+                                2,
+                                {{tc_t::val_src_spc_t::FDOMAIN, 0}, 
+                                 {tc_t::val_src_spc_t::FDOMAIN, 1},
+                                 {tc_t::val_src_spc_t::FRANGE,  0}},
+                                half_sphere
+                               );
 
   ccplx.create_named_datasets({"x", "y", "f(x,y)"},
                               {{"NORMALS", {0, 1, 2}}});
@@ -1231,12 +1213,11 @@ XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/curve_p
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/curve_plot.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/curve_plot.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)' 
+./src2listing.sh ../../examples/curve_plot.cpp
 #+end_src
 
 #+RESULTS:
 #+begin_src c++ :eval never :tangle no
-
 #include "MR_rect_tree.hpp"
 #include "MR_cell_cplx.hpp"
 #include "MR_rt_to_cc.hpp"
@@ -1259,7 +1240,6 @@ tt_t::rrpt_t f(tt_t::drpt_t x) {
 int main() {
   tt_t tree(-3, 3);
   cc_t ccplx;
-  tc_t bridge;
 
   // Sample a uniform grid across the domain
   tree.refine_grid(5, f);
@@ -1293,14 +1273,14 @@ int main() {
 
   tree.dump_tree(10);
 
-  bridge.construct_geometry_fans(ccplx,
-                                 tree,
-                                 1,
-                                 {{tc_t::tree_val_src_t::DOMAIN,   0  }, 
-                                  {tc_t::tree_val_src_t::RANGE,    0  },
-                                  {tc_t::tree_val_src_t::CONSTANT, 0.0}},
-                                 f
-                                );
+  tc_t::construct_geometry_fans(ccplx,
+                                tree,
+                                1,
+                                {{tc_t::val_src_spc_t::FDOMAIN,   0  }, 
+                                 {tc_t::val_src_spc_t::FRANGE,    0  },
+                                 {tc_t::val_src_spc_t::CONSTANT, 0.0}},
+                                f
+                               );
 
   // Note the first argument need not name *every* data element, just the first ones.
   ccplx.create_named_datasets({"x", "f(x)"});
@@ -1348,11 +1328,12 @@ XML VTK Data File 2:  https://github.com/richmit/MRPTree/blob/main/paraview/para
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/parametric_surface_with_defects.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/parametric_surface_with_defects.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+./src2listing.sh ../../examples/parametric_surface_with_defects.cpp
 #+end_src
 
 #+RESULTS:
 #+begin_src c++ :eval never :tangle no
+#include <numbers>                                                       /* C++ math constants      C++20    */
 
 #include "MR_rect_tree.hpp"
 #include "MR_cell_cplx.hpp"
@@ -1374,31 +1355,29 @@ tt_t::rrpt_t par_sphere(tt_t::drpt_t xvec) {
 int main() {
   tt_t tree;
   cc_t ccplx;
-  tc_t bridge;
 
   /* Uniform sampling */
   tree.refine_grid(6, par_sphere);
 
-
   /* First we dump a tessellation made of triangles */
-  bridge.construct_geometry_fans(ccplx,
-                                 tree,
-                                 2,
-                                 {{tc_t::tree_val_src_t::RANGE, 0},
-                                  {tc_t::tree_val_src_t::RANGE, 1},
-                                  {tc_t::tree_val_src_t::RANGE, 2}});
+  tc_t::construct_geometry_fans(ccplx,
+                                tree,
+                                2,
+                                {{tc_t::val_src_spc_t::FRANGE, 0},
+                                 {tc_t::val_src_spc_t::FRANGE, 1},
+                                 {tc_t::val_src_spc_t::FRANGE, 2}});
   ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)"});
   ccplx.dump_cplx(5);
   ccplx.write_xml_vtk("parametric_surface_with_defects-tri.vtu", "parametric_surface_with_defects-tri");
 
   /* Next we dump a tessellation made of rectangles */
   ccplx.clear(); // We need to clear out the old contents first!
-  bridge.construct_geometry_rects(ccplx,
-                                  tree,
-                                  2,
-                                  {{tc_t::tree_val_src_t::RANGE, 0},
-                                   {tc_t::tree_val_src_t::RANGE, 1},
-                                   {tc_t::tree_val_src_t::RANGE, 2}});
+  tc_t::construct_geometry_rects(ccplx,
+                                 tree,
+                                 2,
+                                 {{tc_t::val_src_spc_t::FRANGE, 0},
+                                  {tc_t::val_src_spc_t::FRANGE, 1},
+                                  {tc_t::val_src_spc_t::FRANGE, 2}});
   ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)"});
   ccplx.dump_cplx(5);
   ccplx.write_xml_vtk("parametric_surface_with_defects-rect.vtu", "parametric_surface_with_defects-rect");
@@ -1443,13 +1422,13 @@ XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/perform
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/performance_with_large_surface.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/performance_with_large_surface.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+./src2listing.sh ../../examples/performance_with_large_surface.cpp
 #+end_src
 
 #+RESULTS:
 #+begin_src c++ :eval never :tangle no
-
-#include <chrono>
+#include <chrono>                                                        /* time                    C++11    */
+#include <numbers>                                                       /* C++ math constants      C++20    */
 
 #include "MR_rect_tree.hpp"
 #include "MR_cell_cplx.hpp"
@@ -1472,7 +1451,7 @@ tt_t::rrpt_t stripy_shell(tt_t::drpt_t xvec) {
   double dydv = -u*std::cos(u)*std::sin(v);                            // dY/dv
   double dzdu = std::sin(v);                                           // dZ/du
   double dzdv = u*std::cos(v);                                         // dZ/dv
-  double nx   = dydu*dzdv-dydv*dzdu;                                   // normal_X     This noraml 
+  double nx   = dydu*dzdv-dydv*dzdu;                                   // normal_X     This noraml      
   double ny   = dxdv*dzdu-dxdu*dzdv;                                   // normal_Y     will not be of 
   double nz   = dxdu*dydv-dxdv*dydu;                                   // normal_Z     unit length
   return {x, y, z, c, dxdu, dxdv, dydu, dydv, dzdu, dzdv, nx, ny, nz};
@@ -1482,21 +1461,20 @@ int main() {
   std::chrono::time_point<std::chrono::system_clock> start_time = std::chrono::system_clock::now();
   tt_t tree;
   cc_t ccplx;
-  tc_t bridge;
   std::chrono::time_point<std::chrono::system_clock> construct_time = std::chrono::system_clock::now();
 
   tree.refine_grid(7, stripy_shell);
   std::chrono::time_point<std::chrono::system_clock> sample_time = std::chrono::system_clock::now();
 
-  tree.dump_tree(20);
-  std::chrono::time_point<std::chrono::system_clock> dump_time = std::chrono::system_clock::now();
+  tree.dump_tree(10);
+  std::chrono::time_point<std::chrono::system_clock> tdump_time = std::chrono::system_clock::now();
 
-  bridge.construct_geometry_fans(ccplx,
-                                 tree,
-                                 2,
-                                 {{tc_t::tree_val_src_t::RANGE,  0},
-                                  {tc_t::tree_val_src_t::RANGE,  1},
-                                  {tc_t::tree_val_src_t::RANGE,  2}});
+  tc_t::construct_geometry_fans(ccplx,
+                                tree,
+                                2,
+                                {{tc_t::val_src_spc_t::FRANGE,  0},
+                                 {tc_t::val_src_spc_t::FRANGE,  1},
+                                 {tc_t::val_src_spc_t::FRANGE,  2}});
   std::chrono::time_point<std::chrono::system_clock> fan_time = std::chrono::system_clock::now();
 
   ccplx.create_named_datasets({"u", "v", 
@@ -1507,15 +1485,19 @@ int main() {
                               {{"NORMALS", {12, 13, 14}}});
   std::chrono::time_point<std::chrono::system_clock> dat_anno_time = std::chrono::system_clock::now();
 
+  ccplx.dump_cplx(10);
+  std::chrono::time_point<std::chrono::system_clock> cdump_time = std::chrono::system_clock::now();
+
   ccplx.write_xml_vtk("performance_with_large_surface.vtu", "performance_with_large_surface");
   std::chrono::time_point<std::chrono::system_clock> write_time = std::chrono::system_clock::now();
 
   std::cout << "construct_time time .. " << static_cast<std::chrono::duration<double>>(construct_time-start_time)   << " sec" << std::endl;
   std::cout << "sample_time time ..... " << static_cast<std::chrono::duration<double>>(sample_time-construct_time)  << " sec" << std::endl;
-  std::cout << "dump_time time ....... " << static_cast<std::chrono::duration<double>>(dump_time-sample_time)       << " sec" << std::endl;
-  std::cout << "bridge time .......... " << static_cast<std::chrono::duration<double>>(fan_time-dump_time)          << " sec" << std::endl;
+  std::cout << "tree dump time ....... " << static_cast<std::chrono::duration<double>>(tdump_time-sample_time)      << " sec" << std::endl;
+  std::cout << "bridge time .......... " << static_cast<std::chrono::duration<double>>(fan_time-tdump_time)         << " sec" << std::endl;
   std::cout << "dataset anno time .... " << static_cast<std::chrono::duration<double>>(dat_anno_time-fan_time)      << " sec" << std::endl;
-  std::cout << "write_vtk time ....... " << static_cast<std::chrono::duration<double>>(write_time-dat_anno_time)    << " sec" << std::endl;
+  std::cout << "complex dump time .... " << static_cast<std::chrono::duration<double>>(cdump_time-dat_anno_time)    << " sec" << std::endl;
+  std::cout << "write_vtk time ....... " << static_cast<std::chrono::duration<double>>(write_time-cdump_time)       << " sec" << std::endl;
   std::cout << "Total Run _time ...... " << static_cast<std::chrono::duration<double>>(write_time-start_time)       << " sec" << std::endl;
 }
 #+end_src
@@ -1550,11 +1532,12 @@ fore examples.
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/trefoil.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/trefoil.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+./src2listing.sh ../../examples/trefoil.cpp
 #+end_src
 
 #+RESULTS:
 #+begin_src c++ :eval never :tangle no
+#include <numbers>                                                       /* C++ math constants      C++20    */
 
 #include "MR_rect_tree.hpp"
 #include "MR_cell_cplx.hpp"
@@ -1594,18 +1577,17 @@ int main() {
   tt_t tree;
 
   cc_t ccplx;
-  tc_t bridge;
 
   tree.refine_grid(7, trefoil);
 
   tree.dump_tree(20);
 
-  bridge.construct_geometry_fans(ccplx,
-                                 tree,
-                                 2,
-                                 {{tc_t::tree_val_src_t::RANGE,  0},
-                                  {tc_t::tree_val_src_t::RANGE,  1},
-                                  {tc_t::tree_val_src_t::RANGE,  2}});
+  tc_t::construct_geometry_fans(ccplx,
+                                tree,
+                                2,
+                                {{tc_t::val_src_spc_t::FRANGE,  0},
+                                 {tc_t::val_src_spc_t::FRANGE,  1},
+                                 {tc_t::val_src_spc_t::FRANGE,  2}});
 
   ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)", "nx", "ny", "nz"},
                               {{"NORMALS", {5, 6, 7}}});
@@ -1661,12 +1643,11 @@ XML VTK Data File 3: https://github.com/richmit/MRPTree/blob/main/paraview/param
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/parametric_curve_3d.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/parametric_curve_3d.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+./src2listing.sh ../../examples/parametric_curve_3d.cpp
 #+end_src
 
 #+RESULTS:
 #+begin_src c++ :eval never :tangle no
-
 #include "MR_rect_tree.hpp"
 #include "MR_cell_cplx.hpp"
 #include "MR_rt_to_cc.hpp"
@@ -1706,46 +1687,43 @@ tt2_t::src_t twisted_cubic_srf2_sdf(tt2_t::drpt_t xyvec) {
 int main() {
   tt1_t crv_tree;
   cc1_t crv_ccplx;
-  tc1_t crv_tree_conv;
   crv_tree.refine_grid(8, twisted_cubic_crv);
-  crv_tree_conv.construct_geometry_fans(crv_ccplx,
-                                        crv_tree,
-                                        1,
-                                        {{tc1_t::tree_val_src_t::RANGE, 0},
-                                         {tc1_t::tree_val_src_t::RANGE, 1},
-                                         {tc1_t::tree_val_src_t::RANGE, 2}});
+  tc1_t::construct_geometry_fans(crv_ccplx,
+                                 crv_tree,
+                                 1,
+                                 {{tc1_t::val_src_spc_t::FRANGE, 0},
+                                  {tc1_t::val_src_spc_t::FRANGE, 1},
+                                  {tc1_t::val_src_spc_t::FRANGE, 2}});
   crv_ccplx.create_named_datasets({"t", "x(t)", "y(t)", "z(t)"});
   crv_ccplx.dump_cplx(5);
   crv_ccplx.write_xml_vtk("parametric_curve_3d-crv.vtu", "parametric_curve_3d-crv");
 
   tt2_t srf1_tree;
   cc2_t srf1_ccplx;
-  tc2_t srf1_tree_conv;
   srf1_tree.refine_grid(5, twisted_cubic_srf1);
   srf1_tree.refine_leaves_recursive_cell_pred(6, twisted_cubic_srf1, [&srf1_tree](tt2_t::diti_t i) { return srf1_tree.cell_cross_sdf(i, twisted_cubic_srf2_sdf); });
   srf1_tree.balance_tree(1, twisted_cubic_srf1);
-  srf1_tree_conv.construct_geometry_fans(srf1_ccplx,
-                                         srf1_tree,
-                                         2,
-                                         {{tc2_t::tree_val_src_t::DOMAIN, 0},
-                                          {tc2_t::tree_val_src_t::RANGE,  0},
-                                          {tc2_t::tree_val_src_t::DOMAIN, 1}});
+  tc2_t::construct_geometry_fans(srf1_ccplx,
+                                 srf1_tree,
+                                 2,
+                                 {{tc2_t::val_src_spc_t::FDOMAIN, 0},
+                                  {tc2_t::val_src_spc_t::FRANGE,  0},
+                                  {tc2_t::val_src_spc_t::FDOMAIN, 1}});
   srf1_ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)"});
   srf1_ccplx.dump_cplx(5);
   srf1_ccplx.write_xml_vtk("parametric_curve_3d-srf1.vtu", "parametric_curve_3d-srf1");
 
   tt2_t srf2_tree;
   cc2_t srf2_ccplx;
-  tc2_t srf2_tree_conv;
   srf2_tree.refine_grid(5, twisted_cubic_srf2);
   srf2_tree.refine_leaves_recursive_cell_pred(6, twisted_cubic_srf2, [&srf2_tree](tt2_t::diti_t i) { return srf2_tree.cell_cross_sdf(i, twisted_cubic_srf1_sdf); });
   srf2_tree.balance_tree(1, twisted_cubic_srf2);
-  srf2_tree_conv.construct_geometry_fans(srf2_ccplx,
-                                         srf2_tree,
-                                         2,
-                                         {{tc2_t::tree_val_src_t::RANGE, 0},
-                                          {tc2_t::tree_val_src_t::RANGE, 1},
-                                          {tc2_t::tree_val_src_t::RANGE, 2}});
+  tc2_t::construct_geometry_fans(srf2_ccplx,
+                                 srf2_tree,
+                                 2,
+                                 {{tc2_t::val_src_spc_t::FRANGE, 0},
+                                  {tc2_t::val_src_spc_t::FRANGE, 1},
+                                  {tc2_t::val_src_spc_t::FRANGE, 2}});
   srf2_ccplx.create_named_datasets({"u", "v", "x(u,v)", "y(u,v)", "z(u,v)"});
   srf2_ccplx.dump_cplx(5);
   srf2_ccplx.write_xml_vtk("parametric_curve_3d-srf2.vtu", "parametric_curve_3d-srf2");
@@ -1787,12 +1765,11 @@ XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/ear_sur
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/ear_surface.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/ear_surface.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+./src2listing.sh ../../examples/ear_surface.cpp 
 #+end_src
 
 #+RESULTS:
 #+begin_src c++ :eval never :tangle no
-
 #include "MR_rect_tree.hpp"
 #include "MR_cell_cplx.hpp"
 #include "MR_rt_to_cc.hpp"
@@ -1805,15 +1782,19 @@ tt_t::rrpt_t isf(tt_t::drpt_t xvec) {
   double x = xvec[0];
   double y = xvec[1];
   double z = xvec[2];
-
   return x*x-y*y*z*z+z*z*z;
 }
 
+tt_t::rrpt_t besdf(tt_t::drpt_t xvec) {
+  double x = xvec[0];
+  double y = xvec[1];
+  double z = xvec[2];
+  return x*(z-y*y); // Inner ear edge
+}
+
 int main() {
-  tt_t tree({-2.2, -2.2, -2.2}, 
-            { 2.2,  2.2,  2.2});
+  tt_t tree;
   cc_t ccplx;
-  tc_t bridge; 
 
   /* Initial uniform sample */
   tree.refine_grid(3, isf);
@@ -1821,17 +1802,11 @@ int main() {
   /* Refine near surface */
   tree.refine_leaves_recursive_cell_pred(6, isf, [&tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, isf)); });
 
+  /* Refine between the ears.  Could have also just refined on x=0 plane.  */
+  tree.refine_leaves_recursive_cell_pred(8, isf, [&tree](tt_t::diti_t i) { auto x = tree.diti_to_drpt(i); return (std::abs(x[1])<0.5) && (tree.cell_cross_sdf(i, besdf)); });
+
   /* Refine on the x-y plane */
   tree.refine_leaves_recursive_cell_pred(7, isf, [&tree](tt_t::diti_t i) { return (tree.cell_cross_domain_level(i, 2, 0.0, 1.0e-6)); });
-
-  /* Refine between the ears */
-  tree.refine_leaves_recursive_cell_pred(7,  isf, [&tree](tt_t::diti_t i) { auto x = tree.diti_to_drpt(i); return ((std::abs(x[0]) < 0.07)&&(std::abs(x[1]) < 0.6)); });
-  tree.refine_leaves_recursive_cell_pred(8,  isf, [&tree](tt_t::diti_t i) { auto x = tree.diti_to_drpt(i); return ((std::abs(x[0]) < 0.04)&&(std::abs(x[1]) < 0.3)); });
-  tree.refine_leaves_recursive_cell_pred(9,  isf, [&tree](tt_t::diti_t i) { auto x = tree.diti_to_drpt(i); return ((std::abs(x[0]) < 0.02)&&(std::abs(x[1]) < 0.2)); });
-  tree.refine_leaves_recursive_cell_pred(10, isf, [&tree](tt_t::diti_t i) { auto x = tree.diti_to_drpt(i); return ((std::abs(x[0]) < 0.01)&&(std::abs(x[1]) < 0.15)); });
-
-  /* Refine lower edge of ears */
-  tree.refine_leaves_recursive_cell_pred(7, isf, [&tree](tt_t::diti_t i) { auto x = tree.diti_to_drpt(i); return ((std::abs(x[0]) < 0.3)&&(std::abs(x[1]) > 0.2)&&(std::abs(x[1]) < 1.0)); });
 
   /* Balance the tree */
   tree.balance_tree(1, isf);
@@ -1839,13 +1814,13 @@ int main() {
   tree.dump_tree(5);
 
   /* Convert our tree to a cell complex.  Note that we use an SDF to export only cells that contain our surface */
-  bridge.construct_geometry_fans(ccplx,
-                                 tree,
-                                 tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, isf)); }),
-                                 3,
-                                 {{tc_t::val_src_spc_t::DOMAIN, 0}, 
-                                  {tc_t::val_src_spc_t::DOMAIN, 1},
-                                  {tc_t::val_src_spc_t::DOMAIN, 2}});
+  tc_t::construct_geometry_fans(ccplx,
+                                tree,
+                                tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&tree](tt_t::diti_t i) { return (tree.cell_cross_sdf(i, isf)); }),
+                                3,
+                                {{tc_t::val_src_spc_t::FDOMAIN, 0}, 
+                                 {tc_t::val_src_spc_t::FDOMAIN, 1},
+                                 {tc_t::val_src_spc_t::FDOMAIN, 2}});
 
   /* Name the data points */
   ccplx.create_named_datasets({"x", "y", "z", "f(x,y,z)"});
@@ -1895,12 +1870,11 @@ XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/ear_sur
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/ear_surface_glue.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/ear_surface_glue.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+./src2listing.sh ../../examples/ear_surface_glue.cpp
 #+end_src
 
 #+RESULTS:
 #+begin_src c++ :eval never :tangle no
-
 #include "MR_rect_tree.hpp"
 #include "MR_cell_cplx.hpp"
 #include "MR_rt_to_cc.hpp"
@@ -1979,12 +1953,11 @@ XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/holy_wa
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/holy_wave_surf.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/holy_wave_surf.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+./src2listing.sh ../../examples/holy_wave_surf.cpp
 #+end_src
 
 #+RESULTS:
 #+begin_src c++ :eval never :tangle no
-
 #include <random>                                                        /* C++ random numbers      C++11    */
 #include <chrono>                                                        /* time                    C++11    */
 
@@ -2095,6 +2068,12 @@ done
 #+end_src
 
 #+RESULTS:
+#+begin_example
+make media/ear_surface_100.png
+make media/ear_surface_50.png
+make media/ear_surface_25.png
+make media/ear_surface_10.png
+#+end_example
 
 *** Image Processing: GIFs
 
@@ -2235,6 +2214,6 @@ XML VTK Data File: https://github.com/richmit/MRPTree/blob/main/paraview/PROGRAM
 Source code: https://github.com/richmit/MRPTree/blob/main/examples/PROGRAM_EXAMPLE.cpp
 
 #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../../examples/PROGRAM_EXAMPLE.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
+./src2listing.sh ../../examples/PROGRAM_EXAMPLE.cpp
 #+end_src
 
