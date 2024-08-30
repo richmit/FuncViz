@@ -513,25 +513,6 @@ namespace mjr {
         }
         return(convert.str());
       }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Print all points to STDOUT.
-
-          @param max_num_print Maximum number of points to print.  Use 0 to print all points. */
-      inline void print_all_nodes(int max_num_print) const {
-        int num_printed = 0;
-        if (node_count() > 0) {
-          std::cout << "NODES BEGIN (" << node_count() << ")" << std::endl;
-          for(node_idx_t pnt_idx = 0; pnt_idx<node_count(); ++pnt_idx) {
-            std::cout << "  " << pnt_idx << ": " << node_to_string(pnt_idx) << std::endl;
-            num_printed++;
-            if ((max_num_print > 0) && (num_printed >= max_num_print)) {
-              std::cout << "  Maximum number of nodes reached.  Halting tree dump." << std::endl;
-              break;
-            }
-          }
-          std::cout << "NODES END" << std::endl;
-        }
-      }
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1318,28 +1299,6 @@ namespace mjr {
         return true;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Print all cells to STDOUT.
-          @param max_num_print Maximum number of cells to print.  Use 0 to print all cells. */
-      void print_all_cells(int max_num_print) const {
-        int num_printed = 0;
-        if (num_cells() > 0) {
-          std::cout << "CELLS BEGIN (" << num_cells() << ")" << std::endl;
-          for(int i=0; i<num_cells(); i++) {
-            std::cout << "  ";
-            for(auto& vert: cell_lst[i]) {
-              std::cout << vert << " ";
-            }
-            std::cout << "   " << cell_kind_to_string(req_pt_cnt_to_cell_kind(cell_lst[i].size())) << std::endl;
-            num_printed++;
-            if ((max_num_print > 0) && (num_printed >= max_num_print)) {
-              std::cout << "  Maximum number of cells reached.  Halting tree dump." << std::endl;
-              break;
-            }
-          }
-          std::cout << "CELLS END" << std::endl;
-        }
-      }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Retruns the status of the last cell given to the add_cell() method.
           If (chk_cell_vertexes || chk_cell_dimension | chk_cell_edges) is true, this value is updated each time add_cell() is called.
           Otherwise its value is always cell_stat_t::GOOD. */
@@ -1561,14 +1520,41 @@ namespace mjr {
           @param max_num_print Maximum number of points/cells to print.  Use 0 to print all points/cells. */
       void dump_cplx(int max_num_print) const {
         std::cout << "Meta Data" << std::endl;
-        std::cout << "  Points ............. " << node_count() << std::endl;
+        std::cout << "  Points .................. " << node_count() << std::endl;
         std::cout << "  Data Scalars Per Point .. " << node_idx_to_node_data.size() << std::endl;
         std::cout << "  Named Data Sets ......... " << named_datasets_count() << std::endl;
         std::cout << "    Scalar Data Sets ...... " << named_scalar_datasets_count() << std::endl;
         std::cout << "    Vector Data Sets ...... " << named_vector_datasets_count() << std::endl;
         std::cout << "  Cells ................... " << num_cells() << std::endl;
-        print_all_nodes(max_num_print);
-        print_all_cells(max_num_print);
+        if (node_count() > 0) {
+          int num_nodes_printed = 0;
+          std::cout << "NODES BEGIN (" << node_count() << ")" << std::endl;
+          for(node_idx_t pnt_idx = 0; pnt_idx<node_count(); ++pnt_idx) {
+            std::cout << "  " << pnt_idx << ": " << node_to_string(pnt_idx) << std::endl;
+            num_nodes_printed++;
+            if ((max_num_print > 0) && (num_nodes_printed >= max_num_print)) {
+              std::cout << "  Maximum number of nodes reached.  Halting tree dump." << std::endl;
+              break;
+            }
+          }
+          std::cout << "NODES END" << std::endl;
+        }
+        if (num_cells() > 0) {
+          int num_cells_printed = 0;
+          std::cout << "CELLS BEGIN (" << num_cells() << ")" << std::endl;
+          for(int i=0; i<num_cells(); i++) {
+            std::cout << "  ";
+            for(auto& vert: cell_lst[i]) 
+              std::cout << vert << " ";
+            std::cout << "   " << cell_kind_to_string(req_pt_cnt_to_cell_kind(cell_lst[i].size())) << std::endl;
+            num_cells_printed++;
+            if ((max_num_print > 0) && (num_cells_printed >= max_num_print)) {
+              std::cout << "  Maximum number of cells reached.  Halting tree dump." << std::endl;
+              break;
+            }
+          }
+          std::cout << "CELLS END" << std::endl;
+        }
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Dump to a PLY file
