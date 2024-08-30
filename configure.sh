@@ -40,7 +40,8 @@ if [[ "${@}" == *'-h'* ]]; then
   Use: configure.sh [configure options] [cmake arguments]
 
     Configure Options
-     * -C Clean the build directory before running cmake
+     * -C Clean the build directory before running cmake (asks for conformation)
+     * -F Clean the build directory before running cmake (no conformation)
 
     Common Cmake Arguments:
      * Target -- leave it off to get the default
@@ -60,6 +61,12 @@ if [[ "${@}" == *'-h'* ]]; then
        - -DO_DOXYGEN=[YES|NO]  -- Doxygen (to build documentation)
        - -DO_BTEST=[YES|NO]    -- BOOT unit tests (to run unit tests)
        - -DO_MRASTER=[YES|NO]  -- MRaster (used for some examples)
+         - -DMRaster_DIR=<PATH> -- Search path for MRaster package file
+                                   The following automatically added to the search paths:
+                                     - ./mraster/build/install/share/MRaster/
+                                     - ./mraster/build/
+                                     - ../mraster/build/install/share/MRaster/
+                                     - ../mraster/build/
 EOF
 exit
 fi
@@ -67,10 +74,15 @@ fi
 if [ "$1" == "-C" ]; then
   shift
   CLEAN_DIR='YES'
+  CLEAN_ASK='YES'
+elif [ "$1" == "-F" ]; then
+  shift
+  CLEAN_DIR='YES'
+  CLEAN_ASK='NO'
 else
   CLEAN_DIR='NO'
+  CLEAN_ASK='NO'
 fi
-
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------
 if [ -e ../CMakeLists.txt ]; then
@@ -78,8 +90,12 @@ if [ -e ../CMakeLists.txt ]; then
     #
     # If we need to clean, then CLEAN!!
     if [ "$CLEAN_DIR" == 'YES' ]; then
-      ls
-      rm -rI *
+      if [ "$CLEAN_ASK" == 'YES' ]; then
+        ls
+        rm -rI *
+      else
+        rm -rf *
+      fi
     fi
     #
     # Figure out target
