@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-08-18 Sun 00:11 -->
+<!-- 2024-09-10 Tue 14:01 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Development Roadmap</title>
@@ -231,12 +231,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-08-18 00:11:07</i></td>
+<td class="org-left"><i>2024-09-10 14:01:06</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-08-18 00:11:08</i></td>
+<td class="org-left"><i>2024-09-10 14:01:08</i></td>
 </tr>
 </tbody>
 </table>
@@ -248,14 +248,14 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgf9fc025">1. High Level Future Development Plans (TODO)</a></li>
-<li><a href="#orgda1394d">2. Raw TODO Comments From Source Code</a></li>
+<li><a href="#org28bea0b">1. High Level Future Development Plans (TODO)</a></li>
+<li><a href="#orge097022">2. Raw TODO Comments From Source Code</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgf9fc025" class="outline-2">
-<h2 id="orgf9fc025"><span class="section-number-2">1.</span> High Level Future Development Plans (TODO)</h2>
+<div id="outline-container-org28bea0b" class="outline-2">
+<h2 id="org28bea0b"><span class="section-number-2">1.</span> High Level Future Development Plans (TODO)</h2>
 <div class="outline-text-2" id="text-1">
 <ul class="org-ul">
 <li>Example Updates
@@ -296,7 +296,6 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <li>Use function to produce point data for new point</li>
 <li>Refine cell into new cells containing point as a vertex (work for segments &amp; triangles)</li>
 </ul></li>
-<li>Cell (thin or fat) cutting &#x2013; need to think about this one</li>
 </ul></li>
 <li>Cell Complex Operations
 <ul class="org-ul">
@@ -327,9 +326,8 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <li><i>Consider</i> direct POV-Ray</li>
 <li><i>Consider</i> direct VTK image/voxel (rectilinear grid)</li>
 </ul></li>
-<li><i>Consider</i> MRaster integration
+<li><i>Consider</i> more MRaster integration
 <ul class="org-ul">
-<li><i>Consider</i> color schemes</li>
 <li><i>Consider</i> image generation</li>
 <li><i>Consider</i> image output</li>
 </ul></li>
@@ -337,20 +335,20 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 </div>
 </div>
 
-<div id="outline-container-orgda1394d" class="outline-2">
-<h2 id="orgda1394d"><span class="section-number-2">2.</span> Raw TODO Comments From Source Code</h2>
+<div id="outline-container-orge097022" class="outline-2">
+<h2 id="orge097022"><span class="section-number-2">2.</span> Raw TODO Comments From Source Code</h2>
 <div class="outline-text-2" id="text-2">
-<pre class="example" id="orgb61bd73">
-Sun Aug 18 00:11:05 CDT 2024
-lib/MR_cell_cplx.hpp  662   &lt;2024-07-22T15:48:31-0500&gt; vec3_det3: UNTESTED! UNTESTED! UNTESTED! UNTESTED!
-lib/MR_cell_cplx.hpp  705   &lt;2024-08-02T09:41:48-0500&gt; geomi_seg_isect_type: Repeated point look-up slows things down
-lib/MR_cell_cplx.hpp  706   &lt;2024-08-02T09:41:48-0500&gt; geomi_seg_isect_type: Add unit tests for each code branch
-lib/MR_cell_cplx.hpp  823   &lt;2024-08-02T09:42:19-0500&gt; geomr_pnt_line_distance: check logic -- dp1&gt;segd || dp2&gt;segd?
-lib/MR_cell_cplx.hpp  853   &lt;2024-07-22T15:48:31-0500&gt; geomr_pnt_tri_distance: UNTESTED! UNTESTED! UNTESTED! UNTESTED! UNTESTED!
-lib/MR_cell_cplx.hpp  923   &lt;2024-07-11T16:08:16-0500&gt; geomr_seg_tri_intersection: implement
-lib/MR_cell_cplx.hpp  924   &lt;2024-07-11T16:08:27-0500&gt; geomr_seg_tri_intersection: Should this be a bool or an enum?
-lib/MR_cell_cplx.hpp  961   &lt;2024-07-11T16:06:42-0500&gt; cell_kind_to_structure: make sure polygons are all oriented correctly
-lib/MR_cell_cplx.hpp  1215  &lt;2024-08-02T09:42:38-0500&gt; check_cell_face_intersections: Implement
+<pre class="example" id="orgd272715">
+Tue Sep 10 13:54:43 CDT 2024
+lib/MR_cell_cplx.hpp  643   &lt;2024-07-22T15:48:31-0500&gt; vec3_det3: UNTESTED! UNTESTED! UNTESTED! UNTESTED!
+lib/MR_cell_cplx.hpp  686   &lt;2024-08-02T09:41:48-0500&gt; geomi_seg_isect_type: Repeated point look-up slows things down
+lib/MR_cell_cplx.hpp  687   &lt;2024-08-02T09:41:48-0500&gt; geomi_seg_isect_type: Add unit tests for each code branch
+lib/MR_cell_cplx.hpp  804   &lt;2024-08-02T09:42:19-0500&gt; geomr_pnt_line_distance: check logic -- dp1&gt;segd || dp2&gt;segd?
+lib/MR_cell_cplx.hpp  834   &lt;2024-07-22T15:48:31-0500&gt; geomr_pnt_tri_distance: UNTESTED! UNTESTED! UNTESTED! UNTESTED! UNTESTED!
+lib/MR_cell_cplx.hpp  904   &lt;2024-07-11T16:08:16-0500&gt; geomr_seg_tri_intersection: implement
+lib/MR_cell_cplx.hpp  905   &lt;2024-07-11T16:08:27-0500&gt; geomr_seg_tri_intersection: Should this be a bool or an enum?
+lib/MR_cell_cplx.hpp  942   &lt;2024-07-11T16:06:42-0500&gt; cell_kind_to_structure: make sure polygons are all oriented correctly
+lib/MR_cell_cplx.hpp  1196  &lt;2024-08-02T09:42:38-0500&gt; check_cell_face_intersections: Implement
 lib/MR_rect_tree.hpp  641   &lt;2024-07-11T11:50:36-0500&gt; cuc_two_cross: If diti is close to an corner, some result points may be out of range.
 lib/MR_rect_tree.hpp  1355  &lt;2024-07-11T16:04:10-0500&gt; cell_is_unbalanced: Optimize run time (nix the use of get_smallest_neighbor_level)
 </pre>
