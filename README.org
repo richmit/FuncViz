@@ -48,24 +48,11 @@ Documentation for the library may be found here: [[https://www.mitchr.me/SS/MRPt
    - cmake: 3.29.5
    - boost: I haven't tried to integrate with boost yet!
 
-* Change Log
+* Progress Updates
 
- - 2024-09-10: Build system integration with unit & functional tests
- - 2024-09-09: Refactored removing aspect from tree
- - 2024-08-28: Updated for MRaster package export config
- - 2024-08-20: Published quick start & improved MRaster examples
- - 2024-08-19: Published Doxygen documentation
- - 2024-08-16: MRaster integration & an example using it
- - 2024-08-14: I have bumped the status from pre-alpha to alpha!
- - 2024-08-13: Refactored cplx.  I feel good about the API now.
- - 2024-08-12: Functional test framework prototype working..
- - 2024-08-10: I feel good about MSVC & Clang support.
- - 2024-08-08: Improved unit test coverage of tree components.
- - 2024-08-06: Triangle folding for better corner rendering!
- - 2024-08-05: Solid objects may now be composed of pyramids
- - 2024-07-31: NaN solver to detect edges of undefined regions!
- - 2024-07-20: Working prototype.
- - 2024-07-07: Started coding.
+Please see the [[https://richmit.github.io/MRPTree/changelog.html#pre-release-changelog][Pre-Release Changelog]].
+
+--------------------
 
 Have fun!!
 
