@@ -50,6 +50,8 @@ Documentation for the library may be found here: [[https://www.mitchr.me/SS/MRPt
 
 * Change Log
 
+ - 2024-09-10: Build system integration with unit & functional tests
+ - 2024-09-09: Refactored removing aspect from tree
  - 2024-08-28: Updated for MRaster package export config
  - 2024-08-20: Published quick start & improved MRaster examples
  - 2024-08-19: Published Doxygen documentation

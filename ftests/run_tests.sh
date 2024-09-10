@@ -36,36 +36,43 @@
 #
 #########################################################################################################################################################.H.E.##
 
+DO_BUILD='NO'
+DO_RUN='YES'
+
 if [ "$(basename $(pwd))" == "build" -a -e '../CMakeLists.txt' ]; then
-  echo " "
-  echo " "
-  echo "Building Tests Now"
-  echo " "
-  for f in ../ftests/*.vtu; do
-    t=$(echo $(basename $f) | sed 's/\.vtu$//')
-    make "$t"
-  done
-  echo " "
-  echo " "
-  echo "Running Tests Now"
-  echo " "
-  for f in ../ftests/*.vtu; do
-    t=$(echo $(basename $f) | sed 's/\.vtu$//')
-    b="$t"
-    if [ -x "$b"'.exe' ]; then
-      b="$t"'.exe'
-    fi
-    if [ -x "$b" ]; then
-      ./"$b" > /dev/null
-      if ruby ../ftests/float_diff.rb "$t".vtu ../ftests/"$t".vtu >/dev/null; then
-        echo "PASS: $t"
-      else
-        echo "FAIL: $t (invalid output)"
+  if [ "$DO_BUILD" == 'YES' ]; then
+    echo " "
+    echo " "
+    echo "Building Tests Now"
+    echo " "
+    for f in ../ftests/*.vtu; do
+      t=$(echo $(basename $f) | sed 's/\.vtu$//')
+      make "$t"
+    done
+  fi
+  if [ "$DO_RUN" == 'YES' ]; then
+    echo " "
+    echo " "
+    echo "Running Tests Now"
+    echo " "
+    for f in ../ftests/*.vtu; do
+      t=$(echo $(basename $f) | sed 's/\.vtu$//')
+      b="$t"
+      if [ -x "$b"'.exe' ]; then
+        b="$t"'.exe'
       fi
-    else
-      echo "FAIL: $t (no executable)"
-    fi
-  done
+      if [ -x "$b" ]; then
+        ./"$b" > /dev/null
+        if ruby ../ftests/float_diff.rb "$t".vtu ../ftests/"$t".vtu >/dev/null; then
+          echo "PASS: $t"
+        else
+          echo "FAIL: $t (invalid output)"
+        fi
+      else
+        echo "FAIL: $t (no executable)"
+      fi
+    done
+  fi
   echo " "
 else
   echo "ERROR(run_tests.sh): Run this script from the build directory!"

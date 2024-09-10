@@ -210,10 +210,23 @@ add_custom_target(ftests
   COMMENT "Building Functional Tests"
 )
 
-add_custom_target(utests
-  DEPENDS ${TARGETS_UTEST}
-  COMMENT "Building Unit Tests"
+add_custom_target(run-ftests
+  DEPENDS ${TARGETS_FTEST}
+  COMMENT "Running Functional Tests"
+  COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/ftests/run_tests.sh"
 )
+
+if(Boost_FOUND)
+  add_custom_target(utests
+    DEPENDS ${TARGETS_UTEST}
+    COMMENT "Building Unit Tests"
+  )
+  add_custom_target(run-utests
+    DEPENDS ${TARGETS_UTEST}
+    COMMENT "Running Unit Tests"
+    COMMAND "cmake --build . -t test"
+  )
+endif()
 
 add_custom_target(examples
   DEPENDS ${TARGETS_EXAMPLES}
