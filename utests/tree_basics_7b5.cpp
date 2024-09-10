@@ -67,8 +67,6 @@ BOOST_AUTO_TEST_CASE(tree_basics_7b5) {
     BOOST_TEST_CHECK(tree.dom_at(tree.get_bbox_min(), i)             == -1.0,    boost::test_tools::tolerance(0.00001) );
     BOOST_TEST_CHECK(tree.dom_at(tree.get_bbox_max(), i)             ==  1.0,    boost::test_tools::tolerance(0.00001) );
     BOOST_TEST_CHECK(tree.dom_at(tree.get_bbox_delta(), i)           ==  1.0/64, boost::test_tools::tolerance(0.00001) );
-
-    BOOST_TEST_CHECK(tree.dom_at(tree.get_aspect(), i)               == 1.0,     boost::test_tools::tolerance(0.00001) );
   }
 
   BOOST_TEST_CHECK(tree.dom_at(tree.diti_to_drpt(0x6000804020), 0)     == -0.5,    boost::test_tools::tolerance(0.00001) );

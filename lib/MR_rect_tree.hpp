@@ -286,7 +286,6 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       drpt_t bbox_min;      //!< Holds the minimal point for the real domain range
       drpt_t bbox_max;      //!< Holds the maximal point for the real domain range
-      drpt_t aspect;        //!< Aspect ration for the render box
       drpt_t bbox_delta;    //!< The wdith of the real domain range
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       std::unordered_map<diti_t, rrpt_t> samples; //!< Holds the sampled data
@@ -298,16 +297,13 @@ namespace mjr {
       /** @name Constructors */
       //@{
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Set real coordinate & aspect ratio to defaults.  see: set_bbox_default() & set_aspect_default(). */
-      MR_rect_tree()                                                            { set_bbox_default();                set_aspect_default();   }
+      /** Set real coordinates to defaults.  see: set_bbox_default(). */
+      MR_rect_tree()                                                            { set_bbox_default();                     }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Set real coordinate as specified & aspect ratio to default.  see: set_aspect_default().
+      /** Set real coordinate as specified.
           @param new_bbox_min Value to use for bounding box minimum point
           @param new_bbox_max Value to use for bounding box maximum point */
-      MR_rect_tree(drpt_t new_bbox_min, drpt_t new_bbox_max)                    { set_bbox(new_bbox_min, new_bbox_max); set_aspect_default();   }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Set real coordinate & aspect ratio as specified. */
-      MR_rect_tree(drpt_t new_bbox_min, drpt_t new_bbox_max, drpt_t new_aspect) { set_bbox(new_bbox_min, new_bbox_max); set_aspect(new_aspect); }
+      MR_rect_tree(drpt_t new_bbox_min, drpt_t new_bbox_max)                    { set_bbox(new_bbox_min, new_bbox_max);   }
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -362,20 +358,6 @@ namespace mjr {
       /** Set the bounding box max_level.
           @param new_bbox_max Value to use for bounding box maximum point*/
       void set_bbox_max(drpt_t new_bbox_max) { set_bbox(bbox_min, new_bbox_max); };
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Set the aspect ratio
-          @warning No error checking -- Correct operation only if all elements are positive
-          @param new_aspect Value to use for aspect */
-      void set_aspect(drpt_t new_aspect)  { aspect = new_aspect; }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Set the aspect ratio to the default: 1.0 for all components. */
-      void set_aspect_default() {
-        if constexpr (dom_dim == 1) {
-          aspect = static_cast<src_t>(1.0);
-        } else {
-          aspect.fill(static_cast<src_t>(1.0));
-        }
-      }
       //@}
 
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -390,9 +372,6 @@ namespace mjr {
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Return the bounding box minimum point */
       inline drpt_t get_bbox_delta() const   { return (bbox_delta); }
-      //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Return the aspect std::array */
-      inline drpt_t get_aspect() const       { return (aspect); }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Return the sample value for vertex.
           @param vertex Input vertex */
@@ -818,7 +797,7 @@ namespace mjr {
 
        Note that refine_grid() is a hybrid in that it can be used for both refinement and for sampling. */
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Sample a cell
+      /** Sample a cell.
           @param cell Cell to sample
           @param func Function to use for samples */
       void sample_cell(diti_t cell, drpt2rrpt_func_t func) {
@@ -834,7 +813,7 @@ namespace mjr {
         sample_cell(ccc_get_top_cell(), func);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Sample a point if it has not already been sampled
+      /** Sample a point if it has not already been sampled.
           @param diti Point at which to sample
           @param func Function to sample
           @return true if we sampled the point, and false otherwise. */
@@ -849,7 +828,7 @@ namespace mjr {
         }
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Sample a point
+      /** Sample, or resample, a point.
           @param diti Point at which to sample
           @param func Function to sample */
       inline void sample_point(diti_t diti, drpt2rrpt_func_t func) {
