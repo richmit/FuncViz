@@ -18,6 +18,10 @@ string(TIMESTAMP MRPTREE_CONFIG_DATE "%Y-%m-%d")
 mark_as_advanced(MRPTREE_CONFIG_DATE)
 
 ######################################################################################################################################################
+# Include ctest -- we might not use it if boost is not found...
+include(CTest) 
+
+######################################################################################################################################################
 # Here are the options we use to modify the build -- these options are passed to cmake like so: cmake -DO_BTEST=YES or -DO_BTEST=NO
 
 OPTION(O_DOXYGEN "Include support for doxygen"         ON )
