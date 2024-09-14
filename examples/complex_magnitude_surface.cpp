@@ -116,10 +116,10 @@ int main() {
   // Sample near 0+0i because we have a minimum at that piont
 
   // The most direct method 
-  // tree.refine_leaves_recursive_cell_pred(6, cpf, [&tree](tt_t::diti_t i) { return (tree.cell_close_to_domain_point({0, 0}, 1.0e-2, i)); });
+  // tree.refine_leaves_recursive_cell_pred(6, cpf, [&tree](tt_t::diti_t i) { return (tree.cell_near_domain_point({0, 0}, 1.0e-2, i)); });
 
   // This function is positive with a universal minimum at 0+0i, so we could just sample where  |f| is below 1/4
-  tree.refine_leaves_recursive_cell_pred(6, cpf, [&tree](tt_t::diti_t i) { return !(tree.cell_above_range_level(i, 4, 0.25, 1.0e-5)); });
+  tree.refine_leaves_recursive_cell_pred(6, cpf, [&tree](tt_t::diti_t i) { return !(tree.cell_above_range_level(i, 4, 0.25)); });
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
   // Sample around the poles where we will clip the graph
@@ -153,10 +153,10 @@ int main() {
   // We can sample near the real & imagaxes axes.
 
   // Sample near the real axis
-  tree.refine_leaves_recursive_cell_pred(5, cpf, [&tree](tt_t::diti_t i) { return (tree.cell_cross_domain_level(i, 0, 0.0, 1.0e-6)); });
+  tree.refine_leaves_recursive_cell_pred(5, cpf, [&tree](tt_t::diti_t i) { return (tree.cell_near_domain_level(i, 0, 0.0, 1.0e-6)); });
 
   // Sample near the imaginary axis
-  tree.refine_leaves_recursive_cell_pred(5, cpf, [&tree](tt_t::diti_t i) { return (tree.cell_cross_domain_level(i, 1, 0.0, 1.0e-6)); });
+  tree.refine_leaves_recursive_cell_pred(5, cpf, [&tree](tt_t::diti_t i) { return (tree.cell_near_domain_level(i, 1, 0.0, 1.0e-6)); });
 
   //--------------------------------------------------------------------------------------------------------------------------------------------------------------
   // We don't need to balance the three, but it makes things look nice.
@@ -173,7 +173,7 @@ int main() {
   auto tcret = tc_t::construct_geometry_fans(ccplx,
                                              tree,
                                              tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), 
-                                                                      [&tree](tt_t::diti_t i) { return !(tree.cell_above_range_level(i, 4, 3.5, 1.0e-6)); }),
+                                                                      [&tree](tt_t::diti_t i) { return !(tree.cell_above_range_level(i, 4, 3.5)); }),
                                              2,
                                              {{tc_t::val_src_spc_t::FDOMAIN, 0}, 
                                               {tc_t::val_src_spc_t::FDOMAIN, 1},

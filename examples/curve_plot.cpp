@@ -78,26 +78,26 @@ int main() {
   // TODO: Add NaN edge repair when implemented in MR_rt_to_cc
 
   // Refine near vertical tangent line
-  tree.refine_leaves_recursive_cell_pred(10, f, [&tree](tt_t::diti_t i) { return (tree.cell_close_to_domain_point(0.0, 1.0e-2, i)); });
+  tree.refine_leaves_recursive_cell_pred(10, f, [&tree](tt_t::diti_t i) { return (tree.cell_near_domain_point(0.0, 1.0e-2, i)); });
   // TODO: Use derivative test for this
 
   // Step discontinuities at 2.
-  tree.refine_leaves_recursive_cell_pred(10, f, [&tree](tt_t::diti_t i) { return (tree.cell_close_to_domain_point(2.0, 1.0e-2, i)); });
+  tree.refine_leaves_recursive_cell_pred(10, f, [&tree](tt_t::diti_t i) { return (tree.cell_near_domain_point(2.0, 1.0e-2, i)); });
   // TODO: Add cell cut when implemented in MR_rt_to_cc
 
   // Non differentiable point near x=-2.619185320
-  tree.refine_leaves_recursive_cell_pred(11, f, [&tree](tt_t::diti_t i) { return (tree.cell_close_to_domain_point(-2.619185320, 1.0e-2, i)); });
+  tree.refine_leaves_recursive_cell_pred(11, f, [&tree](tt_t::diti_t i) { return (tree.cell_near_domain_point(-2.619185320, 1.0e-2, i)); });
   // TODO: Add folding edge when implemented in MR_rt_to_cc
 
   // High oscillation from [2,3]
   tree.refine_leaves_recursive_cell_pred(10, f, [&tree](tt_t::diti_t i) { return (tree.diti_to_drpt(i) >= 2.0); });
 
   // Extrema near -0.2171001290
-  tree.refine_leaves_recursive_cell_pred(10, f, [&tree](tt_t::diti_t i) { return (tree.cell_close_to_domain_point(-0.2171001290, 1.0e-2, i)); });
+  tree.refine_leaves_recursive_cell_pred(10, f, [&tree](tt_t::diti_t i) { return (tree.cell_near_domain_point(-0.2171001290, 1.0e-2, i)); });
   // TODO: Use derivative test for this
 
   // Extrema near 0.8775087009
-  tree.refine_leaves_recursive_cell_pred(8, f, [&tree](tt_t::diti_t i) { return (tree.cell_close_to_domain_point(0.8775087009, 1.0e-2, i)); });
+  tree.refine_leaves_recursive_cell_pred(8, f, [&tree](tt_t::diti_t i) { return (tree.cell_near_domain_point(0.8775087009, 1.0e-2, i)); });
   // TODO: Use derivative test for this
 
   tree.dump_tree(10);

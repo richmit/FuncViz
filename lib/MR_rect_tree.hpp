@@ -62,6 +62,9 @@
 #include <vector>                                                        /* STL vector              C++11    */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include "MR_math.hpp"                                                   /* My Simple Math Utilities          */
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Put everything in the mjr namespace
 namespace mjr {
 /** @brief Template Class used to house an MR_rect_tree.
@@ -71,48 +74,49 @@ namespace mjr {
 
     This class forms the primary component of the MR @f$2^P\mathrm{-Tree}@f$ library (also known as "MRPTree").  In terms of this library, a quadtree is a
     @f$2^2\mathrm{-Tree}@f$ and an octree is a @f$2^3\mathrm{-Tree}@f$ -- in essence this class implements a universal data structure capable of holding such
-    trees of any dimension.  Contrary to the name, this is all achieved without using any tree-like data structures at all!  This class also contains some
-    infrastructure allowing it to sample data from user provided functions as this is the typical way in which quadtree/octree libraries work.
+    trees of any dimension.  Contrary to the name, this is all achieved without using any tree-like data structures at all!
 
-    The dom_dim template parameter corresponds to the "$f$P$f$" in the exponent.  If one wishes to implement a quadtree, then dom_dim should be set to 2.  For
-    octrees the value of dom_dim should be set to 3.
+    The `dom_dim` template parameter corresponds to the "@f$P@f$" in the exponent.  If one wishes to implement a quadtree, then dom_dim should be set to 2.
+    For octrees the value of dom_dim should be set to 3.  We are not limited to dimensions 2 & 3 -- for example, we could make 1D "bitrees" or a 4D "space
+    time trees".
 
-    This class makes an odd assumption that the sampled data stored in the tree is a finite, real vector space.  So instead of using a template parameter to
-    specify the type of the sampled data, we provide 1) a type for the vector space scalar (spc_real_t) and 2) a dimension (rng_dim).  This is the typical
-    quadtree/octrees use case, and is particularly appropriate for the provided examples.
+    This class makes the unusual assumption that the sampled data stored in the tree is a finite, real vector space.  So instead of using a template parameter
+    to specify the type of the sampled data, we provide 1) a type for the vector space scalar (spc_real_t) and 2) a dimension (rng_dim).  In other words these
+    trees are optimized to model model functions @f$f:\mathbb{R}^d\rightarrow\mathbb{R}^r@f$ where @f$d@f$ and @f$r@f$ *are* template parameters(`dom_dim` &
+    `rng_dim` respectively).
 
-    The max_level parameter will seem odd for anyone who has used a traditional quadtree/octree library.  As a practical matter trees in traditional libraries
-    are limited to a shallow depths (say 10 or 12 levels); however, the code bases themselves don't usually place an explicit limit on depth.  In this
-    library the maximum depth must be specified from the start.
+    The `max_level` parameter will seem odd for anyone who has used a traditional quadtree/octree library.  As a practical matter trees in traditional
+    libraries are limited to a shallow depths (say 10 or 12 levels); however, the code bases themselves don't usually place an explicit limit on depth.  In
+    this library the maximum depth must be specified from the start.
 
     As an example, suppose we have a function @f$f:\mathbb{R}^2\rightarrow\mathbb{R}^3@f$ we wish to sample.  For this application we might use the following values:
-      - spc_real_t = double
-      - dom_dim = 2
-      - rng_dim = 3
-      - max_level = 15
+      - `spc_real_t = double`
+      - `dom_dim = 2`
+      - `rng_dim = 3`
+      - `max_level = 15`
 
-    We could use an alternate value for max_level, but I think 15 is a good balance.  We can do quadtrees at this depth using 32-bit integer keys, and we can
-    do octrees with 64-bit integer keys.
+    We could use an alternate value for `max_level`, but I think 15 is a good balance.  We can do quadtrees at this depth using 32-bit integer keys, and we
+    can do octrees with 64-bit integer keys.
 
     Naming Conventions
     ==================
 
-    - Methods for numeric computation on coordinate tuples (diti_t types).  These methods have nothing to do with cell sample status -- just coordinates!
+    - Methods for numeric computation on coordinate tuples (::diti_t types).  These methods have nothing to do with cell sample status -- just coordinates!
       - ccc_ -- Cell Coordinate Computation:  Coordinates are interpreted as cell coordinate centers
       - cuc_ -- Coordinate Utility Computation: Coordinate are not necessarily cell coordinate centers
     - Type Naming Conventions
       - Coordinates
-        - dic_t (domain Integer Coordinate) -- A single integer
-        - src_t (domain/range space Real Coordinate) -- Floating point
+        - ::dic_t (domain Integer Coordinate) -- A single integer
+        - ::src_t (domain/range space Real Coordinate) -- Floating point
       - Domain Integer Coordinate Tuples
-        - diti_t (domain int tuple Integer) -- Encoded as a packed integer
-        - dita_t (domain int tuple Array) -- As a dom_dim element std::array
-        - ditv_t (domain int tuple Vector) -- As a dom_dim element std::vector
+        - ::diti_t (domain int tuple Integer) -- Encoded as a packed integer
+        - ::dita_t (domain int tuple Array)   -- As a dom_dim element std::array
+        - ::ditv_t (domain int tuple Vector)  -- As a dom_dim element std::vector
       - Domain/range real Coordinate  tuples
-        - rrta_t/drta_t (range/domain real tuple Array) -- As a dom_dim/rng_dim element std::array
-        - rrtv_t/drtv_t (range/domain real tuple Vector) -- As a dom_dim/rng_dim element std::vector
-        - rrpt_t/drpt_t (range/domain real psudo-tuple) -- As a src_t when dim==1, and an array otherwise
-    Function arguments of type 'foo_t' are frequently called 'foo'.
+        - ::rrta_t & ::drta_t (range/domain real tuple Array)  -- As a `dom_dim` or `rng_dim` element std::array
+        - ::rrtv_t & ::drtv_t (range/domain real tuple Vector) -- As a `dom_dim` or `rng_dim` element std::vector
+        - ::rrpt_t & ::drpt_t (range/domain real psudo-tuple)  -- As a ::src_t when `dim==1`, and an array otherwise
+    Function arguments of type "`foo_t`" are frequently called "`foo`".
 
     Details
     =======
@@ -1178,7 +1182,7 @@ namespace mjr {
       /** Test if a cell has been sampled.
           @warning Simply checks that cell has been sampled -- identical to vertex_exists().
           @param cell Input cell*/
-      inline bool cell_good_samples(diti_t cell) const {
+      inline bool cell_is_sampled(diti_t cell) const {
         diti_list_t verts = ccc_get_vertexes(cell);
         return (std::all_of(verts.cbegin(), verts.cend(), [this](diti_t i) { return (vertex_exists(i)); }));
       }
@@ -1224,20 +1228,32 @@ namespace mjr {
       inline bool cell_has_neighbor(diti_t cell, int index, int direction) {
         diti_t tmp = ccc_get_neighbor(cell, index, direction);
         if (tmp)
-          return cell_good_samples(cell);
+          return cell_is_sampled(cell);
         else
           return false;
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Test if a cell crosses a signed distance function boundry
+      /** Test if a cell crosses, or is on, a signed distance function boundry.
+          "Crossing" is defined as: The center is zero or any corner has a diffrent sign from the center.
           @warning Incorrect result if ALL vertexes of the cell are zero.
           @param cell Input Cell
           @param sdf Signed distance function
-          @return true if the cell crosses the signed distance function. */
+          @return true if the cell crosses, or is on, the signed distance function boundry. */
       inline bool cell_cross_sdf(diti_t cell, drpt2real_func_t sdf) {
-        bool first_sign = std::signbit(sdf(diti_to_drpt(cell)));
+        /* The algorithm below directly expresses the RHS of the following iff which is equivalent to the LHS (and the statement in the documentation).
+           @f[
+           (\mathrm{sgn}(\vec{\mathbf{c}})=0)\lor(\exists \vec{\mathbf{v}}\in E(\vec{\mathbf{c}})\,\mathrm{st}\,\mathrm{sgn}(\vec{\mathbf{c}})\ne\mathrm{sgn}(\vec{\mathbf{v}}))
+           \Longleftrightarrow
+           (\exists \vec{\mathbf{v}}\in E(\vec{\mathbf{c}})\,\mathrm{st}\,\mathrm{sgn}(\vec{\mathbf{v}})=0)
+           \lor
+           (\exists \vec{\mathbf{v_1}},\vec{\mathbf{v_2}}\in E(\vec{\mathbf{c}})\,\mathrm{st}\,\mathrm{sgn}(\vec{\mathbf{v1}})\ne\mathrm{sgn}(\vec{\mathbf{v2}}))
+           @f]
+        */
+        int center_sign = mjr::math::sgn(sdf(diti_to_drpt(cell)));
+        if (center_sign == 0)
+          return true;
         for(diti_t& v: ccc_get_corners(cell))
-          if (first_sign != std::signbit(sdf(diti_to_drpt(v))))
+          if (center_sign != mjr::math::sgn(sdf(diti_to_drpt(v))))
             return true;
         return false;
       }
@@ -1247,7 +1263,7 @@ namespace mjr {
           @param epsilon      How close the point must be
           @param cell Input Cell
           @return true if a cell contains, or is close to, a domain_point. */
-      inline bool cell_close_to_domain_point(drpt_t domain_point, src_t epsilon, diti_t cell) {
+      inline bool cell_near_domain_point(drpt_t domain_point, src_t epsilon, diti_t cell) {
         drpt_t min_drpt = diti_to_drpt(ccc_cell_get_corner_min(cell));
         for(int i=0; i<dom_dim; i++)
           if (dom_at(min_drpt, i)-epsilon > dom_at(domain_point, i))
@@ -1265,7 +1281,7 @@ namespace mjr {
           @param domain_level The level, or value, of the domain component we are testing
           @param epsilon      Used to fuzz floating point comparisons
           @return true if the cell crosses the domain level. */
-      inline bool cell_cross_domain_level(diti_t cell, int domain_index, src_t domain_level, src_t epsilon) {
+      inline bool cell_near_domain_level(diti_t cell, int domain_index, src_t domain_level, src_t epsilon) {
         return ( (dom_at(diti_to_drpt(ccc_cell_get_corner_min(cell)), domain_index) < domain_level+epsilon) &&
                  (dom_at(diti_to_drpt(ccc_cell_get_corner_max(cell)), domain_index) > domain_level-epsilon) );
       }
@@ -1274,32 +1290,32 @@ namespace mjr {
           @param cell Input Cell
           @param domain_index The index of the domain component we are testing
           @param domain_level The level, or value, of the domain component we are testing
-          @param epsilon      Used to fuzz floating point comparisons
           @return true if the cell below the domain level. */
-      inline bool cell_below_domain_level(diti_t cell, int domain_index, src_t domain_level, src_t epsilon) {
-        return (dom_at(diti_to_drpt(ccc_cell_get_corner_max(cell)), domain_index) < domain_level+epsilon);
+      inline bool cell_below_domain_level(diti_t cell, int domain_index, src_t domain_level) {
+        return (dom_at(diti_to_drpt(ccc_cell_get_corner_max(cell)), domain_index) < domain_level);
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Test if a cell above the given domain component value
           @param cell Input Cell
           @param domain_index The index of the domain component we are testing
           @param domain_level The level, or value, of the domain component we are testing
-          @param epsilon      Used to fuzz floating point comparisons
           @return true if the cell above the domain level. */
-      inline bool cell_above_domain_level(diti_t cell, int domain_index, src_t domain_level, src_t epsilon) {
-        return ((dom_at(diti_to_drpt(ccc_cell_get_corner_min(cell)), domain_index) > domain_level-epsilon));
+      inline bool cell_above_domain_level(diti_t cell, int domain_index, src_t domain_level) {
+        return ((dom_at(diti_to_drpt(ccc_cell_get_corner_min(cell)), domain_index) > domain_level));
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
-      /** Test if a cell crosses the given range component value
-          @warning Incorrect result if ALL vertexes of the cell equal the level.
+      /** Test if a cell crosses the given range component value.
+          See ::cell_cross_sdf for algorithm notes.
           @param cell Input Cell
           @param range_index The index of the range component we are testing
           @param range_level The level, or value, of the range component we are testing
           @return true if the cell crosses the range level. */
       inline bool cell_cross_range_level(diti_t cell, int range_index, src_t range_level) {
-        bool first_sign = std::signbit(rng_at(samples[cell], range_index)-range_level);
+        int center_sign = mjr::math::sgn(rng_at(samples[cell], range_index)-range_level);
+        if (center_sign == 0)
+          return true;
         for(diti_t& v: ccc_get_corners(cell))
-          if (first_sign != std::signbit(rng_at(samples[v], range_index)-range_level))
+          if (center_sign != mjr::math::sgn(rng_at(samples[v], range_index)-range_level))
             return true;
         return false;
       }
@@ -1308,22 +1324,20 @@ namespace mjr {
           @param cell Input Cell
           @param range_index The index of the range component we are testing
           @param range_level The level, or value, of the range component we are testing
-          @param epsilon      Used to fuzz floating point comparisons
           @return true if the cell is below the range level. */
-      inline bool cell_below_range_level(diti_t cell, int range_index, src_t range_level, src_t epsilon) {
+      inline bool cell_below_range_level(diti_t cell, int range_index, src_t range_level) {
         diti_list_t verts = ccc_get_vertexes(cell);
-        return std::all_of(verts.cbegin(), verts.cend(), [this, range_index, range_level, epsilon](int i) { return (rng_at(samples[i], range_index) < range_level+epsilon); });
+        return std::all_of(verts.cbegin(), verts.cend(), [this, range_index, range_level](int i) { return (rng_at(samples[i], range_index) < range_level); });
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Test if a cell is above given range component value
           @param cell Input Cell
           @param range_index The index of the range component we are testing
           @param range_level The level, or value, of the range component we are testing
-          @param epsilon      Used to fuzz floating point comparisons
           @return true if the cell is above the range level. */
-      inline bool cell_above_range_level(diti_t cell, int range_index, src_t range_level, src_t epsilon) {
+      inline bool cell_above_range_level(diti_t cell, int range_index, src_t range_level) {
         diti_list_t verts = ccc_get_vertexes(cell);
-        return std::all_of(verts.cbegin(), verts.cend(), [this, range_index, range_level, epsilon](int i) { return (rng_at(samples[i], range_index) > range_level-epsilon); });
+        return std::all_of(verts.cbegin(), verts.cend(), [this, range_index, range_level](int i) { return (rng_at(samples[i], range_index) > range_level); });
       }
       //--------------------------------------------------------------------------------------------------------------------------------------------------------
       /** Test if a cell is unbalanced at the given level

@@ -600,7 +600,7 @@ namespace mjr {
        */
       inline static int cull_cc_cells_on_domain_sdf_boundry(cc_t&               ccplx,
                                                             rt_drpt2real_func_t sdf_func) {
-        return ccplx.cull_cells([&ccplx, &sdf_func](cc_cell_verts_t c) { return ccplx.cell_on_sdf_boundry(c, [&sdf_func](cc_node_data_t pd) { return (tsdf_to_csdf(sdf_func, pd)); }); });
+        return ccplx.cull_cells([&ccplx, &sdf_func](cc_cell_verts_t c) { return ccplx.cell_near_sdf_boundry(c, [&sdf_func](cc_node_data_t pd) { return (tsdf_to_csdf(sdf_func, pd)); }); });
       }
 
 

@@ -52,6 +52,9 @@
 #include <vector>                                                        /* STL vector              C++11    */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include "MR_math.hpp"                                                   /* My Simple Math Utilities          */
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Put everything in the mjr namespace
 namespace mjr {
   /** @brief Template class used to store and transform cell complexes (mesh/triangluation/etc...) and data sets generated from  MR_rect_tree sample data.
@@ -1924,33 +1927,16 @@ namespace mjr {
         return std::all_of(cell_verts.cbegin(), cell_verts.cend(), [this, level_index, level, level_epsilon](int v) { return (node_idx_to_node_data[v][level_index] < level+level_epsilon); });
       }
       /** Return true if cell is near SDF boundry */
-      bool cell_on_sdf_boundry(const cell_verts_t cell_verts, p2real_func_t sdf_function, uft_t sdf_epsilon=epsilon) {
+      bool cell_near_sdf_boundry(const cell_verts_t cell_verts, p2real_func_t sdf_function, uft_t sdf_epsilon=epsilon) {
         int pos_cnt=0, neg_cnt=0;
         for(auto v: cell_verts) {
           uft_t sv = sdf_function(node_idx_to_node_data[v]);
-          if (std::abs(sv)<sdf_epsilon)
+          if (mjr::math::fnear_zero(sv, sdf_epsilon))
             return true;
           if (sv < 0) {
             neg_cnt++;
           } else {
             pos_cnt++;
-          }
-          if ((neg_cnt > 0) && (pos_cnt > 0))
-            return true;
-        }
-        return false;
-      }
-      /** Return true if cell crosses SDF boundry */
-      bool cell_cross_sdf_boundry(const cell_verts_t cell_verts, p2real_func_t sdf_function, uft_t sdf_epsilon=epsilon) {
-        int pos_cnt=0, neg_cnt=0;
-        for(auto v: cell_verts) {
-          uft_t sv = sdf_function(node_idx_to_node_data[v]);
-          if (std::abs(sv)>=sdf_epsilon) {
-            if (sv < 0) {
-              neg_cnt++;
-            } else {
-              pos_cnt++;
-            }
           }
           if ((neg_cnt > 0) && (pos_cnt > 0))
             return true;

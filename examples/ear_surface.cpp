@@ -86,7 +86,7 @@ int main() {
   tree.refine_leaves_recursive_cell_pred(8, isf, [&tree](tt_t::diti_t i) { auto x = tree.diti_to_drpt(i); return (std::abs(x[1])<0.5) && (tree.cell_cross_sdf(i, besdf)); });
 
   /* Refine on the x-y plane */
-  tree.refine_leaves_recursive_cell_pred(7, isf, [&tree](tt_t::diti_t i) { return (tree.cell_cross_domain_level(i, 2, 0.0, 1.0e-6)); });
+  tree.refine_leaves_recursive_cell_pred(7, isf, [&tree](tt_t::diti_t i) { return (tree.cell_near_domain_level(i, 2, 0.0, 1.0e-6)); });
 
   /* Balance the tree */
   tree.balance_tree(1, isf);
