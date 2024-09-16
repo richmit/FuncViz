@@ -4,6 +4,8 @@
 *.aux
 *.log
 
+/maple/
+
 /old-media
 
 
