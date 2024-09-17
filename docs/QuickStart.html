@@ -3,10 +3,10 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-09-16 Mon 16:30 -->
+<!-- 2024-09-17 Tue 14:29 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
-<title>MRCellCplx3D Quick Start</title>
+<title>FuncViz Quick Start</title>
 <meta name="author" content="Mitch Richling" />
 <meta name="description" content="Minimal tutorial for getting started with MRPTree" />
 <meta name="keywords" content="KEYWORDS FIXME" />
@@ -213,7 +213,7 @@
  |
  <a accesskey="H" href="https://www.mitchr.me/"> HOME </a>
 </div><div id="content" class="content">
-<h1 class="title">MRCellCplx3D Quick Start</h1>
+<h1 class="title">FuncViz Quick Start</h1>
 <table border="2 solid #ccc" cellspacing="0" cellpadding="6" rules="groups" frame="hsides" align="center">
 
 
@@ -227,9 +227,125 @@
 </tbody>
 </table>
 
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#examples">1. Playing With The Example Programs</a>
+<ul>
+<li><a href="#org1db9154">1.1. Accessing <b><code>MRPtree</code></b> &amp; <b><code>MRaster</code></b> features</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-examples" class="outline-2">
+<h2 id="examples"><span class="section-number-2">1.</span> Playing With The Example Programs</h2>
+<div class="outline-text-2" id="text-examples">
 <p>
-WARNING: This code is being refactored!
+This repository depends upon a couple others.  I suggest making one direcotyr, and cloneing all three into that directory.
 </p>
+
+<p>
+A typical shell session following the steps outlined above might look like this:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">mkdir working                                        <span style="color: #ffa500;"># </span><span style="color: #ff7f24;">Create a working directory (name it whatever you want)</span>
+<span style="color: #b0c4de;">cd</span> working                                           <span style="color: #ffa500;"># </span><span style="color: #ff7f24;">Change into the working directory</span>
+git clone <span style="color: #fa8072;">'https://github.com/richmit/FuncViz.git'</span>   <span style="color: #ffa500;"># </span><span style="color: #ff7f24;">Clone the FuncViz repository</span>
+git clone <span style="color: #fa8072;">'https://github.com/richmit/MRPTree.git'</span>   <span style="color: #ffa500;"># </span><span style="color: #ff7f24;">Clone the MRPTree repository</span>
+git clone <span style="color: #fa8072;">'https://github.com/richmit/mraster.git'</span>   <span style="color: #ffa500;"># </span><span style="color: #ff7f24;">Clone the MRaster repository</span>
+<span style="color: #b0c4de;">cd</span> FuncViz                                           <span style="color: #ffa500;"># </span><span style="color: #ff7f24;">Change directory to the root of the git FuncViz repository</span>
+rm -rf build                                         <span style="color: #ffa500;"># </span><span style="color: #ff7f24;">Just in case a build directory exists, get rid of it!</span>
+mkdir build                                          <span style="color: #ffa500;"># </span><span style="color: #ff7f24;">Create a build directory</span>
+<span style="color: #b0c4de;">cd</span> build                                             <span style="color: #ffa500;"># </span><span style="color: #ff7f24;">Change directory to the build directory</span>
+cmake -G <span style="color: #fa8072;">'MSYS Makefiles'</span> ..                         <span style="color: #ffa500;"># </span><span style="color: #ff7f24;">Generate build files</span>
+cmake --build . -t examples                          <span style="color: #ffa500;"># </span><span style="color: #ff7f24;">Build the examples</span>
+</pre>
+</div>
+
+<p>
+Note the "<code>cmake -G</code>" command given above is specific to Windows.  For UNIX/Linux replace "<code>MSYS Makefiles</code>" with "<code>Unix Makefiles</code>".
+</p>
+
+<p>
+Alternately you can run the "<code>configure.sh</code>" script in the root directory of the git repository.  Here is the 'help' printed from that script:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">../configure.sh -h
+</pre>
+</div>
+
+<pre class="example" id="org83e0a51">
+
+Run this script from the 'build' directory.
+
+If you don't have a 'build' directory yet, then create one!
+
+Use: configure.sh [configure options] [cmake arguments]
+
+  Configure Options
+   - -C Clean the build directory before running cmake (asks for conformation)
+   - -F Clean the build directory before running cmake (no conformation)
+
+  Common Cmake Arguments:
+   - Target -- leave it off to get the default
+     - -G 'MSYS Makefiles'           &lt;-- Default on MSYS2
+     - -G 'Visual Studio 17 2022'
+     - -G 'Unix Makefiles'           &lt;-- Default on Linux ('Linux' means 'Not MSYS2')
+     - -G Ninja
+   - Compiler -- leave it off to get the default
+     - -DCMAKE_CXX_COMPILER=clang++
+     - -DCMAKE_CXX_COMPILER=g++      &lt;-- Default for 'MSYS Makefiles'
+     - -DCMAKE_CXX_COMPILER=g++-##   &lt;-- Default for 'Unix Makefiles' if /usr/bin/g++-[0-9][0-9] exists
+                                         in which case the highest numbered version is selected.
+                                         This code base needs at least GCC-14.
+     - -DCMAKE_CXX_COMPILER=g++      &lt;-- Default for 'Unix Makefiles' if /usr/bin/g++-[0-9][0-9] missing
+     -                               &lt;-- Default for 'Visual Studio 17 2022'
+   - Optional features -- leave them off to enable everything
+     - -DO_DOXYGEN=[YES|NO]  -- Doxygen (to build documentation)
+     - -DO_BTEST=[YES|NO]    -- BOOT unit tests (to run unit tests)
+     - -DO_MRASTER=[YES|NO]  -- MRaster (Raster graphics used by some examples)
+     - -DMRaster_DIR=&lt;PATH&gt;  -- Search path for MRaster package file
+                                 The following automatically added to the search paths:
+                                   - ./mraster/build/install/share/MRaster/
+                                   - ./mraster/build/
+                                   - ../mraster/build/install/share/MRaster/
+                                   - ../mraster/build/
+     - -DO_MRPTREE=[YES|NO]  -- MRPTree (Sample tree used by most examples)
+     - -DMRPTree_DIR=&lt;PATH&gt;  -- Search path for MRaster package file
+                                 The following automatically added to the search paths:
+                                   - ./MRPTree/build/install/share/MRPTree/
+                                   - ./MRPTree/build/
+                                   - ../MRPTree/build/install/share/MRPTree/
+                                   - ../MRPTree/build/
+</pre>
+</div>
+
+<div id="outline-container-org1db9154" class="outline-3">
+<h3 id="org1db9154"><span class="section-number-3">1.1.</span> Accessing <b><code>MRPtree</code></b> &amp; <b><code>MRaster</code></b> features</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+These packages can be found &amp; used in various different ways:
+</p>
+
+<ul class="org-ul">
+<li>Simply clone the repo as described above and CMake will find headers. Note that advanced TIFF support will unavailable in this configuration.</li>
+<li>Do the previous and also configure each repo &#x2013; i.e. run <code>cmake</code> or the <code>configure.sh</code> script in each repo.  This will provide full functionality and load cmake packages from <code>&lt;REPO&gt;/build/</code>).</li>
+<li>Do the previous and also install without a custom install prefix. This will provide full functionality and load cmake packages from <code>&lt;REPO&gt;/build/install/lib/cmake/</code>).</li>
+<li>Do the previous but with a custom install prefix.
+<ul class="org-ul">
+<li>If the custom install prefix is known by cmake, then cmake will find the packages and use them.</li>
+<li>Otherwise you need to tell cmake where to find the package install (for example, by setting the <code>MRaster_DIR</code> &amp; <code>MRPTree_DIR</code> variables in the <code>CMakeLists.txt</code> file)</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
 <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br />

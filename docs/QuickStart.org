@@ -1,14 +1,14 @@
 # -*- Mode:Org; Coding:utf-8; fill-column:158 -*-
 # ######################################################################################################################################################.H.S.##
 # FILE:        QuickStart.org
-#+TITLE:       MRCellCplx3D Quick Start
+#+TITLE:       FuncViz Quick Start
 #+AUTHOR:      Mitch Richling
 #+EMAIL:       http://www.mitchr.me/
 #+DATE:        2024-08-20
 #+DESCRIPTION: Minimal tutorial for getting started with MRPTree
 #+KEYWORDS:    KEYWORDS FIXME
 #+LANGUAGE:    en
-#+OPTIONS:     num:t toc:nil \n:nil @:t ::t |:t ^:nil -:t f:t *:t <:t skip:nil d:nil todo:t pri:nil H:5 p:t author:t html-scripts:nil 
+#+OPTIONS:     num:t toc:nil \n:nil @:t ::t |:t ^:nil -:t f:t *:t <:t skip:nil d:nil todo:t pri:nil H:5 p:t author:t html-scripts:nil
 #+SEQ_TODO:    TODO:NEW(t)                         TODO:WORK(w)    TODO:HOLD(h)    | TODO:FUTURE(f)   TODO:DONE(d)    TODO:CANCELED(c)
 #+PROPERTY: header-args :eval never-export
 #+HTML_HEAD: <style>body { width: 95%; margin: 2% auto; font-size: 18px; line-height: 1.4em; font-family: Georgia, serif; color: black; background-color: white; }</style>
@@ -32,169 +32,90 @@
 #+TOC: headlines 5
 
 
-WARNING: This code is being refactored!
+* Playing With The Example Programs
+:PROPERTIES:
+:CUSTOM_ID: examples
+:END:
 
+This repository depends upon a couple others.  I suggest making one direcotyr, and cloneing all three into that directory.
 
-# * Playing With *=MRPtree=*'s Example Programs
-# :PROPERTIES:
-# :CUSTOM_ID: examples
-# :END:
+A typical shell session following the steps outlined above might look like this:
 
-# I suggest starting iwth the example programs.
+#+begin_src sh :exports code :eval never
+mkdir working                                        # Create a working directory (name it whatever you want)
+cd working                                           # Change into the working directory
+git clone 'https://github.com/richmit/FuncViz.git'   # Clone the FuncViz repository
+git clone 'https://github.com/richmit/MRPTree.git'   # Clone the MRPTree repository
+git clone 'https://github.com/richmit/mraster.git'   # Clone the MRaster repository
+cd FuncViz                                           # Change directory to the root of the git FuncViz repository
+rm -rf build                                         # Just in case a build directory exists, get rid of it!
+mkdir build                                          # Create a build directory
+cd build                                             # Change directory to the build directory
+cmake -G 'MSYS Makefiles' ..                         # Generate build files
+cmake --build . -t examples                          # Build the examples
+#+end_src
 
-# The first step is to download *=MRPtree=*.  Simply clone the repository with GIT like this:
+Note the "=cmake -G=" command given above is specific to Windows.  For UNIX/Linux replace "=MSYS Makefiles=" with "=Unix Makefiles=".
 
-# #+BEGIN_EXAMPLE
-# git clone 'https://github.com/richmit/MRPTree.git'
-# #+END_EXAMPLE
+Alternately you can run the "=configure.sh=" script in the root directory of the git repository.  Here is the 'help' printed from that script:
 
-# This next step is optional, but some of the examples won't build without *=MRaster=*.  You can clone *=MRaster=* in the same directory you cloned *=MRPtree=*
-# or you can do it at the top level of the *=MRPtree=* repository.  Whatever directory you chose, the clone command will look something like this:
+#+begin_src sh :results output verbatum :exports both
+../configure.sh -h
+#+end_src
 
-# #+BEGIN_EXAMPLE
-# git clone 'https://github.com/richmit/mraster.git'
-# #+END_EXAMPLE
+#+RESULTS:
+#+begin_example
 
-# The above is all you need for the examples as they don't use any advanced functionality from *=MRaster=*.  If you want to make use of advanced *=MRaster=*
-# features in your own programs, then see the section [[Accessing *=MRaster=* features]] additional for options.
+  Run this script from the 'build' directory.
 
-# The source code for the example programs is located in the "=examples=" directory in the *=MRPtree=* repository -- note the *=MRaster=* repository also has an
-# "=examples=", but that's not the one you want.  *=MRPtree=* ships with a =cmake= build system that should be able to interrogate your environment, and produce
-# make files for your OS.  To build the example programs:
+  If you don't have a 'build' directory yet, then create one!
 
-#    1) Change directory to the root of the git *=MRPtree=* repository (you should see "=lib=" & "=examples=" directories).
-#    2) Create a "=build=" directory -- cmake builds outside of the source trees.
-#    3) Change directory to the build directory
-#    4) Use =cmake= to generate make files for your system
-#    5) Build the examples
-#    6) Play with the examples
+  Use: configure.sh [configure options] [cmake arguments]
 
-# A typical shell session following the steps outlined above might look like this:
+    Configure Options
+     - -C Clean the build directory before running cmake (asks for conformation)
+     - -F Clean the build directory before running cmake (no conformation)
 
-# #+begin_src sh :exports code :eval never
-# git clone 'https://github.com/richmit/MRPTree.git'
-# git clone 'https://github.com/richmit/mraster.git'
-# cd MRPTree
-# rm -rf build
-# mkdir build
-# cd build
-# cmake -G 'MSYS Makefiles' ..    # For Windows running MSYS2.  Remove the "-G 'MSYS Makefiles'" bit for other platforms.
-# make
-# #+end_src
+    Common Cmake Arguments:
+     - Target -- leave it off to get the default
+       - -G 'MSYS Makefiles'           <-- Default on MSYS2
+       - -G 'Visual Studio 17 2022'
+       - -G 'Unix Makefiles'           <-- Default on Linux ('Linux' means 'Not MSYS2')
+       - -G Ninja
+     - Compiler -- leave it off to get the default
+       - -DCMAKE_CXX_COMPILER=clang++
+       - -DCMAKE_CXX_COMPILER=g++      <-- Default for 'MSYS Makefiles'
+       - -DCMAKE_CXX_COMPILER=g++-##   <-- Default for 'Unix Makefiles' if /usr/bin/g++-[0-9][0-9] exists
+                                           in which case the highest numbered version is selected.
+                                           This code base needs at least GCC-14.
+       - -DCMAKE_CXX_COMPILER=g++      <-- Default for 'Unix Makefiles' if /usr/bin/g++-[0-9][0-9] missing
+       -                               <-- Default for 'Visual Studio 17 2022'
+     - Optional features -- leave them off to enable everything
+       - -DO_DOXYGEN=[YES|NO]  -- Doxygen (to build documentation)
+       - -DO_BTEST=[YES|NO]    -- BOOT unit tests (to run unit tests)
+       - -DO_MRASTER=[YES|NO]  -- MRaster (Raster graphics used by some examples)
+       - -DMRaster_DIR=<PATH>  -- Search path for MRaster package file
+                                   The following automatically added to the search paths:
+                                     - ./mraster/build/install/share/MRaster/
+                                     - ./mraster/build/
+                                     - ../mraster/build/install/share/MRaster/
+                                     - ../mraster/build/
+       - -DO_MRPTREE=[YES|NO]  -- MRPTree (Sample tree used by most examples)
+       - -DMRPTree_DIR=<PATH>  -- Search path for MRaster package file
+                                   The following automatically added to the search paths:
+                                     - ./MRPTree/build/install/share/MRPTree/
+                                     - ./MRPTree/build/
+                                     - ../MRPTree/build/install/share/MRPTree/
+                                     - ../MRPTree/build/
+#+end_example
 
-# Note =cmake= can take several options like the "=-G=" option mentioned in the example above.  For more information on options related to *=MRPtree=*, take a look
-# at the "=configure.sh=" script in the root directory of the git repository.  Here is the 'help' printed from that script:
+** Accessing *=MRPtree=* & *=MRaster=* features
 
-# #+begin_src sh :results output verbatum :exports both 
-# ../configure.sh -h
-# #+end_src
+These packages can be found & used in various different ways:
 
-# #+RESULTS:
-# #+begin_example
-
-#   Run this script from the 'build' directory.
-
-#   If you don't have a 'build' directory yet, then create one!
-
-#   Use: configure.sh [cmake arguments]
-
-#     Common Arguments:
-#      ,* Target -- leave it off to get the default
-#        - -G 'MSYS Makefiles'           <-- Default on MSYS2
-#        - -G 'Visual Studio 17 2022'
-#        - -G 'Unix Makefiles'           <-- Default on Linux ('Linux' means 'Not MSYS2')
-#        - -G Ninja
-#      ,* Compiler -- leave it off to get the default
-#        - -DCMAKE_CXX_COMPILER=clang++
-#        - -DCMAKE_CXX_COMPILER=g++      <-- Default for 'MSYS Makefiles'
-#        - -DCMAKE_CXX_COMPILER=g++-##   <-- Default for 'Unix Makefiles' if /usr/bin/g++-[0-9][0-9] exists
-#                                            in which case the highest numbered version is selcted.
-#                                            This code base needs at least GCC-14.
-#        - -DCMAKE_CXX_COMPILER=g++      <-- Default for 'Unix Makefiles' if /usr/bin/g++-[0-9][0-9] missing
-#        -                               <-- Default for 'Visual Studio 17 2022'
-#      ,* Optional features -- leave them off to enable everything
-#        - -DO_DOXYGEN=[YES|NO]  -- Doxygen (to build documentation)
-#        - -DO_BTEST=[YES|NO]    -- BOOT unit tests (to run unit tests)
-#        - -DO_MRASTER=[YES|NO]  -- MRaster (used for some examples)
-# #+end_example
-
-# ** Accessing *=MRaster=* features
-
-# *=MRaster=* can be found & used in various different ways:
-
-#  - Simply clone the repo as described above: *=MRPtree=* will find the headers. Advanced TIFF support will unavailable.
-#  - Clone and configure the repo: *=MRPtree=* will import a package in the build directory (=build/MRasterConfig*.cmake=).
-#  - Clone, configure the repo, and delete the package files in the build directory: *=MRPtree=* will then use the exported target in =build/MRasterLib.cmake=
-#  - Clone, configure, and install without a custom install prefix: *=MRPtree=* will import the package from =build/install/lib/cmake/MRaster/MRasterConfig*.cmake=).
-#  - Clone, configure, and install with a custom install prefix.  
-#    - If the custom install prefix is known by cmake (perhaps it's on your path), then *=MRPtree=* will import the package from wherever you installed it
-#    - Otherwise you need to tell cmake where to find the package install (for example, by setting the =MRaster_DIR= variable in the =CMakeLists.txt= file)
-
-# * Quick Start (The absolute minimum for people who hate cmake)
-# :PROPERTIES:
-# :CUSTOM_ID: qs-min
-# :END:
-
-# If you are interested playing around with *=MRPtree=* as quickly as possible, then this section is for you.
-
-# The first step is to download *=MRPtree=*.  Simply clone the repository with GIT like this:
-
-# #+BEGIN_EXAMPLE
-# git clone 'https://github.com/richmit/MRPTree.git'
-# #+END_EXAMPLE
-
-# Once you have it downloaded, make note of the "=lib=" folder within the repository.  This folder contains everything you need to develop with *=MRPtree=*, and you
-# can simply put your code right in that directory.  So let's create a file called "=hello_world.cpp=" right inside the "=lib=" directory with the following content:
-
-# #+begin_src sh :results output verbatum :exports results :wrap "src c++ :eval never :tangle no"
-# grep -EA 10000 '(!|#|\*|=|_|-|%|;|C|/){70,}\.H\.E\.' ../examples/hello_world.cpp | grep -vE '(!|#|\*|=|_|-|%|;|C|/){70,}' | grep -vE '@(cond|endcond)'
-# #+end_src
-
-# #+RESULTS:
-# #+begin_src c++ :eval never :tangle no
-
-# #include "MR_rect_tree.hpp"
-# #include "MR_cell_cplx.hpp"
-# #include "MR_rt_to_cc.hpp"
-
-# typedef mjr::tree15b2d1rT            tt_t;
-# typedef mjr::MRccT5                  cc_t;
-# typedef mjr::MR_rt_to_cc<tt_t, cc_t> tc_t;
-
-# tt_t::rrpt_t damp_cos_wave(tt_t::drpt_t xvec) {
-#   double x = xvec[0];
-#   double y = xvec[1];
-#   double d = x*x+y*y;
-#   double z = std::exp(-d/4)*std::cos(4*std::sqrt(d));
-#   return z;
-# }
-
-# int main() {
-#   tt_t tree({-2.1, -2.1},
-#             { 2.1,  2.1});
-#   cc_t ccplx;
-
-#   tree.refine_grid(7, damp_cos_wave);
-#   tree.dump_tree(5);
-
-#   tc_t::construct_geometry_fans(ccplx,
-#                                 tree,
-#                                 2,
-#                                 {{tc_t::val_src_spc_t::FDOMAIN, 0},
-#                                  {tc_t::val_src_spc_t::FDOMAIN, 1},
-#                                  {tc_t::val_src_spc_t::FRANGE,  0}});
-#   ccplx.create_named_datasets({"x", "y", "f(x,y)"});
-
-#   ccplx.write_xml_vtk("hello_world.vtu", "hello_world");
-# }
-# #+end_src
-
-# Now we can compile it with GCC like this:
-
-# #+begin_src sh :exports source :eval never
-# g++ -m64 -std=gnu++23 hello_world.cpp -o hello_world
-# #+end_src
-
-# Now you can run it, and then load the file it created ("=hello_world.vtu=") up in something like Paraview.
-
-
+ - Simply clone the repo as described above and CMake will find headers. Note that advanced TIFF support will unavailable in this configuration.
+ - Do the previous and also configure each repo -- i.e. run =cmake= or the =configure.sh= script in each repo.  This will provide full functionality and load cmake packages from =<REPO>/build/=).
+ - Do the previous and also install without a custom install prefix. This will provide full functionality and load cmake packages from =<REPO>/build/install/lib/cmake/=).
+ - Do the previous but with a custom install prefix.
+   - If the custom install prefix is known by cmake, then cmake will find the packages and use them.
+   - Otherwise you need to tell cmake where to find the package install (for example, by setting the =MRaster_DIR= & =MRPTree_DIR= variables in the =CMakeLists.txt= file)

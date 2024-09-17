@@ -40,16 +40,16 @@ if [[ "${@}" == *'-h'* ]]; then
   Use: configure.sh [configure options] [cmake arguments]
 
     Configure Options
-     * -C Clean the build directory before running cmake (asks for conformation)
-     * -F Clean the build directory before running cmake (no conformation)
+     - -C Clean the build directory before running cmake (asks for conformation)
+     - -F Clean the build directory before running cmake (no conformation)
 
     Common Cmake Arguments:
-     * Target -- leave it off to get the default
+     - Target -- leave it off to get the default
        - -G 'MSYS Makefiles'           <-- Default on MSYS2
        - -G 'Visual Studio 17 2022'
        - -G 'Unix Makefiles'           <-- Default on Linux ('Linux' means 'Not MSYS2')
        - -G Ninja
-     * Compiler -- leave it off to get the default
+     - Compiler -- leave it off to get the default
        - -DCMAKE_CXX_COMPILER=clang++
        - -DCMAKE_CXX_COMPILER=g++      <-- Default for 'MSYS Makefiles'
        - -DCMAKE_CXX_COMPILER=g++-##   <-- Default for 'Unix Makefiles' if /usr/bin/g++-[0-9][0-9] exists
@@ -57,16 +57,23 @@ if [[ "${@}" == *'-h'* ]]; then
                                            This code base needs at least GCC-14.
        - -DCMAKE_CXX_COMPILER=g++      <-- Default for 'Unix Makefiles' if /usr/bin/g++-[0-9][0-9] missing
        -                               <-- Default for 'Visual Studio 17 2022'
-     * Optional features -- leave them off to enable everything
+     - Optional features -- leave them off to enable everything
        - -DO_DOXYGEN=[YES|NO]  -- Doxygen (to build documentation)
        - -DO_BTEST=[YES|NO]    -- BOOT unit tests (to run unit tests)
-       - -DO_MRASTER=[YES|NO]  -- MRaster (used for some examples)
-         - -DMRaster_DIR=<PATH> -- Search path for MRaster package file
+       - -DO_MRASTER=[YES|NO]  -- MRaster (Raster graphics used by some examples)
+       - -DMRaster_DIR=<PATH>  -- Search path for MRaster package file
                                    The following automatically added to the search paths:
                                      - ./mraster/build/install/share/MRaster/
                                      - ./mraster/build/
                                      - ../mraster/build/install/share/MRaster/
                                      - ../mraster/build/
+       - -DO_MRPTREE=[YES|NO]  -- MRPTree (Sample tree used by most examples)
+       - -DMRPTree_DIR=<PATH>  -- Search path for MRaster package file
+                                   The following automatically added to the search paths:
+                                     - ./MRPTree/build/install/share/MRPTree/
+                                     - ./MRPTree/build/
+                                     - ../MRPTree/build/install/share/MRPTree/
+                                     - ../MRPTree/build/
 EOF
 exit
 fi

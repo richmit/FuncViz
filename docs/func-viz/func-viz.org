@@ -5,7 +5,7 @@
 #+AUTHOR:      Mitch Richling
 #+EMAIL:       http://www.mitchr.me/
 #+DATE:        2024-07-16
-#+DESCRIPTION: Notes on function visualization examples that ship with MRPTree
+#+DESCRIPTION: Notes on function visualization examples
 #+KEYWORDS:    KEYWORDS FIXME
 #+LANGUAGE:    en
 #+OPTIONS:     num:t toc:nil \n:nil @:t ::t |:t ^:nil -:t f:t *:t <:t skip:nil d:nil todo:t pri:nil H:5 p:t author:t html-scripts:nil 
@@ -50,15 +50,6 @@ Copyright \copy {{{time(%Y)}}} Mitch Richling. All rights reserved.
 :CUSTOM_ID: intro
 :END:
 
-Quadtree-like data structures are widely applied today: image processing, spatial indexing, collision detection, terrain modeling, sparse matrix computation,
-computational field dynamics, mesh generation, and many more.  Being a mathematician, my primary interest in these kinds of structures is
-visualization of mathematical objects -- i.e. mesh generation with a few extras.  As luck would have it, I think function visualization is a great way to
-demonstrate how to use this library because everything is self contained and easy to understand.
-
-The goal of this document is to gather together in one place information & results for the example programs distributed with MRPTree.  As such, much of this
-page is auto-generated from the examples themselves -- the intro for each example section is pulled directly from the source code's top comment, and the code
-listing are pulled right out of the repository.
-
 In this document we break the process of mathematical function visualization into three steps:
 
  - Sample      :: The goal is to evaluate the function at various sample points so that we can faithfully approximate the geometric structure we are interested in visualizing.
@@ -75,7 +66,7 @@ In some cases we preform post processing or use other tools: VisIT, meshlab, POV
 :CUSTOM_ID: core_examples
 :END:
 
-This group of core examples is intended to illistrate various features of MRPTree.
+This group of examples illistrate most of the features of MRPTree. 
 
 ** Complex Magnitude Surface Plot
 :PROPERTIES:
@@ -1510,7 +1501,7 @@ int main() {
 :END:
 
 The examples that follow are mostly just interesting mathematical objects.  No new MRPTree functionality is demonstrated beyond what is demonstrated in the
-fore examples.
+core examples.
 
 ** Trefoil Parametric Surface
 :PROPERTIES:

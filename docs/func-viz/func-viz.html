@@ -3,12 +3,12 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-09-16 Mon 16:07 -->
+<!-- 2024-09-17 Tue 14:34 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
 <title>Function Visualization</title>
 <meta name="author" content="Mitch Richling" />
-<meta name="description" content="Notes on function visualization examples that ship with MRPTree" />
+<meta name="description" content="Notes on function visualization examples" />
 <meta name="keywords" content="KEYWORDS FIXME" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -272,12 +272,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-08-29 16:44:26</i></td>
+<td class="org-left"><i>2024-09-17 14:34:17</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-09-16 16:07:28</i></td>
+<td class="org-left"><i>2024-09-17 14:34:18</i></td>
 </tr>
 </tbody>
 </table>
@@ -325,19 +325,6 @@ Copyright &copy; 2024 Mitch Richling. All rights reserved.
 <h2 id="intro"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-intro">
 <p>
-Quadtree-like data structures are widely applied today: image processing, spatial indexing, collision detection, terrain modeling, sparse matrix computation,
-computational field dynamics, mesh generation, and many more.  Being a mathematician, my primary interest in these kinds of structures is
-visualization of mathematical objects &#x2013; i.e. mesh generation with a few extras.  As luck would have it, I think function visualization is a great way to
-demonstrate how to use this library because everything is self contained and easy to understand.
-</p>
-
-<p>
-The goal of this document is to gather together in one place information &amp; results for the example programs distributed with MRPTree.  As such, much of this
-page is auto-generated from the examples themselves &#x2013; the intro for each example section is pulled directly from the source code's top comment, and the code
-listing are pulled right out of the repository.
-</p>
-
-<p>
 In this document we break the process of mathematical function visualization into three steps:
 </p>
 
@@ -360,7 +347,7 @@ In some cases we preform post processing or use other tools: VisIT, meshlab, POV
 <h2 id="core_examples"><span class="section-number-2">2.</span> Core Examples</h2>
 <div class="outline-text-2" id="text-core_examples">
 <p>
-This group of core examples is intended to illistrate various features of MRPTree.
+This group of examples illistrate most of the features of MRPTree. 
 </p>
 </div>
 
@@ -1421,7 +1408,7 @@ any holes.  This is really the only change from <a href="#surface_plot_edge">sur
 
 <div class="org-center">
 
-<div id="orgf41e2a6" class="figure">
+<div id="org6a44637" class="figure">
 <p><a href="media/surface_branch_glue_100.png"><img src="media/surface_branch_glue_10.png" alt="surface_branch_glue_10.png" /></a>
 </p>
 </div>
@@ -1519,7 +1506,7 @@ Note that most of the items above are listed TBD.  A few features need to be add
 
 <div class="org-center">
 
-<div id="org3aa8ce7" class="figure">
+<div id="org906b888" class="figure">
 <p><a href="media/sq_curve_plot_heal_100.png"><img src="media/sq_curve_plot_heal_10.png" alt="sq_curve_plot_heal_10.png" /></a>
 </p>
 </div>
@@ -1841,7 +1828,7 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/perf
 <div class="outline-text-2" id="text-extra_examples">
 <p>
 The examples that follow are mostly just interesting mathematical objects.  No new MRPTree functionality is demonstrated beyond what is demonstrated in the
-fore examples.
+core examples.
 </p>
 </div>
 
@@ -1854,7 +1841,7 @@ This example doesn't really demonstrate anything not found in the other examples
 
 <div class="org-center">
 
-<div id="orgf239a47" class="figure">
+<div id="orgb70a708" class="figure">
 <p><a href="media/trefoil_rot_50_crf30.html"><img src="media/trefoil_rot_10.gif" alt="trefoil_rot_10.gif" /></a>
 </p>
 </div>
@@ -1951,7 +1938,7 @@ Alternately the curve is also the intersection of two surfaces in \(\mathbb{R}^3
 The "typical" way to graph a surface like \(f_2\) is to transform it into pseudo-parametric form.  In Maple that might look like this
 </p>
 
-<pre class="example" id="orgda30d53">
+<pre class="example" id="org05ac4d6">
 plot3d([u, u^2, v], u=-1..1, v=-1..1):
 </pre>
 
@@ -1967,7 +1954,7 @@ not using a tool that can extract a nice surface intersection, I have also dumpe
 
 <div class="org-center">
 
-<div id="orgf6e57df" class="figure">
+<div id="org759bb67" class="figure">
 <p><a href="media/parametric_curve_3d_rot_100_crf30.html"><img src="media/parametric_curve_3d_rot_10.gif" alt="parametric_curve_3d_rot_10.gif" /></a>
 </p>
 </div>

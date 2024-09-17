@@ -90,12 +90,12 @@ Copyright \copy {{{time(%Y)}}} Mitch Richling. All rights reserved.
 * Raw TODO Comments From Source Code
 
 #+begin_src sh :results output verbatum :exports results 
-date; grep -n 'MJR TODO NOTE' ../lib/*.hpp ../examples/*.cpp ../utests/*.cpp ../ftests/*.cpp | sed -E 's/^...//; s/pp:([0-9]+): +\/\/ +MJR TODO NOTE +/pp%\1%/;' | column -s% -t
+date; grep -n 'MJR TODO NOTE' ../*/*.hpp ../*/*.cpp | sed -E 's/^...//; s/pp:([0-9]+): +\/\/ +MJR TODO NOTE +/pp%\1%/;' | column -s% -t
 #+end_src
 
 #+RESULTS:
 #+begin_example
-Mon Sep 16 16:07:18 CDT 2024
+Tue Sep 17 14:29:56 CDT 2024
 lib/MR_cell_cplx.hpp  646   <2024-07-22T15:48:31-0500> vec3_det3: UNTESTED! UNTESTED! UNTESTED! UNTESTED!
 lib/MR_cell_cplx.hpp  689   <2024-08-02T09:41:48-0500> geomi_seg_isect_type: Repeated point look-up slows things down
 lib/MR_cell_cplx.hpp  690   <2024-08-02T09:41:48-0500> geomi_seg_isect_type: Add unit tests for each code branch
@@ -105,4 +105,5 @@ lib/MR_cell_cplx.hpp  907   <2024-07-11T16:08:16-0500> geomr_seg_tri_intersectio
 lib/MR_cell_cplx.hpp  908   <2024-07-11T16:08:27-0500> geomr_seg_tri_intersection: Should this be a bool or an enum?
 lib/MR_cell_cplx.hpp  945   <2024-07-11T16:06:42-0500> cell_kind_to_structure: make sure polygons are all oriented correctly
 lib/MR_cell_cplx.hpp  1199  <2024-08-02T09:42:38-0500> check_cell_face_intersections: Implement
+lib/zzz_tbd_tmp.cpp   27    <2024-08-06T12:38:33-0500> triangle_folder: Implement!
 #+end_example

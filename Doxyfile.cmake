@@ -48,13 +48,13 @@ PROJECT_NAME           = "@CMAKE_PROJECT_NAME@ @PROJECT_VERSION_ID@ @DOXINPUT@"
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = @PROJECT_VERSION_DATE@
+PROJECT_NUMBER         = "@PROJECT_VERSION_DATE@"
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "MR 2^P Trees (MRPTree)"
+PROJECT_BRIEF          = "@CMAKE_PROJECT_DESCRIPTION@"
 
 # With the PROJECT_LOGO tag one can specify a logo or an icon that is included
 # in the documentation. The maximum height of the logo should not exceed 55
