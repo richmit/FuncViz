@@ -5,20 +5,20 @@ mathematical function visualization accompanied by practical code
 illustrating various techniques.
 
 Most of the programs depend on the
-[[https://github.com/richmit/MRPTree][=MRPTree=]] library -- a C++
+[[https://github.com/richmit/MRPTree][MRPTree]] library -- a C++
 library implementing a data structure that is a generalization of the
 quadtree/octree concept to any dimension.  As such this repository
 also provides a pretty robust set of examples for the
-[[https://github.com/richmit/MRPTree][=MRPTree=]] library.
+[[https://github.com/richmit/MRPTree][MRPTree]] library.
 
 Some of the code in this repository also makes use of the
-[[https://github.com/richmit/MRaster][=MRaster=]] library for both
+[[https://github.com/richmit/MRaster][MRaster]] library for both
 image synthesis and color schemes.
 
 In addition to the example code, this repository also provides two
 libraries of it's own:
   - A 3D cell complex library (think "triangulation" or "mesh")
-  - A library to tessellate [[https://github.com/richmit/MRPTree][=MRPTree=]] data into a cell complex.
+  - A library to tessellate [[https://github.com/richmit/MRPTree][MRPTree]] data into a cell complex.
 
 * Learn More
 
