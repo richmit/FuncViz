@@ -46,6 +46,12 @@ Copyright \copy {{{time(%Y)}}} Mitch Richling. All rights reserved.
 
 * High Level Future Development Plans (TODO)
 
+     - Put together a "Function Visualization Cookbook"
+     - Rework func-viz into MRPTree core examples
+     - Add general gallery
+
+* Low level Plans
+
      - Example Updates
        - Add Paraview state for vector_field_3d
        - Add Paraview state & data for surface_plot_step
@@ -72,6 +78,7 @@ Copyright \copy {{{time(%Y)}}} Mitch Richling. All rights reserved.
      - Function Examples
        - Demonstrate how to insert multiple trees into one cell complex (and glue them together?)
        - Demonstrate cutting on a domain point for bitree example -- step discontinuity.
+       - Flesh out complex color example
      - External Interfaces (listed in no particular order)
        - Julia
        - Maple

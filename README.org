@@ -25,7 +25,6 @@ libraries of it's own:
  - [[https://richmit.github.io/FuncViz/QuickStart.html][Quick Start Guide]]
  - [[https://richmit.github.io/FuncViz/roadmap.html][Development roadmap]]
  - [[https://richmit.github.io/FuncViz/func-viz/func-viz.html][Example code for mathematical function visualization]]
- - [[https://richmit.github.io/FuncViz/cookbook/cookbook.html][Function Visualization Challanges & Solutions]] (TODO)
  - Doxygen documentation
    - [[https://www.mitchr.me/SS/FuncViz/doc-examples/autodocs/html/index.html][Examples]]
    - [[https://www.mitchr.me/SS/FuncViz/doc-lib/autodocs/html/index.html][Library]]
