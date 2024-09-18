@@ -3,12 +3,12 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-09-18 Wed 12:49 -->
+<!-- 2024-09-18 Wed 13:13 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=1024, initial-scale=1" />
-<title>Function Visualization</title>
+<title>MRPTree Core Examples</title>
 <meta name="author" content="Mitch Richling" />
-<meta name="description" content="Notes on function visualization examples" />
+<meta name="description" content="Examples demonstrating most of the MRPTree library via function visualization." />
 <meta name="keywords" content="KEYWORDS FIXME" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -246,7 +246,7 @@
  |
  <a accesskey="H" href="https://www.mitchr.me/"> HOME </a>
 </div><div id="content" class="content">
-<h1 class="title">Function Visualization</h1>
+<h1 class="title">MRPTree Core Examples</h1>
 <div class="org-center">
 <p>
 <a href="#complex_magnitude_surface"><img src="media/sq_complex_magnitude_surface_rot_10.gif" alt="sq_complex_magnitude_surface_rot_10.gif" /></a>
@@ -272,12 +272,12 @@
 
 <tr>
 <td class="org-right"><b>Updated:</b></td>
-<td class="org-left"><i>2024-09-17 14:34:17</i></td>
+<td class="org-left"><i>2024-09-18 13:12:59</i></td>
 </tr>
 
 <tr>
 <td class="org-right"><b>Generated:</b></td>
-<td class="org-left"><i>2024-09-18 12:49:50</i></td>
+<td class="org-left"><i>2024-09-18 13:12:59</i></td>
 </tr>
 </tbody>
 </table>
@@ -285,75 +285,36 @@
 Copyright &copy; 2024 Mitch Richling. All rights reserved.
 </p>
 
+<p>
+Most of the example programs on this page may be found in the cookbook; however, this collection is targeted at providing a concise set of examples to
+demonstrate the most important <a href="https://github.com/richmit/MRPTree">MRPTree</a> functionality.  
+</p>
+
 <div id="table-of-contents" role="doc-toc">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#intro">1. Introduction</a></li>
-<li><a href="#core_examples">2. Core Examples</a>
-<ul>
-<li><a href="#complex_magnitude_surface">2.1. Complex Magnitude Surface Plot</a></li>
-<li><a href="#implicit_curve_2d">2.2. Implicit Curve</a></li>
-<li><a href="#implicit_surface">2.3. Implicit Surface</a></li>
-<li><a href="#vector_field_3d">2.4. 3D Vector Field</a></li>
-<li><a href="#surface_with_normals">2.5. Surface Plot With Normals</a></li>
-<li><a href="#surface_plot_edge">2.6. Surface Plot With An Edge</a></li>
-<li><a href="#surface_plot_annular_edge">2.7. Surface Plot With Annular Edge</a></li>
-<li><a href="#surface_plot_corner">2.8. Surface Plot With An Corner</a></li>
-<li><a href="#surface_plot_step">2.9. Surface Plot With An Step</a></li>
-<li><a href="#surface_branch_glue">2.10. Surface Branches &amp; Glue</a></li>
-<li><a href="#curve_plot">2.11. Curve Plot</a></li>
-<li><a href="#parametric_surface_with_defects">2.12. Parametric Surface With Defects</a></li>
-<li><a href="#performance_with_large_surface">2.13. High Resolution Parametric Surface</a></li>
-</ul>
-</li>
-<li><a href="#extra_examples">3. Extra Examples</a>
-<ul>
-<li><a href="#trefoil">3.1. Trefoil Parametric Surface</a></li>
-<li><a href="#parametric_curve_3d">3.2. Twisted Cubic As A Surface Intersection</a></li>
-<li><a href="#ear_surface">3.3. Ear Surface (Implicit)</a></li>
-<li><a href="#ear_surface_glue">3.4. Ear Surface (Solve &amp; Glue)</a></li>
-<li><a href="#holy_wave_surf">3.5. Holy Wave Surface</a></li>
-</ul>
-</li>
+<li><a href="#complex_magnitude_surface">1. Complex Magnitude Surface Plot</a></li>
+<li><a href="#implicit_curve_2d">2. Implicit Curve</a></li>
+<li><a href="#implicit_surface">3. Implicit Surface</a></li>
+<li><a href="#vector_field_3d">4. 3D Vector Field</a></li>
+<li><a href="#surface_with_normals">5. Surface Plot With Normals</a></li>
+<li><a href="#surface_plot_edge">6. Surface Plot With An Edge</a></li>
+<li><a href="#surface_plot_annular_edge">7. Surface Plot With Annular Edge</a></li>
+<li><a href="#surface_plot_corner">8. Surface Plot With An Corner</a></li>
+<li><a href="#surface_plot_step">9. Surface Plot With An Step</a></li>
+<li><a href="#surface_branch_glue">10. Surface Branches &amp; Glue</a></li>
+<li><a href="#curve_plot">11. Curve Plot</a></li>
+<li><a href="#parametric_surface_with_defects">12. Parametric Surface With Defects</a></li>
+<li><a href="#performance_with_large_surface">13. High Resolution Parametric Surface</a></li>
 </ul>
 </div>
 </div>
 
 
-<div id="outline-container-intro" class="outline-2">
-<h2 id="intro"><span class="section-number-2">1.</span> Introduction</h2>
-<div class="outline-text-2" id="text-intro">
-<p>
-In this document we break the process of mathematical function visualization into three steps:
-</p>
-
-<dl class="org-dl">
-<dt>Sample     </dt><dd>The goal is to evaluate the function at various sample points so that we can faithfully approximate the geometric structure we are interested in visualizing.
-In the examples here, this step is almost entirely accomplished via the <code>MR_rect_tree</code> class.  When possible we use more samples where the
-function behaviour is complex and fewer elseware.</dd>
-<dt>Approximate</dt><dd>In this step we transform our sample data into a finite collection of geometric primitives (a "mesh" or a "cell complex") that may be visualized.
-In the examples here, this step is accomplished by the <code>MR_cell_cplx</code> and <code>MR_rt_to_cc</code> classes.</dd>
-<dt>Explore    </dt><dd>Finally we use Paraview to display &amp; explore the data.</dd>
-</dl>
-
-<p>
-In some cases we preform post processing or use other tools: VisIT, meshlab, POV-Ray, Blender, ffmpeg, ImageMagick, etc&#x2026;
-</p>
-</div>
-</div>
-
-<div id="outline-container-core_examples" class="outline-2">
-<h2 id="core_examples"><span class="section-number-2">2.</span> Core Examples</h2>
-<div class="outline-text-2" id="text-core_examples">
-<p>
-This group of examples illistrate most of the features of MRPTree. 
-</p>
-</div>
-
-<div id="outline-container-complex_magnitude_surface" class="outline-3">
-<h3 id="complex_magnitude_surface"><span class="section-number-3">2.1.</span> Complex Magnitude Surface Plot</h3>
-<div class="outline-text-3" id="text-complex_magnitude_surface">
+<div id="outline-container-complex_magnitude_surface" class="outline-2">
+<h2 id="complex_magnitude_surface"><span class="section-number-2">1.</span> Complex Magnitude Surface Plot</h2>
+<div class="outline-text-2" id="text-complex_magnitude_surface">
 <p>
 One popular way to plot complex functions is to use a surface plot of \(\vert f(z)\vert\) and color the surface with \(\arg(f(z))\).  This way we can
 simultaneously represent the magnitude and phase over the complex plain.  There are several ways to color the plots, and we will be following the method
@@ -541,9 +502,9 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/comp
 </div>
 </div>
 
-<div id="outline-container-implicit_curve_2d" class="outline-3">
-<h3 id="implicit_curve_2d"><span class="section-number-3">2.2.</span> Implicit Curve</h3>
-<div class="outline-text-3" id="text-implicit_curve_2d">
+<div id="outline-container-implicit_curve_2d" class="outline-2">
+<h2 id="implicit_curve_2d"><span class="section-number-2">2.</span> Implicit Curve</h2>
+<div class="outline-text-2" id="text-implicit_curve_2d">
 <p>
 For many of us our first exposure to an implicit curve was the unit circle in high school algebra, \(x^2+y^2=1\), where we were ask to graph \(y\) with
 respect to \(x\) only to discover that \(y\) didn't appear to be a function of \(x\) because \(y\) had TWO values for some values of \(x\)!  But
@@ -650,9 +611,9 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/impl
 </div>
 </div>
 
-<div id="outline-container-implicit_surface" class="outline-3">
-<h3 id="implicit_surface"><span class="section-number-3">2.3.</span> Implicit Surface</h3>
-<div class="outline-text-3" id="text-implicit_surface">
+<div id="outline-container-implicit_surface" class="outline-2">
+<h2 id="implicit_surface"><span class="section-number-2">3.</span> Implicit Surface</h2>
+<div class="outline-text-2" id="text-implicit_surface">
 <p>
 This example is very similar to <a href="#implicit_curve_2d">implicit_curve_2d.cpp</a>; however, instead of extracting a curve from a triangulation of a surface, this time we extract a
 surface from a quad tessellation of a hexahedron.  In addition to what we demonstrate with <a href="#implicit_curve_2d">implicit_curve_2d.cpp</a>, this example also demonstrates:
@@ -734,9 +695,9 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/impl
 </div>
 </div>
 
-<div id="outline-container-vector_field_3d" class="outline-3">
-<h3 id="vector_field_3d"><span class="section-number-3">2.4.</span> 3D Vector Field</h3>
-<div class="outline-text-3" id="text-vector_field_3d">
+<div id="outline-container-vector_field_3d" class="outline-2">
+<h2 id="vector_field_3d"><span class="section-number-2">4.</span> 3D Vector Field</h2>
+<div class="outline-text-2" id="text-vector_field_3d">
 <p>
 This example illustrates how to uniformly sample a vector field.  Just for fun we have also produced a solution to the Lorenz system, and directly
 stored it with a MR_cell_cplx.
@@ -839,9 +800,9 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/vect
 </div>
 </div>
 
-<div id="outline-container-surface_with_normals" class="outline-3">
-<h3 id="surface_with_normals"><span class="section-number-3">2.5.</span> Surface Plot With Normals</h3>
-<div class="outline-text-3" id="text-surface_with_normals">
+<div id="outline-container-surface_with_normals" class="outline-2">
+<h2 id="surface_with_normals"><span class="section-number-2">5.</span> Surface Plot With Normals</h2>
+<div class="outline-text-2" id="text-surface_with_normals">
 <p>
 Surface normals may be used by many visualization tools to render smoother results.  In this example we demonstrate:
 </p>
@@ -976,9 +937,9 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
 </div>
 </div>
 
-<div id="outline-container-surface_plot_edge" class="outline-3">
-<h3 id="surface_plot_edge"><span class="section-number-3">2.6.</span> Surface Plot With An Edge</h3>
-<div class="outline-text-3" id="text-surface_plot_edge">
+<div id="outline-container-surface_plot_edge" class="outline-2">
+<h2 id="surface_plot_edge"><span class="section-number-2">6.</span> Surface Plot With An Edge</h2>
+<div class="outline-text-2" id="text-surface_plot_edge">
 <p>
 Surface plots are frequently complicated by regions upon which the function singular or undefined.  These functions often behave quite poorly on the
 boundaries of such regions.  For this example we consider \(f(x, y)=\sqrt{1-x^2-y^2}\) &#x2013; the upper half of the unit sphere.  Outside the unit circle this
@@ -1082,9 +1043,9 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
 </div>
 </div>
 
-<div id="outline-container-surface_plot_annular_edge" class="outline-3">
-<h3 id="surface_plot_annular_edge"><span class="section-number-3">2.7.</span> Surface Plot With Annular Edge</h3>
-<div class="outline-text-3" id="text-surface_plot_annular_edge">
+<div id="outline-container-surface_plot_annular_edge" class="outline-2">
+<h2 id="surface_plot_annular_edge"><span class="section-number-2">7.</span> Surface Plot With Annular Edge</h2>
+<div class="outline-text-2" id="text-surface_plot_annular_edge">
 <p>
 In example <a href="#surface_plot_edge">surface_plot_edge.cpp</a> we had a surface plot with a large, undefined region easily discovered by Maple &amp; Nathematica.  In this example we have a
 surface with a smaller, annular undefined region that is harder for automatic software to get right.  The function in question is as follows:
@@ -1182,9 +1143,9 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
 </div>
 
 
-<div id="outline-container-surface_plot_corner" class="outline-3">
-<h3 id="surface_plot_corner"><span class="section-number-3">2.8.</span> Surface Plot With An Corner</h3>
-<div class="outline-text-3" id="text-surface_plot_corner">
+<div id="outline-container-surface_plot_corner" class="outline-2">
+<h2 id="surface_plot_corner"><span class="section-number-2">8.</span> Surface Plot With An Corner</h2>
+<div class="outline-text-2" id="text-surface_plot_corner">
 <p>
 The function illustrated here is continuous on the entire plane, but has no derivative on the unit circle.  While no derivative exists on the unit circle,
 directional derivatives pointing from the origin approach infinity as we get close to the unit circle.  The derivative at the origin is zero.  Thus the
@@ -1292,9 +1253,9 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
 </div>
 </div>
 
-<div id="outline-container-surface_plot_step" class="outline-3">
-<h3 id="surface_plot_step"><span class="section-number-3">2.9.</span> Surface Plot With An Step</h3>
-<div class="outline-text-3" id="text-surface_plot_step">
+<div id="outline-container-surface_plot_step" class="outline-2">
+<h2 id="surface_plot_step"><span class="section-number-2">9.</span> Surface Plot With An Step</h2>
+<div class="outline-text-2" id="text-surface_plot_step">
 <p>
 The function illustrated here is defined on the entire plan, but has a step discontinuity on the unit circle.  Except on the unit circle, the function's
 derivative is zero.  If we sample on a uniform grid, some of the resulting polygons will have vertexes both inside and outside the unit circle &#x2013; they cross
@@ -1391,9 +1352,9 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
 </div>
 </div>
 
-<div id="outline-container-surface_branch_glue" class="outline-3">
-<h3 id="surface_branch_glue"><span class="section-number-3">2.10.</span> Surface Branches &amp; Glue</h3>
-<div class="outline-text-3" id="text-surface_branch_glue">
+<div id="outline-container-surface_branch_glue" class="outline-2">
+<h2 id="surface_branch_glue"><span class="section-number-2">10.</span> Surface Branches &amp; Glue</h2>
+<div class="outline-text-2" id="text-surface_branch_glue">
 <p>
 In <a href="#surface_plot_edge">surface_plot_edge.cpp</a> we encountered the unit sphere defined by the zeros of \(1^2=x^2+y^2+z^2\), and the related function 
 \(f(x,y)=\sqrt{1-x^2-y^2}\) obtained by "solving" for \(z\).  Note that if \(z=f(x, y)\), then both \(z\) and \(-z\) satisfy the original equation.
@@ -1408,7 +1369,7 @@ any holes.  This is really the only change from <a href="#surface_plot_edge">sur
 
 <div class="org-center">
 
-<div id="org1a97c4e" class="figure">
+<div id="orga2b8c69" class="figure">
 <p><a href="media/surface_branch_glue_100.png"><img src="media/surface_branch_glue_10.png" alt="surface_branch_glue_10.png" /></a>
 </p>
 </div>
@@ -1484,9 +1445,9 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/surf
 </div>
 </div>
 
-<div id="outline-container-curve_plot" class="outline-3">
-<h3 id="curve_plot"><span class="section-number-3">2.11.</span> Curve Plot</h3>
-<div class="outline-text-3" id="text-curve_plot">
+<div id="outline-container-curve_plot" class="outline-2">
+<h2 id="curve_plot"><span class="section-number-2">11.</span> Curve Plot</h2>
+<div class="outline-text-2" id="text-curve_plot">
 <p>
 Univariate function plots are the bread-and-butter of the plotting world.  Normally a simple, uniformly spaced, sequence is enough to get the job 
 done quite nicely.  Still, a few things can come up:
@@ -1506,7 +1467,7 @@ Note that most of the items above are listed TBD.  A few features need to be add
 
 <div class="org-center">
 
-<div id="orgb522121" class="figure">
+<div id="orgf05a606" class="figure">
 <p><a href="media/sq_curve_plot_heal_100.png"><img src="media/sq_curve_plot_heal_10.png" alt="sq_curve_plot_heal_10.png" /></a>
 </p>
 </div>
@@ -1601,9 +1562,9 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/curv
 </div>
 </div>
 
-<div id="outline-container-parametric_surface_with_defects" class="outline-3">
-<h3 id="parametric_surface_with_defects"><span class="section-number-3">2.12.</span> Parametric Surface With Defects</h3>
-<div class="outline-text-3" id="text-parametric_surface_with_defects">
+<div id="outline-container-parametric_surface_with_defects" class="outline-2">
+<h2 id="parametric_surface_with_defects"><span class="section-number-2">12.</span> Parametric Surface With Defects</h2>
+<div class="outline-text-2" id="text-parametric_surface_with_defects">
 <p>
 This example illustrates some of the things that can go wrong when generating parametric surfaces.  We dump two version of the tessellation &#x2013; one with
 quads and one with triangles.  This allows us to better illustrate how some defects show up.
@@ -1699,9 +1660,9 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/para
 </div>
 
 
-<div id="outline-container-performance_with_large_surface" class="outline-3">
-<h3 id="performance_with_large_surface"><span class="section-number-3">2.13.</span> High Resolution Parametric Surface</h3>
-<div class="outline-text-3" id="text-performance_with_large_surface">
+<div id="outline-container-performance_with_large_surface" class="outline-2">
+<h2 id="performance_with_large_surface"><span class="section-number-2">13.</span> High Resolution Parametric Surface</h2>
+<div class="outline-text-2" id="text-performance_with_large_surface">
 <p>
 Just a nice parametric surface without any weirdness.  Some things demonstrated:
 </p>
@@ -1816,582 +1777,6 @@ Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/perf
   <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"Total Run _time ...... "</span> &lt;&lt; <span style="color: #00ffff;">static_cast</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt;&gt;(write_time-start_time)       &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
 }
 </pre>
-</div>
-</div>
-</div>
-</div>
-
-
-
-<div id="outline-container-extra_examples" class="outline-2">
-<h2 id="extra_examples"><span class="section-number-2">3.</span> Extra Examples</h2>
-<div class="outline-text-2" id="text-extra_examples">
-<p>
-The examples that follow are mostly just interesting mathematical objects.  No new MRPTree functionality is demonstrated beyond what is demonstrated in the
-core examples.
-</p>
-</div>
-
-<div id="outline-container-trefoil" class="outline-3">
-<h3 id="trefoil"><span class="section-number-3">3.1.</span> Trefoil Parametric Surface</h3>
-<div class="outline-text-3" id="text-trefoil">
-<p>
-This example doesn't really demonstrate anything not found in the other examples.  It's just a neat surface. ;)
-</p>
-
-<div class="org-center">
-
-<div id="org2bbe224" class="figure">
-<p><a href="media/trefoil_rot_50_crf30.html"><img src="media/trefoil_rot_10.gif" alt="trefoil_rot_10.gif" /></a>
-</p>
-</div>
-</div>
-
-<p>
-Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/trefoil.cpp">https://github.com/richmit/MRPTree/blob/main/examples/trefoil.cpp</a>
-</p>
-
-<div class="org-src-container">
-<pre class="src src-c++"><span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">&lt;numbers&gt;</span>                                                       <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">C++ math constants      C++20</span><span style="color: #ffa500;">    */</span>
-
-<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
-<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
-<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
-
-<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b2d6rT</span>            <span style="color: #63b8ff;">tt_t</span>;
-<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;
-<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
-
-<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">trefoil</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">u</span> = xvec[0] * <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi;
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">v</span> = xvec[1] * <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi;
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">r</span> = 5;
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x</span> = r * <span style="color: #8470ff; font-weight: bold;">std</span>::sin(3 * u) / (2 + <span style="color: #8470ff; font-weight: bold;">std</span>::cos(v));
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y</span> = r * (<span style="color: #8470ff; font-weight: bold;">std</span>::sin(u) + 2 * <span style="color: #8470ff; font-weight: bold;">std</span>::sin(2 * u)) / (2 + <span style="color: #8470ff; font-weight: bold;">std</span>::cos(v + <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi * 2 / 3));
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z</span> = r / 2 * (<span style="color: #8470ff; font-weight: bold;">std</span>::cos(u) - 2 * <span style="color: #8470ff; font-weight: bold;">std</span>::cos(2 * u)) * (2 + <span style="color: #8470ff; font-weight: bold;">std</span>::cos(v)) * (2 + <span style="color: #8470ff; font-weight: bold;">std</span>::cos(v + <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi * 2 / 3)) / 4;
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">dxdu</span> = (3*r*<span style="color: #8470ff; font-weight: bold;">std</span>::cos(3*u))/(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v)+2);
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">dxdv</span> = (r*<span style="color: #8470ff; font-weight: bold;">std</span>::sin(3*u)*<span style="color: #8470ff; font-weight: bold;">std</span>::sin(v))/(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v)+2)/(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v)+2);
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">dydu</span> = (r*(4*<span style="color: #8470ff; font-weight: bold;">std</span>::cos(2*u)+<span style="color: #8470ff; font-weight: bold;">std</span>::cos(u)))/(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v+(2*<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi)/3)+2);
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">dydv</span> = (r*(2*<span style="color: #8470ff; font-weight: bold;">std</span>::sin(2*u)+<span style="color: #8470ff; font-weight: bold;">std</span>::sin(u))*<span style="color: #8470ff; font-weight: bold;">std</span>::sin(v+(2*<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi)/3))/
-    ((<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v+(2*<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi)/3)+2)*(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v+(2*<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi)/3)+2));
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">dzdu</span> = (r*(4*<span style="color: #8470ff; font-weight: bold;">std</span>::sin(2*u)-<span style="color: #8470ff; font-weight: bold;">std</span>::sin(u))*(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v)+2)*(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v+(2*<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi)/3)+2))/8;
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">dzdv</span> = (-(r*(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(u)-2*<span style="color: #8470ff; font-weight: bold;">std</span>::cos(2*u))*(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v)+2)*<span style="color: #8470ff; font-weight: bold;">std</span>::sin(v+(2*<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi)/3))/8) -
-    (r*(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(u)-2*<span style="color: #8470ff; font-weight: bold;">std</span>::cos(2*u))*<span style="color: #8470ff; font-weight: bold;">std</span>::sin(v)*(<span style="color: #8470ff; font-weight: bold;">std</span>::cos(v+(2*<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numbers</span>::pi)/3)+2))/8;
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">nx</span>   = dydu*dzdv-dydv*dzdu;
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">ny</span>   = dxdv*dzdu-dxdu*dzdv;
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">nz</span>   = dxdu*dydv-dxdv*dydu;
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">nm</span>   = <span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(nx*nx+ny*ny+nz*nz);
-  nm = (nm &gt; 0 ? nm : 1);
-  nx = nx / nm;
-  ny = ny / nm;
-  nz = nz / nm;
-  <span style="color: #00ffff;">return</span> {x, y, z, nx, ny, nz};
-}                          
-
-<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
-  <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">tree</span>;
-
-  <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">ccplx</span>;
-
-  tree.refine_grid(7, trefoil);
-
-  tree.dump_tree(20);
-
-  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::construct_geometry_fans(ccplx,
-                                tree,
-                                2,
-                                {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FRANGE,  0},
-                                 {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FRANGE,  1},
-                                 {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FRANGE,  2}});
-
-  ccplx.create_named_datasets({<span style="color: #fa8072;">"u"</span>, <span style="color: #fa8072;">"v"</span>, <span style="color: #fa8072;">"x(u,v)"</span>, <span style="color: #fa8072;">"y(u,v)"</span>, <span style="color: #fa8072;">"z(u,v)"</span>, <span style="color: #fa8072;">"nx"</span>, <span style="color: #fa8072;">"ny"</span>, <span style="color: #fa8072;">"nz"</span>},
-                              {{<span style="color: #fa8072;">"NORMALS"</span>, {5, 6, 7}}});
-
-  ccplx.write_xml_vtk(<span style="color: #fa8072;">"trefoil.vtu"</span>, <span style="color: #fa8072;">"trefoil"</span>);
-}
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-parametric_curve_3d" class="outline-3">
-<h3 id="parametric_curve_3d"><span class="section-number-3">3.2.</span> Twisted Cubic As A Surface Intersection</h3>
-<div class="outline-text-3" id="text-parametric_curve_3d">
-<p>
-This program produces an interesting visualization of an object known as the twisted cubic.  In parametric form, the curve may be expressed as
-</p>
-
-<p>
-\[ f(t)=[t, t^2, t^3] \]
-</p>
-
-<p>
-Alternately the curve is also the intersection of two surfaces in \(\mathbb{R}^3\):
-</p>
-
-<p>
-\[ y=f_2(x, z)=y^2 \]
-\[ z=f_3(x, y)=x^3 \]
-</p>
-
-<p>
-The "typical" way to graph a surface like \(f_2\) is to transform it into pseudo-parametric form.  In Maple that might look like this
-</p>
-
-<pre class="example" id="org7e1cf67">
-plot3d([u, u^2, v], u=-1..1, v=-1..1):
-</pre>
-
-<p>
-We could do that with MRPTree, but it is easier to simply map the variables when we use construct_geometry_fans().
-</p>
-
-<p>
-Another interesting use of MRPTree in this example is the way we have transformed each surface function into an SDF to drive up sample resolution near the
-surface intersection.  This would allow us to use a tool like Paraview to compute an approximation to the the intersection.  Just in case the reader is
-not using a tool that can extract a nice surface intersection, I have also dumped the curve out in a 3rd .VTU file.
-</p>
-
-<div class="org-center">
-
-<div id="orgfc8f29d" class="figure">
-<p><a href="media/parametric_curve_3d_rot_100_crf30.html"><img src="media/parametric_curve_3d_rot_10.gif" alt="parametric_curve_3d_rot_10.gif" /></a>
-</p>
-</div>
-</div>
-
-<p>
-Paraview State File: <a href="https://github.com/richmit/MRPTree/blob/main/paraview/parametric_curve_3d.pvsm">https://github.com/richmit/MRPTree/blob/main/paraview/parametric_curve_3d.pvsm</a>
-</p>
-
-<p>
-XML VTK Data File 1: <a href="https://github.com/richmit/MRPTree/blob/main/paraview/parametric_curve_3d-crv.vtu">https://github.com/richmit/MRPTree/blob/main/paraview/parametric_curve_3d-crv.vtu</a>
-</p>
-
-<p>
-XML VTK Data File 2: <a href="https://github.com/richmit/MRPTree/blob/main/paraview/parametric_curve_3d-srf1.vtu">https://github.com/richmit/MRPTree/blob/main/paraview/parametric_curve_3d-srf1.vtu</a>
-</p>
-
-<p>
-XML VTK Data File 3: <a href="https://github.com/richmit/MRPTree/blob/main/paraview/parametric_curve_3d-srf2.vtu">https://github.com/richmit/MRPTree/blob/main/paraview/parametric_curve_3d-srf2.vtu</a>
-</p>
-
-<p>
-Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/parametric_curve_3d.cpp">https://github.com/richmit/MRPTree/blob/main/examples/parametric_curve_3d.cpp</a>
-</p>
-
-<div class="org-src-container">
-<pre class="src src-c++"><span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
-<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
-<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
-
-<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b1d3rT</span>              <span style="color: #63b8ff;">tt1_t</span>;
-<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                    <span style="color: #63b8ff;">cc1_t</span>;
-<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt1_t</span>, <span style="color: #63b8ff;">cc1_t</span>&gt; <span style="color: #63b8ff;">tc1_t</span>;
-
-<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b2d1rT</span>              <span style="color: #63b8ff;">tt2_t</span>;
-<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                    <span style="color: #63b8ff;">cc2_t</span>;
-<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt2_t</span>, <span style="color: #63b8ff;">cc2_t</span>&gt; <span style="color: #63b8ff;">tc2_t</span>;
-
-<span style="color: #8470ff; font-weight: bold;">tt1_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">twisted_cubic_crv</span>(<span style="color: #8470ff; font-weight: bold;">tt1_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">t</span>) {
-  <span style="color: #00ffff;">return</span> { t, t*t, t*t*t };
-}                          
-
-<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">twisted_cubic_srf1</span>(<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xzvec</span>) {
-  <span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">x</span> = xzvec[0];
-  <span style="color: #00ffff;">return</span> x*x;
-}                          
-
-<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #00fa9a; font-weight: bold;">twisted_cubic_srf1_sdf</span>(<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xzvec</span>) {
-  <span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">z</span> = xzvec[1];
-  <span style="color: #00ffff;">return</span> (twisted_cubic_srf1(xzvec)-z);
-}
-
-<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">twisted_cubic_srf2</span>(<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xyvec</span>) {
-  <span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">x</span> = xyvec[0];
-  <span style="color: #00ffff;">return</span> x*x*x;
-}                          
-
-<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #00fa9a; font-weight: bold;">twisted_cubic_srf2_sdf</span>(<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xyvec</span>) {
-  <span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">y</span> = xyvec[1];
-  <span style="color: #00ffff;">return</span> (twisted_cubic_srf2(xyvec)-y);
-}
-
-<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
-  <span style="color: #63b8ff;">tt1_t</span> <span style="color: #7fffd4;">crv_tree</span>;
-  <span style="color: #63b8ff;">cc1_t</span> <span style="color: #7fffd4;">crv_ccplx</span>;
-  crv_tree.refine_grid(8, twisted_cubic_crv);
-  <span style="color: #8470ff; font-weight: bold;">tc1_t</span>::construct_geometry_fans(crv_ccplx,
-                                 crv_tree,
-                                 1,
-                                 {{<span style="color: #8470ff; font-weight: bold;">tc1_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FRANGE, 0},
-                                  {<span style="color: #8470ff; font-weight: bold;">tc1_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FRANGE, 1},
-                                  {<span style="color: #8470ff; font-weight: bold;">tc1_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FRANGE, 2}});
-  crv_ccplx.create_named_datasets({<span style="color: #fa8072;">"t"</span>, <span style="color: #fa8072;">"x(t)"</span>, <span style="color: #fa8072;">"y(t)"</span>, <span style="color: #fa8072;">"z(t)"</span>});
-  crv_ccplx.dump_cplx(5);
-  crv_ccplx.write_xml_vtk(<span style="color: #fa8072;">"parametric_curve_3d-crv.vtu"</span>, <span style="color: #fa8072;">"parametric_curve_3d-crv"</span>);
-
-  <span style="color: #63b8ff;">tt2_t</span> <span style="color: #7fffd4;">srf1_tree</span>;
-  <span style="color: #63b8ff;">cc2_t</span> <span style="color: #7fffd4;">srf1_ccplx</span>;
-  srf1_tree.refine_grid(5, twisted_cubic_srf1);
-  srf1_tree.refine_leaves_recursive_cell_pred(6, twisted_cubic_srf1, [&amp;<span style="color: #7fffd4;">srf1_tree</span>](<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> srf1_tree.cell_cross_sdf(i, twisted_cubic_srf2_sdf); });
-  srf1_tree.balance_tree(1, twisted_cubic_srf1);
-  <span style="color: #8470ff; font-weight: bold;">tc2_t</span>::construct_geometry_fans(srf1_ccplx,
-                                 srf1_tree,
-                                 2,
-                                 {{<span style="color: #8470ff; font-weight: bold;">tc2_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FDOMAIN, 0},
-                                  {<span style="color: #8470ff; font-weight: bold;">tc2_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FRANGE,  0},
-                                  {<span style="color: #8470ff; font-weight: bold;">tc2_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FDOMAIN, 1}});
-  srf1_ccplx.create_named_datasets({<span style="color: #fa8072;">"u"</span>, <span style="color: #fa8072;">"v"</span>, <span style="color: #fa8072;">"x(u,v)"</span>, <span style="color: #fa8072;">"y(u,v)"</span>, <span style="color: #fa8072;">"z(u,v)"</span>});
-  srf1_ccplx.dump_cplx(5);
-  srf1_ccplx.write_xml_vtk(<span style="color: #fa8072;">"parametric_curve_3d-srf1.vtu"</span>, <span style="color: #fa8072;">"parametric_curve_3d-srf1"</span>);
-
-  <span style="color: #63b8ff;">tt2_t</span> <span style="color: #7fffd4;">srf2_tree</span>;
-  <span style="color: #63b8ff;">cc2_t</span> <span style="color: #7fffd4;">srf2_ccplx</span>;
-  srf2_tree.refine_grid(5, twisted_cubic_srf2);
-  srf2_tree.refine_leaves_recursive_cell_pred(6, twisted_cubic_srf2, [&amp;<span style="color: #7fffd4;">srf2_tree</span>](<span style="color: #8470ff; font-weight: bold;">tt2_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> srf2_tree.cell_cross_sdf(i, twisted_cubic_srf1_sdf); });
-  srf2_tree.balance_tree(1, twisted_cubic_srf2);
-  <span style="color: #8470ff; font-weight: bold;">tc2_t</span>::construct_geometry_fans(srf2_ccplx,
-                                 srf2_tree,
-                                 2,
-                                 {{<span style="color: #8470ff; font-weight: bold;">tc2_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FRANGE, 0},
-                                  {<span style="color: #8470ff; font-weight: bold;">tc2_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FRANGE, 1},
-                                  {<span style="color: #8470ff; font-weight: bold;">tc2_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FRANGE, 2}});
-  srf2_ccplx.create_named_datasets({<span style="color: #fa8072;">"u"</span>, <span style="color: #fa8072;">"v"</span>, <span style="color: #fa8072;">"x(u,v)"</span>, <span style="color: #fa8072;">"y(u,v)"</span>, <span style="color: #fa8072;">"z(u,v)"</span>});
-  srf2_ccplx.dump_cplx(5);
-  srf2_ccplx.write_xml_vtk(<span style="color: #fa8072;">"parametric_curve_3d-srf2.vtu"</span>, <span style="color: #fa8072;">"parametric_curve_3d-srf2"</span>);
-}
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-ear_surface" class="outline-3">
-<h3 id="ear_surface"><span class="section-number-3">3.3.</span> Ear Surface (Implicit)</h3>
-<div class="outline-text-3" id="text-ear_surface">
-<p>
-This example is very similar to <a href="#implicit_surface">implicit_surface.cpp</a>; however, instead of extracting a surface from a quad tessellation of a hexahedrona we extract the
-surface from a tessellation of a pyramids.  Why use pyramids instead of hexahedrona?  In the example <a href="#implicit_surface">implicit_surface.cpp</a> all of the underlying cells are
-the same size, and thus no gaps occur in the extracted level set (the surface).  In this example we have cells that vary a great deal in size.
-</p>
-
-<p>
-This example demonstrates scratch made cell predicates, and uses them to increse sample resolution on parts of the surface that are particularly difficlut
-to extract.
-</p>
-
-<p>
-This surface is defined by the zeros of the following polynomial
-</p>
-
-<p>
-\[ x^2-y^2*z^2+z^3 \]
-</p>
-
-
-<div class="org-center">
-<p>
-<a href="media/ear_surface_100.png"><img src="media/ear_surface_10.png" alt="ear_surface_10.png" /></a> 
-<a href="media/ear_surface_rot_100_crf30.html"><img src="media/ear_surface_rot_10.gif" alt="ear_surface_rot_10.gif" /></a>
-</p>
-</div>
-
-<p>
-Paraview State File: <a href="https://github.com/richmit/MRPTree/blob/main/paraview/ear_surface.pvsm">https://github.com/richmit/MRPTree/blob/main/paraview/ear_surface.pvsm</a>
-</p>
-
-<p>
-XML VTK Data File: <a href="https://github.com/richmit/MRPTree/blob/main/paraview/ear_surface.vtu">https://github.com/richmit/MRPTree/blob/main/paraview/ear_surface.vtu</a>
-</p>
-
-<p>
-Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/ear_surface.cpp">https://github.com/richmit/MRPTree/blob/main/examples/ear_surface.cpp</a>
-</p>
-
-<div class="org-src-container">
-<pre class="src src-c++"><span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
-<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
-<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
-
-<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b3d1rT</span>            <span style="color: #63b8ff;">tt_t</span>;
-<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT9</span>                  <span style="color: #63b8ff;">cc_t</span>;
-<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
-
-<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">isf</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x</span> = xvec[0];
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y</span> = xvec[1];
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z</span> = xvec[2];
-  <span style="color: #00ffff;">return</span> x*x-y*y*z*z+z*z*z;
-}
-
-<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">besdf</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x</span> = xvec[0];
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y</span> = xvec[1];
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z</span> = xvec[2];
-  <span style="color: #00ffff;">return</span> x*(z-y*y); <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Inner ear edge</span>
-}
-
-<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
-  <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">tree</span>;
-  <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">ccplx</span>;
-
-  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Initial uniform sample</span><span style="color: #ffa500;"> */</span>
-  tree.refine_grid(3, isf);
-
-  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Refine near surface</span><span style="color: #ffa500;"> */</span>
-  tree.refine_leaves_recursive_cell_pred(6, isf, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_cross_sdf(i, isf)); });
-
-  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Refine between the ears.  Could have also just refined on x=0 plane.</span><span style="color: #ffa500;">  */</span>
-  tree.refine_leaves_recursive_cell_pred(8, isf, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">auto</span> <span style="color: #7fffd4;">x</span> = tree.diti_to_drpt(i); <span style="color: #00ffff;">return</span> (<span style="color: #8470ff; font-weight: bold;">std</span>::abs(x[1])&lt;0.5) &amp;&amp; (tree.cell_cross_sdf(i, besdf)); });
-
-  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Refine on the x-y plane</span><span style="color: #ffa500;"> */</span>
-  tree.refine_leaves_recursive_cell_pred(7, isf, [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_cross_domain_level(i, 2, 0.0, 1.0e-6)); });
-
-  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Balance the tree</span><span style="color: #ffa500;"> */</span>
-  tree.balance_tree(1, isf);
-
-  tree.dump_tree(5);
-
-  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Convert our tree to a cell complex.  Note that we use an SDF to export only cells that contain our surface</span><span style="color: #ffa500;"> */</span>
-  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::construct_geometry_fans(ccplx,
-                                tree,
-                                tree.get_leaf_cells_pred(tree.ccc_get_top_cell(), [&amp;<span style="color: #7fffd4;">tree</span>](<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">diti_t</span> <span style="color: #7fffd4;">i</span>) { <span style="color: #00ffff;">return</span> (tree.cell_cross_sdf(i, isf)); }),
-                                3,
-                                {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FDOMAIN, 0}, 
-                                 {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FDOMAIN, 1},
-                                 {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FDOMAIN, 2}});
-
-  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Name the data points</span><span style="color: #ffa500;"> */</span>
-  ccplx.create_named_datasets({<span style="color: #fa8072;">"x"</span>, <span style="color: #fa8072;">"y"</span>, <span style="color: #fa8072;">"z"</span>, <span style="color: #fa8072;">"f(x,y,z)"</span>});
-
-  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Display some data about the cell complex</span><span style="color: #ffa500;"> */</span>
-  ccplx.dump_cplx(5);
-
-  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Write out our cell complex</span><span style="color: #ffa500;"> */</span>
-  ccplx.write_xml_vtk(<span style="color: #fa8072;">"ear_surface.vtu"</span>, <span style="color: #fa8072;">"ear_surface"</span>);
-}
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-ear_surface_glue" class="outline-3">
-<h3 id="ear_surface_glue"><span class="section-number-3">3.4.</span> Ear Surface (Solve &amp; Glue)</h3>
-<div class="outline-text-3" id="text-ear_surface_glue">
-<p>
-This example illustrates the same object as <a href="#ear_surface">ear_surface.cpp</a>, but uses a different strategy to generate the triangulation.  For reference, the surface we
-are interested in is defined by the zeros of the following polynomial:
-</p>
-
-<p>
-\[ x^2-y^2*z^2+z^3 \]
-</p>
-
-<p>
-In <a href="#ear_surface">ear_surface.cpp</a> we used a mesh of cubes covering a 3D region, and extracted the triangulation as a contour surface.  In this example, we solve this equation
-for \(x\) giving us two surfaces:
-</p>
-
-<p>
-\[ +z\cdot\sqrt{y^2-z} \]
-\[ -z\cdot\sqrt{y^2-z} \]
-</p>
-
-<p>
-As in the example <a href="#surface_plot_edge">surface_plot_edge.cpp</a>, we use the NaN solver to flesh the surface out so that it hits the X plane.  And as in <a href="#surface_branch_glue">surface_branch_glue.cpp</a>, we
-then glue the two surfaces together.
-</p>
-
-<div class="org-center">
-<p>
-<a href="media/ear_surface_glue_100.png"><img src="media/ear_surface_glue_10.png" alt="ear_surface_glue_10.png" /></a>
-<a href="media/ear_surface_glue_rot_100_crf30.html"><img src="media/ear_surface_glue_rot_10.gif" alt="ear_surface_glue_rot_10.gif" /></a>
-</p>
-</div>
-
-<p>
-Paraview State File: <a href="https://github.com/richmit/MRPTree/blob/main/paraview/ear_surface_glue.pvsm">https://github.com/richmit/MRPTree/blob/main/paraview/ear_surface_glue.pvsm</a>
-</p>
-
-<p>
-XML VTK Data File: <a href="https://github.com/richmit/MRPTree/blob/main/paraview/ear_surface_glue.vtu">https://github.com/richmit/MRPTree/blob/main/paraview/ear_surface_glue.vtu</a>
-</p>
-
-<p>
-Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/ear_surface_glue.cpp">https://github.com/richmit/MRPTree/blob/main/examples/ear_surface_glue.cpp</a>
-</p>
-
-<div class="org-src-container">
-<pre class="src src-c++"><span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rect_tree.hpp"</span>
-<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
-<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_rt_to_cc.hpp"</span>
-
-<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">tree15b2d1rT</span>            <span style="color: #63b8ff;">tt_t</span>;
-<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span>                  <span style="color: #63b8ff;">cc_t</span>;
-<span style="color: #00ffff;">typedef</span> <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MR_rt_to_cc</span>&lt;<span style="color: #63b8ff;">tt_t</span>, <span style="color: #63b8ff;">cc_t</span>&gt; <span style="color: #63b8ff;">tc_t</span>;
-
-<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">rrpt_t</span> <span style="color: #00fa9a; font-weight: bold;">ear_yz</span>(<span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">drpt_t</span> <span style="color: #7fffd4;">xvec</span>) {
-  <span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">y</span> = xvec[0];
-  <span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">z</span> = xvec[1];
-  <span style="color: #8470ff; font-weight: bold;">tt_t</span>::<span style="color: #63b8ff;">src_t</span> <span style="color: #7fffd4;">m</span> = y*y-z;
-  <span style="color: #00ffff;">if</span> (m &lt; 0) {
-    <span style="color: #00ffff;">return</span> <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">numeric_limits</span>&lt;<span style="color: #63b8ff;">double</span>&gt;::quiet_NaN();
-  } <span style="color: #00ffff;">else</span> {
-    <span style="color: #00ffff;">return</span> <span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(m)*z;
-  }
-}
-
-<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
-  <span style="color: #63b8ff;">tt_t</span> <span style="color: #7fffd4;">tree</span>;
-  <span style="color: #63b8ff;">cc_t</span> <span style="color: #7fffd4;">ccplx</span>;
-
-  <span style="color: #ffa500;">// </span><span style="color: #ff7f24;">Sample a uniform grid across the domain</span>
-  tree.refine_grid(7, ear_yz);
-
-  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">Refine near the edge</span><span style="color: #ffa500;"> */</span>
-  tree.refine_recursive_if_cell_vertex_is_nan(8, ear_yz);
-
-  tree.dump_tree(10);
-
-  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">By passing half_sphere() to the construct_geometry_fans() we enable broken edges (an edge with one good point and one NaN) to be repaired.</span><span style="color: #ffa500;"> */</span>
-  <span style="color: #8470ff; font-weight: bold;">tc_t</span>::construct_geometry_fans(ccplx,
-                                tree,
-                                2,
-                                {{<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FRANGE,  0},
-                                 {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FDOMAIN, 0}, 
-                                 {<span style="color: #8470ff; font-weight: bold;">tc_t</span>::<span style="color: #8470ff; font-weight: bold;">val_src_spc_t</span>::FDOMAIN, 1}},
-                                ear_yz
-                               );
-
-  ccplx.create_named_datasets({<span style="color: #fa8072;">"y"</span>, <span style="color: #fa8072;">"z"</span>, <span style="color: #fa8072;">"x=f(x,z)"</span>});
-
-  <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">This is the magic.  We add new cells with the third element of each point data vector negated.</span><span style="color: #ffa500;"> */</span>
-  ccplx.mirror({0, 0, 1}, 1.0e-5);
-
-  ccplx.dump_cplx(10);
-
-  ccplx.write_xml_vtk(<span style="color: #fa8072;">"ear_surface_glue.vtu"</span>, <span style="color: #fa8072;">"ear_surface_glue"</span>);
-}
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-holy_wave_surf" class="outline-3">
-<h3 id="holy_wave_surf"><span class="section-number-3">3.5.</span> Holy Wave Surface</h3>
-<div class="outline-text-3" id="text-holy_wave_surf">
-<p>
-Just a fun example directly using MR_cell_cplx to drop randomly placed triangles on a surface.
-</p>
-
-<div class="org-center">
-<p>
-High Resolution Still Image (click on it) <br />
-<a href="media/holy_wave_surf_100.png"><img src="media/holy_wave_surf_10.png" alt="holy_wave_surf_10.png" /></a> <br />
-Movie of the surface (click on it) <br />
-<a href="media/holy_wave_surf_rot_100_crf30.html"><img src="media/holy_wave_surf_rot_10.gif" alt="holy_wave_surf_rot_10.gif" /></a>
-</p>
-</div>
-
-<p>
-Paraview State File: <a href="https://github.com/richmit/MRPTree/blob/main/paraview/holy_wave_surf.pvsm">https://github.com/richmit/MRPTree/blob/main/paraview/holy_wave_surf.pvsm</a>
-</p>
-
-<p>
-XML VTK Data File: <a href="https://github.com/richmit/MRPTree/blob/main/paraview/holy_wave_surf.vtu">https://github.com/richmit/MRPTree/blob/main/paraview/holy_wave_surf.vtu</a>
-</p>
-
-<p>
-Source code: <a href="https://github.com/richmit/MRPTree/blob/main/examples/holy_wave_surf.cpp">https://github.com/richmit/MRPTree/blob/main/examples/holy_wave_surf.cpp</a>
-</p>
-
-<div class="org-src-container">
-<pre class="src src-c++"><span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">&lt;random&gt;</span>                                                        <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">C++ random numbers      C++11</span><span style="color: #ffa500;">    */</span>
-<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">&lt;chrono&gt;</span>                                                        <span style="color: #ffa500;">/* </span><span style="color: #ff7f24;">time                    C++11</span><span style="color: #ffa500;">    */</span>
-
-<span style="color: #6495ed;">#include</span> <span style="color: #fa8072;">"MR_cell_cplx.hpp"</span>
-
-<span style="color: #63b8ff;">double</span> <span style="color: #00fa9a; font-weight: bold;">f</span>(<span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x</span>, <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y</span>) {
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">d</span> = x*x+y*y;
-  <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::exp(-d/4)*<span style="color: #8470ff; font-weight: bold;">std</span>::cos(4*<span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(d));
-  <span style="color: #00ffff;">return</span> z;
-}
-
-<span style="color: #63b8ff;">int</span> <span style="color: #00fa9a; font-weight: bold;">main</span>() {
-  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"PROGRAM: START"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
-  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">program_start_time</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
-
-  <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #63b8ff;">MRccT5</span> <span style="color: #7fffd4;">aPoly</span>;
-
-  aPoly.create_dataset_to_point_mapping({0, 1, 2});
-  aPoly.create_named_datasets({<span style="color: #fa8072;">"x"</span>, <span style="color: #fa8072;">"y"</span>, <span style="color: #fa8072;">"z"</span>, <span style="color: #fa8072;">"za"</span>, <span style="color: #fa8072;">"xyMag"</span>, <span style="color: #fa8072;">"xyzMag"</span>, <span style="color: #fa8072;">"dir"</span>});
-
-  <span style="color: #00ffff;">const</span> <span style="color: #63b8ff;">int</span>    <span style="color: #7fffd4;">num_tri</span> =  20000;
-  <span style="color: #00ffff;">const</span> <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">tri_siz</span> =  0.07;
-  <span style="color: #00ffff;">const</span> <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x_min</span>   = -2.1;
-  <span style="color: #00ffff;">const</span> <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x_max</span>   =  2.1;
-  <span style="color: #00ffff;">const</span> <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y_min</span>   = -2.1;
-  <span style="color: #00ffff;">const</span> <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y_max</span>   =  2.1;
-
-  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #63b8ff;">random_device</span> <span style="color: #7fffd4;">rd</span>;
-  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #63b8ff;">mt19937</span> <span style="color: #7fffd4;">rEng</span>(rd());
-  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #63b8ff;">uniform_real_distribution</span>&lt;<span style="color: #63b8ff;">double</span>&gt; <span style="color: #7fffd4;">x_uniform_dist_float</span>(x_min, x_max);
-  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #63b8ff;">uniform_real_distribution</span>&lt;<span style="color: #63b8ff;">double</span>&gt; <span style="color: #7fffd4;">y_uniform_dist_float</span>(y_min, y_max);
-  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #63b8ff;">uniform_real_distribution</span>&lt;<span style="color: #63b8ff;">double</span>&gt; <span style="color: #7fffd4;">siz_uniform_dist_float</span>(-tri_siz, tri_siz);
-
-  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"SAMPLE: START"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;  
-  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">sample_start_time</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
-  <span style="color: #00ffff;">for</span>(<span style="color: #63b8ff;">int</span> <span style="color: #7fffd4;">i</span>=0; i&lt;num_tri; i++) {
-    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">xc</span> = x_uniform_dist_float(rEng);
-    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">yc</span> = y_uniform_dist_float(rEng);
-
-    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x1</span> = xc + siz_uniform_dist_float(rEng);
-    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y1</span> = yc + siz_uniform_dist_float(rEng);
-    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z1</span> = f(x1, y1);
-    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x2</span> = xc + siz_uniform_dist_float(rEng);
-    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y2</span> = yc + siz_uniform_dist_float(rEng);
-    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z2</span> = f(x2, y2);
-    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">x3</span> = xc + siz_uniform_dist_float(rEng);
-    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">y3</span> = yc + siz_uniform_dist_float(rEng);
-    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">z3</span> = f(x3, y3);
-
-    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">xa</span> = (x1+x2+x3)/3;
-    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">ya</span> = (y1+y2+y3)/3;
-    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">za</span> = (z1+z2+z3)/3;
-
-    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">xy_mag</span>  = <span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(xa*xa+ya*ya);
-    <span style="color: #63b8ff;">double</span> <span style="color: #7fffd4;">xyz_mag</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::sqrt(xa*xa+ya*ya+za*za);
-
-    <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #8470ff; font-weight: bold;">MRccT5</span>::<span style="color: #63b8ff;">node_idx_t</span> <span style="color: #7fffd4;">p1i</span> = aPoly.add_node({x1, y1, z1, za, xy_mag, xyz_mag});
-    <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #8470ff; font-weight: bold;">MRccT5</span>::<span style="color: #63b8ff;">node_idx_t</span> <span style="color: #7fffd4;">p2i</span> = aPoly.add_node({x2, y2, z2, za, xy_mag, xyz_mag});
-    <span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #8470ff; font-weight: bold;">MRccT5</span>::<span style="color: #63b8ff;">node_idx_t</span> <span style="color: #7fffd4;">p3i</span> = aPoly.add_node({x3, y3, z3, za, xy_mag, xyz_mag});
-
-    aPoly.add_cell(<span style="color: #8470ff; font-weight: bold;">mjr</span>::<span style="color: #8470ff; font-weight: bold;">MRccT5</span>::<span style="color: #8470ff; font-weight: bold;">cell_kind_t</span>::TRIANGLE, {p1i, p2i, p3i});
-  }
-
-  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"SAMPLE: Total Points: "</span> &lt;&lt; aPoly.node_count() &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
-  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"SAMPLE: Total Cells: "</span> &lt;&lt; aPoly.num_cells() &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
-
-  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt; <span style="color: #7fffd4;">sample_run_time</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now() - sample_start_time;
-  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"SAMPLE: Total Runtime "</span> &lt;&lt; sample_run_time.count() &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
-  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"SAMPLE: END"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;  
-
-  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"XML WRITE: START"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
-  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">time_point</span>&lt;<span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::system_clock&gt; <span style="color: #7fffd4;">xwrite_start_time</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now();
-  <span style="color: #63b8ff;">int</span> <span style="color: #7fffd4;">xwrite_result</span> = aPoly.write_xml_vtk(<span style="color: #fa8072;">"holy_wave_surf.vtu"</span>, <span style="color: #fa8072;">"holy_wave_surf"</span>);
-  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt; <span style="color: #7fffd4;">xwrite_run_time</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now() - xwrite_start_time;
-  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"XML WRITE: Total Runtime "</span> &lt;&lt; xwrite_run_time.count() &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
-  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"XML WRITE: END -- "</span> &lt;&lt; (xwrite_result != 0 ? <span style="color: #fa8072;">"BAD"</span> : <span style="color: #fa8072;">"GOOD"</span>) &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
-
-  <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #63b8ff;">duration</span>&lt;<span style="color: #63b8ff;">double</span>&gt; <span style="color: #7fffd4;">program_run_time</span> = <span style="color: #8470ff; font-weight: bold;">std</span>::<span style="color: #8470ff; font-weight: bold;">chrono</span>::<span style="color: #8470ff; font-weight: bold;">system_clock</span>::now() - program_start_time;
-  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"PROGRAM: Total Runtime "</span> &lt;&lt; program_run_time.count() &lt;&lt; <span style="color: #fa8072;">" sec"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
-  <span style="color: #8470ff; font-weight: bold;">std</span>::cout &lt;&lt; <span style="color: #fa8072;">"PROGRAM: END"</span> &lt;&lt; <span style="color: #8470ff; font-weight: bold;">std</span>::endl;
-
-  <span style="color: #00ffff;">return</span> 0;
-}
-
-</pre>
-</div>
 </div>
 </div>
 </div>

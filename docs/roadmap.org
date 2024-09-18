@@ -47,7 +47,7 @@ Copyright \copy {{{time(%Y)}}} Mitch Richling. All rights reserved.
 * High Level Future Development Plans (TODO)
 
      - Put together a "Function Visualization Cookbook"
-     - Rework func-viz into MRPTree core examples
+     - Add an "extra examples" page consisting of the stuff in func-viz that is not "core"
      - Add general gallery
 
 * Low level Plans

@@ -1,0 +1,196 @@
+# -*- Mode:Org; Coding:utf-8; fill-column:158 -*-
+# ######################################################################################################################################################.H.S.##
+# FILE:        meta.org
+#+TITLE:       TITLE FIXME
+#+SUBTITLE:    SUBTITLE FIXME
+#+AUTHOR:      Mitch Richling
+#+EMAIL:       http://www.mitchr.me/
+#+DATE:        2024-09-18 FIXME
+#+DESCRIPTION: DESCRIPTION FIXME
+#+KEYWORDS:    KEYWORDS FIXME
+#+LANGUAGE:    en
+#+OPTIONS:     num:t toc:nil \n:nil @:t ::t |:t ^:nil -:t f:t *:t <:t skip:nil d:nil todo:t pri:nil H:5 p:t author:t html-scripts:nil 
+# FIXME: When uncommented the following line will render latex equations as images embedded into exported HTML, when commented MathJax will be used
+# #+OPTIONS:     tex:dvipng
+# FIXME: Select ONE of the three TODO lines below
+# #+SEQ_TODO:    ACTION:NEW(t!) ACTION:ASSIGNED(a!@) ACTION:WORK(w!) ACTION:HOLD(h@) | ACTION:FUTURE(f) ACTION:DONE(d!) ACTION:CANCELED(c!)
+# #+SEQ_TODO:    TODO:NEW(T!)                        TODO:WORK(W!)   TODO:HOLD(H@)   |                  TODO:DONE(D!)   TODO:CANCELED(C!)
+#+SEQ_TODO:    TODO:NEW(t)                         TODO:WORK(w)    TODO:HOLD(h)    | TODO:FUTURE(f)   TODO:DONE(d)    TODO:CANCELED(c)
+#+PROPERTY: header-args :eval never-export
+#+HTML_HEAD: <style>body { width: 95%; margin: 2% auto; font-size: 18px; line-height: 1.4em; font-family: Georgia, serif; color: black; background-color: white; }</style>
+# Change max-width to get wider output -- also note #content style below
+#+HTML_HEAD: <style>body { min-width: 500px; max-width: 1024px; }</style>
+#+HTML_HEAD: <style>h1,h2,h3,h4,h5,h6 { color: #A5573E; line-height: 1em; font-family: Helvetica, sans-serif; }</style>
+#+HTML_HEAD: <style>h1,h2,h3 { line-height: 1.4em; }</style>
+#+HTML_HEAD: <style>h1.title { font-size: 3em; }</style>
+#+HTML_HEAD: <style>.subtitle { font-size: 0.6em; }</style>
+#+HTML_HEAD: <style>h4,h5,h6 { font-size: 1em; }</style>
+#+HTML_HEAD: <style>.org-src-container { border: 1px solid #ccc; box-shadow: 3px 3px 3px #eee; font-family: Lucida Console, monospace; font-size: 80%; margin: 0px; padding: 0px 0px; position: relative; }</style>
+#+HTML_HEAD: <style>.org-src-container>pre { line-height: 1.2em; padding-top: 1.5em; margin: 0.5em; background-color: #404040; color: white; overflow: auto; }</style>
+#+HTML_HEAD: <style>.org-src-container>pre:before { display: block; position: absolute; background-color: #b3b3b3; top: 0; right: 0; padding: 0 0.2em 0 0.4em; border-bottom-left-radius: 8px; border: 0; color: white; font-size: 100%; font-family: Helvetica, sans-serif;}</style>
+#+HTML_HEAD: <style>pre.example { white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -o-pre-wrap; font-family: Lucida Console, monospace; font-size: 80%; background: #404040; color: white; display: block; padding: 0em; border: 2px solid black; }</style>
+#+HTML_HEAD: <style>blockquote { margin-bottom: 0.5em; padding: 0.5em; background-color: #FFF8DC; border-left: 2px solid #A5573E; border-left-color: rgb(255, 228, 102); display: block; margin-block-start: 1em; margin-block-end: 1em; margin-inline-start: 5em; margin-inline-end: 5em; } </style>
+# Change the following to get wider output -- also note body style above
+#+HTML_HEAD: <style>#content { max-width: 60em; }</style>
+#+HTML_LINK_HOME: https://www.mitchr.me/
+#+HTML_LINK_UP: https://www.mitchr.me/FIXME
+# ######################################################################################################################################################.H.E.##
+
+#+ATTR_HTML: :border 2 solid #ccc :frame hsides :align center
+|          <r> | <l>                                          |
+|    *Author:* | /{{{author}}}/                               |
+|   *Updated:* | /{{{modification-time(%Y-%m-%d %H:%M:%S)}}}/ |
+| *Generated:* | /{{{time(%Y-%m-%d %H:%M:%S)}}}/              |
+#+ATTR_HTML: :align center
+Copyright \copy {{{time(%Y)}}} Mitch Richling. All rights reserved.
+
+#+TOC: headlines 5
+
+* Meta Stuff :noexport:
+
+** Media
+
+*** Image Processing: Resize PNGs                             
+
+#+begin_src sh  :results output verbatum :exports both
+for d in ../../paraview/ ../../misc/; do
+  for f in $d/*.png; do
+    b=$(echo $f | sed 's/\.png//; s/^.*\///')
+    for s in 100 50 25 10; do
+      fn="media/${b}_$s.png"
+      if [ "$f" -nt "$fn" ]; then
+        echo make "$fn"
+        magick "$f" -resize $s% "$fn"
+      # else
+      #   echo skip "$fn"
+      fi
+    done
+  done
+done
+#+end_src
+
+#+RESULTS:
+#+begin_example
+make media/ear_surface_100.png
+make media/ear_surface_50.png
+make media/ear_surface_25.png
+make media/ear_surface_10.png
+#+end_example
+
+*** Image Processing: GIFs
+
+#+begin_src sh  :results output verbatum :exports both
+for f in ../../paraview/*.gif; do
+  b=$(echo $f | sed 's/^.*\///')
+  fn="media/${b}"
+  if [ $f -nt $fn ]; then
+    echo make $fn
+    cp $f $fn
+  # else
+  #   echo skip $fn
+  fi
+done
+#+end_src
+
+#+RESULTS:
+#+begin_example
+make media/ear_surface_glue_rot_10.gif
+make media/ear_surface_glue_rot_25.gif
+make media/ear_surface_glue_rot_50.gif
+#+end_example
+
+** Image Processing: WEBMs
+
+*** Put media in place
+
+#+begin_src sh  :results output verbatum :exports both
+bad_list='media/lorenz_rot_100_crf30.webm'
+for f in ../../paraview/*_crf30.webm; do
+  b=$(echo $f | sed 's/^.*\///')
+  if echo $bad_list | grep $b >/dev/null; then
+    echo "bad  $f"
+  else
+    fn="media/${b}"
+    if [ $f -nt $fn ]; then
+      echo "make $fn"
+      cp $f $fn
+    # else
+    #   echo "skip $fn"
+    fi
+  fi
+done
+#+end_src
+
+#+RESULTS:
+#+begin_example
+make media/ear_surface_glue_rot_100_crf30.webm
+make media/ear_surface_glue_rot_25_crf30.webm
+make media/ear_surface_glue_rot_50_crf30.webm
+bad  ../../paraview/lorenz_rot_100_crf30.webm
+#+end_example
+
+*** Create HTML Wrappers
+
+#+begin_src sh :results output verbatum
+for e in complex_magnitude_surface implicit_surface lorenz trefoil parametric_curve_3d surface_plot_corner ear_surface surface_plot_annular_edge holy_wave_surf; do
+  echo Processing Example $e
+  he=$(echo $e | sed 's/_/ /g; s/\b\(.\)/\u\1/g')
+  for f in media/$e*_crf30.webm; do
+    b=$(echo $f | sed 's/\.webm$//; s/^.*\///')
+    hr=$(basename $f | sed 's/_[0-9][0-9]*_crf30\.webm$/_100_lossless.html/;')
+    fn="media/${b}.html"
+    if [ "$f" -nt "$fn" -o 'misc/movie_template.html' -nt "$fn" ]; then
+      if [ ! -e "$HOME/Documents/WWW/site/SS/MRPtree/media/$hr" ]; then
+        hr='HRLINK'
+      fi
+      echo "  make $fn"
+      sed "s/HRLINK/$hr/; s/LINKT/$e/; s/TITLE/$he/; s/MOVIEFILE/$b/;" < 'misc/movie_template.html' | grep -v 'HRLINK' > "$fn"
+    else
+      echo "  skip $fn"
+    fi
+  done
+done
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Processing Example complex_magnitude_surface
+  skip media/complex_magnitude_surface_rot_100_crf30.html
+  skip media/complex_magnitude_surface_rot_25_crf30.html
+  skip media/complex_magnitude_surface_rot_50_crf30.html
+Processing Example implicit_surface
+  skip media/implicit_surface_rot_100_crf30.html
+  skip media/implicit_surface_rot_25_crf30.html
+  skip media/implicit_surface_rot_50_crf30.html
+Processing Example lorenz
+  skip media/lorenz_rot_25_crf30.html
+  skip media/lorenz_rot_50_crf30.html
+Processing Example trefoil
+  skip media/trefoil_rot_100_crf30.html
+  skip media/trefoil_rot_25_crf30.html
+  skip media/trefoil_rot_50_crf30.html
+Processing Example parametric_curve_3d
+  skip media/parametric_curve_3d_rot_100_crf30.html
+  skip media/parametric_curve_3d_rot_25_crf30.html
+  skip media/parametric_curve_3d_rot_50_crf30.html
+Processing Example surface_plot_corner
+  skip media/surface_plot_corner_rot_100_crf30.html
+  skip media/surface_plot_corner_rot_25_crf30.html
+  skip media/surface_plot_corner_rot_50_crf30.html
+Processing Example ear_surface
+  make media/ear_surface_glue_rot_100_crf30.html
+  make media/ear_surface_glue_rot_25_crf30.html
+  make media/ear_surface_glue_rot_50_crf30.html
+  skip media/ear_surface_rot_100_crf30.html
+  skip media/ear_surface_rot_25_crf30.html
+  skip media/ear_surface_rot_50_crf30.html
+Processing Example surface_plot_annular_edge
+  skip media/surface_plot_annular_edge_rot_100_crf30.html
+  skip media/surface_plot_annular_edge_rot_25_crf30.html
+  skip media/surface_plot_annular_edge_rot_50_crf30.html
+Processing Example holy_wave_surf
+  skip media/holy_wave_surf_rot_100_crf30.html
+  skip media/holy_wave_surf_rot_25_crf30.html
+  skip media/holy_wave_surf_rot_50_crf30.html
+#+end_example
+
