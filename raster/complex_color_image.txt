@@ -1,0 +1,1 @@
+magick build/complex_color_image.tiff raster/complex_color_image.png

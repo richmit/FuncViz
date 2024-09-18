@@ -160,7 +160,7 @@ set(TARGETS "hello_world"
             ### Examples using MRaster
             "hello_MRaster"
             "complex_magnitude_surface"
-            "cplxColor"
+            "complex_color_image"
             ### Unit Tests
             "check_cell_hexahedron" "check_cell_pyramid" "check_cell_quad" "check_cell_triangle" "check_cell_segment"
             "geomi_pnt_line_distance" "geomi_seg_isect_type"
@@ -178,7 +178,7 @@ set(TARGETS "hello_world"
 set(REQ_MRPTREE complex_magnitude_surface curve_plot ear_surface ear_surface_glue hello_MRaster hello_world holy_wave_surf implicit_curve_2d implicit_surface parametric_curve_3d parametric_surface_with_defects performance_with_large_surface surface_branch_glue surface_plot_annular_edge surface_plot_corner surface_plot_edge surface_plot_step surface_with_normals trefoil vector_field_3d flat_test_tree_01 nan_solver rect_fix_dup rect_fix_nan segment_folder triangle_folder check_cell_hexahedron check_cell_pyramid check_cell_quad check_cell_segment check_cell_triangle geomi_pnt_line_distance geomi_seg_isect_type geomr_pnt_line_distance geomr_pnt_pln_distance geomr_pnt_tri_distance)
 
 # Targets listed here require MRaster to build --- *grep -El '(ramCanvas|MRcolor)\.hpp' */*.cpp | xargs basename -as .cpp | xargs -n 1000 echo
-set(REQ_MRASTER complex_magnitude_surface cplxColor hello_MRaster)
+set(REQ_MRASTER complex_magnitude_surface complex_color_image hello_MRaster)
 
 # Add a target for each one we can build
 foreach(CURTGT IN LISTS TARGETS)
